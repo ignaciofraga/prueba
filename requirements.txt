@@ -1,0 +1,3 @@
+SQLAlchemy
+streamlit
+streamlit-aggrid
