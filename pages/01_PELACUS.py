@@ -8,21 +8,17 @@ Created on Fri Aug  5 08:44:36 2022
 
 
 import pandas 
-import sys
 
 from pages.COMUNES.FUNCIONES_AUXILIARES import pagina_programa
 
 pandas.options.mode.chained_assignment = None
 
-# Define las rutas de los directorios
-dir_base = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/WEB'
-sys.path.append(dir_base)
 
 # Carga el modulo con las funciones comunes
 #import FUNCIONES_AUXILIARES
 
 # Carga los parámetros de la base de datos y de estilo
-archivo_parametros = dir_base + '/DATOS/DATOS_GENERALES.xlsx'
+archivo_parametros = '/DATOS/DATOS_GENERALES.xlsx'
 xls                = pandas.ExcelFile(archivo_parametros)
 df_base_datos      = pandas.read_excel(xls, 'BASE_DATOS')
 df_estilos         = pandas.read_excel(xls, 'ESTILOS')
@@ -39,7 +35,7 @@ listado_colores = df_estilos['Color']
 
 
 # Llama a la funcion que construye la página
-FUNCIONES_AUXILIARES.pagina_programa('PELACUS',listado_estados,listado_colores,base_datos,usuario,contrasena,puerto)
+pagina_programa('PELACUS',listado_estados,listado_colores,base_datos,usuario,contrasena,puerto)
 
 
 
