@@ -18,7 +18,7 @@ pandas.options.mode.chained_assignment = None
 #import FUNCIONES_AUXILIARES
 
 # Carga los parámetros de la base de datos y de estilo
-archivo_parametros = '/DATOS/DATOS_GENERALES.xlsx'
+archivo_parametros = 'DATOS/DATOS_GENERALES.xlsx'
 xls                = pandas.ExcelFile(archivo_parametros)
 df_base_datos      = pandas.read_excel(xls, 'BASE_DATOS')
 df_estilos         = pandas.read_excel(xls, 'ESTILOS')
