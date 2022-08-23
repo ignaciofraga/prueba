@@ -20,10 +20,32 @@ pandas.options.mode.chained_assignment = None
 
 def pagina_programa(nombre_programa,listado_estados,listado_colores,base_datos,usuario,contrasena,puerto):
 
+    
+
+    # Initialize connection.
+    # Uses st.experimental_singleton to only run once.
+    @st.experimental_singleton
+    def init_connection():
+        return psycopg2.connect(**st.secrets["postgres"])
+    
+    conn = init_connection()
+    
+    # Perform query.
+    # Uses st.experimental_memo to only rerun when the query changes or after 10 min.
+    @st.experimental_memo(ttl=600)
+    def run_query(query):
+        with conn.cursor() as cur:
+            cur.execute(query)
+            return cur.fetchall()
+    
+#    rows = run_query("SELECT * from mytable;")
+
+
+
         
     ### Consulta a la base de datos las fechas de los distintos procesos
     
-    conn   = psycopg2.connect(database=base_datos, user=usuario, password=contrasena, port=puerto)
+    #conn   = psycopg2.connect(database=base_datos, user=usuario, password=contrasena, port=puerto)
     cursor = conn.cursor()
     
     # Identificador del programa (PELACUS en este caso)
