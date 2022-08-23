@@ -9,6 +9,9 @@ Created on Fri Aug  5 08:44:36 2022
 
 import pandas 
 import sys
+
+from pages.COMUNES.FUNCIONES_AUXILIARES import pagina_programa
+
 pandas.options.mode.chained_assignment = None
 
 # Define las rutas de los directorios
@@ -16,7 +19,7 @@ dir_base = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/WEB'
 sys.path.append(dir_base)
 
 # Carga el modulo con las funciones comunes
-import FUNCIONES_AUXILIARES
+#import FUNCIONES_AUXILIARES
 
 # Carga los parámetros de la base de datos y de estilo
 archivo_parametros = dir_base + '/DATOS/DATOS_GENERALES.xlsx'
