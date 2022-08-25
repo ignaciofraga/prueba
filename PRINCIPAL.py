@@ -17,7 +17,7 @@ st.set_page_config(page_title="Datos de nutrientes", layout="wide")
 st.title("Datos de nutrientes disponibles en el C.O de A Coruña")
 
 # Añade el logo del IEO
-logo_IEO = 'DATOS/IMAGENES/logo-CSIC.jpg'
+logo_IEO =  'C:/Users/ifraga/Desktop/03-DESARROLLOS/PRUEBA_WEB/prueba/' + 'DATOS/IMAGENES/logo-CSIC.jpg'
 imagen   = Image.open(logo_IEO)
 st.image(imagen)
 
