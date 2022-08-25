@@ -193,7 +193,15 @@ def pagina_programa(nombre_programa,listado_estados,listado_colores,base_datos):
         st.header("Listado de datos")
         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_visor)
         gb.configure_column("estado", cellStyle=cellsytle_jscode)
-    
+
+        gridOptions = gb.build()
+        
+        data = st_aggrid.AgGrid(
+            datos_visor,
+            gridOptions=gridOptions,
+            enable_enterprise_modules=True,
+            allow_unsafe_jscode=True
+            )    
 
     with col2:
         
