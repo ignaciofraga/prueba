@@ -39,7 +39,7 @@ listado_colores = df_estilos['Color']
 #pagina_programa('PELACUS',listado_estados,listado_colores,base_datos,usuario,contrasena,puerto)
 
 base_datos = 'DATOS/COAC.db'
-nombre_programa = 'PELACUS' # RADIAL CORUNA       
+nombre_programa = 'RADIAL CORUNA' # RADIAL CORUNA       
 
 pagina_programa(nombre_programa,listado_estados,listado_colores,base_datos)
 
