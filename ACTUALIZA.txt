@@ -1,0 +1,6 @@
+curl -i -X PUT -H 'Authorization: token 4d013330xxxxxxxxxxxxxx' -d "{\"path\": \"COAC.db\", \
+\"Actualizada base de datos COAC.db\": \"update\", \"content\": \"$(openssl base64 -A -in $/COAC.db)\", \"branch\": \"main\",\
+\"sha\": $(curl -X GET https://api.github.com/repos/ignaciofraga/prueba/contents/COAC.db | jq .sha)}" \
+https://api.github.com/repos/ignaciofraga/prueba/contents/COAC.db
+
+curl -X PUT -H "Authorization: token xxxxxxxxxxxxxxxxxxxx" https://api.github.com/repos/ignaciofraga/prueba/contents/DATOS/COAC.db -d "{\"message\":\"Actualizada base de datos\",\"content\":\"your file in BASE64\"}"
