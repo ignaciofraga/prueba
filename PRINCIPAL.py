@@ -15,7 +15,7 @@ logo_IEO_reducido  = 'DATOS/IMAGENES/IEO.png'
 
 
 # Encabezados y titulos 
-st.set_page_config(page_title="Datos de nutrientes", layout="wide",page_icon=logo_IEO_reducido) 
+st.set_page_config(page_title="Datos de nutrientes TR", layout="wide",page_icon=logo_IEO_reducido) 
 st.title("Datos de nutrientes disponibles en el C.O de A Coruña")
 
 # Añade el logo del IEO
