@@ -11,7 +11,7 @@ from PIL import Image
 
 
 logo_IEO_principal = 'DATOS/IMAGENES/logo-CSIC.jpg'
-logo_IEO_reducido  = 'DATOS/IMAGENES/IEO.jpg'
+logo_IEO_reducido  = 'DATOS/IMAGENES/ieo.jpg'
 
 
 # Encabezados y titulos 
