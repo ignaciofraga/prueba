@@ -24,11 +24,11 @@ puerto_postgresql     = '5432'
 base_datos_sqlite  = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/COAC.db'
 
 # import base64
-# from github import Github
+from github import Github
 # from github import InputGitTreeElement
 #import github
 
-from github.MainClass import Github, GithubIntegration
+#from github.MainClass import Github, GithubIntegration
 
 user = "ignaciofraga"
 password = "Nacho_1985"
@@ -50,8 +50,19 @@ contents = repo.get_contents("")
 for content_file in contents:
     print(content_file)
 
+import base64
+contents = repo.get_contents("/requirements.txt", ref="main")
+repo.update_file('/requirements.txt', 'lele','texto', contents.sha)
+
+#update_file(path, message, content, sha, branch=NotSet, committer=NotSet, author=NotSet)
+
+# import github
+# g = github.Github(user, password)
+# repo = g.get_user().get_repo("ignaciofraga/prueba")
+# file = repo.get_file_contents("/your_file.txt")
+
 #repo.create_file('/test', 'commit message', 'content of the file', branch='main')
-repo.update()
+#repo.update_file('/requirements.txt','actualizado requirements','nuevo')
 # contents = repo.get_file_contents("requirements.txt")
 # print(contents)
 
