@@ -70,7 +70,7 @@ def pagina_programa(nombre_programa,listado_estados,listado_colores,base_datos,l
     ### Encabezados y titulos 
     titulo = 'Campaña ' + nombre_programa
     st.set_page_config(page_title=nombre_programa, layout="wide",page_icon=logo_IEO_reducido) 
-    #st.title(titulo)
+    st.title(titulo)
 
 
 
