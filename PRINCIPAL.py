@@ -13,6 +13,7 @@ from PIL import Image
 logo_IEO_principal = 'DATOS/IMAGENES/logo-CSIC.jpg'
 logo_IEO_reducido  = 'DATOS/IMAGENES/IEO.png'
 
+
 # Encabezados y titulos 
 st.set_page_config(page_title="Datos de nutrientes", layout="wide",page_icon=logo_IEO_reducido) 
 st.title("Datos de nutrientes disponibles en el C.O de A Coruña")
