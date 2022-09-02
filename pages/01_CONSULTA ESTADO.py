@@ -210,108 +210,115 @@ else:
         buf = BytesIO()
         fig.savefig(buf, format="png",bbox_inches='tight')
         st.image(buf)
+
+        # Condicional para realizar el procesado sólo si hay datos disponibles         
+        if datos_disponibles.shape[0] == 0:
+            
+            st.warning('En la fecha consultada no había ningún dato disponible', icon="⚠️")
+            
+        else:
         
-        # Selecciona el año del que se quiere descargar datos
-        seleccion = st.selectbox('Selecciona el año a descargar (entre los disponibles)',        
-            datos_disponibles['año'])
-    
-    
-        anho_consulta         = seleccion #☺datos_disponibles['año'][0]
-        fecha_inicio_consulta = datetime.date(anho_consulta,1,1)
-        fecha_final_consulta  = datetime.date(anho_consulta+1,1,1)
-    
-        
-        # Primero recupera los registros correspondientes al periodo evaluado y al año consultado
-        conn = init_connection()
-        cursor = conn.cursor()
-        instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos INNER JOIN estaciones ON muestreos_discretos.estacion = estaciones.id_estacion WHERE estaciones.programa = %s AND muestreos_discretos.fecha_muestreo >= %s AND muestreos_discretos.fecha_muestreo < %s;"
-        cursor.execute(instruccion_sql,(id_programa,fecha_inicio_consulta,fecha_final_consulta))
-        #registros_consulta =cursor.fetchall()
-        registros_consulta = [r[0] for r in cursor.fetchall()]
-        conn.commit()
-        cursor.close()
-        conn.close()
-        
-        indices_dataframe         = numpy.arange(0,len(registros_consulta),1,dtype=int)
-        
-        # A continuacion recupera las tablas de estaciones, muestreos, datos biogeoquimicos y físicos
-        
-        conn = init_connection()
-        
-        temporal_estaciones          = psql.read_sql('SELECT * FROM estaciones', conn)
-        
-        temporal_muestreos           = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-     
-        temporal_datos_biogeoquimica = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-        
-        temporal_datos_fisica        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
-               
-        conn.close()    
-              
-        # Compón dataframes con los registros que interesan y elimina el temporal, para reducir la memoria ocupada
-        # En cada dataframe hay que re-definir el indice del registro para luego poder juntar los 3 dataframes 
-        datos_biogeoquimicos            = temporal_datos_biogeoquimica[temporal_datos_biogeoquimica['muestreo'].isin(registros_consulta)]
-        datos_biogeoquimicos['id_temp'] = indices_dataframe
-        datos_biogeoquimicos.set_index('id_temp',drop=True,append=False,inplace=True)
-        del(temporal_datos_biogeoquimica)
-        datos_biogeoquimicos = datos_biogeoquimicos.drop(columns=['id_disc_biogeoquim','muestreo'])
-        
-        datos_fisicos = temporal_datos_fisica[temporal_datos_fisica['muestreo'].isin(registros_consulta)]
-        datos_fisicos['id_temp'] = indices_dataframe
-        datos_fisicos.set_index('id_temp',drop=True,append=False,inplace=True) 
-        del(temporal_datos_fisica)
-        datos_fisicos = datos_fisicos.drop(columns=['id_disc_fisica','muestreo'])
-        
-        datos_muestreo = temporal_muestreos[temporal_muestreos['id_muestreo'].isin(registros_consulta)]
-        datos_muestreo['id_temp'] = indices_dataframe
-        datos_muestreo.set_index('id_temp',drop=True,append=False,inplace=True)      
-        datos_muestreo = datos_muestreo.drop(columns=['id_muestreo','configuracion_perfilador','configuracion_superficie'])
-        datos_muestreo['fecha_muestreo'] = pandas.to_datetime(datos_muestreo['fecha_muestreo']).dt.date
-        #datos_muestreo['hora_muestreo'] = datos_muestreo['hora_muestreo'].apply(lambda x: x.replace(tzinfo=None))   
-        try:
-            datos_muestreo['hora_muestreo'] = datos_muestreo['hora_muestreo'].apply(lambda x: x.replace(tzinfo=None))   
-        except:
-            pass
-    
-        del(temporal_muestreos)
+            # Selecciona el año del que se quiere descargar datos
+            seleccion = st.selectbox('Selecciona el año a descargar (entre los disponibles)',        
+                datos_disponibles['año'])
         
         
+            anho_consulta         = seleccion #☺datos_disponibles['año'][0]
+            fecha_inicio_consulta = datetime.date(anho_consulta,1,1)
+            fecha_final_consulta  = datetime.date(anho_consulta+1,1,1)
         
-        # Añade las coordenadas de cada muestreo, a partir de la estación asociada
-        datos_muestreo['latitud']  = numpy.zeros(datos_muestreo.shape[0])
-        datos_muestreo['longitud'] = numpy.zeros(datos_muestreo.shape[0])    
-        for iregistro in range(datos_muestreo.shape[0]):
-            datos_muestreo['latitud'][iregistro] = temporal_estaciones['latitud'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]]
-            datos_muestreo['longitud'][iregistro] = temporal_estaciones['longitud'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]]  
-        del(temporal_estaciones)
-        datos_muestreo = datos_muestreo.drop(columns=['estacion'])
-        
-        # Une los dataframes resultantes
-        datos_compuesto = pandas.concat([datos_muestreo, datos_fisicos, datos_biogeoquimicos], axis=1, join='inner')
+            
+            # Primero recupera los registros correspondientes al periodo evaluado y al año consultado
+            conn = init_connection()
+            cursor = conn.cursor()
+            instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos INNER JOIN estaciones ON muestreos_discretos.estacion = estaciones.id_estacion WHERE estaciones.programa = %s AND muestreos_discretos.fecha_muestreo >= %s AND muestreos_discretos.fecha_muestreo < %s;"
+            cursor.execute(instruccion_sql,(id_programa,fecha_inicio_consulta,fecha_final_consulta))
+            #registros_consulta =cursor.fetchall()
+            registros_consulta = [r[0] for r in cursor.fetchall()]
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+            indices_dataframe         = numpy.arange(0,len(registros_consulta),1,dtype=int)
+            
+            # A continuacion recupera las tablas de estaciones, muestreos, datos biogeoquimicos y físicos
+            
+            conn = init_connection()
+            
+            temporal_estaciones          = psql.read_sql('SELECT * FROM estaciones', conn)
+            
+            temporal_muestreos           = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
          
-        # Reemplaza los NaN por None
-        datos_compuesto = datos_compuesto.replace({numpy.nan:None})
+            temporal_datos_biogeoquimica = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+            
+            temporal_datos_fisica        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+                   
+            conn.close()    
+                  
+            # Compón dataframes con los registros que interesan y elimina el temporal, para reducir la memoria ocupada
+            # En cada dataframe hay que re-definir el indice del registro para luego poder juntar los 3 dataframes 
+            datos_biogeoquimicos            = temporal_datos_biogeoquimica[temporal_datos_biogeoquimica['muestreo'].isin(registros_consulta)]
+            datos_biogeoquimicos['id_temp'] = indices_dataframe
+            datos_biogeoquimicos.set_index('id_temp',drop=True,append=False,inplace=True)
+            del(temporal_datos_biogeoquimica)
+            datos_biogeoquimicos = datos_biogeoquimicos.drop(columns=['id_disc_biogeoquim','muestreo'])
+            
+            datos_fisicos = temporal_datos_fisica[temporal_datos_fisica['muestreo'].isin(registros_consulta)]
+            datos_fisicos['id_temp'] = indices_dataframe
+            datos_fisicos.set_index('id_temp',drop=True,append=False,inplace=True) 
+            del(temporal_datos_fisica)
+            datos_fisicos = datos_fisicos.drop(columns=['id_disc_fisica','muestreo'])
+            
+            datos_muestreo = temporal_muestreos[temporal_muestreos['id_muestreo'].isin(registros_consulta)]
+            datos_muestreo['id_temp'] = indices_dataframe
+            datos_muestreo.set_index('id_temp',drop=True,append=False,inplace=True)      
+            datos_muestreo = datos_muestreo.drop(columns=['id_muestreo','configuracion_perfilador','configuracion_superficie'])
+            datos_muestreo['fecha_muestreo'] = pandas.to_datetime(datos_muestreo['fecha_muestreo']).dt.date
+            #datos_muestreo['hora_muestreo'] = datos_muestreo['hora_muestreo'].apply(lambda x: x.replace(tzinfo=None))   
+            try:
+                datos_muestreo['hora_muestreo'] = datos_muestreo['hora_muestreo'].apply(lambda x: x.replace(tzinfo=None))   
+            except:
+                pass
         
+            del(temporal_muestreos)
+            
+            
+            
+            # Añade las coordenadas de cada muestreo, a partir de la estación asociada
+            datos_muestreo['latitud']  = numpy.zeros(datos_muestreo.shape[0])
+            datos_muestreo['longitud'] = numpy.zeros(datos_muestreo.shape[0])    
+            for iregistro in range(datos_muestreo.shape[0]):
+                datos_muestreo['latitud'][iregistro] = temporal_estaciones['latitud'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]]
+                datos_muestreo['longitud'][iregistro] = temporal_estaciones['longitud'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]]  
+            del(temporal_estaciones)
+            datos_muestreo = datos_muestreo.drop(columns=['estacion'])
+            
+            # Une los dataframes resultantes
+            datos_compuesto = pandas.concat([datos_muestreo, datos_fisicos, datos_biogeoquimicos], axis=1, join='inner')
+             
+            # Reemplaza los NaN por None
+            datos_compuesto = datos_compuesto.replace({numpy.nan:None})
+            
+            
+             
+            ## Botón para exportar los resultados
+            nombre_archivo =  nombre_programa + str(anho_consulta) + '.xlsx'
         
-         
-        ## Botón para exportar los resultados
-        nombre_archivo =  nombre_programa + str(anho_consulta) + '.xlsx'
-    
-        output = BytesIO()
-        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-        datos_compuesto.to_excel(writer, index=False, sheet_name='DATOS')
-        workbook = writer.book
-        worksheet = writer.sheets['DATOS']
-        writer.save()
-        datos_exporta = output.getvalue()
-    
-        st.download_button(
-            label="DESCARGA LOS DATOS SELECCIONADOS",
-            data=datos_exporta,
-            file_name=nombre_archivo,
-            help= 'Descarga un archivo .csv con los datos solicitados',
-            mime="application/vnd.ms-excel"
-        )
+            output = BytesIO()
+            writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+            datos_compuesto.to_excel(writer, index=False, sheet_name='DATOS')
+            workbook = writer.book
+            worksheet = writer.sheets['DATOS']
+            writer.save()
+            datos_exporta = output.getvalue()
+        
+            st.download_button(
+                label="DESCARGA LOS DATOS SELECCIONADOS",
+                data=datos_exporta,
+                file_name=nombre_archivo,
+                help= 'Descarga un archivo .csv con los datos solicitados',
+                mime="application/vnd.ms-excel"
+            )
 
 
 
