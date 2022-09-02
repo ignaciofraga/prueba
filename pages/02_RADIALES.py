@@ -40,7 +40,7 @@ logo_IEO_reducido  = 'DATOS/IMAGENES/ieo.ico'
 #pagina_programa('PELACUS',listado_estados,listado_colores,base_datos,usuario,contrasena,puerto)
 
 base_datos = 'DATOS/COAC.db'
-nombre_programa = 'RADIAL CORUNA' # RADIAL CORUNA       
+nombre_programa = 'RADIAL CORUÑA' # RADIAL CORUNA       
 
 pagina_programa(nombre_programa,logo_IEO_reducido)
 
