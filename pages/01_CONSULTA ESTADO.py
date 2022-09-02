@@ -49,7 +49,7 @@ with st.form("Formulario seleccion"):
     submitted = st.form_submit_button("Enviar")
 
 # Recupera el identificador del programa seleccionado
-id_programa = df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa]
+id_programa = df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa][0]
 
 st.text(id_programa)
 
