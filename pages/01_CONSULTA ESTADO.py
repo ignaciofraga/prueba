@@ -71,7 +71,7 @@ temporal_estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
 conn.close()
 
 # Extrae los datos disponibles del programa consultado 
-estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['programa']==id_programa]
+estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['programa']==id_programa[0]]
 
 # Quita del dataframe las columnas con el identificador del programa y el número registro (no interesa mostrarlo en la web)
 estado_procesos_programa = estado_procesos_programa.drop(['id_proceso','programa'], axis = 1)
