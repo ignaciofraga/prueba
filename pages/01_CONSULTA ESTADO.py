@@ -37,7 +37,7 @@ st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO
 st.title('Servicio de consulta de información disponible del C.O de A Coruña')
 
 
-# Recupera la tabla de los programas disponibles estado de los procesos como un dataframe
+# Recupera la tabla de los programas disponibles como un dataframe
 conn = init_connection()
 df_programas = psql.read_sql('SELECT * FROM programas', conn)
 conn.close()

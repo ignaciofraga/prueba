@@ -39,7 +39,7 @@ df_programas = psql.read_sql('SELECT * FROM programas', conn)
 conn.close()
 
 # Listado del tipo de dato a introducir      
-listado_opciones = ['Análisis de laboratorio','Procesado o revisión de datos disponibles']
+listado_opciones = ['Análisis de laboratorio','Procesado o revisión de datos ya disponibles']
 
 # Despliega un formulario para elegir el programa y el tipo de información a insertar
 
@@ -90,21 +90,39 @@ st.write('')
 st.warning('Los archivos a subir deben ajustarse a la plantilla disponible más abajo', icon="⚠️")
 st.write('')
 
-## Botón para descargar la plantilla
-datos_plantilla = pandas.read_excel(archivo_plantilla, 'DATOS')
+#Division en dos columnas, una para la plantilla y otra para las instrucciones
+col1, col2 = st.columns(2,gap="medium")
 
-output = BytesIO()
-writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-datos_plantilla.to_excel(writer, index=False, sheet_name='DATOS')
-workbook = writer.book
-worksheet = writer.sheets['DATOS']
-writer.save()
-datos_exporta = output.getvalue()
+with col1:
+    
+    ## Botón para descargar la plantilla
+    datos_plantilla = pandas.read_excel(archivo_plantilla, 'DATOS')
+    
+    output = BytesIO()
+    writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+    datos_plantilla.to_excel(writer, index=False, sheet_name='DATOS')
+    workbook = writer.book
+    worksheet = writer.sheets['DATOS']
+    writer.save()
+    datos_exporta = output.getvalue()
+    
+    st.download_button(
+        label="DESCARGAR PLANTILLA",
+        data=datos_exporta,
+        file_name='Plantilla_datos.xlsx',
+        help= 'Descarga un archivo .xlsx de referencia para subir los datos solicitados',
+        mime="application/vnd.ms-excel"
+    )
 
-st.download_button(
-    label="DESCARGAR PLANTILLA",
-    data=datos_exporta,
-    file_name='Plantilla_datos.xlsx',
-    help= 'Descarga un archivo .xlsx de referencia para subir los datos solicitados',
-    mime="application/vnd.ms-excel"
-)
+with col2:
+
+    import os
+    import base64
+    def get_binary_file_downloader_html(bin_file, file_label='File'):
+        with open(bin_file, 'rb') as f:
+            data = f.read()
+        bin_str = base64.b64encode(data).decode()
+        href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{os.path.basename(bin_file)}">Download {file_label}</a>'
+        return href
+    
+    st.markdown(get_binary_file_downloader_html('photo.jpg', 'Picture'), unsafe_allow_html=True)
