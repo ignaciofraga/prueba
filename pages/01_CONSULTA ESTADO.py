@@ -29,16 +29,16 @@ conn = init_connection()
 df_programas = psql.read_sql('SELECT * FROM programas', conn)
 conn.close()
 
+# Despliega un formulario para elegir el programa a consultar
 with st.form("Formulario seleccion"):
-    st.write("Programa")
     programa_elegido  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
-
     # Botón de envío para confirmar selección
     submitted = st.form_submit_button("Enviar")
-    if submitted:
-        st.write("Resultado de la selección. Programa: ", programa_elegido)
 
+# Recupera el identificador del programa seleccionado
+id_programa = df_programas['id_programa'][df_programas['nombre_programa']==programa_elegido]
 
+st.text(id_programa)
 
 def pagina_programa(nombre_programa,logo_IEO_reducido):
 
