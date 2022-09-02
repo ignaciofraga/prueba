@@ -53,19 +53,17 @@ id_programa = df_programas['id_programa'][df_programas['nombre_programa']==nombr
 
 
 
-#def pagina_programa(nombre_programa,logo_IEO_reducido):
+### Consulta a la base de datos las fechas de los distintos procesos (muestreo, análisis y post-procesado)
 
-### Consulta a la base de datos las fechas de los distintos procesos
+#conn = init_connection()
+# cursor = conn.cursor()
 
-conn = init_connection()
-cursor = conn.cursor()
-
-# Recupera el identificador del programa en cuestión
-instruccion_sql = "SELECT id_programa FROM programas WHERE nombre_programa = '" + nombre_programa + "' ;"
-cursor.execute(instruccion_sql)
-id_programa =cursor.fetchone()[0]
-conn.commit()
-cursor.close()
+# # Recupera el identificador del programa en cuestión
+# instruccion_sql = "SELECT id_programa FROM programas WHERE nombre_programa = '" + nombre_programa + "' ;"
+# cursor.execute(instruccion_sql)
+# id_programa =cursor.fetchone()[0]
+# conn.commit()
+# cursor.close()
 
 # Recupera la tabla del estado de los procesos como un dataframe
 conn = init_connection()
