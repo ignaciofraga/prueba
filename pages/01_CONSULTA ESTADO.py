@@ -23,9 +23,18 @@ pandas.options.mode.chained_assignment = None
 logo_IEO_reducido  = 'DATOS/IMAGENES/ieo.ico'
 
 
+##### FUNCIONES AUXILIARES ######
+
 # Funcion para recuperar los parámetros de conexión a partir de los "secrets" establecidos en Streamlit
 def init_connection():
     return psycopg2.connect(**st.secrets["postgres"])
+
+
+##### WEB STREAMLIT #####
+
+### Encabezados y titulos 
+st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
+st.title('Servicio de consulta de información disponible del C.O de A Coruña')
 
 
 # Recupera la tabla de los programas disponibles estado de los procesos como un dataframe
@@ -78,11 +87,6 @@ estado_procesos_programa['id_temp'] = indices_dataframe
 estado_procesos_programa.set_index('id_temp',drop=True,append=False,inplace=True)
 
    
-### Encabezados y titulos 
-titulo = 'Campaña ' + nombre_programa
-st.set_page_config(page_title=nombre_programa, layout="wide",page_icon=logo_IEO_reducido) 
-st.title(titulo)
-
 ## Bara de selección de fecha de consulta. 
 num_semanas_intervalo = 12
 t_actual            = datetime.date.today()
