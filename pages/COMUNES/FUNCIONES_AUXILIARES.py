@@ -15,6 +15,8 @@ import datetime
 import numpy
 import psycopg2
 
+import pandas.io.sql as psql
+
 pandas.options.mode.chained_assignment = None
 
 # Funcion para recuperar los parámetros de conexión a partir de los "secrets" establecidos en Streamlit
@@ -39,11 +41,18 @@ def pagina_programa(nombre_programa,logo_IEO_reducido):
 
     # # Recupera la información de la tabla como un dataframe
     conn = init_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * From estado_procesos")
-    data = cursor.fetchall()
-    cols = [column[0] for column in data.description]
-    temporal_estado_procesos= pandas.DataFrame.from_records(data = data, columns = cols)
+    # cursor = conn.cursor()
+    # cursor.execute("SELECT * From estado_procesos")
+    # data = cursor.fetchall()
+    # cols = [column[0] for column in data.description]
+    # temporal_estado_procesos= pandas.DataFrame.from_records(data = data, columns = cols)
+
+    # temporal_estado_procesos = pandas.read_sql_query('select * from "estado_procesos"',conn=engine)
+
+
+    temporal_estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
+
+    
 
 
     # Extrae los datos disponibles del programa y quita del dataframe el identificador del programa y el registro
