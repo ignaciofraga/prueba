@@ -42,9 +42,10 @@ def pagina_programa(nombre_programa,logo_IEO_reducido):
     # # Recupera la información de la tabla como un dataframe
     conn = init_connection()
     cursor = conn.cursor()
-    query = cursor.execute("SELECT * From estado_procesos")
-    cols = [column[0] for column in query.description]
-    temporal_estado_procesos= pandas.DataFrame.from_records(data = query.fetchall(), columns = cols)
+    cursor.execute("SELECT * From estado_procesos")
+    data = cursor.fetchall()
+    cols = [column[0] for column in data.description]
+    temporal_estado_procesos= pandas.DataFrame.from_records(data = data, columns = cols)
 
 
     # Extrae los datos disponibles del programa y quita del dataframe el identificador del programa y el registro
