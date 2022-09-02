@@ -91,39 +91,35 @@ st.write('')
 st.warning('Los archivos a subir deben ajustarse a la plantilla disponible más abajo', icon="⚠️")
 st.write('')
 
-#Division en dos columnas, una para la plantilla y otra para las instrucciones
-col1, col2 = st.columns(2,gap="medium")
 
-with col1:
-    
-    ## Botón para descargar la plantilla
-    datos_plantilla = pandas.read_excel(archivo_plantilla, 'DATOS')
-    
-    output = BytesIO()
-    writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-    datos_plantilla.to_excel(writer, index=False, sheet_name='DATOS')
-    workbook = writer.book
-    worksheet = writer.sheets['DATOS']
-    writer.save()
-    datos_exporta = output.getvalue()
-    
-    st.download_button(
-        label="DESCARGAR PLANTILLA",
-        data=datos_exporta,
-        file_name='Plantilla_datos.xlsx',
-        help= 'Descarga un archivo .xlsx de referencia para subir los datos solicitados',
-        mime="application/vnd.ms-excel"
-    )
+   
+## Botón para descargar la plantilla
+datos_plantilla = pandas.read_excel(archivo_plantilla, 'DATOS')
 
-with col2:
+output = BytesIO()
+writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+datos_plantilla.to_excel(writer, index=False, sheet_name='DATOS')
+workbook = writer.book
+worksheet = writer.sheets['DATOS']
+writer.save()
+datos_exporta = output.getvalue()
 
-    with open(archivo_instrucciones, "rb") as fp:
-        btn = st.download_button(
-            label="DESCARGA INTRUCCIONES",
-            data=fp,
-            file_name="Instrucciones.zip",
-            help= 'Descarga un archivo con instrucciones para rellenar la plantilla de datos',
-            mime="application/zip"
-        )    
+st.download_button(
+    label="DESCARGAR PLANTILLA",
+    data=datos_exporta,
+    file_name='Plantilla_datos.xlsx',
+    help= 'Descarga un archivo .xlsx de referencia para subir los datos solicitados',
+    mime="application/vnd.ms-excel"
+)
+
+
+with open(archivo_instrucciones, "rb") as fp:
+    btn = st.download_button(
+        label="DESCARGA INTRUCCIONES",
+        data=fp,
+        file_name="Instrucciones.zip",
+        help= 'Descarga un archivo con instrucciones para rellenar la plantilla de datos',
+        mime="application/zip"
+    )    
 
 
