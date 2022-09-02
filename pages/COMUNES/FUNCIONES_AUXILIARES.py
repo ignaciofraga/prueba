@@ -21,8 +21,6 @@ pandas.options.mode.chained_assignment = None
 def init_connection():
     return psycopg2.connect(**st.secrets["postgres"])
 
-conn = init_connection()
-
 
 def pagina_programa(nombre_programa,logo_IEO_reducido):
 
