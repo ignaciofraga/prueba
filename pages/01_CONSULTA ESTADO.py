@@ -49,10 +49,9 @@ with st.form("Formulario seleccion"):
     submitted = st.form_submit_button("Enviar")
 
 # Recupera el identificador del programa seleccionado
-id_programa = df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa][1]
-
-st.text(id_programa)
-
+id_programa = df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa]
+st.text(id_programa[0])
+st.text(id_programa[1])
 ### Consulta a la base de datos las fechas de los distintos procesos (muestreo, análisis y post-procesado)
 
 #conn = init_connection()
