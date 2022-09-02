@@ -10,7 +10,7 @@ Created on Fri Aug  5 08:44:36 2022
 import pandas
 
 
-from pages.COMUNES.FUNCIONES_AUXILIARES_SQLITE import pagina_programa
+from pages.COMUNES.FUNCIONES_AUXILIARES import pagina_programa
 
 pandas.options.mode.chained_assignment = None
 
@@ -42,7 +42,7 @@ logo_IEO_reducido  = 'DATOS/IMAGENES/ieo.ico'
 base_datos = 'DATOS/COAC.db'
 nombre_programa = 'RADIAL CORUNA' # RADIAL CORUNA       
 
-pagina_programa(nombre_programa,listado_estados,listado_colores,base_datos,logo_IEO_reducido)
+pagina_programa(nombre_programa,logo_IEO_reducido)
 
 
 
