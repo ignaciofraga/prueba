@@ -36,9 +36,9 @@ with st.form("Formulario seleccion"):
     submitted = st.form_submit_button("Enviar")
 
 # Recupera el identificador del programa seleccionado
-id_programa = df_programas['id_programa'][df_programas['nombre_programa']==programa_elegido][0]
+id_programa = df_programas['id_programa'][df_programas['nombre_programa']==programa_elegido]
 
-st.text(id_programa)
+st.text(id_programa,id_programa +3)
 
 def pagina_programa(nombre_programa,logo_IEO_reducido):
 
