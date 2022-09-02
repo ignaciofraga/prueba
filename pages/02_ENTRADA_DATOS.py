@@ -17,7 +17,7 @@ import pandas.io.sql as psql
 
 logo_IEO_reducido     =  'DATOS/IMAGENES/ieo.ico'
 archivo_plantilla     =  'DATOS/PLANTILLA.xlsx'
-archivo_instrucciones =  'DATOS/INSTRUCCIONES_PLANTILLA.docx'
+archivo_instrucciones =  'DATOS/INSTRUCCIONES_PLANTILLA.zip'
 
 
 ##### FUNCIONES AUXILIARES ######
@@ -117,13 +117,13 @@ with col1:
 
 with col2:
 
-    import os
-    import base64
-    def get_binary_file_downloader_html(bin_file, file_label='File'):
-        with open(bin_file, 'rb') as f:
-            data = f.read()
-        bin_str = base64.b64encode(data).decode()
-        href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{os.path.basename(bin_file)}">Download {file_label}</a>'
-        return href
-    
-    st.markdown(get_binary_file_downloader_html(archivo_instrucciones, 'Picture'), unsafe_allow_html=True)
+    with open(archivo_instrucciones, "rb") as fp:
+        btn = st.download_button(
+            label="DESCARGA INTRUCCIONES",
+            data=fp,
+            file_name="Instrucciones.zip",
+            help= 'Descarga un archivo con instrucciones para rellenar la plantilla de datos',
+            mime="application/zip"
+        )    
+
+
