@@ -15,8 +15,9 @@ import pandas.io.sql as psql
 
 # DATOS BASE
 
-logo_IEO_reducido  =  'DATOS/IMAGENES/ieo.ico'
-archivo_plantilla  =  'DATOS/PLANTILLA.xlsx'
+logo_IEO_reducido     =  'DATOS/IMAGENES/ieo.ico'
+archivo_plantilla     =  'DATOS/PLANTILLA.xlsx'
+archivo_instrucciones =  'DATOS/INSTRUCCIONES_PLANTILLA.docx'
 
 
 ##### FUNCIONES AUXILIARES ######
@@ -125,4 +126,4 @@ with col2:
         href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{os.path.basename(bin_file)}">Download {file_label}</a>'
         return href
     
-    st.markdown(get_binary_file_downloader_html('photo.jpg', 'Picture'), unsafe_allow_html=True)
+    st.markdown(get_binary_file_downloader_html(archivo_instrucciones, 'Picture'), unsafe_allow_html=True)
