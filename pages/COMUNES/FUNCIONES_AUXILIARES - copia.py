@@ -31,25 +31,33 @@ def pagina_programa(nombre_programa,logo_IEO_reducido):
     conn = init_connection()
     cursor = conn.cursor()
 
-    # Recupera el identificador del programa en cuestión
+    # Identificador del programa (PELACUS en este caso)
     instruccion_sql = "SELECT id_programa FROM programas WHERE nombre_programa = '" + nombre_programa + "' ;"
     cursor.execute(instruccion_sql)
     id_programa =cursor.fetchone()[0]
     conn.commit()
     cursor.close()
-
-    # Recupera la tabla del estado de los procesos como un dataframe
-    conn = init_connection()
-    temporal_estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
     conn.close()
+
+    # # Recupera la información de la tabla como un dataframe
+    conn = init_connection()
+    # cursor = conn.cursor()
+    # cursor.execute("SELECT * From estado_procesos")
+    # data = cursor.fetchall()
+    # cols = [column[0] for column in data.description]
+    # temporal_estado_procesos= pandas.DataFrame.from_records(data = data, columns = cols)
+
+    # temporal_estado_procesos = pandas.read_sql_query('select * from "estado_procesos"',conn=engine)
+
+
+    temporal_estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
+
     
-    # Extrae los datos disponibles del programa consultado 
+
+
+    # Extrae los datos disponibles del programa y quita del dataframe el identificador del programa y el registro
     estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['programa']==id_programa]
-    
-    # Quita del dataframe las columnas con el identificador del programa y el número registro (no interesa mostrarlo en la web)
     estado_procesos_programa = estado_procesos_programa.drop(['id_proceso','programa'], axis = 1)
-    
-    # Reemplaza los nan por None
     estado_procesos_programa = estado_procesos_programa.fillna(numpy.nan).replace([numpy.nan], [None])
 
     # Actualiza el indice del dataframe 
@@ -57,14 +65,14 @@ def pagina_programa(nombre_programa,logo_IEO_reducido):
     estado_procesos_programa['id_temp'] = indices_dataframe
     estado_procesos_programa.set_index('id_temp',drop=True,append=False,inplace=True)
 
-    # ## Convierte las fechas a tiempos
-    # for idato in range(estado_procesos_programa.shape[0]):
-    #     if estado_procesos_programa['fecha_final_muestreo'][idato] is not None:
-    #         estado_procesos_programa['fecha_final_muestreo'][idato] = datetime.datetime.strptime(estado_procesos_programa['fecha_final_muestreo'][idato], '%Y-%m-%d').date()
-    #     if estado_procesos_programa['fecha_analisis_laboratorio'][idato] is not None:
-    #         estado_procesos_programa['fecha_analisis_laboratorio'][idato] = datetime.datetime.strptime(estado_procesos_programa['fecha_analisis_laboratorio'][idato], '%Y-%m-%d').date()
-    #     if estado_procesos_programa['fecha_post_procesado'][idato] is not None:    
-    #         estado_procesos_programa['fecha_post_procesado'][idato] = datetime.datetime.strptime(estado_procesos_programa['fecha_post_procesado'][idato], '%Y-%m-%d').date()
+    ## Convierte las fechas a tiempos
+    for idato in range(estado_procesos_programa.shape[0]):
+        if estado_procesos_programa['fecha_final_muestreo'][idato] is not None:
+            estado_procesos_programa['fecha_final_muestreo'][idato] = datetime.datetime.strptime(estado_procesos_programa['fecha_final_muestreo'][idato], '%Y-%m-%d').date()
+        if estado_procesos_programa['fecha_analisis_laboratorio'][idato] is not None:
+            estado_procesos_programa['fecha_analisis_laboratorio'][idato] = datetime.datetime.strptime(estado_procesos_programa['fecha_analisis_laboratorio'][idato], '%Y-%m-%d').date()
+        if estado_procesos_programa['fecha_post_procesado'][idato] is not None:    
+            estado_procesos_programa['fecha_post_procesado'][idato] = datetime.datetime.strptime(estado_procesos_programa['fecha_post_procesado'][idato], '%Y-%m-%d').date()
 
 
     ### Encabezados y titulos 
