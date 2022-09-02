@@ -217,30 +217,20 @@ def pagina_programa(nombre_programa,logo_IEO_reducido):
         
         indices_dataframe         = numpy.arange(0,len(registros_consulta),1,dtype=int)
         
-        # # A continuacion recupera las tablas de datos biogeoquimicos y físicos
+        # A continuacion recupera las tablas de estaciones, muestreos, datos biogeoquimicos y físicos
         
         conn = init_connection()
-        cursor = conn.cursor()
         
-        query = cursor.execute("SELECT * From estaciones")
-        cols = [column[0] for column in query.description]
-        temporal_estaciones= pandas.DataFrame.from_records(data = query.fetchall(), columns = cols)
+        temporal_estaciones          = psql.read_sql('SELECT * FROM estaciones', conn)
         
-        query = cursor.execute("SELECT * From muestreos_discretos")
-        cols = [column[0] for column in query.description]
-        temporal_muestreos= pandas.DataFrame.from_records(data = query.fetchall(), columns = cols)
-                
-        query = cursor.execute("SELECT * From datos_discretos_biogeoquimica")
-        cols = [column[0] for column in query.description]
-        temporal_datos_biogeoquimica= pandas.DataFrame.from_records(data = query.fetchall(), columns = cols)
-                    
-        query = cursor.execute("SELECT * From datos_discretos_fisica")
-        cols = [column[0] for column in query.description]
-        temporal_datos_fisica= pandas.DataFrame.from_records(data = query.fetchall(), columns = cols)
+        temporal_muestreos           = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+ 
+        temporal_datos_biogeoquimica = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
         
-        cursor.close()
+        temporal_datos_fisica        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+               
         conn.close()    
-      
+              
         # Compón dataframes con los registros que interesan y elimina el temporal, para reducir la memoria ocupada
         # En cada dataframe hay que re-definir el indice del registro para luego poder juntar los 3 dataframes 
         datos_biogeoquimicos            = temporal_datos_biogeoquimica[temporal_datos_biogeoquimica['muestreo'].isin(registros_consulta)]
