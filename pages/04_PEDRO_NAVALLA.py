@@ -35,3 +35,5 @@ cursor.close()
 conn.close()
 
 print(id_programa)
+
+st.text(id_programa[0])
