@@ -42,9 +42,21 @@ conn = init_connection()
 df_programas = psql.read_sql('SELECT * FROM programas', conn)
 conn.close()
 
-# Despliega un formulario para elegir el programa a consultar
+# Despliega un formulario para elegir el programa y la fecha a consultar
+
+## Bara de selección de fecha de consulta. 
+num_semanas_intervalo = 12
+t_actual            = datetime.date.today()
+t_inicial           = t_actual-datetime.timedelta(weeks=num_semanas_intervalo) 
+
+#tiempo_consulta = st.sidebar.slider("Selecciona fecha de consulta",min_value = t_inicial,max_value = t_actual,value = t_actual,step= datetime.timedelta(days=7),format="DD/MM/YYYY")
+#st.sidebar.write("Fecha consultada:", tiempo_consulta.strftime("%d-%m-%Y"))
+
+
 with st.form("Formulario seleccion"):
     nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
+    tiempo_consulta = st.slider("Selecciona fecha de consulta",min_value = t_inicial,max_value = t_actual,value = t_actual,step= datetime.timedelta(days=7),format="DD/MM/YYYY")
+
     # Botón de envío para confirmar selección
     submitted = st.form_submit_button("Enviar")
 
@@ -80,21 +92,9 @@ else:
     estado_procesos_programa.set_index('id_temp',drop=True,append=False,inplace=True)
     
        
-    ## Bara de selección de fecha de consulta. 
-    num_semanas_intervalo = 12
-    t_actual            = datetime.date.today()
-    t_inicial           = t_actual-datetime.timedelta(weeks=num_semanas_intervalo) 
+
     
-    tiempo_consulta = st.sidebar.slider(
-          "Selecciona fecha de consulta",
-          min_value = t_inicial,
-          max_value = t_actual,
-          value     = t_actual,
-          step      = datetime.timedelta(days=7),
-          format="DD/MM/YYYY")
-    st.sidebar.write("Fecha consultada:", tiempo_consulta.strftime("%d-%m-%Y"))
     
-    #tiempo_consulta = datetime.date(2019,12,5)
     
     ### Determina el estado de cada proceso, en la fecha seleccionada
     estado_procesos_programa['estado']    = ''
