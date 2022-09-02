@@ -64,7 +64,7 @@ estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['pr
 # Bucle if para desplegar información únicamente si hay información del programa seleccionado
 if estado_procesos_programa.shape[0] == 0:
     
-    st.text('No se dispone de información acerca del estado del programa de muestreo seleccionado')
+    st.warning('No se dispone de información acerca del estado del programa de muestreo seleccionado', icon="⚠️")
 
 else:
 
