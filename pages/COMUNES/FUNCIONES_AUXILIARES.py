@@ -57,22 +57,11 @@ def pagina_programa(nombre_programa,logo_IEO_reducido):
     estado_procesos_programa['id_temp'] = indices_dataframe
     estado_procesos_programa.set_index('id_temp',drop=True,append=False,inplace=True)
 
-    # ## Convierte las fechas a tiempos
-    # for idato in range(estado_procesos_programa.shape[0]):
-    #     if estado_procesos_programa['fecha_final_muestreo'][idato] is not None:
-    #         estado_procesos_programa['fecha_final_muestreo'][idato] = datetime.datetime.strptime(estado_procesos_programa['fecha_final_muestreo'][idato], '%Y-%m-%d').date()
-    #     if estado_procesos_programa['fecha_analisis_laboratorio'][idato] is not None:
-    #         estado_procesos_programa['fecha_analisis_laboratorio'][idato] = datetime.datetime.strptime(estado_procesos_programa['fecha_analisis_laboratorio'][idato], '%Y-%m-%d').date()
-    #     if estado_procesos_programa['fecha_post_procesado'][idato] is not None:    
-    #         estado_procesos_programa['fecha_post_procesado'][idato] = datetime.datetime.strptime(estado_procesos_programa['fecha_post_procesado'][idato], '%Y-%m-%d').date()
-
-
+   
     ### Encabezados y titulos 
     titulo = 'Campaña ' + nombre_programa
     st.set_page_config(page_title=nombre_programa, layout="wide",page_icon=logo_IEO_reducido) 
     st.title(titulo)
-
-
 
     ## Bara de selección de fecha de consulta. 
     num_semanas_intervalo = 12
@@ -152,7 +141,7 @@ def pagina_programa(nombre_programa,logo_IEO_reducido):
 
 
     # Genera un subset del dataframe con los años en los que hay datos, entre los que se seleccionará la fecha a descargar
-    datos_disponibles = estado_procesos_programa.loc[estado_procesos_programa['id_estado'] >= 3]
+    datos_disponibles = estado_procesos_programa.loc[estado_procesos_programa['id_estado'] >= 2]
 
     # Genera un dataframe con las columnas que se quieran mostrar en la web
     datos_visor = estado_procesos_programa.drop(columns=['nombre_programa','fecha_final_muestreo','fecha_analisis_laboratorio','fecha_post_procesado','id_estado','contacto_muestreo','contacto_post_procesado'])
