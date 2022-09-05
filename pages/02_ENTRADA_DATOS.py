@@ -13,6 +13,8 @@ import pandas
 from io import BytesIO
 import pandas.io.sql as psql
 
+from pages.COMUNES import FUNCIONES_INSERCION
+
 # DATOS BASE
 
 logo_IEO_reducido     =  'DATOS/IMAGENES/ieo.ico'
@@ -38,6 +40,8 @@ st.title('Servicio de entrada de datos en la base de datos del C.O de A Coruña'
 conn = init_connection()
 df_programas = psql.read_sql('SELECT * FROM programas', conn)
 conn.close()
+
+st.text(st.secrets["postgres"])
 
 # Listado del tipo de dato a introducir      
 listado_opciones = ['Análisis de laboratorio','Procesado o revisión de datos ya disponibles']
@@ -66,14 +70,45 @@ for iorigen in range(len(listado_opciones)):
         id_opcion_elegida = iorigen
 
 
-### Subida de archivos
+# ### Subida de archivos
 
-# Boton para subir los archivos de datos
-uploaded_files = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)
-for uploaded_file in uploaded_files:
-     bytes_data = uploaded_file.read()
-     st.write("Archivo subido:", uploaded_file.name)
-     st.write(bytes_data)
+# # Boton para subir los archivos de datos
+# uploaded_files = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)
+# for uploaded_file in uploaded_files:
+#     bytes_data = uploaded_file.read()
+#     st.write("Archivo subido:", uploaded_file.name)
+#     st.write(bytes_data)
+
+#     if id_programa_elegido == 1:
+        
+#         datos = lectura_datos_pelacus(nombre_archivo,base_datos,usuario,contrasena,puerto)
+
+#     # Lectura de los archivos subidos
+#     print('Leyendo los datos contenidos en el archivo excel')
+#     datos_radiales = FUNCIONES_INSERCION.lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    
+    
+#     # Realiza un control de calidad primario a los datos importados   
+#     print('Realizando control de calidad')
+#     datos_radiales_corregido = FUNCIONES_INSERCION.control_calidad(datos_radiales,archivo_variables_base_datos)  
+     
+#     # Recupera el identificador del programa de muestreo
+#     id_programa = FUNCIONES_INSERCION.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+#     # Introduce los datos en la base de datos
+#     print('Introduciendo los datos en la base de datos')
+#     FUNCIONES_INSERCION.inserta_datos(datos_radiales_corregido,min_dist,programa_muestreo,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+          
+#     # Actualiza estado
+#     print('Actualizando el estado de los procesos')
+#     FUNCIONES_INSERCION.actualiza_estado(datos_radiales_corregido,id_programa,programa_muestreo,itipo_informacion,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    
+    
+
+
+
 
 
 
