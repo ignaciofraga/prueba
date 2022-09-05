@@ -134,6 +134,9 @@ for archivo_subido in listado_archivos_subidos:
     id_programa = id_programa_elegido
     nombre_programa = programa_elegido
  
+    texto ='init' + (datetime.datetime.now()).strftime('%H:%M:%S')
+    st.text(texto)   
+ 
     ### IDENTIFICA LAS ESTACIONES MUESTREADAS Y EVALUA SI YA EXISTEN EN LA BASE DE DATOS (TABLA ESTACIONES)
     
     datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
@@ -193,7 +196,8 @@ for archivo_subido in listado_archivos_subidos:
     cursor.close()
     conn.close()
     
-    st.text('estaciones',datetime.datetime.now())
+    texto ='estaciones' + (datetime.datetime.now()).strftime('%H:%M:%S')
+    st.text(texto)
      
     ### DETERMINA EL NUMERO DE REGISTRO DE CADA MUESTREO 
     
@@ -263,8 +267,11 @@ for archivo_subido in listado_archivos_subidos:
     
     cursor.close()
     conn.close()     
-  
-    st.text('registros',datetime.datetime.now())    
+
+    
+    texto ='registros' + (datetime.datetime.now()).strftime('%H:%M:%S')
+    st.text(texto)
+   
   
     
   
