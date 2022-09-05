@@ -83,13 +83,11 @@ puerto         = st.secrets["postgres"].port
 # Boton para subir los archivos de datos
 uploaded_files = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)
 for uploaded_file in uploaded_files:
-    bytes_data = uploaded_file.read()
     st.write("Archivo subido:", uploaded_file.name)
-    st.write(bytes_data)
 
     if id_programa_elegido == 1:
         
-        datos = FUNCIONES_INSERCION.lectura_datos_pelacus(uploaded_file.name,base_datos,usuario,contrasena,puerto)
+        datos = FUNCIONES_INSERCION.lectura_datos_pelacus(uploaded_file,base_datos,usuario,contrasena,puerto)
 
 #     # Lectura de los archivos subidos
 #     print('Leyendo los datos contenidos en el archivo excel')
