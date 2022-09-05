@@ -17,10 +17,11 @@ from pages.COMUNES import FUNCIONES_INSERCION
 
 # DATOS BASE
 
-logo_IEO_reducido     =  'DATOS/IMAGENES/ieo.ico'
-archivo_plantilla     =  'DATOS/PLANTILLA.xlsx'
-archivo_instrucciones =  'DATOS/INSTRUCCIONES_PLANTILLA.zip'
-
+logo_IEO_reducido            =  'DATOS/IMAGENES/ieo.ico'
+archivo_plantilla            =  'DATOS/PLANTILLA.xlsx'
+archivo_instrucciones        =  'DATOS/INSTRUCCIONES_PLANTILLA.zip'
+archivo_variables_base_datos =  'DATOS/VARIABLES.xlsx'
+min_dist          = 50 # minima distancia para considerar dos estaciones diferentes
 
 ##### FUNCIONES AUXILIARES ######
 
@@ -85,29 +86,20 @@ listado_archivos_subidos = st.file_uploader("Arrastra los archivos a insertar en
 for archivo_subido in listado_archivos_subidos:
     st.write("Archivo subido:", archivo_subido.name)
 
-    if id_programa_elegido == 1:
+    if id_programa_elegido == 1: # Programa PELACUS
         
         datos = FUNCIONES_INSERCION.lectura_datos_pelacus(archivo_subido)
 
-        st.text(datos['fecha_muestreo'][0])        
-        st.text(id_programa_elegido)
-
-#     # Lectura de los archivos subidos
-#     print('Leyendo los datos contenidos en el archivo excel')
-#     datos_radiales = FUNCIONES_INSERCION.lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto)
+    if id_programa_elegido == 2 or id_programa_elegido == 3 or id_programa_elegido == 4:  # Programa Radiales (2-Vigo, 3-Coruña, 4-Santander)
     
+        datos = FUNCIONES_INSERCION.lectura_datos_radiales(archivo_subido,direccion_host,base_datos,usuario,contrasena,puerto)
     
-    
-#     # Realiza un control de calidad primario a los datos importados   
-#     print('Realizando control de calidad')
-#     datos_radiales_corregido = FUNCIONES_INSERCION.control_calidad(datos_radiales,archivo_variables_base_datos)  
+    # Realiza un control de calidad primario a los datos importados   
+    datos_corregidos = FUNCIONES_INSERCION.control_calidad(datos,archivo_variables_base_datos)  
      
-#     # Recupera el identificador del programa de muestreo
-#     id_programa = FUNCIONES_INSERCION.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
-    
-#     # Introduce los datos en la base de datos
-#     print('Introduciendo los datos en la base de datos')
-#     FUNCIONES_INSERCION.inserta_datos(datos_radiales_corregido,min_dist,programa_muestreo,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+    # Introduce los datos en la base de datos
+
+    FUNCIONES_INSERCION.inserta_datos(datos_corregidos,min_dist,programa_elegido,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
           
 #     # Actualiza estado
 #     print('Actualizando el estado de los procesos')
