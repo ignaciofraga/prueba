@@ -45,10 +45,18 @@ st.text(st.secrets["postgres"])
 
 direccion_host = st.secrets["postgres"].host
 st.text(direccion_host)
-# base_datos
-# usuario
-# contrasena
-# puerto
+
+base_datos  = st.secrets["postgres"].dbname
+st.text(base_datos)
+
+usuario     = st.secrets["postgres"].user
+st.text(usuario)
+
+contrasena  = st.secrets["postgres"].password
+st.text(contrasena)
+
+puerto      = st.secrets["postgres"].port
+st.text(puerto)
 
 # Listado del tipo de dato a introducir      
 listado_opciones = ['Análisis de laboratorio','Procesado o revisión de datos ya disponibles']
