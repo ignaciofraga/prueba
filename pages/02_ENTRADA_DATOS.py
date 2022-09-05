@@ -97,7 +97,7 @@ for archivo_subido in listado_archivos_subidos:
     # Realiza un control de calidad primario a los datos importados   
     with st.spinner('Realizando control de calidad de los datos contenidos en el archivo subido'):
         datos_corregidos = FUNCIONES_INSERCION.control_calidad(datos,archivo_variables_base_datos)  
-    st.succes('Control de calidad realizado correctamente')
+    st.success('Control de calidad realizado correctamente')
 
     # with st.spinner('Insertando datos en la base de datos'):
      
