@@ -23,6 +23,13 @@ contrasena     = 'IEO2022'
 puerto         = '5432'
 direccion_host = 'localhost'
 
+
+base_datos     = 'COAC'
+usuario        = 'postgres'
+contrasena     = 'm0nt34lt0'
+puerto         = '5432'
+direccion_host = '193.146.155.99'
+
 # Parámetros
 min_dist          = 50 # minima distancia para considerar dos estaciones diferentes
 programa_muestreo = 'RADIAL CORUÑA'

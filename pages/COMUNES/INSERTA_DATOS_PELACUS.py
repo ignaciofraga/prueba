@@ -10,10 +10,17 @@ import pandas
 pandas.options.mode.chained_assignment = None
 
 # Parámetros de la base de datos
-base_datos = 'IEO_Coruna'
-usuario    = 'postgres'
-contrasena = 'IEO2022'
-puerto     = '5432'
+# base_datos = 'IEO_Coruna'
+# usuario    = 'postgres'
+# contrasena = 'IEO2022'
+# puerto     = '5432'
+
+base_datos     = 'COAC'
+usuario        = 'postgres'
+contrasena     = 'm0nt34lt0'
+puerto         = '5432'
+direccion_host = '193.146.155.99'
+
 
 # Parámetros
 min_dist          = 50 # minima distancia para considerar dos estaciones diferentes
@@ -33,7 +40,7 @@ email_contacto    = 'prueba@ieo.csic.es'
 
 # Carga los datos
 print('Leyendo los datos contenidos en la excel')
-datos_pelacus = FUNCIONES_INSERCION.lectura_datos_pelacus(archivo_datos,direccion_host,base_datos,usuario,contrasena,puerto)  
+datos_pelacus = FUNCIONES_INSERCION.lectura_datos_pelacus(archivo_datos)  
  
 # Realiza un control de calidad primario a los datos importados   
 print('Realizando control de calidad')
