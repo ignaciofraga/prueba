@@ -118,7 +118,7 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
 ######## FUNCION PARA LEER DATOS CON EL FORMATO DE CAMPAÑA PELACUS  ########
 ############################################################################ 
     
-def lectura_datos_pelacus(nombre_archivo,base_datos,usuario,contrasena,puerto):
+def lectura_datos_pelacus(nombre_archivo):
   
     # Importa el .xlsx
     datos_pelacus = pandas.read_excel(nombre_archivo, 'tabla_nutrientes',dtype={'hora': datetime.datetime})

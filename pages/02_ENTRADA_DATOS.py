@@ -81,15 +81,15 @@ contrasena     = st.secrets["postgres"].password
 puerto         = st.secrets["postgres"].port
 
 # Boton para subir los archivos de datos
-uploaded_files = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)
-for uploaded_file in uploaded_files:
-    st.write("Archivo subido:", uploaded_file.name)
+listado_archivos_subidos = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)
+for archivo_subido in listado_archivos_subidos:
+    st.write("Archivo subido:", archivo_subido.name)
 
     if id_programa_elegido == 1:
         
-        datos = FUNCIONES_INSERCION.lectura_datos_pelacus(uploaded_file,base_datos,usuario,contrasena,puerto)
+        datos = FUNCIONES_INSERCION.lectura_datos_pelacus(archivo_subido)
 
-        st.text(datos['fecha'][-1])        
+        st.text(datos['fecha_muestreo'][0])        
         st.text(id_programa_elegido)
 
 #     # Lectura de los archivos subidos
