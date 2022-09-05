@@ -137,6 +137,56 @@ for archivo_subido in listado_archivos_subidos:
     texto ='init' + (datetime.datetime.now()).strftime('%H:%M:%S')
     st.text(texto)   
  
+    # recupera las estaciones disponibles en la base de datos
+    conn = init_connection()
+    datos_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+    conn.close() 
+
+    # identifica la estación asociada a cada registro
+    datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+    proy_datos                = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
+     
+    for iregistro in range(datos.shape[0]): 
+        if datos_estaciones.shape[0] == 0:
+            datos['id_estacion_temp'][iregistro] = 1
+            datos_estaciones['nombre'] = datos['estacion']
+            datos_estaciones['nombre'] = datos['estacion']           
+            
+            nueva_estacion = {'id_estacion':1,'nombre_estacion':datos['estacion'][iregistro], 'latitud':datos['latitud'][iregistro], 'longitud':datos['longitud'][iregistro], 'programa':id_programa}
+            datos_estaciones = datos_estaciones.concat(nueva_estacion, ignore_index=True)
+
+        else:
+           vector_distancias      = numpy.zeros(datos_estaciones.shape[0])
+           vector_identificadores = numpy.zeros(datos_estaciones.shape[0],dtype=int)
+           
+           # Determina la distancia de cada registro a las estaciones incluidas en la base de datos
+           for iestacion_disponible in range(datos_estaciones.shape[0]):
+               x_muestreo, y_muestreo = proy_datos(datos['longitud'][iregistro], datos['latitud'][iregistro], inverse=False)
+               x_bd, y_bd             = proy_datos(datos_estaciones['longitud'][iestacion_disponible], datos_estaciones['latitud'][iestacion_disponible], inverse=False)
+               distancia              = math.sqrt((((x_muestreo-x_bd)**2) + ((y_muestreo-y_bd)**2)))
+               
+               vector_distancias[iestacion_disponible]      = distancia
+               vector_identificadores[iestacion_disponible] = int(datos_estaciones['id_estacion'][iestacion_disponible])
+               
+           # Si la distancia a alguna de las estaciones es menor a la distancia mínima, la estación ya está en la base de datos
+           if min(vector_distancias) <= min_dist :
+               ipos_minimo = numpy.argmin(vector_distancias)
+               datos['id_estacion_temp'][iregistro] = vector_identificadores[ipos_minimo]
+               
+           # En caso contrario, la estación es nueva y se añade a la base de datos
+           else:
+               indice_insercion = int(max(datos_estaciones['id_estacion']) + 1)
+ 
+               nueva_estacion = {'id_estacion':indice_insercion,'nombre_estacion':datos['estacion'][iregistro], 'latitud':datos['latitud'][iregistro], 'longitud':datos['longitud'][iregistro], 'programa':id_programa}
+               datos_estaciones = datos_estaciones.concat(nueva_estacion, ignore_index=True)
+
+             
+               datos['id_estacion_temp'][iregistro] = indice_insercion            
+ 
+    texto ='estaciones 1' + (datetime.datetime.now()).strftime('%H:%M:%S')
+    st.text(texto)   
+ 
+    
     ### IDENTIFICA LAS ESTACIONES MUESTREADAS Y EVALUA SI YA EXISTEN EN LA BASE DE DATOS (TABLA ESTACIONES)
     
     datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
@@ -196,7 +246,7 @@ for archivo_subido in listado_archivos_subidos:
     cursor.close()
     conn.close()
     
-    texto ='estaciones' + (datetime.datetime.now()).strftime('%H:%M:%S')
+    texto ='estaciones 2' + (datetime.datetime.now()).strftime('%H:%M:%S')
     st.text(texto)
      
     ### DETERMINA EL NUMERO DE REGISTRO DE CADA MUESTREO 
