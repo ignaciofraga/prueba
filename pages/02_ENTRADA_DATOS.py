@@ -145,7 +145,7 @@ for archivo_subido in listado_archivos_subidos:
     # identifica la estación asociada a cada registro
     datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
     proy_datos                = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
-     
+    
     for iregistro in range(datos.shape[0]): 
         if datos_estaciones.shape[0] == 0:
             datos['id_estacion_temp'][iregistro] = 1
@@ -181,7 +181,9 @@ for archivo_subido in listado_archivos_subidos:
                datos_estaciones = datos_estaciones.concat(nueva_estacion, ignore_index=True)
 
              
-               datos['id_estacion_temp'][iregistro] = indice_insercion            
+               datos['id_estacion_temp'][iregistro] = indice_insercion 
+               
+    datos_estaciones.to_sql('estaciones', con=conn, if_exists='replace', index=False)         
  
     texto ='estaciones 1' + (datetime.datetime.now()).strftime('%H:%M:%S')
     st.text(texto)   
