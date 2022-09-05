@@ -188,8 +188,8 @@ for archivo_subido in listado_archivos_subidos:
     con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     engine = create_engine(con_engine)
     st.text(con_engine)
-    engine = create_engine('postgresql://postgres:m0nt34lt0@193.146.155.99:5432/COAC')
-    datos_estaciones.to_sql('estaciones', engine, if_exists='replace')
+#   engine = create_engine('postgresql://postgres:m0nt34lt0@193.146.155.99:5432/COAC')
+    datos_estaciones.to_sql('estaciones 4', engine, if_exists='replace')
     
     # conn = init_connection()           
     # datos_estaciones.to_sql('estaciones', con=conn, if_exists='replace', index=False)         
