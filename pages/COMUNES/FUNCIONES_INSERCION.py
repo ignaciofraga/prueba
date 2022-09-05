@@ -830,44 +830,44 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 
 
-base_datos     = 'COAC'
-usuario        = 'postgres'
-contrasena     = 'm0nt34lt0'
-puerto         = '5432'
-direccion_host = '193.146.155.99'
+# base_datos     = 'COAC'
+# usuario        = 'postgres'
+# contrasena     = 'm0nt34lt0'
+# puerto         = '5432'
+# direccion_host = '193.146.155.99'
 
 
 
 
-listado_variables = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VARIABLES.xlsx'
+# listado_variables = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VARIABLES.xlsx'
 
     
   
-nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2015.xlsx'   
-datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
+# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2015.xlsx'   
+# datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
 
-nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
-datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
+# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
+# datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
 
-datos = control_calidad(datos_pelacus,listado_variables)  
-id_programa = 1
-min_dist = 50
-nombre_programa = "PELACUS"
+# datos = control_calidad(datos_pelacus,listado_variables)  
+# id_programa = 1
+# min_dist = 50
+# nombre_programa = "PELACUS"
 
-import pandas.io.sql as psql
-from sqlalchemy import create_engine
+# import pandas.io.sql as psql
+# from sqlalchemy import create_engine
 
-texto ='init' + (datetime.datetime.now()).strftime('%H:%M:%S')
+# texto ='init' + (datetime.datetime.now()).strftime('%H:%M:%S')
   
-print('inicia', datetime.datetime.now())
+# print('inicia', datetime.datetime.now())
 
-datos = evalua_estaciones(datos,min_dist,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+# datos = evalua_estaciones(datos,min_dist,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
-print('estaciones', datetime.datetime.now())
+# print('estaciones', datetime.datetime.now())
 
-datos = evalua_registros(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+# datos = evalua_registros(datos,direccion_host,base_datos,usuario,contrasena,puerto)
 
-print('registros', datetime.datetime.now())
+# print('registros', datetime.datetime.now())
 
 
 
