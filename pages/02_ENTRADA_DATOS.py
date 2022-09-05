@@ -182,10 +182,15 @@ for archivo_subido in listado_archivos_subidos:
 
              
                datos['id_estacion_temp'][iregistro] = indice_insercion 
+
+    from sqlalchemy import create_engine
+    engine = create_engine('postgresql://postgres:m0nt34lt0@193.146.155.99:5432/COAC')
+    datos_estaciones.to_sql('estaciones', engine,if_exists='replace')
+
     
-    conn = init_connection()           
-    datos_estaciones.to_sql('estaciones', con=conn, if_exists='replace', index=False)         
-    conn.close()  
+    # conn = init_connection()           
+    # datos_estaciones.to_sql('estaciones', con=conn, if_exists='replace', index=False)         
+    # conn.close()  
     
     texto ='estaciones 1' + (datetime.datetime.now()).strftime('%H:%M:%S')
     st.text(texto)   
