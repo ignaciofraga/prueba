@@ -71,9 +71,10 @@ id_programa_elegido = int(df_programas['id_programa'][df_programas['nombre_progr
 for iorigen in range(len(listado_opciones)):
     if listado_opciones[iorigen] == tipo_dato_elegido:
         id_opcion_elegida = iorigen
-
-if submitted is not Null:
-
+    
+    
+if submitted:
+    
     ### Subida de archivos
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
@@ -85,7 +86,6 @@ if submitted is not Null:
     
     # Boton para subir los archivos de datos
     listado_archivos_subidos = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)
-    
     for archivo_subido in listado_archivos_subidos:
         st.write("Archivo subido:", archivo_subido.name)
     
@@ -144,8 +144,8 @@ if submitted is not Null:
             texto_error = 'Error al actualizar las fechas de procesado en la base de datos'
             st.warning(texto_error, icon="⚠️")    
         
-
-
+    
+    
 
 
 
