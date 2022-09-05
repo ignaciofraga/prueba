@@ -89,6 +89,8 @@ for uploaded_file in uploaded_files:
         
         datos = FUNCIONES_INSERCION.lectura_datos_pelacus(uploaded_file,base_datos,usuario,contrasena,puerto)
 
+    st.text(datos['fecha'][-1])
+
 #     # Lectura de los archivos subidos
 #     print('Leyendo los datos contenidos en el archivo excel')
 #     datos_radiales = FUNCIONES_INSERCION.lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto)
