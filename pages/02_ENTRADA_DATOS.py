@@ -95,16 +95,12 @@ for archivo_subido in listado_archivos_subidos:
         datos = FUNCIONES_INSERCION.lectura_datos_radiales(archivo_subido,direccion_host,base_datos,usuario,contrasena,puerto)
     
     # Realiza un control de calidad primario a los datos importados   
-    with st.spinner('Realizando control de calidad de los datos contenidos en el archivo subido'):
-        datos_corregidos = FUNCIONES_INSERCION.control_calidad(datos,archivo_variables_base_datos)  
-    st.success('Control de calidad realizado correctamente')
+    datos_corregidos = FUNCIONES_INSERCION.control_calidad(datos,archivo_variables_base_datos)  
 
-    # with st.spinner('Insertando datos en la base de datos'):
-     
-    #     # Introduce los datos en la base de datos
-    #     FUNCIONES_INSERCION.inserta_datos(datos_corregidos,min_dist,programa_elegido,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
-
-    # st.success('Inserción terminada')
+    # Introduce los datos en la base de datos
+    with st.spinner('Insertando datos en la base de datos'):
+        FUNCIONES_INSERCION.inserta_datos(datos_corregidos,min_dist,programa_elegido,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+    st.success('Inserción terminada')
          
 #     # Actualiza estado
 #     print('Actualizando el estado de los procesos')
