@@ -13,7 +13,7 @@ import pandas
 from io import BytesIO
 import pandas.io.sql as psql
 
-from pages.COMUNES import FUNCIONES_INSERCION
+#from pages.COMUNES import FUNCIONES_INSERCION
 
 # DATOS BASE
 
