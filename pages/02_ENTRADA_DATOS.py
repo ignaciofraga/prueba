@@ -89,7 +89,8 @@ for uploaded_file in uploaded_files:
         
         datos = FUNCIONES_INSERCION.lectura_datos_pelacus(uploaded_file,base_datos,usuario,contrasena,puerto)
 
-    st.text(datos['fecha'][-1])
+        st.text(datos['fecha'][-1])        
+        st.text(id_programa_elegido)
 
 #     # Lectura de los archivos subidos
 #     print('Leyendo los datos contenidos en el archivo excel')
