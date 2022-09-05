@@ -187,7 +187,7 @@ for archivo_subido in listado_archivos_subidos:
     engine = create_engine('postgresql://postgres:m0nt34lt0@193.146.155.99:5432/COAC')
     #datos_estaciones.to_sql('estaciones 2', engine, if_exists='replace')
 
-    datos_estaciones.to_sql('estaciones 2', engine)
+    datos_estaciones.to_sql('estaciones 2', engine, if_exists='replace')
     
     # conn = init_connection()           
     # datos_estaciones.to_sql('estaciones', con=conn, if_exists='replace', index=False)         
