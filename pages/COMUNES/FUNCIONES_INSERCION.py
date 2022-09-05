@@ -630,106 +630,106 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 
 
-# base_datos     = 'COAC'
-# usuario        = 'postgres'
-# contrasena     = 'm0nt34lt0'
-# puerto         = '5432'
-# direccion_host = '193.146.155.99'
+base_datos     = 'COAC'
+usuario        = 'postgres'
+contrasena     = 'm0nt34lt0'
+puerto         = '5432'
+direccion_host = '193.146.155.99'
 
 
 
 
-# listado_variables = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VARIABLES.xlsx'
+listado_variables = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VARIABLES.xlsx'
 
     
   
-# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2015.xlsx'   
-# datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
+nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2015.xlsx'   
+datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
 
-# #nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
-# #datos_pelacus = lectura_datos_pelacus(nombre_archivo,base_datos,usuario,contrasena,puerto)    
+#nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
+#datos_pelacus = lectura_datos_pelacus(nombre_archivo,base_datos,usuario,contrasena,puerto)    
 
-# datos = control_calidad(datos_radiales,listado_variables)  
-# id_programa = 1
-# min_dist = 50
-# nombre_programa = "PELACUS"
+datos = control_calidad(datos_radiales,listado_variables)  
+id_programa = 1
+min_dist = 50
+nombre_programa = "PELACUS"
 
-# import pandas.io.sql as psql
-# from sqlalchemy import create_engine
+import pandas.io.sql as psql
+from sqlalchemy import create_engine
 
-# texto ='init' + (datetime.datetime.now()).strftime('%H:%M:%S')
+texto ='init' + (datetime.datetime.now()).strftime('%H:%M:%S')
   
  
-# # recupera las estaciones disponibles en la base de datos
-# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-# datos_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
-# conn.close() 
+# recupera las estaciones disponibles en la base de datos
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+datos_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+conn.close() 
 
-# # identifica la estación asociada a cada registro
-# datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
-# proy_datos                = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
+# identifica la estación asociada a cada registro
+datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+proy_datos                = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
 
-# for iregistro in range(datos.shape[0]): 
-#     if datos_estaciones.shape[0] == 0:
-#         datos['id_estacion_temp'][iregistro] = 1
-#         datos_estaciones['nombre'] = datos['estacion']
-#         datos_estaciones['nombre'] = datos['estacion']           
+for iregistro in range(datos.shape[0]): 
+    if datos_estaciones.shape[0] == 0:
+        datos['id_estacion_temp'][iregistro] = 1
+        datos_estaciones['nombre'] = datos['estacion']
+        datos_estaciones['nombre'] = datos['estacion']           
         
-#         nueva_estacion = {'id_estacion':1,'nombre_estacion':datos['estacion'][iregistro], 'latitud':datos['latitud'][iregistro], 'longitud':datos['longitud'][iregistro], 'programa':id_programa}
-#         datos_estaciones = datos_estaciones.concat(nueva_estacion, ignore_index=True)
+        nueva_estacion = {'id_estacion':1,'nombre_estacion':datos['estacion'][iregistro], 'latitud':datos['latitud'][iregistro], 'longitud':datos['longitud'][iregistro], 'programa':id_programa}
+        datos_estaciones = datos_estaciones.concat(nueva_estacion, ignore_index=True)
 
-#     else:
-#         vector_distancias      = numpy.zeros(datos_estaciones.shape[0])
-#         vector_identificadores = numpy.zeros(datos_estaciones.shape[0],dtype=int)
+    else:
+        vector_distancias      = numpy.zeros(datos_estaciones.shape[0])
+        vector_identificadores = numpy.zeros(datos_estaciones.shape[0],dtype=int)
        
-#         # Determina la distancia de cada registro a las estaciones incluidas en la base de datos
-#         for iestacion_disponible in range(datos_estaciones.shape[0]):
-#             x_muestreo, y_muestreo = proy_datos(datos['longitud'][iregistro], datos['latitud'][iregistro], inverse=False)
-#             x_bd, y_bd             = proy_datos(datos_estaciones['longitud'][iestacion_disponible], datos_estaciones['latitud'][iestacion_disponible], inverse=False)
-#             distancia              = math.sqrt((((x_muestreo-x_bd)**2) + ((y_muestreo-y_bd)**2)))
+        # Determina la distancia de cada registro a las estaciones incluidas en la base de datos
+        for iestacion_disponible in range(datos_estaciones.shape[0]):
+            x_muestreo, y_muestreo = proy_datos(datos['longitud'][iregistro], datos['latitud'][iregistro], inverse=False)
+            x_bd, y_bd             = proy_datos(datos_estaciones['longitud'][iestacion_disponible], datos_estaciones['latitud'][iestacion_disponible], inverse=False)
+            distancia              = math.sqrt((((x_muestreo-x_bd)**2) + ((y_muestreo-y_bd)**2)))
            
-#             vector_distancias[iestacion_disponible]      = distancia
-#             vector_identificadores[iestacion_disponible] = int(datos_estaciones['id_estacion'][iestacion_disponible])
+            vector_distancias[iestacion_disponible]      = distancia
+            vector_identificadores[iestacion_disponible] = int(datos_estaciones['id_estacion'][iestacion_disponible])
            
-#         # Si la distancia a alguna de las estaciones es menor a la distancia mínima, la estación ya está en la base de datos
-#         if min(vector_distancias) <= min_dist :
-#             ipos_minimo = numpy.argmin(vector_distancias)
-#             datos['id_estacion_temp'][iregistro] = vector_identificadores[ipos_minimo]
+        # Si la distancia a alguna de las estaciones es menor a la distancia mínima, la estación ya está en la base de datos
+        if min(vector_distancias) <= min_dist :
+            ipos_minimo = numpy.argmin(vector_distancias)
+            datos['id_estacion_temp'][iregistro] = vector_identificadores[ipos_minimo]
            
-#         # En caso contrario, la estación es nueva y se añade a la base de datos
-#         else:
-#             indice_insercion = int(max(datos_estaciones['id_estacion']) + 1)
+        # En caso contrario, la estación es nueva y se añade a la base de datos
+        else:
+            indice_insercion = int(max(datos_estaciones['id_estacion']) + 1)
  
-#             nueva_estacion = {'id_estacion':indice_insercion,'nombre_estacion':datos['estacion'][iregistro], 'latitud':datos['latitud'][iregistro], 'longitud':datos['longitud'][iregistro], 'programa':id_programa}
-#             datos_estaciones = datos_estaciones.concat(nueva_estacion, ignore_index=True)
+            nueva_estacion = {'id_estacion':indice_insercion,'nombre_estacion':datos['estacion'][iregistro], 'latitud':datos['latitud'][iregistro], 'longitud':datos['longitud'][iregistro], 'programa':id_programa}
+            datos_estaciones = datos_estaciones.concat(nueva_estacion, ignore_index=True)
 
          
-#             datos['id_estacion_temp'][iregistro] = indice_insercion 
+            datos['id_estacion_temp'][iregistro] = indice_insercion 
 
 
-# # Inserta las nuevas estaciones
-# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-# cursor = conn.cursor()
+# Inserta las nuevas estaciones
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()
 
-# for iestacion in range(datos_estaciones.shape[0]):
-#     datos_insercion = (int(datos_estaciones['id_estacion'][iestacion]),str(datos_estaciones['nombre_estacion'][iestacion]),round(datos_estaciones['latitud'][iestacion],4),round(datos_estaciones['longitud'][iestacion],4),int(id_programa))
-#     instruccion_sql = "INSERT INTO estaciones (id_estacion,nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
-#     cursor.execute(instruccion_sql, (datos_insercion))
-#     conn.commit() 
-# cursor.close()
-# conn.close()
+for iestacion in range(datos_estaciones.shape[0]):
+    datos_insercion = (int(datos_estaciones['id_estacion'][iestacion]),str(datos_estaciones['nombre_estacion'][iestacion]),round(datos_estaciones['latitud'][iestacion],4),round(datos_estaciones['longitud'][iestacion],4),int(id_programa))
+    instruccion_sql = "INSERT INTO estaciones (id_estacion,nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
+    cursor.execute(instruccion_sql, (datos_insercion))
+    conn.commit() 
+cursor.close()
+conn.close()
 
-# # con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-# # engine = create_engine(con_engine)
+# con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+# engine = create_engine(con_engine)
 
-# # #   engine = create_engine('postgresql://postgres:m0nt34lt0@193.146.155.99:5432/COAC')
-# # datos_estaciones.to_sql('estaciones', engine, if_exists='append', index = False)
+# #   engine = create_engine('postgresql://postgres:m0nt34lt0@193.146.155.99:5432/COAC')
+# datos_estaciones.to_sql('estaciones', engine, if_exists='append', index = False)
 
-# # conn = init_connection()           
-# # datos_estaciones.to_sql('estaciones', con=conn, if_exists='replace', index=False)         
-# # conn.close()  
+# conn = init_connection()           
+# datos_estaciones.to_sql('estaciones', con=conn, if_exists='replace', index=False)         
+# conn.close()  
 
-# texto ='estaciones 1' + (datetime.datetime.now()).strftime('%H:%M:%S')
+texto ='estaciones 1' + (datetime.datetime.now()).strftime('%H:%M:%S')
   
 
 
