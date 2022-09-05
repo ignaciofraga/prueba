@@ -184,18 +184,32 @@ for archivo_subido in listado_archivos_subidos:
              
                datos['id_estacion_temp'][iregistro] = indice_insercion 
 
+    texto ='estaciones 0 ' + (datetime.datetime.now()).strftime('%H:%M:%S')
+    st.text(texto)  
+    
+    # Inserta las nuevas estaciones
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor()
+    
+    for iestacion in range(datos_estaciones.shape[0]):
+        datos_insercion = (str(datos_estaciones['nombre_estacion'][iestacion]),round(datos_estaciones['latitud'][iestacion],4),round(datos_estaciones['longitud'][iestacion],4),int(id_programa))
+        instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
+        cursor.execute(instruccion_sql, (datos_insercion))
+        conn.commit() 
+    cursor.close()
+    conn.close()
 
-    con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    engine = create_engine(con_engine)
-    st.text(con_engine)
-#   engine = create_engine('postgresql://postgres:m0nt34lt0@193.146.155.99:5432/COAC')
-    datos_estaciones.to_sql('estaciones', engine, if_exists='replace')
+#     con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+#     engine = create_engine(con_engine)
+#     st.text(con_engine)
+# #   engine = create_engine('postgresql://postgres:m0nt34lt0@193.146.155.99:5432/COAC')
+#     datos_estaciones.to_sql('estaciones', engine, if_exists='replace')
     
-    # conn = init_connection()           
-    # datos_estaciones.to_sql('estaciones', con=conn, if_exists='replace', index=False)         
-    # conn.close()  
+#     # conn = init_connection()           
+#     # datos_estaciones.to_sql('estaciones', con=conn, if_exists='replace', index=False)         
+#     # conn.close()  
     
-    texto ='estaciones 1' + (datetime.datetime.now()).strftime('%H:%M:%S')
+    texto ='estaciones 1 ' + (datetime.datetime.now()).strftime('%H:%M:%S')
     st.text(texto)   
  
     
