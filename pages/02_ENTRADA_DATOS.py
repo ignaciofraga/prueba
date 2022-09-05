@@ -214,140 +214,140 @@ for archivo_subido in listado_archivos_subidos:
     st.text(texto)   
  
     
-    ### IDENTIFICA LAS ESTACIONES MUESTREADAS Y EVALUA SI YA EXISTEN EN LA BASE DE DATOS (TABLA ESTACIONES)
+    # ### IDENTIFICA LAS ESTACIONES MUESTREADAS Y EVALUA SI YA EXISTEN EN LA BASE DE DATOS (TABLA ESTACIONES)
     
-    datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+    # datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
     
-    proy_datos                = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
+    # proy_datos                = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
     
-    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    cursor = conn.cursor()
+    # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    # cursor = conn.cursor()
     
-    for iregistro in range(datos.shape[0]):  
+    # for iregistro in range(datos.shape[0]):  
     
-        # Busca el identificador de la estacion
-        instruccion_sql = 'SELECT id_estacion,longitud,latitud FROM estaciones WHERE programa = %s ;'
-        cursor.execute(instruccion_sql,(str(id_programa)))
-        estaciones_disponibles =cursor.fetchall()
-        conn.commit()     
+    #     # Busca el identificador de la estacion
+    #     instruccion_sql = 'SELECT id_estacion,longitud,latitud FROM estaciones WHERE programa = %s ;'
+    #     cursor.execute(instruccion_sql,(str(id_programa)))
+    #     estaciones_disponibles =cursor.fetchall()
+    #     conn.commit()     
         
-        # Si no hay registros de estaciones en la bas de datos, insertar la estación muestreada directamente
-        if len(estaciones_disponibles) == 0:
-            datos_insercion = (str(datos['estacion'][iregistro]),round(datos['latitud'][iregistro],4),round(datos['longitud'][iregistro],4),int(id_programa))
-            instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
-            cursor.execute(instruccion_sql, (datos_insercion))
-            conn.commit() 
+    #     # Si no hay registros de estaciones en la bas de datos, insertar la estación muestreada directamente
+    #     if len(estaciones_disponibles) == 0:
+    #         datos_insercion = (str(datos['estacion'][iregistro]),round(datos['latitud'][iregistro],4),round(datos['longitud'][iregistro],4),int(id_programa))
+    #         instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
+    #         cursor.execute(instruccion_sql, (datos_insercion))
+    #         conn.commit() 
     
-            datos['id_estacion_temp'][iregistro] = 1
+    #         datos['id_estacion_temp'][iregistro] = 1
         
-        # En caso contrario, buscar si hay una estación en el mismo punto (+- min_dist)
-        else:
+    #     # En caso contrario, buscar si hay una estación en el mismo punto (+- min_dist)
+    #     else:
             
-            vector_distancias      = numpy.zeros(len(estaciones_disponibles))
-            vector_identificadores = numpy.zeros(len(estaciones_disponibles),dtype=int)
+    #         vector_distancias      = numpy.zeros(len(estaciones_disponibles))
+    #         vector_identificadores = numpy.zeros(len(estaciones_disponibles),dtype=int)
             
-            # Determina la distancia de cada registro a las estaciones incluidas en la base de datos
-            for iestacion_disponible in range(len(estaciones_disponibles)):
-                x_muestreo, y_muestreo = proy_datos(datos['longitud'][iregistro], datos['latitud'][iregistro], inverse=False)
-                x_bd, y_bd             = proy_datos(float(estaciones_disponibles[iestacion_disponible][1]), float(float(estaciones_disponibles[iestacion_disponible][2])), inverse=False)
-                distancia              = math.sqrt((((x_muestreo-x_bd)**2) + ((y_muestreo-y_bd)**2)))
+    #         # Determina la distancia de cada registro a las estaciones incluidas en la base de datos
+    #         for iestacion_disponible in range(len(estaciones_disponibles)):
+    #             x_muestreo, y_muestreo = proy_datos(datos['longitud'][iregistro], datos['latitud'][iregistro], inverse=False)
+    #             x_bd, y_bd             = proy_datos(float(estaciones_disponibles[iestacion_disponible][1]), float(float(estaciones_disponibles[iestacion_disponible][2])), inverse=False)
+    #             distancia              = math.sqrt((((x_muestreo-x_bd)**2) + ((y_muestreo-y_bd)**2)))
                 
-                vector_distancias[iestacion_disponible]      = distancia
-                vector_identificadores[iestacion_disponible] = int(estaciones_disponibles[iestacion_disponible][0])
+    #             vector_distancias[iestacion_disponible]      = distancia
+    #             vector_identificadores[iestacion_disponible] = int(estaciones_disponibles[iestacion_disponible][0])
                 
-            # Si la distancia a alguna de las estaciones es menor a la distancia mínima, la estación ya está en la base de datos
-            if min(vector_distancias) <= min_dist :
-                ipos_minimo = numpy.argmin(vector_distancias)
-                datos['id_estacion_temp'][iregistro] = int(estaciones_disponibles[ipos_minimo][0])
+    #         # Si la distancia a alguna de las estaciones es menor a la distancia mínima, la estación ya está en la base de datos
+    #         if min(vector_distancias) <= min_dist :
+    #             ipos_minimo = numpy.argmin(vector_distancias)
+    #             datos['id_estacion_temp'][iregistro] = int(estaciones_disponibles[ipos_minimo][0])
                 
-            # En caso contrario, la estación es nueva y se añade a la base de datos
-            else:
-                indice_insercion = max(vector_identificadores) + 1
-                datos_insercion = (str(datos['estacion'][iregistro]),round(datos['latitud'][iregistro],4),round(datos['longitud'][iregistro],4),int(id_programa))
-                instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
-                cursor.execute(instruccion_sql, (datos_insercion))
-                conn.commit() 
+    #         # En caso contrario, la estación es nueva y se añade a la base de datos
+    #         else:
+    #             indice_insercion = max(vector_identificadores) + 1
+    #             datos_insercion = (str(datos['estacion'][iregistro]),round(datos['latitud'][iregistro],4),round(datos['longitud'][iregistro],4),int(id_programa))
+    #             instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
+    #             cursor.execute(instruccion_sql, (datos_insercion))
+    #             conn.commit() 
         
-                datos['id_estacion_temp'][iregistro] = indice_insercion
+    #             datos['id_estacion_temp'][iregistro] = indice_insercion
                 
-    cursor.close()
-    conn.close()
+    # cursor.close()
+    # conn.close()
     
-    texto ='estaciones 2' + (datetime.datetime.now()).strftime('%H:%M:%S')
-    st.text(texto)
+    # texto ='estaciones 2' + (datetime.datetime.now()).strftime('%H:%M:%S')
+    # st.text(texto)
      
-    ### DETERMINA EL NUMERO DE REGISTRO DE CADA MUESTREO 
+    # ### DETERMINA EL NUMERO DE REGISTRO DE CADA MUESTREO 
     
-    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    cursor = conn.cursor()
+    # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    # cursor = conn.cursor()
     
-    datos['id_muestreo_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+    # datos['id_muestreo_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
      
     
-    for idato in range(datos.shape[0]):
-    #for idato in range(300): 
+    # for idato in range(datos.shape[0]):
+    # #for idato in range(300): 
     
-        nombre_muestreo = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
+    #     nombre_muestreo = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
     
-        # Por seguridad, convierte el identificador de botella a entero si éste existe
-        if datos['botella'][idato] is not None:
-            id_botella = int(datos['botella'][idato])
-        else:
-            id_botella = None
+    #     # Por seguridad, convierte el identificador de botella a entero si éste existe
+    #     if datos['botella'][idato] is not None:
+    #         id_botella = int(datos['botella'][idato])
+    #     else:
+    #         id_botella = None
             
-        # Por incompatibilidad con POSTGRESQL hay que "desmontar" y volver a montar las fechas
-        anho           = datos['fecha_muestreo'][idato].year # 
-        mes            = datos['fecha_muestreo'][idato].month
-        dia            = datos['fecha_muestreo'][idato].day
-        fecha_consulta = datetime.date(anho,mes,dia) 
+    #     # Por incompatibilidad con POSTGRESQL hay que "desmontar" y volver a montar las fechas
+    #     anho           = datos['fecha_muestreo'][idato].year # 
+    #     mes            = datos['fecha_muestreo'][idato].month
+    #     dia            = datos['fecha_muestreo'][idato].day
+    #     fecha_consulta = datetime.date(anho,mes,dia) 
         
-        # Intenta insertar el muestreo correspondiente al registro. Si ya existe en la base de datos no hará nada, de lo contrario añadirá el nuevo muestreo
-        # Distinta instrucción según haya información de hora o no (para hacer el script más tolerante a fallos)
+    #     # Intenta insertar el muestreo correspondiente al registro. Si ya existe en la base de datos no hará nada, de lo contrario añadirá el nuevo muestreo
+    #     # Distinta instrucción según haya información de hora o no (para hacer el script más tolerante a fallos)
         
-        if datos['hora_muestreo'][idato] is not None:
-            # Si es un string conviertelo a time
-            if isinstance(datos['hora_muestreo'][idato], str) is True:
-                hora_temporal = datetime.datetime.strptime(datos['hora_muestreo'][idato],'%H:%M')
-            # Si es un datetime conviertelo a time
-            elif isinstance(datos['hora_muestreo'][idato], datetime.datetime) is True:
-                hora_temporal = datos['hora_muestreo'][idato].time()
-            else:
-                hora_temporal= datos['hora_muestreo'][idato]
+    #     if datos['hora_muestreo'][idato] is not None:
+    #         # Si es un string conviertelo a time
+    #         if isinstance(datos['hora_muestreo'][idato], str) is True:
+    #             hora_temporal = datetime.datetime.strptime(datos['hora_muestreo'][idato],'%H:%M')
+    #         # Si es un datetime conviertelo a time
+    #         elif isinstance(datos['hora_muestreo'][idato], datetime.datetime) is True:
+    #             hora_temporal = datos['hora_muestreo'][idato].time()
+    #         else:
+    #             hora_temporal= datos['hora_muestreo'][idato]
             
-            # Por incompatibilidad con POSTGRESQL también hay que "desmontar" y volver a montar las horas
-            hora          = hora_temporal.hour
-            minuto        = hora_temporal.minute
-            hora_consulta = datetime.time(hora,minuto) 
+    #         # Por incompatibilidad con POSTGRESQL también hay que "desmontar" y volver a montar las horas
+    #         hora          = hora_temporal.hour
+    #         minuto        = hora_temporal.minute
+    #         hora_consulta = datetime.time(hora,minuto) 
                 
-            instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,hora_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
-            cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,hora_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
-            conn.commit()
+    #         instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,hora_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
+    #         cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,hora_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+    #         conn.commit()
      
-            instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND hora_muestreo=%s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
-            cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,datos['hora_muestreo'][idato],round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
-            id_muestreos_bd =cursor.fetchone()
-            conn.commit()     
+    #         instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND hora_muestreo=%s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
+    #         cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,datos['hora_muestreo'][idato],round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+    #         id_muestreos_bd =cursor.fetchone()
+    #         conn.commit()     
         
     
-        else:
+    #     else:
             
-            instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
-            cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
-            conn.commit()
+    #         instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
+    #         cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+    #         conn.commit()
                 
-            instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
-            cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
-            id_muestreos_bd =cursor.fetchone()
-            conn.commit() 
+    #         instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
+    #         cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+    #         id_muestreos_bd =cursor.fetchone()
+    #         conn.commit() 
         
-        datos['id_muestreo_temp'][idato] =  id_muestreos_bd[0]
+    #     datos['id_muestreo_temp'][idato] =  id_muestreos_bd[0]
     
-    cursor.close()
-    conn.close()     
+    # cursor.close()
+    # conn.close()     
 
     
-    texto ='registros' + (datetime.datetime.now()).strftime('%H:%M:%S')
-    st.text(texto)
+    # texto ='registros' + (datetime.datetime.now()).strftime('%H:%M:%S')
+    # st.text(texto)
    
   
     
