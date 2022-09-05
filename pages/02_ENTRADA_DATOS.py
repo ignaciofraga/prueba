@@ -188,7 +188,8 @@ for archivo_subido in listado_archivos_subidos:
     st.text(texto)  
     
     # Inserta las nuevas estaciones
-    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    #conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    conn = init_connection()
     cursor = conn.cursor()
     
     for iestacion in range(datos_estaciones.shape[0]):
