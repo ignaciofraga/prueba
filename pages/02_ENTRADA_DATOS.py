@@ -194,6 +194,7 @@ for archivo_subido in listado_archivos_subidos:
     for iestacion in range(datos_estaciones.shape[0]):
         datos_insercion = (str(datos_estaciones['nombre_estacion'][iestacion]),round(datos_estaciones['latitud'][iestacion],4),round(datos_estaciones['longitud'][iestacion],4),int(id_programa))
         instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
+        st.text(datos_insercion)
         cursor.execute(instruccion_sql, (datos_insercion))
         conn.commit() 
     cursor.close()
