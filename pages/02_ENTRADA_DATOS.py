@@ -43,6 +43,13 @@ conn.close()
 
 st.text(st.secrets["postgres"])
 
+direccion_host = st.secrets["postgres"].host
+st.text(direccion_host)
+# base_datos
+# usuario
+# contrasena
+# puerto
+
 # Listado del tipo de dato a introducir      
 listado_opciones = ['Análisis de laboratorio','Procesado o revisión de datos ya disponibles']
 
