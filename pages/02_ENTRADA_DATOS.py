@@ -13,7 +13,7 @@ import pandas
 from io import BytesIO
 import pandas.io.sql as psql
 
-#from pages.COMUNES import FUNCIONES_INSERCION
+from pages.COMUNES import FUNCIONES_INSERCION
 
 # DATOS BASE
 
@@ -28,11 +28,12 @@ archivo_instrucciones =  'DATOS/INSTRUCCIONES_PLANTILLA.zip'
 def init_connection():
     return psycopg2.connect(**st.secrets["postgres"])
 
+
+
+
 ##### WEB STREAMLIT #####
 
-
-
-# ### Encabezados y titulos 
+# Encabezados y titulos 
 st.set_page_config(page_title='ENTRADA DE DATOS', layout="wide",page_icon=logo_IEO_reducido) 
 st.title('Servicio de entrada de datos en la base de datos del C.O de A Coruña')
 
@@ -41,27 +42,12 @@ conn = init_connection()
 df_programas = psql.read_sql('SELECT * FROM programas', conn)
 conn.close()
 
-st.text(st.secrets["postgres"])
 
-direccion_host = st.secrets["postgres"].host
-st.text(direccion_host)
 
-base_datos  = st.secrets["postgres"].dbname
-st.text(base_datos)
-
-usuario     = st.secrets["postgres"].user
-st.text(usuario)
-
-contrasena  = st.secrets["postgres"].password
-st.text(contrasena)
-
-puerto      = st.secrets["postgres"].port
-st.text(puerto)
+### Despliega un formulario para elegir el programa y el tipo de información a insertar
 
 # Listado del tipo de dato a introducir      
 listado_opciones = ['Análisis de laboratorio','Procesado o revisión de datos ya disponibles']
-
-# Despliega un formulario para elegir el programa y el tipo de información a insertar
 
 with st.form("Formulario insercion"):
     st.write("Selecciona el origen y tipo de los datos a insertar")
@@ -85,7 +71,14 @@ for iorigen in range(len(listado_opciones)):
         id_opcion_elegida = iorigen
 
 
-# ### Subida de archivos
+### Subida de archivos
+
+# Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+direccion_host = st.secrets["postgres"].host
+base_datos     = st.secrets["postgres"].dbname
+usuario        = st.secrets["postgres"].user
+contrasena     = st.secrets["postgres"].password
+puerto         = st.secrets["postgres"].port
 
 # # Boton para subir los archivos de datos
 # uploaded_files = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)

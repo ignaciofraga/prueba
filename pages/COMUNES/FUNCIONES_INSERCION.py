@@ -10,6 +10,7 @@ import pandas
 import datetime
 from pyproj import Proj
 import math
+import psycopg2
 
 
 pandas.options.mode.chained_assignment = None
