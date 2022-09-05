@@ -182,9 +182,11 @@ for archivo_subido in listado_archivos_subidos:
 
              
                datos['id_estacion_temp'][iregistro] = indice_insercion 
-               
+    
+    conn = init_connection()           
     datos_estaciones.to_sql('estaciones', con=conn, if_exists='replace', index=False)         
- 
+    conn.close()  
+    
     texto ='estaciones 1' + (datetime.datetime.now()).strftime('%H:%M:%S')
     st.text(texto)   
  
