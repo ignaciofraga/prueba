@@ -292,7 +292,7 @@ def evalua_estaciones(datos,min_dist,id_programa,direccion_host,base_datos,usuar
             datos_temporal = cursor.fetchone()
             conn.commit()
             
-        datos['id_estacion_temp'][idato] = datos_temporal[0]    
+            datos['id_estacion_temp'][idato] = datos_temporal[0]    
          
             
 
