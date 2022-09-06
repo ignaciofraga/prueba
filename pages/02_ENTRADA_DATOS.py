@@ -132,7 +132,7 @@ for archivo_subido in listado_archivos_subidos:
     texto = 'inicia 1 ' + (datetime.datetime.now()).strftime('%H:%M:%S')
     st.text(texto)
 
-    datos = FUNCIONES_INSERCION.evalua_estaciones(datos,min_dist,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+    datos = FUNCIONES_INSERCION.evalua_estaciones(datos_corregidos,min_dist,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
  
     texto = 'estaciones ' + (datetime.datetime.now()).strftime('%H:%M:%S')
     st.text(texto)
