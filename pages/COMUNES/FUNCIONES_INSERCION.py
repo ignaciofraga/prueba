@@ -269,6 +269,8 @@ def control_calidad(datos,archivo_variables_base_datos):
 
 def evalua_estaciones(datos,min_dist,id_programa,direccion_host,base_datos,usuario,contrasena,puerto):
 
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor()
     
     for idato in range(datos.shape[0]):
     
