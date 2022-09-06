@@ -108,6 +108,7 @@ for archivo_subido in listado_archivos_subidos:
         texto_error = 'Error en el control de calidad de los datos del archivo ' + archivo_subido.name
         st.warning(texto_error, icon="⚠️")
 
+    st.text(id_programa_elegido)
 
     # ## Introduce los datos en la base de datos
     # try:
