@@ -226,10 +226,18 @@ def control_calidad(datos,archivo_variables_base_datos):
     # Corregir los valores positivos de longitud, pasándolos a negativos (algunos datos de Pelacus tienen este error)
     datos['longitud'] = -1*datos['longitud'].abs()  
     
+
+    #datos = datos.round({"longitud": 4, "latitud": 4})
+    
     # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
     indices_dataframe        = numpy.arange(0,datos.shape[0],1,dtype=int)    
     datos['id_temp'] = indices_dataframe
     datos.set_index('id_temp',drop=False,append=False,inplace=True)
+    
+    # Redondea a 4 decimales los datos de latitud y longitud (precisión utilizada en la base de datos)
+    for idato in range(datos.shape[0]):
+        datos['longitud'][idato] = round(datos['longitud'][idato],4)
+        datos['latitud'][idato] = round(datos['latitud'][idato],4)
     
     # # # Cambia los valores -999 por None y asigna bandera de calidad correspondiente (por precaucion)
     # # Variables fisicas
@@ -260,73 +268,134 @@ def control_calidad(datos,archivo_variables_base_datos):
 ##############################################################################
 
 def evalua_estaciones(datos,min_dist,id_programa,direccion_host,base_datos,usuario,contrasena,puerto):
+
     
-    # Recupera las estaciones disponibles en la base de datos
-    #conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)   
-    con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    engine = create_engine(con_engine)
-    tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', engine)
+    for idato in range(datos.shape[0]):
     
-    # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
-    datos_estaciones = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
-    indices_dataframe        = numpy.arange(0,datos_estaciones.shape[0],1,dtype=int)    
-    datos_estaciones['id_temp'] = indices_dataframe
-    datos_estaciones.set_index('id_temp',drop=True,append=False,inplace=True)
+        datos_insercion = (str(datos['estacion'][idato]),round(datos['latitud'][idato],4),round(datos['longitud'][idato],4),int(id_programa))
+            
+        instruccion_sql = "SELECT id_estacion FROM estaciones WHERE nombre_estacion = %s AND latitud = %s AND longitud=%s AND programa = %s;"
+        cursor.execute(instruccion_sql, datos_insercion)
+        datos_temporal = cursor.fetchone()
+        conn.commit()
+        
+        if datos_temporal is None:
+            
+            instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s);"   
+            cursor.execute(instruccion_sql, (datos_insercion))
+            conn.commit() 
+            
+            instruccion_sql = "SELECT id_estacion FROM estaciones WHERE nombre_estacion = %s AND latitud = %s AND longitud=%s AND programa = %s;"
+            cursor.execute(instruccion_sql, datos_insercion)
+            datos_temporal = cursor.fetchone()
+            conn.commit()
+            
+        datos['id_estacion_temp'][idato] = datos_temporal[0]    
+         
+            
+
+    # # recupera las estaciones disponibles en la base de datos
+    # #conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+
+    # con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    # conn       = create_engine(con_engine)
+    # tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+    # #conn.close() 
+    
+    # # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
+    # estaciones_programa            = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
+    # indices_dataframe              = numpy.arange(1,estaciones_programa.shape[0]+1,1,dtype=int)    
+    # estaciones_programa['id_temp'] = indices_dataframe
+    # estaciones_programa.set_index('id_temp',drop=True,append=False,inplace=True)
         
     
-    # identifica la estación asociada a cada registro
-    datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
-    proy_datos                = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
+    # ## Identifica la estación asociada a cada registro
     
-    for iregistro in range(datos.shape[0]): 
-        if datos_estaciones.shape[0] == 0:
+    # # Columna para punteros de estaciones
+    # datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+    
+    # # Genera un dataframe con la combinación única de latitud/longitud en los muestreos
+    # coordenadas_unicas            = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
+    # coordenadas_unicas['identif'] = numpy.arange(0,coordenadas_unicas.shape[0],dtype=int)
+    
+    # # Redondea a la misma precisión que las coordenadas almacenadas en la base de datos
+    # coordenadas_unicas = coordenadas_unicas.round({'longitud': 4, 'latitud': 4})
+    
+    # # Busca los registros con la misma lat/lon que cada par de coordenadas únicas, a los que asigna un identificado (nº de estación)
+    # for idato in range(coordenadas_unicas.shape[0]):
+    #     aux = (datos['latitud'] == coordenadas_unicas['latitud'][idato]) & (datos['longitud'] == coordenadas_unicas['longitud'][idato])
+    #     indices = [i for i, x in enumerate(aux) if x]
+    #     datos['id_estacion_temp'][indices] = coordenadas_unicas['identif'][idato]
+
+    # return datos    
+
+
+    # # Recupera las estaciones disponibles en la base de datos
+    # #conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)   
+    # con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    # engine = create_engine(con_engine)
+    # tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', engine)
+    
+    # # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
+    # datos_estaciones = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
+    # indices_dataframe        = numpy.arange(0,datos_estaciones.shape[0],1,dtype=int)    
+    # datos_estaciones['id_temp'] = indices_dataframe
+    # datos_estaciones.set_index('id_temp',drop=True,append=False,inplace=True)
+        
+    
+    # # identifica la estación asociada a cada registro
+    # datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+    # proy_datos                = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
+    
+    # for iregistro in range(datos.shape[0]): 
+    #     if datos_estaciones.shape[0] == 0:
                      
-            nueva_estacion = {'id_estacion':1,'nombre_estacion':datos['estacion'][iregistro], 'latitud':datos['latitud'][iregistro], 'longitud':datos['longitud'][iregistro], 'programa':id_programa}
-    #        datos_estaciones = datos_estaciones.concat(nueva_estacion, ignore_index=True)
-            datos_estaciones.loc[1] = nueva_estacion       
+    #         nueva_estacion = {'id_estacion':1,'nombre_estacion':datos['estacion'][iregistro], 'latitud':datos['latitud'][iregistro], 'longitud':datos['longitud'][iregistro], 'programa':id_programa}
+    # #        datos_estaciones = datos_estaciones.concat(nueva_estacion, ignore_index=True)
+    #         datos_estaciones.loc[1] = nueva_estacion       
     
-        else:
-            vector_distancias      = numpy.zeros(datos_estaciones.shape[0])
-            vector_identificadores = numpy.zeros(datos_estaciones.shape[0],dtype=int)
+    #     else:
+    #         vector_distancias      = numpy.zeros(datos_estaciones.shape[0])
+    #         vector_identificadores = numpy.zeros(datos_estaciones.shape[0],dtype=int)
            
-            # Determina la distancia de cada registro a las estaciones incluidas en la base de datos
-            for iestacion_disponible in range(datos_estaciones.shape[0]):
-                x_muestreo, y_muestreo = proy_datos(datos['longitud'][iregistro], datos['latitud'][iregistro], inverse=False)
-                x_bd, y_bd             = proy_datos(datos_estaciones['longitud'][iestacion_disponible], datos_estaciones['latitud'][iestacion_disponible], inverse=False)
-                distancia              = math.sqrt((((x_muestreo-x_bd)**2) + ((y_muestreo-y_bd)**2)))
+    #         # Determina la distancia de cada registro a las estaciones incluidas en la base de datos
+    #         for iestacion_disponible in range(datos_estaciones.shape[0]):
+    #             x_muestreo, y_muestreo = proy_datos(datos['longitud'][iregistro], datos['latitud'][iregistro], inverse=False)
+    #             x_bd, y_bd             = proy_datos(datos_estaciones['longitud'][iestacion_disponible], datos_estaciones['latitud'][iestacion_disponible], inverse=False)
+    #             distancia              = math.sqrt((((x_muestreo-x_bd)**2) + ((y_muestreo-y_bd)**2)))
                
-                vector_distancias[iestacion_disponible]      = distancia
-                vector_identificadores[iestacion_disponible] = int(datos_estaciones['id_estacion'][iestacion_disponible])
+    #             vector_distancias[iestacion_disponible]      = distancia
+    #             vector_identificadores[iestacion_disponible] = int(datos_estaciones['id_estacion'][iestacion_disponible])
                
-            # Si la distancia a alguna de las estaciones es menor a la distancia mínima, la estación ya está en la base de datos
-            if min(vector_distancias) <= min_dist :
-                ipos_minimo = numpy.argmin(vector_distancias)
-                datos['id_estacion_temp'][iregistro] = vector_identificadores[ipos_minimo]
+    #         # Si la distancia a alguna de las estaciones es menor a la distancia mínima, la estación ya está en la base de datos
+    #         if min(vector_distancias) <= min_dist :
+    #             ipos_minimo = numpy.argmin(vector_distancias)
+    #             datos['id_estacion_temp'][iregistro] = vector_identificadores[ipos_minimo]
                
-            # En caso contrario, la estación es nueva y se añade a la base de datos
-            else:
-                indice_insercion = int(max(datos_estaciones['id_estacion']) + 1)
+    #         # En caso contrario, la estación es nueva y se añade a la base de datos
+    #         else:
+    #             indice_insercion = int(max(datos_estaciones['id_estacion']) + 1)
      
-                nueva_estacion = {'id_estacion':indice_insercion,'nombre_estacion':datos['estacion'][iregistro], 'latitud':datos['latitud'][iregistro], 'longitud':datos['longitud'][iregistro], 'programa':id_programa}
-                #datos_estaciones = datos_estaciones.concat(nueva_estacion, ignore_index=True)
-                datos_estaciones.loc[datos_estaciones.shape[0]] = nueva_estacion 
+    #             nueva_estacion = {'id_estacion':indice_insercion,'nombre_estacion':datos['estacion'][iregistro], 'latitud':datos['latitud'][iregistro], 'longitud':datos['longitud'][iregistro], 'programa':id_programa}
+    #             #datos_estaciones = datos_estaciones.concat(nueva_estacion, ignore_index=True)
+    #             datos_estaciones.loc[datos_estaciones.shape[0]] = nueva_estacion 
              
-                datos['id_estacion_temp'][iregistro] = indice_insercion 
+    #             datos['id_estacion_temp'][iregistro] = indice_insercion 
     
     
-    # Inserta las nuevas estaciones
-    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    cursor = conn.cursor()
+    # # Inserta las nuevas estaciones
+    # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    # cursor = conn.cursor()
     
-    for iestacion in range(datos_estaciones.shape[0]):
-        datos_insercion = (int(datos_estaciones['id_estacion'][iestacion]),str(datos_estaciones['nombre_estacion'][iestacion]),round(datos_estaciones['latitud'][iestacion],4),round(datos_estaciones['longitud'][iestacion],4),int(id_programa))
-        instruccion_sql = "INSERT INTO estaciones (id_estacion,nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
-        cursor.execute(instruccion_sql, (datos_insercion))
-        conn.commit() 
-    cursor.close()
-    conn.close()
+    # for iestacion in range(datos_estaciones.shape[0]):
+    #     datos_insercion = (int(datos_estaciones['id_estacion'][iestacion]),str(datos_estaciones['nombre_estacion'][iestacion]),round(datos_estaciones['latitud'][iestacion],4),round(datos_estaciones['longitud'][iestacion],4),int(id_programa))
+    #     instruccion_sql = "INSERT INTO estaciones (id_estacion,nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
+    #     cursor.execute(instruccion_sql, (datos_insercion))
+    #     conn.commit() 
+    # cursor.close()
+    # conn.close()
     
-    return datos
+    # return datos
 
 
 
@@ -850,9 +919,229 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 # datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
 
 # datos = control_calidad(datos_pelacus,listado_variables)  
+# # id_programa = 3
+# # min_dist = 50
+# # nombre_programa = "RADIAL CORUÑA"
+
 # id_programa = 1
 # min_dist = 50
 # nombre_programa = "PELACUS"
+
+# print(datetime.datetime.now())
+
+
+
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
+
+# datos['id_estacion_temp']  = numpy.zeros(datos.shape[0],dtype=int)
+
+# for idato in range(datos.shape[0]):
+
+#     datos_insercion = (str(datos['estacion'][idato]),round(datos['latitud'][idato],4),round(datos['longitud'][idato],4),int(id_programa))
+        
+#     instruccion_sql = "SELECT id_estacion FROM estaciones WHERE nombre_estacion = %s AND latitud = %s AND longitud=%s AND programa = %s;"
+#     cursor.execute(instruccion_sql, datos_insercion)
+#     datos_temporal = cursor.fetchone()
+#     conn.commit()
+    
+#     if datos_temporal is None:
+        
+#         instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s);"   
+#         cursor.execute(instruccion_sql, (datos_insercion))
+#         conn.commit() 
+        
+#         instruccion_sql = "SELECT id_estacion FROM estaciones WHERE nombre_estacion = %s AND latitud = %s AND longitud=%s AND programa = %s;"
+#         cursor.execute(instruccion_sql, datos_insercion)
+#         datos_temporal = cursor.fetchone()
+#         conn.commit()
+        
+#     datos['id_estacion_temp'][idato] = datos_temporal[0]    
+     
+        
+
+# print(datetime.datetime.now())
+
+     # str_actualiza  = 'DO UPDATE SET ('
+     # for iparametro in range(len(parametros)-2):
+     #     str_actualiza = str_actualiza + parametros[iparametro+1] + ',' 
+     # str_actualiza = str_actualiza + parametros[-1] + ') = ('
+     # for iparametro in range(len(parametros)-2):
+     #     str_actualiza = str_actualiza + 'EXCLUDED.' +  parametros[iparametro+1] + ',' 
+     # str_actualiza = str_actualiza + 'EXCLUDED.' + parametros[-1] + ')' 
+
+
+
+
+#         datos_insercion = (str(datos_estaciones['nombre_estacion'][iestacion]),round(coordenadas_unicas['latitud'][iestacion],4),round(coordenadas_unicas['longitud'][iestacion],4),int(id_programa))
+#         instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
+#         cursor.execute(instruccion_sql, (datos_insercion))
+#         conn.commit() 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+# conn       = create_engine(con_engine)
+# tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+ 
+
+# # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
+# estaciones_programa            = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
+# indices_dataframe              = numpy.arange(0,estaciones_programa.shape[0],1,dtype=int)    
+# estaciones_programa['id_temp'] = indices_dataframe
+# estaciones_programa.set_index('id_temp',drop=True,append=False,inplace=True)
+
+# ## Identifica la estación asociada a cada registro
+
+# # Columna para punteros de estaciones
+# datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+
+# # Genera un dataframe con la combinación única de latitud/longitud en los muestreos
+# coordenadas_unicas             = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
+# coordenadas_unicas['identif']  = numpy.zeros(coordenadas_unicas.shape[0],dtype=int)
+# coordenadas_unicas['io_nueva'] = numpy.zeros(coordenadas_unicas.shape[0],dtype=int)
+
+# # si no hay estaciones de un programa determinado, insertar todas las estaciones
+# if estaciones_programa.shape[0]==0:
+ 
+#     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+#     cursor = conn.cursor()
+#     for idato in range(coordenadas_unicas.shape[0]):
+        
+#         datos_insercion = (str(datos_estaciones['nombre_estacion'][iestacion]),round(coordenadas_unicas['latitud'][iestacion],4),round(coordenadas_unicas['longitud'][iestacion],4),int(id_programa))
+#         instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
+#         cursor.execute(instruccion_sql, (datos_insercion))
+#         conn.commit() 
+
+# # Redondea a la misma precisión que las coordenadas almacenadas en la base de datos
+# coordenadas_unicas = coordenadas_unicas.round({'longitud': 4, 'latitud': 4})
+
+# # Asocia a cada par de coordenadas unicas, la estación correspondiente
+# for idato in range(estaciones_programa.shape[0]):
+#     aux = (coordenadas_unicas ['latitud'] == estaciones_programa['latitud'][idato]) & (coordenadas_unicas ['longitud'] == estaciones_programa['longitud'][idato])
+#     if any(aux) is True:
+#         indices = [i for i, x in enumerate(aux) if x]
+#         coordenadas_unicas['identif'][indices]  = estaciones_programa['id_estacion'][idato]
+#         coordenadas_unicas['io_nueva'][indices] = 1
+        
+# # Extrae las estaciones nuevas (io_nueva = 1)        
+# coordenadas_unicas[coordenadas_unicas['io_nueva']==1] = numpy.arange(max(tabla_estaciones['id_estacion']))   
+        
+        
+
+# # Busca los registros con la misma lat/lon que cada par de coordenadas únicas, a los que asigna un identificado (nº de estación)
+# for idato in range(coordenadas_unicas.shape[0]):
+
+#     aux = (datos['latitud'] == coordenadas_unicas['latitud'][idato]) & (datos['longitud'] == coordenadas_unicas['longitud'][idato])
+#     indices = [i for i, x in enumerate(aux) if x]
+#     datos['id_estacion_temp'][indices] = coordenadas_unicas['identif'][idato]
+
+# print(datetime.datetime.now())
+
+
+
+
+# ### DETERMINA EL NUMERO DE REGISTRO DE CADA MUESTREO 
+
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
+
+
+
+# datos['id_muestreo_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+ 
+
+# for idato in range(datos.shape[0]):
+
+#     nombre_muestreo = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
+
+#     # Por seguridad, convierte el identificador de botella a entero si éste existe
+#     if datos['botella'][idato] is not None:
+#         id_botella = int(datos['botella'][idato])
+#     else:
+#         id_botella = None
+        
+#     # Por incompatibilidad con POSTGRESQL hay que "desmontar" y volver a montar las fechas
+#     anho           = datos['fecha_muestreo'][idato].year # 
+#     mes            = datos['fecha_muestreo'][idato].month
+#     dia            = datos['fecha_muestreo'][idato].day
+#     fecha_consulta = datetime.date(anho,mes,dia) 
+    
+#     # Intenta insertar el muestreo correspondiente al registro. Si ya existe en la base de datos no hará nada, de lo contrario añadirá el nuevo muestreo
+#     # Distinta instrucción según haya información de hora o no (para hacer el script más tolerante a fallos)
+    
+#     if datos['hora_muestreo'][idato] is not None:
+#         # Si es un string conviertelo a time
+#         if isinstance(datos['hora_muestreo'][idato], str) is True:
+#             hora_temporal = datetime.datetime.strptime(datos['hora_muestreo'][idato],'%H:%M')
+#         # Si es un datetime conviertelo a time
+#         elif isinstance(datos['hora_muestreo'][idato], datetime.datetime) is True:
+#             hora_temporal = datos['hora_muestreo'][idato].time()
+#         else:
+#             hora_temporal= datos['hora_muestreo'][idato]
+        
+#         # Por incompatibilidad con POSTGRESQL también hay que "desmontar" y volver a montar las horas
+#         hora          = hora_temporal.hour
+#         minuto        = hora_temporal.minute
+#         hora_consulta = datetime.time(hora,minuto) 
+            
+#         instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,hora_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
+#         cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,hora_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+#         conn.commit()
+ 
+#         instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND hora_muestreo=%s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
+#         cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,datos['hora_muestreo'][idato],round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+#         id_muestreos_bd =cursor.fetchone()
+#         conn.commit()     
+    
+
+#     else:
+        
+#         instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
+#         cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+#         conn.commit()
+            
+#         instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
+#         cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+#         id_muestreos_bd =cursor.fetchone()
+#         conn.commit() 
+    
+#     datos['id_muestreo_temp'][idato] =  id_muestreos_bd[0]
+
+# cursor.close()
+# conn.close() 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# datos = evalua_registros(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+
+
 
 # import pandas.io.sql as psql
 # from sqlalchemy import create_engine
@@ -869,7 +1158,7 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 # print('registros', datetime.datetime.now())
 
-
+# print(datetime.datetime.now())
 
 # # recupera las estaciones disponibles en la base de datos
 # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -877,14 +1166,34 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 # conn.close() 
 
 # # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
-# datos_estaciones = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
-# indices_dataframe        = numpy.arange(0,datos_estaciones.shape[0],1,dtype=int)    
-# datos_estaciones['id_temp'] = indices_dataframe
-# datos_estaciones.set_index('id_temp',drop=True,append=False,inplace=True)
+# estaciones_programa            = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
+# indices_dataframe              = numpy.arange(0,estaciones_programa.shape[0],1,dtype=int)    
+# estaciones_programa['id_temp'] = indices_dataframe
+# estaciones_programa.set_index('id_temp',drop=True,append=False,inplace=True)
     
 
-# # identifica la estación asociada a cada registro
+# ## Identifica la estación asociada a cada registro
+
+# # Columna para punteros de estaciones
 # datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+
+# # Genera un dataframe con la combinación única de latitud/longitud en los muestreos
+# coordenadas_unicas            = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
+# coordenadas_unicas['identif'] = numpy.arange(0,coordenadas_unicas.shape[0],dtype=int)
+
+# # Redondea a la misma precisión que las coordenadas almacenadas en la base de datos
+# coordenadas_unicas = coordenadas_unicas.round({'longitud': 4, 'latitud': 4})
+
+# # Busca los registros con la misma lat/lon que cada par de coordenadas únicas, a los que asigna un identificado (nº de estación)
+# for idato in range(coordenadas_unicas.shape[0]):
+#     aux = (datos['latitud'] == coordenadas_unicas['latitud'][idato]) & (datos['longitud'] == coordenadas_unicas['longitud'][idato])
+#     indices = [i for i, x in enumerate(aux) if x]
+#     datos['id_estacion_temp'][indices] = coordenadas_unicas['identif'][idato]
+
+# print(datetime.datetime.now())
+
+
+
 # proy_datos                = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
 
 # for iregistro in range(datos.shape[0]): 
