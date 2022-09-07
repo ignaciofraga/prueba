@@ -101,7 +101,7 @@ for archivo_subido in listado_archivos_subidos:
     
     ## Realiza un control de calidad primario a los datos importados   
     try:
-        datos_corregidos = FUNCIONES_INSERCION.control_calidad(datos,archivo_variables_base_datos) 
+        datos = FUNCIONES_INSERCION.control_calidad(datos,archivo_variables_base_datos) 
         texto_exito = 'Control de calidad de los datos del archivo ' + archivo_subido.name + ' realizado correctamente'
         st.success(texto_exito)
     except:
@@ -110,12 +110,23 @@ for archivo_subido in listado_archivos_subidos:
 
     st.text(id_programa_elegido)
 
-    # ## Introduce los datos en la base de datos
-    # try:
-    #     with st.spinner('Insertando datos en la base de datos'):
-    #         FUNCIONES_INSERCION.inserta_datos(datos_corregidos,min_dist,programa_elegido,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
-    #     texto_exito = 'Datos del archivo ' + archivo_subido.name + ' insertados en la base de datos correctamente'
-    #     st.success(texto_exito)
+    ## Introduce los datos en la base de datos
+    try:
+        with st.spinner('Comprobando los datos importados con los disponibles en la base de datos'):
+            # comprueba las estaciones utilizadas
+            datos = FUNCIONES_INSERCION.evalua_estaciones(datos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+            # cmprueba los registros a importat
+            datos = FUNCIONES_INSERCION.evalua_registros(datos,programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+
+
+        with st.spinner('Insertando datos en la base de datos'):
+
+            FUNCIONES_INSERCION.inserta_datos(datos,nombre_programa,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            
+        texto_exito = 'Datos del archivo ' + archivo_subido.name + ' insertados en la base de datos correctamente'
+        st.success(texto_exito)
+        
+        
         
     # except:
     #     texto_error = 'Error al insertar los datos importados en la base de datos'
@@ -130,20 +141,20 @@ for archivo_subido in listado_archivos_subidos:
     #     texto_error = 'Error al actualizar las fechas de procesado en la base de datos'
     #     st.warning(texto_error, icon="⚠️")    
     
-    del(datos)
+    # del(datos)
         
-    texto = 'inicia 1 ' + (datetime.datetime.now()).strftime('%H:%M:%S')
-    st.text(texto)
+    # texto = 'inicia 1 ' + (datetime.datetime.now()).strftime('%H:%M:%S')
+    # st.text(texto)
 
-    datos = FUNCIONES_INSERCION.evalua_estaciones(datos_corregidos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+    # datos = FUNCIONES_INSERCION.evalua_estaciones(datos_corregidos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
  
-    texto = 'estaciones ' + (datetime.datetime.now()).strftime('%H:%M:%S')
-    st.text(texto)
+    # texto = 'estaciones ' + (datetime.datetime.now()).strftime('%H:%M:%S')
+    # st.text(texto)
 
-    datos = FUNCIONES_INSERCION.evalua_registros(datos,programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+    # datos = FUNCIONES_INSERCION.evalua_registros(datos,programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
 
-    texto = 'registros ' + (datetime.datetime.now()).strftime('%H:%M:%S')
-    st.text(texto)
+    # texto = 'registros ' + (datetime.datetime.now()).strftime('%H:%M:%S')
+    # st.text(texto)
     
 
  

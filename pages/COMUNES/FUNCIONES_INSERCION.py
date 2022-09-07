@@ -473,18 +473,9 @@ def inserta_datos(datos,nombre_programa,id_programa,direccion_host,base_datos,us
         cursor.execute(instruccion_sql,datos_insercion)
         conn.commit()
         
-    cursor.close()
-    conn.close()
-    
-    
-    
     
     ### INSERTA LOS DATOS EN LA TABLA DE MUESTREOS PUNTUALES BIOGEOQUIMICOS
-    
-    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    cursor = conn.cursor()
-    
-    for idato in range(datos.shape[0]):
+
     
         # Intenta insertar los muestreos. Si ya existe el muestreo, actualiza las variables biogeoquímicas con los datos cargados. 
         # De lo contrario, añade el registro correspondiente al nuevo muestreo
