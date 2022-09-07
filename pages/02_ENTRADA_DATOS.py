@@ -24,7 +24,7 @@ logo_IEO_reducido            =  'DATOS/IMAGENES/ieo.ico'
 archivo_plantilla            =  'DATOS/PLANTILLA.xlsx'
 archivo_instrucciones        =  'DATOS/INSTRUCCIONES_PLANTILLA.zip'
 archivo_variables_base_datos =  'DATOS/VARIABLES.xlsx'
-
+min_dist                     = 50
 
 ##### FUNCIONES AUXILIARES ######
 
@@ -122,7 +122,7 @@ for archivo_subido in listado_archivos_subidos:
  
     with st.spinner('Insertando datos en la base de datos'):
 
-        FUNCIONES_INSERCION.inserta_datos(datos,programa_elegido,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+        FUNCIONES_INSERCION.inserta_datos(datos,min_dist,programa_elegido,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
     
     texto_exito = 'Datos del archivo ' + archivo_subido.name + ' insertados en la base de datos correctamente'
     st.success(texto_exito)
