@@ -546,10 +546,8 @@ def inserta_datos(datos,nombre_programa,id_programa,direccion_host,base_datos,us
 ######## FUNCION PARA ACTUALIZAR LA TABLA DE ESTADOS, UTILIZADA POR LA APLICACIO STREAMLIT ########
 ###################################################################################################
     
-def actualiza_estado(datos,id_programa,nombre_programa,itipo_informacion,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto):
+def actualiza_estado(datos,fecha_actualizacion,id_programa,nombre_programa,itipo_informacion,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto):
 
-    # Define la fecha actual
-    fecha_actual = datetime.date.today()
     
     # Busca de cuántos años diferentes contiene información el dataframe
     vector_auxiliar_tiempo = numpy.zeros(datos.shape[0],dtype=int)
@@ -586,10 +584,10 @@ def actualiza_estado(datos,id_programa,nombre_programa,itipo_informacion,email_c
                 
             # Genera el vector con los datos a insertar. diferente según sea análisis o post-procesado
             if itipo_informacion == 1: # La información a insertar es un nuevo registro de análisis de laboratorio
-                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,fecha_actual,None,email_contacto,None]
+                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,fecha_actualizacion,None,email_contacto,None]
             
             if itipo_informacion == 2: # La información a insertar es un registro de post-procesado 
-                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,None,fecha_actual,None,email_contacto]
+                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,None,fecha_actualizacion,None,email_contacto]
             
             # Inserta la información en la base de datos
             instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado,EXCLUDED.contacto_muestreo,EXCLUDED.contacto_post_procesado);"   
@@ -600,12 +598,12 @@ def actualiza_estado(datos,id_programa,nombre_programa,itipo_informacion,email_c
         else:
             if itipo_informacion == 1:
                 instruccion_sql = "UPDATE estado_procesos SET fecha_analisis_laboratorio = %s,contacto_muestreo = %s WHERE programa = %s AND año = %s;"   
-                cursor.execute(instruccion_sql, (fecha_actual,email_contacto,int(id_programa),int(anho_procesado)))
+                cursor.execute(instruccion_sql, (fecha_actualizacion,email_contacto,int(id_programa),int(anho_procesado)))
                 conn.commit()                
 
             if itipo_informacion == 2:
                 instruccion_sql = "UPDATE estado_procesos SET fecha_post_procesado = %s,contacto_post_procesado = %s WHERE programa = %s AND año = %s;"   
-                cursor.execute(instruccion_sql, (fecha_actual,email_contacto,int(id_programa),int(anho_procesado)))
+                cursor.execute(instruccion_sql, (fecha_actualizacion,email_contacto,int(id_programa),int(anho_procesado)))
                 conn.commit()  
     
     cursor.close()
