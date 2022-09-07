@@ -423,14 +423,189 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #####################################################################################
 ######## FUNCION PARA INSERTAR LOS DATOS, YA AJUSTADOS, EN LA BASE DE DATOS  ########
 #####################################################################################
 
 
-def inserta_datos(datos,nombre_programa,id_programa,direccion_host,base_datos,usuario,contrasena,puerto):
+def inserta_datos(datos,min_dist,nombre_programa,id_programa,direccion_host,base_datos,usuario,contrasena,puerto):
  
-       
+    
+ 
+    ### IDENTIFICA LAS ESTACIONES MUESTREADAS Y EVALUA SI YA EXISTEN EN LA BASE DE DATOS (TABLA ESTACIONES)
+    
+    datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+    
+    proy_datos                = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
+    
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor()
+    
+    for iregistro in range(datos.shape[0]):  
+    
+        # Busca el identificador de la estacion
+        instruccion_sql = 'SELECT id_estacion,longitud,latitud FROM estaciones WHERE programa = %s ;'
+        cursor.execute(instruccion_sql,(str(id_programa)))
+        estaciones_disponibles =cursor.fetchall()
+        conn.commit()     
+        
+        # Si no hay registros de estaciones en la bas de datos, insertar la estación muestreada directamente
+        if len(estaciones_disponibles) == 0:
+            datos_insercion = (str(datos['estacion'][iregistro]),round(datos['latitud'][iregistro],4),round(datos['longitud'][iregistro],4),int(id_programa))
+            instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
+            cursor.execute(instruccion_sql, (datos_insercion))
+            conn.commit() 
+    
+            datos['id_estacion_temp'][iregistro] = 1
+        
+        # En caso contrario, buscar si hay una estación en el mismo punto (+- min_dist)
+        else:
+            
+            vector_distancias      = numpy.zeros(len(estaciones_disponibles))
+            vector_identificadores = numpy.zeros(len(estaciones_disponibles),dtype=int)
+            
+            # Determina la distancia de cada registro a las estaciones incluidas en la base de datos
+            for iestacion_disponible in range(len(estaciones_disponibles)):
+                x_muestreo, y_muestreo = proy_datos(datos['longitud'][iregistro], datos['latitud'][iregistro], inverse=False)
+                x_bd, y_bd             = proy_datos(float(estaciones_disponibles[iestacion_disponible][1]), float(float(estaciones_disponibles[iestacion_disponible][2])), inverse=False)
+                distancia              = math.sqrt((((x_muestreo-x_bd)**2) + ((y_muestreo-y_bd)**2)))
+                
+                vector_distancias[iestacion_disponible]      = distancia
+                vector_identificadores[iestacion_disponible] = int(estaciones_disponibles[iestacion_disponible][0])
+                
+            # Si la distancia a alguna de las estaciones es menor a la distancia mínima, la estación ya está en la base de datos
+            if min(vector_distancias) <= min_dist :
+                ipos_minimo = numpy.argmin(vector_distancias)
+                datos['id_estacion_temp'][iregistro] = int(estaciones_disponibles[ipos_minimo][0])
+                
+            # En caso contrario, la estación es nueva y se añade a la base de datos
+            else:
+                indice_insercion = max(vector_identificadores) + 1
+                datos_insercion = (str(datos['estacion'][iregistro]),round(datos['latitud'][iregistro],4),round(datos['longitud'][iregistro],4),int(id_programa))
+                instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
+                cursor.execute(instruccion_sql, (datos_insercion))
+                conn.commit() 
+        
+                datos['id_estacion_temp'][iregistro] = indice_insercion
+                
+    cursor.close()
+    conn.close()
+    
+     
+    ### DETERMINA EL NUMERO DE REGISTRO DE CADA MUESTREO 
+    
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor()
+    
+    datos['id_muestreo_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+     
+    
+    for idato in range(datos.shape[0]):
+    #for idato in range(300): 
+    
+        nombre_muestreo = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
+    
+        # Por seguridad, convierte el identificador de botella a entero si éste existe
+        if datos['botella'][idato] is not None:
+            id_botella = int(datos['botella'][idato])
+        else:
+            id_botella = None
+            
+        # Por incompatibilidad con POSTGRESQL hay que "desmontar" y volver a montar las fechas
+        anho           = datos['fecha_muestreo'][idato].year # 
+        mes            = datos['fecha_muestreo'][idato].month
+        dia            = datos['fecha_muestreo'][idato].day
+        fecha_consulta = datetime.date(anho,mes,dia) 
+        
+        # Intenta insertar el muestreo correspondiente al registro. Si ya existe en la base de datos no hará nada, de lo contrario añadirá el nuevo muestreo
+        # Distinta instrucción según haya información de hora o no (para hacer el script más tolerante a fallos)
+        
+        if datos['hora_muestreo'][idato] is not None:
+            # Si es un string conviertelo a time
+            if isinstance(datos['hora_muestreo'][idato], str) is True:
+                hora_temporal = datetime.datetime.strptime(datos['hora_muestreo'][idato],'%H:%M')
+            # Si es un datetime conviertelo a time
+            elif isinstance(datos['hora_muestreo'][idato], datetime.datetime) is True:
+                hora_temporal = datos['hora_muestreo'][idato].time()
+            else:
+                hora_temporal= datos['hora_muestreo'][idato]
+            
+            # Por incompatibilidad con POSTGRESQL también hay que "desmontar" y volver a montar las horas
+            hora          = hora_temporal.hour
+            minuto        = hora_temporal.minute
+            hora_consulta = datetime.time(hora,minuto) 
+                
+            instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,hora_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
+            cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,hora_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+            conn.commit()
+     
+            instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND hora_muestreo=%s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
+            cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,datos['hora_muestreo'][idato],round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+            id_muestreos_bd =cursor.fetchone()
+            conn.commit()     
+        
+    
+        else:
+            
+            instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
+            cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+            conn.commit()
+                
+            instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
+            cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+            id_muestreos_bd =cursor.fetchone()
+            conn.commit() 
+        
+        datos['id_muestreo_temp'][idato] =  id_muestreos_bd[0]
+    
+    cursor.close()
+    conn.close() 
+    
+    
+    
+    
+    
+    
     ### INSERTA LOS DATOS EN LA TABLA DE MUESTREOS PUNTUALES FISICA
     
     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -547,7 +722,11 @@ def inserta_datos(datos,nombre_programa,id_programa,direccion_host,base_datos,us
     conn.close()
         
  
+     
  
+    
+ 
+    
     
     
  
@@ -663,46 +842,183 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 
 
-# base_datos     = 'COAC'
-# usuario        = 'postgres'
-# contrasena     = 'm0nt34lt0'
-# puerto         = '5432'
-# direccion_host = '193.146.155.99'
+base_datos     = 'COAC'
+usuario        = 'postgres'
+contrasena     = 'm0nt34lt0'
+puerto         = '5432'
+direccion_host = '193.146.155.99'
 
 
 
 
-# listado_variables = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VARIABLES.xlsx'
+listado_variables = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VARIABLES.xlsx'
 
     
   
-# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2015.xlsx'   
-# datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
-# datos = control_calidad(datos_radiales,listado_variables)
-# id_programa = 3
-# nombre_programa = "RADIAL CORUÑA"
+nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2015.xlsx'   
+datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
+datos = control_calidad(datos_radiales,listado_variables)
+id_programa = 3
+nombre_programa = "RADIAL CORUÑA"
 
 
-# # # # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
-# # # # datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
-# # # # datos = control_calidad(datos_pelacus,listado_variables)
-# # # # id_programa = 1
-# # # # min_dist = 50
-# # # # nombre_programa = "PELACUS"
+# # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
+# # datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
+# # datos = control_calidad(datos_pelacus,listado_variables)
+# # id_programa = 1
+# # min_dist = 50
+# # nombre_programa = "PELACUS"
 
-# print(datetime.datetime.now())
+print(datetime.datetime.now())
 
-# datos = evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+datos = evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# print(datetime.datetime.now())
 
-# evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# print(datetime.datetime.now())
 
-# inserta_datos(datos,nombre_programa,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+
+
+
+
+print(datetime.datetime.now())
+
+#datos = evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+
+
+
+# Recupera la tabla con los registros de muetreos físicos
+con_engine             = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+conn                   = create_engine(con_engine)
+tabla_registros_fisica = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+
+
+
+
+# Genera un dataframe solo con las columnas de la tabla datos_discretos_fisica
+datos_fisicos = datos[['temperatura_ctd', 'temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf','par_ctd','par_ctd_qf','turbidez_ctd','turbidez_ctd_qf','id_muestreo_temp']]
+datos_fisicos = datos_fisicos.rename(columns={"id_muestreo_temp": "muestreo"})
+
+# df3 = pd.concat([df1.set_index('id'), 
+                 #df2.set_index('id')], axis=1).reset_index()
+# Comprueba si los registros ya están disponibles en la base de datos
+datos_fisicos['id_disc_fisica'] = numpy.zeros(datos.shape[0],dtype=int)
+for idato in range(datos.shape[0]):
+    # Si el registro ya está en la base de datos eliminarlo del dataframe temporal
+    if datos['id_muestreo_temp'][idato] in tabla_registros_fisica['muestreo'].values:
+        datos_fisicos.drop([idato])        
+
+
+# ### INSERTA LOS DATOS EN LA TABLA DE MUESTREOS PUNTUALES FISICA
+
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
+
+# for idato in range(datos.shape[0]):
+    
+#     # Intenta insertar los muestreos. Si ya existen no hará nada, de lo contrario añade el registro
+#     datos_insercion = (
+#         int(datos['id_muestreo_temp'][idato]),
+#         datos['temperatura_ctd'][idato],datos['temperatura_ctd_qf'][idato],
+#         datos['salinidad_ctd'][idato],datos['salinidad_ctd_qf'][idato],
+#         datos['par_ctd'][idato],datos['par_ctd_qf'][idato]   
+#         )
  
-# print(datetime.datetime.now())
+#     parametros = ['muestreo',
+#                   'temperatura_ctd','temperatura_ctd_qf',
+#                   'salinidad_ctd','salinidad_ctd_qf',
+#                   'par_ctd','par_ctd_qf'
+#                   ]
+ 
+#     str_variables =  'VALUES ('
+#     str_parametros = '('
+#     for iparametro in range(len(parametros)-1):
+#         str_variables  = str_variables + '%s,'
+#         str_parametros = str_parametros + parametros[iparametro] + ','
+#     str_variables = str_variables + '%s)'    
+#     str_parametros = str_parametros + parametros[-1] + ')'
+    
+    
+#     str_actualiza  = 'DO UPDATE SET ('
+#     for iparametro in range(len(parametros)-2):
+#         str_actualiza = str_actualiza + parametros[iparametro+1] + ',' 
+#     str_actualiza = str_actualiza + parametros[-1] + ') = ('
+#     for iparametro in range(len(parametros)-2):
+#         str_actualiza = str_actualiza + 'EXCLUDED.' +  parametros[iparametro+1] + ',' 
+#     str_actualiza = str_actualiza + 'EXCLUDED.' + parametros[-1] + ')' 
+    
+#     instruccion_sql = "INSERT INTO datos_discretos_fisica " + str_parametros + " " + str_variables + "ON CONFLICT (muestreo) " + str_actualiza + ";"       
+#     cursor.execute(instruccion_sql,datos_insercion)
+#     conn.commit()
+    
+# cursor.close()
+# conn.close()
 
 
 
+
+# ### INSERTA LOS DATOS EN LA TABLA DE MUESTREOS PUNTUALES BIOGEOQUIMICOS
+
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
+
+# for idato in range(datos.shape[0]):
+
+#     # Intenta insertar los muestreos. Si ya existe el muestreo, actualiza las variables biogeoquímicas con los datos cargados. 
+#     # De lo contrario, añade el registro correspondiente al nuevo muestreo
+
+#     datos_insercion = (int(datos['id_muestreo_temp'][idato]),
+#         datos['fluorescencia_ctd'][idato],datos['fluorescencia_ctd_qf'][idato],
+#         datos['oxigeno_ctd'][idato],datos['oxigeno_ctd_qf'][idato],
+#         datos['oxigeno_wk'][idato],datos['oxigeno_wk_qf'][idato],
+#         datos['sio4'][idato],datos['sio4_qf'][idato],
+#         datos['no3'][idato],datos['no3_qf'][idato],
+#         datos['no2'][idato],datos['no2_qf'][idato],
+#         datos['po4'][idato],datos['po4_qf'][idato],
+#         datos['tcarbn'][idato],datos['tcarbn_qf'][idato],
+#         datos['alkali'][idato],datos['alkali_qf'][idato],
+#         datos['phts25P0_unpur'][idato],datos['phts25P0_unpur_qf'][idato],
+#         datos['phts25P0_pur'][idato],datos['phts25P0_pur_qf'][idato],
+#         datos['r_clor'][idato],datos['r_clor_qf'][idato],
+#         datos['r_per'][idato],datos['r_per_qf'][idato],
+#         datos['co3_temp'][idato]        
+#         )
+  
+#     parametros = ['muestreo',
+#     'fluorescencia_ctd','fluorescencia_ctd_qf',
+#     'oxigeno_ctd','oxigeno_ctd_qf',
+#     'oxigeno_wk','oxigeno_wk_qf',
+#     'sio4','sio4_qf',
+#     'no3','no3_qf',
+#     'no2','no2_qf',
+#     'po4','po4_qf',
+#     'tcarbn','tcarbn_qf',
+#     'alkali','alkali_qf',
+#     'phts25P0_unpur',' phts25P0_unpur_qf',
+#     'phts25P0_pur','phts25P0_pur_qf',
+#     'r_clor','r_clor_qf',
+#     'r_per','r_per_qf',
+#     'co3_temp']
+    
+#     str_variables =  'VALUES ('
+#     str_parametros = '('
+#     for iparametro in range(len(parametros)-1):
+#         str_variables  = str_variables + '%s,'
+#         str_parametros = str_parametros + parametros[iparametro] + ','
+#     str_variables = str_variables + '%s)'    
+#     str_parametros = str_parametros + parametros[-1] + ')'
+    
+    
+#     str_actualiza  = 'DO UPDATE SET ('
+#     for iparametro in range(len(parametros)-2):
+#         str_actualiza = str_actualiza + parametros[iparametro+1] + ',' 
+#     str_actualiza = str_actualiza + parametros[-1] + ') = ('
+#     for iparametro in range(len(parametros)-2):
+#         str_actualiza = str_actualiza + 'EXCLUDED.' +  parametros[iparametro+1] + ',' 
+#     str_actualiza = str_actualiza + 'EXCLUDED.' + parametros[-1] + ')' 
+    
+#     instruccion_sql = "INSERT INTO datos_discretos_biogeoquimica " + str_parametros + " " + str_variables + "ON CONFLICT (muestreo) " + str_actualiza + ";"       
+#     cursor.execute(instruccion_sql,datos_insercion)
+#     conn.commit()
+
+# cursor.close()
+# conn.close()
