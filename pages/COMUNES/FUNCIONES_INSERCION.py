@@ -472,7 +472,7 @@ def evalua_estaciones(datos,min_dist,id_programa,direccion_host,base_datos,usuar
 ######## FUNCION PARA ENCONTRAR EL IDENTIFICADOR DE CADA REGISTRO  ########
 ###########################################################################
 
-def evalua_registros(datos,direccion_host,base_datos,usuario,contrasena,puerto):
+def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto):
     
     ### DETERMINA EL NUMERO DE REGISTRO DE CADA MUESTREO 
     
