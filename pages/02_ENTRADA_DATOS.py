@@ -118,27 +118,27 @@ for archivo_subido in listado_archivos_subidos:
         st.warning(texto_error, icon="⚠️")
 
     ## Introduce los datos en la base de datos
-    try:
+    # try:
  
-        with st.spinner('Insertando datos en la base de datos'):
+    with st.spinner('Insertando datos en la base de datos'):
 
-            FUNCIONES_INSERCION.inserta_datos(datos,programa_elegido,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+        FUNCIONES_INSERCION.inserta_datos(datos,programa_elegido,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    texto_exito = 'Datos del archivo ' + archivo_subido.name + ' insertados en la base de datos correctamente'
+    st.success(texto_exito)
         
-        texto_exito = 'Datos del archivo ' + archivo_subido.name + ' insertados en la base de datos correctamente'
-        st.success(texto_exito)
+    # except:
+    #     texto_error = 'Error en la subida de los datos del archivo ' + archivo_subido.name
+    #     st.warning(texto_error, icon="⚠️")
         
-    except:
-        texto_error = 'Error en la subida de los datos del archivo ' + archivo_subido.name
-        st.warning(texto_error, icon="⚠️")
-        
-    # Actualiza estado
-    try:
-        FUNCIONES_INSERCION.actualiza_estado(datos,fecha_actualizacion,id_programa_elegido,programa_elegido,tipo_dato_elegido,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
-        texto_exito = 'Las fechas de procesado contenidas en la base de datos han sido actualizadas correctamente'
-        st.success(texto_exito)    
-    except:
-        texto_error = 'Error al actualizar las fechas de procesado en la base de datos'
-        st.warning(texto_error, icon="⚠️")    
+    # # Actualiza estado
+    # try:
+    #     FUNCIONES_INSERCION.actualiza_estado(datos,fecha_actualizacion,id_programa_elegido,programa_elegido,tipo_dato_elegido,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
+    #     texto_exito = 'Las fechas de procesado contenidas en la base de datos han sido actualizadas correctamente'
+    #     st.success(texto_exito)    
+    # except:
+    #     texto_error = 'Error al actualizar las fechas de procesado en la base de datos'
+    #     st.warning(texto_error, icon="⚠️")    
     
     # del(datos)
         
