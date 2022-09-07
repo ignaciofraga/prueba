@@ -234,11 +234,11 @@ def control_calidad(datos,archivo_variables_base_datos):
     datos['id_temp'] = indices_dataframe
     datos.set_index('id_temp',drop=False,append=False,inplace=True)
     
-    # Redondea a 4 decimales los datos de latitud y longitud (precisión utilizada en la base de datos)
+    # Redondea los decimales los datos de latitud, longitud y profundidad (precisión utilizada en la base de datos)
     for idato in range(datos.shape[0]):
         datos['longitud'][idato] = round(datos['longitud'][idato],4)
         datos['latitud'][idato] = round(datos['latitud'][idato],4)
-    
+        datos['profundidad'][idato] = round(datos['latitud'][idato],2)    
     # # # Cambia los valores -999 por None y asigna bandera de calidad correspondiente (por precaucion)
     # # Variables fisicas
     
@@ -267,7 +267,7 @@ def control_calidad(datos,archivo_variables_base_datos):
 ######## FUNCION PARA ENCONTRAR LA ESTACIÓN ASOCIADA A CADA REGISTRO  ########
 ##############################################################################
 
-def evalua_estaciones(datos,min_dist,id_programa,direccion_host,base_datos,usuario,contrasena,puerto):
+def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto):
 
     con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn       = create_engine(con_engine)
@@ -335,139 +335,10 @@ def evalua_estaciones(datos,min_dist,id_programa,direccion_host,base_datos,usuar
     cursor.close()
     conn.close() 
 
+    # elimina la informacion cargada y que no se vaya a exportar, para liberar memoria
+    del(estaciones_muestradas,estaciones_programa,tabla_estaciones)
+    
     return datos     
-
-
-
-    # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    # cursor = conn.cursor()
-    
-    # for idato in range(datos.shape[0]):
-    
-    #     datos_insercion = (str(datos['estacion'][idato]),round(datos['latitud'][idato],4),round(datos['longitud'][idato],4),int(id_programa))
-            
-    #     instruccion_sql = "SELECT id_estacion FROM estaciones WHERE nombre_estacion = %s AND latitud = %s AND longitud=%s AND programa = %s;"
-    #     cursor.execute(instruccion_sql, datos_insercion)
-    #     datos_temporal = cursor.fetchone()
-    #     conn.commit()
-        
-    #     if datos_temporal is None:
-            
-    #         instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s);"   
-    #         cursor.execute(instruccion_sql, (datos_insercion))
-    #         conn.commit() 
-            
-    #         instruccion_sql = "SELECT id_estacion FROM estaciones WHERE nombre_estacion = %s AND latitud = %s AND longitud=%s AND programa = %s;"
-    #         cursor.execute(instruccion_sql, datos_insercion)
-    #         datos_temporal = cursor.fetchone()
-    #         conn.commit()
-            
-    #         datos['id_estacion_temp'][idato] = datos_temporal[0]    
-         
-            
-
-    # # recupera las estaciones disponibles en la base de datos
-    # #conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-
-    # con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    # conn       = create_engine(con_engine)
-    # tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
-    # #conn.close() 
-    
-    # # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
-    # estaciones_programa            = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
-    # indices_dataframe              = numpy.arange(1,estaciones_programa.shape[0]+1,1,dtype=int)    
-    # estaciones_programa['id_temp'] = indices_dataframe
-    # estaciones_programa.set_index('id_temp',drop=True,append=False,inplace=True)
-        
-    
-    # ## Identifica la estación asociada a cada registro
-    
-    # # Columna para punteros de estaciones
-    # datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
-    
-    # # Genera un dataframe con la combinación única de latitud/longitud en los muestreos
-    # coordenadas_unicas            = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
-    # coordenadas_unicas['identif'] = numpy.arange(0,coordenadas_unicas.shape[0],dtype=int)
-    
-    # # Redondea a la misma precisión que las coordenadas almacenadas en la base de datos
-    # coordenadas_unicas = coordenadas_unicas.round({'longitud': 4, 'latitud': 4})
-    
-    # # Busca los registros con la misma lat/lon que cada par de coordenadas únicas, a los que asigna un identificado (nº de estación)
-    # for idato in range(coordenadas_unicas.shape[0]):
-    #     aux = (datos['latitud'] == coordenadas_unicas['latitud'][idato]) & (datos['longitud'] == coordenadas_unicas['longitud'][idato])
-    #     indices = [i for i, x in enumerate(aux) if x]
-    #     datos['id_estacion_temp'][indices] = coordenadas_unicas['identif'][idato]
-
-    # return datos    
-
-
-    # # Recupera las estaciones disponibles en la base de datos
-    # #conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)   
-    # con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    # engine = create_engine(con_engine)
-    # tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', engine)
-    
-    # # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
-    # datos_estaciones = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
-    # indices_dataframe        = numpy.arange(0,datos_estaciones.shape[0],1,dtype=int)    
-    # datos_estaciones['id_temp'] = indices_dataframe
-    # datos_estaciones.set_index('id_temp',drop=True,append=False,inplace=True)
-        
-    
-    # # identifica la estación asociada a cada registro
-    # datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
-    # proy_datos                = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
-    
-    # for iregistro in range(datos.shape[0]): 
-    #     if datos_estaciones.shape[0] == 0:
-                     
-    #         nueva_estacion = {'id_estacion':1,'nombre_estacion':datos['estacion'][iregistro], 'latitud':datos['latitud'][iregistro], 'longitud':datos['longitud'][iregistro], 'programa':id_programa}
-    # #        datos_estaciones = datos_estaciones.concat(nueva_estacion, ignore_index=True)
-    #         datos_estaciones.loc[1] = nueva_estacion       
-    
-    #     else:
-    #         vector_distancias      = numpy.zeros(datos_estaciones.shape[0])
-    #         vector_identificadores = numpy.zeros(datos_estaciones.shape[0],dtype=int)
-           
-    #         # Determina la distancia de cada registro a las estaciones incluidas en la base de datos
-    #         for iestacion_disponible in range(datos_estaciones.shape[0]):
-    #             x_muestreo, y_muestreo = proy_datos(datos['longitud'][iregistro], datos['latitud'][iregistro], inverse=False)
-    #             x_bd, y_bd             = proy_datos(datos_estaciones['longitud'][iestacion_disponible], datos_estaciones['latitud'][iestacion_disponible], inverse=False)
-    #             distancia              = math.sqrt((((x_muestreo-x_bd)**2) + ((y_muestreo-y_bd)**2)))
-               
-    #             vector_distancias[iestacion_disponible]      = distancia
-    #             vector_identificadores[iestacion_disponible] = int(datos_estaciones['id_estacion'][iestacion_disponible])
-               
-    #         # Si la distancia a alguna de las estaciones es menor a la distancia mínima, la estación ya está en la base de datos
-    #         if min(vector_distancias) <= min_dist :
-    #             ipos_minimo = numpy.argmin(vector_distancias)
-    #             datos['id_estacion_temp'][iregistro] = vector_identificadores[ipos_minimo]
-               
-    #         # En caso contrario, la estación es nueva y se añade a la base de datos
-    #         else:
-    #             indice_insercion = int(max(datos_estaciones['id_estacion']) + 1)
-     
-    #             nueva_estacion = {'id_estacion':indice_insercion,'nombre_estacion':datos['estacion'][iregistro], 'latitud':datos['latitud'][iregistro], 'longitud':datos['longitud'][iregistro], 'programa':id_programa}
-    #             #datos_estaciones = datos_estaciones.concat(nueva_estacion, ignore_index=True)
-    #             datos_estaciones.loc[datos_estaciones.shape[0]] = nueva_estacion 
-             
-    #             datos['id_estacion_temp'][iregistro] = indice_insercion 
-    
-    
-    # # Inserta las nuevas estaciones
-    # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    # cursor = conn.cursor()
-    
-    # for iestacion in range(datos_estaciones.shape[0]):
-    #     datos_insercion = (int(datos_estaciones['id_estacion'][iestacion]),str(datos_estaciones['nombre_estacion'][iestacion]),round(datos_estaciones['latitud'][iestacion],4),round(datos_estaciones['longitud'][iestacion],4),int(id_programa))
-    #     instruccion_sql = "INSERT INTO estaciones (id_estacion,nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
-    #     cursor.execute(instruccion_sql, (datos_insercion))
-    #     conn.commit() 
-    # cursor.close()
-    # conn.close()
-    
-    # return datos
 
 
 
@@ -999,15 +870,11 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 # # min_dist = 50
 # # nombre_programa = "PELACUS"
 
-# print(datetime.datetime.now())
+# # print(datetime.datetime.now())
 
 # datos = evalua_estaciones(datos,min_dist,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# print(datetime.datetime.now())
+# # print(datetime.datetime.now())
 
-# datos = evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-
-# print(datetime.datetime.now())
-
-
+# datos = evalua_estacionesevalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 

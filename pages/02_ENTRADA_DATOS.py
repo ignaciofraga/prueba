@@ -24,7 +24,7 @@ logo_IEO_reducido            =  'DATOS/IMAGENES/ieo.ico'
 archivo_plantilla            =  'DATOS/PLANTILLA.xlsx'
 archivo_instrucciones        =  'DATOS/INSTRUCCIONES_PLANTILLA.zip'
 archivo_variables_base_datos =  'DATOS/VARIABLES.xlsx'
-min_dist          = 50 # minima distancia para considerar dos estaciones diferentes
+
 
 ##### FUNCIONES AUXILIARES ######
 
@@ -129,11 +129,13 @@ for archivo_subido in listado_archivos_subidos:
     # except:
     #     texto_error = 'Error al actualizar las fechas de procesado en la base de datos'
     #     st.warning(texto_error, icon="⚠️")    
-            
+    
+    del(datos)
+        
     texto = 'inicia 1 ' + (datetime.datetime.now()).strftime('%H:%M:%S')
     st.text(texto)
 
-    datos = FUNCIONES_INSERCION.evalua_estaciones(datos_corregidos,min_dist,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+    datos = FUNCIONES_INSERCION.evalua_estaciones(datos_corregidos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
  
     texto = 'estaciones ' + (datetime.datetime.now()).strftime('%H:%M:%S')
     st.text(texto)
