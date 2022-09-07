@@ -981,12 +981,12 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
     
   
-# # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2015.xlsx'   
-# # datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
-# # datos = control_calidad(datos_radiales,listado_variables)
-# # id_programa = 3
-# # min_dist = 50
-# # nombre_programa = "RADIAL CORUÑA"
+# # # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2015.xlsx'   
+# # # datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
+# # # datos = control_calidad(datos_radiales,listado_variables)
+# # # id_programa = 3
+# # # min_dist = 50
+# # # nombre_programa = "RADIAL CORUÑA"
 
 
 # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
@@ -997,6 +997,79 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 # nombre_programa = "PELACUS"
 
 # print(datetime.datetime.now())
+
+# evalua_estaciones(datos,min_dist,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+
+
+
+# ### DETERMINA EL NUMERO DE REGISTRO DE CADA MUESTREO 
+
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
+
+# datos['id_muestreo_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+ 
+
+# for idato in range(datos.shape[0]):
+
+#     nombre_muestreo = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
+
+#     # Por seguridad, convierte el identificador de botella a entero si éste existe
+#     if datos['botella'][idato] is not None:
+#         id_botella = int(datos['botella'][idato])
+#     else:
+#         id_botella = None
+        
+#     # Por incompatibilidad con POSTGRESQL hay que "desmontar" y volver a montar las fechas
+#     anho           = datos['fecha_muestreo'][idato].year # 
+#     mes            = datos['fecha_muestreo'][idato].month
+#     dia            = datos['fecha_muestreo'][idato].day
+#     fecha_consulta = datetime.date(anho,mes,dia) 
+    
+#     # Intenta insertar el muestreo correspondiente al registro. Si ya existe en la base de datos no hará nada, de lo contrario añadirá el nuevo muestreo
+#     # Distinta instrucción según haya información de hora o no (para hacer el script más tolerante a fallos)
+    
+#     if datos['hora_muestreo'][idato] is not None:
+#         # Si es un string conviertelo a time
+#         if isinstance(datos['hora_muestreo'][idato], str) is True:
+#             hora_temporal = datetime.datetime.strptime(datos['hora_muestreo'][idato],'%H:%M')
+#         # Si es un datetime conviertelo a time
+#         elif isinstance(datos['hora_muestreo'][idato], datetime.datetime) is True:
+#             hora_temporal = datos['hora_muestreo'][idato].time()
+#         else:
+#             hora_temporal= datos['hora_muestreo'][idato]
+        
+#         # Por incompatibilidad con POSTGRESQL también hay que "desmontar" y volver a montar las horas
+#         hora          = hora_temporal.hour
+#         minuto        = hora_temporal.minute
+#         hora_consulta = datetime.time(hora,minuto) 
+            
+#         instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,hora_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
+#         cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,hora_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+#         conn.commit()
+ 
+#         instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND hora_muestreo=%s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
+#         cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,datos['hora_muestreo'][idato],round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+#         id_muestreos_bd =cursor.fetchone()
+#         conn.commit()     
+    
+
+#     else:
+        
+#         instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
+#         cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+#         conn.commit()
+            
+#         instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
+#         cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
+#         id_muestreos_bd =cursor.fetchone()
+#         conn.commit() 
+    
+#     datos['id_muestreo_temp'][idato] =  id_muestreos_bd[0]
+
+# cursor.close()
+# conn.close() 
+
 
 
 

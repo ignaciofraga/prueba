@@ -138,10 +138,10 @@ for archivo_subido in listado_archivos_subidos:
     texto = 'estaciones ' + (datetime.datetime.now()).strftime('%H:%M:%S')
     st.text(texto)
 
-    # datos = FUNCIONES_INSERCION.evalua_registros(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+    datos = FUNCIONES_INSERCION.evalua_registros(datos,direccion_host,base_datos,usuario,contrasena,puerto)
 
-    # texto = 'registros ' + (datetime.datetime.now()).strftime('%H:%M:%S')
-    # st.text(texto)
+    texto = 'registros ' + (datetime.datetime.now()).strftime('%H:%M:%S')
+    st.text(texto)
     
 
  
