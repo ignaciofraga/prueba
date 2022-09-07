@@ -46,13 +46,20 @@ conn = init_connection()
 df_programas = psql.read_sql('SELECT * FROM programas', conn)
 conn.close()
 
-# Listado del tipo de dato a introducir      
-listado_opciones = ['Análisis de laboratorio','Procesado o revisión de datos ya disponibles']
+col1, col2 = st.columns(2)
 
-# Selección de programa, tipo de dato y correo de contacto
-programa_elegido  = st.selectbox('Selecciona el programa al que corresponden los datos a insertar',(df_programas['nombre_programa']))
-tipo_dato_elegido = st.selectbox('Selecciona el origen de los datos a insertar', (listado_opciones))
-email_contacto    = st.text_input('Correo de contacto', "...@ieo.csic.es")
+with col1:
+    # Formulario 
+    # Listado del tipo de dato a introducir      
+    listado_opciones = ['Análisis de laboratorio','Procesado o revisión de datos ya disponibles']
+    
+    # Selección de programa, tipo de dato y correo de contacto
+    programa_elegido  = st.selectbox('Selecciona el programa al que corresponden los datos a insertar',(df_programas['nombre_programa']))
+    tipo_dato_elegido = st.selectbox('Selecciona el origen de los datos a insertar', (listado_opciones))
+    email_contacto    = st.text_input('Correo de contacto', "...@ieo.csic.es")
+
+with col2:
+    fecha_actualizacion = st.date_input("Selecciona fecha de procesado",datetime.date.today())
 
 
 ### Recupera los identificadores de la selección hecha
@@ -73,6 +80,8 @@ base_datos     = st.secrets["postgres"].dbname
 usuario        = st.secrets["postgres"].user
 contrasena     = st.secrets["postgres"].password
 puerto         = st.secrets["postgres"].port
+
+col1 = st.columns(1)
 
 # Boton para subir los archivos de datos
 listado_archivos_subidos = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)
@@ -108,11 +117,9 @@ for archivo_subido in listado_archivos_subidos:
         texto_error = 'Error en el control de calidad de los datos del archivo ' + archivo_subido.name
         st.warning(texto_error, icon="⚠️")
 
-    st.text(id_programa_elegido)
-
     ## Introduce los datos en la base de datos
     try:
-        with st.spinner('Comprobando los datos importados con los disponibles en la base de datos'):
+        with st.spinner('Comarando los datos importados con los disponibles en la base de datos'):
             # comprueba las estaciones utilizadas
             datos = FUNCIONES_INSERCION.evalua_estaciones(datos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
             # cmprueba los registros a importat
