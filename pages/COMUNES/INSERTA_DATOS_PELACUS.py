@@ -51,6 +51,11 @@ id_programa = FUNCIONES_INSERCION.recupera_id_programa(programa_muestreo,direcci
 
 # Introduce los datos en la base de datos
 print('Introduciendo los datos en la base de datos')
+
+datos = FUNCIONES_INSERCION.evalua_estaciones(datos_pelacus_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+
+datos = FUNCIONES_INSERCION.evalua_registros(datos,programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+
 FUNCIONES_INSERCION.inserta_datos(datos_pelacus_corregido,min_dist,programa_muestreo,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
       
 # Actualiza estado

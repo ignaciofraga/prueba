@@ -51,7 +51,7 @@ col1, col2 = st.columns(2)
 with col1:
     # Formulario 
     # Listado del tipo de dato a introducir      
-    listado_opciones = ['Análisis de laboratorio','Procesado o revisión de datos ya disponibles']
+    listado_opciones = ['Análisis de laboratorio (nuevos datos)','Procesado o revisión de datos ya disponibles']
     
     # Selección de programa, tipo de dato y correo de contacto
     programa_elegido  = st.selectbox('Selecciona el programa al que corresponden los datos a insertar',(df_programas['nombre_programa']))
@@ -117,25 +117,25 @@ for archivo_subido in listado_archivos_subidos:
         texto_error = 'Error en el control de calidad de los datos del archivo ' + archivo_subido.name
         st.warning(texto_error, icon="⚠️")
 
-    # ## Introduce los datos en la base de datos
-    # try:
-    #     with st.spinner('Comparando los datos importados con los disponibles en la base de datos'):
-    #         # comprueba las estaciones utilizadas
-    #         datos = FUNCIONES_INSERCION.evalua_estaciones(datos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
-    #         # cmprueba los registros a importat
-    #         datos = FUNCIONES_INSERCION.evalua_registros(datos,programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+    ## Introduce los datos en la base de datos
+    try:
+        with st.spinner('Comparando los datos importados con los disponibles en la base de datos'):
+            # comprueba las estaciones utilizadas
+            datos = FUNCIONES_INSERCION.evalua_estaciones(datos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+            # cmprueba los registros a importat
+            datos = FUNCIONES_INSERCION.evalua_registros(datos,programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
 
 
-    #     with st.spinner('Insertando datos en la base de datos'):
+        with st.spinner('Insertando datos en la base de datos'):
 
-    #         FUNCIONES_INSERCION.inserta_datos(datos,programa_elegido,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+            FUNCIONES_INSERCION.inserta_datos(datos,programa_elegido,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
             
-    #     texto_exito = 'Datos del archivo ' + archivo_subido.name + ' insertados en la base de datos correctamente'
-    #     st.success(texto_exito)
+        texto_exito = 'Datos del archivo ' + archivo_subido.name + ' insertados en la base de datos correctamente'
+        st.success(texto_exito)
         
-    # except:
-    #     texto_error = 'Error en la subida de los datos del archivo ' + archivo_subido.name
-    #     st.warning(texto_error, icon="⚠️")
+    except:
+        texto_error = 'Error en la subida de los datos del archivo ' + archivo_subido.name
+        st.warning(texto_error, icon="⚠️")
         
     # Actualiza estado
     try:

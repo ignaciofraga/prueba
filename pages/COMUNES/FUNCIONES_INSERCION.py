@@ -11,8 +11,7 @@ import datetime
 from pyproj import Proj
 import math
 import psycopg2
-import pandas.io.sql as psql
-from sqlalchemy import create_engine
+
 
 pandas.options.mode.chained_assignment = None
 
@@ -226,19 +225,11 @@ def control_calidad(datos,archivo_variables_base_datos):
     # Corregir los valores positivos de longitud, pasándolos a negativos (algunos datos de Pelacus tienen este error)
     datos['longitud'] = -1*datos['longitud'].abs()  
     
-
-    #datos = datos.round({"longitud": 4, "latitud": 4})
-    
     # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
     indices_dataframe        = numpy.arange(0,datos.shape[0],1,dtype=int)    
     datos['id_temp'] = indices_dataframe
     datos.set_index('id_temp',drop=False,append=False,inplace=True)
     
-    # Redondea los decimales los datos de latitud, longitud y profundidad (precisión utilizada en la base de datos)
-    for idato in range(datos.shape[0]):
-        datos['longitud'][idato] = round(datos['longitud'][idato],4)
-        datos['latitud'][idato] = round(datos['latitud'][idato],4)
-        datos['profundidad'][idato] = round(datos['profundidad'][idato],2)    
     # # # Cambia los valores -999 por None y asigna bandera de calidad correspondiente (por precaucion)
     # # Variables fisicas
     
@@ -258,96 +249,162 @@ def control_calidad(datos,archivo_variables_base_datos):
 
     return datos    
    
+    # # Carga información de las variables utilizadas en la base de datos  
+    # datos_general     = pandas.read_excel(archivo_variables_base_datos, 'variables')    
+    
+    # variables_muestreo = [x for x in datos_general['parametros_muestreo'] if str(x) != 'nan']
+    # variables_fisicas  = [x for x in datos_general['variables_fisicas'] if str(x) != 'nan']    
+    # variables_biogeoquimicas  = [x for x in datos_general['variables_biogeoquimicas'] if str(x) != 'nan'] 
+    
+    # listado_variables = variables_muestreo + variables_biogeoquimicas + variables_fisicas
 
+    # # Comprueba si falta alguna variable y si es así añade una columna de None
+    # for ivariable in range(len(listado_variables)):
+    #     if listado_variables[ivariable] not in datos:
+    #         datos[listado_variables[ivariable]] = None 
+            
+    # # Reordena las columnas del dataframe para que tengan el mismo orden que el listado de variables
+    # datos = datos.reindex(columns=listado_variables)
 
-
-
-
-##############################################################################
-######## FUNCION PARA ENCONTRAR LA ESTACIÓN ASOCIADA A CADA REGISTRO  ########
-##############################################################################
-
-def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto):
-
-    con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    conn       = create_engine(con_engine)
-    tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+    # # Eliminar los registros sin dato de latitud,longitud, profundidad o fecha 
+    # datos = datos[datos['latitud'].notna()]
+    # datos = datos[datos['longitud'].notna()]  
+    # datos = datos[datos['profundidad'].notna()] 
+    # datos = datos[datos['fecha_muestreo'].notna()] 
+    
+    # # Elimina los registros con datos de profundidad negativos
+    # datos = datos.drop(datos[datos.profundidad < 0].index)
      
+    # # Corregir los valores positivos de longitud, pasándolos a negativos (algunos datos de Pelacus tienen este error)
+    # datos['longitud'] = -1*datos['longitud'].abs()  
+
+    # # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
+    # indices_dataframe        = numpy.arange(0,datos.shape[0],1,dtype=int)    
+    # datos['id_temp'] = indices_dataframe
+    # datos.set_index('id_temp',drop=False,append=False,inplace=True)
+
+    # # # Cambia los valores -999 por None y asigna bandera de calidad correspondiente (por precaucion)
+    # # Variables fisicas
+
+    # datos['temperatura_ctd'][datos['temperatura_ctd']<0] = None
+    # datos.loc[datos['temperatura_ctd'].isnull(),'temperatura_ctd_qf'] = 9
+    # datos['salinidad_ctd'][datos['salinidad_ctd']<0] = None
+    # datos.loc[datos['salinidad_ctd'].isnull(),'salinidad_ctd_qf'] = 9
+    # datos['par_ctd'][datos['par_ctd']<0] = None
+    # datos.loc[datos['par_ctd'].isnull(),'par_ctd_qf'] = 9
+    # datos['turbidez_ctd'][datos['turbidez_ctd']<0] = None
+    # datos.loc[datos['turbidez_ctd'].isnull(),'turbidez_ctd_qf'] = 9
+    # # Variables biogeoquimicas
+    # datos['fluorescencia_ctd'][datos['fluorescencia_ctd']<0] = None
+    # datos.loc[datos['fluorescencia_ctd'].isnull(),'fluorescencia_ctd_qf'] = 9
+    # datos['oxigeno_ctd'][datos['oxigeno_ctd']<0] = None
+    # datos.loc[datos['oxigeno_ctd'].isnull(),'oxigeno_ctd_qf'] = 9    
+    # datos['oxigeno_wk'][datos['oxigeno_wk']<0] = None
+    # datos.loc[datos['oxigeno_wk'].isnull(),'oxigeno_wk_qf'] = 9
+    # datos['no3'][datos['no3']<0] = None 
+    # datos.loc[datos['no3'].isnull(),'no3_qf'] = 9
+    # datos['no2'][datos['no2']<0] = None 
+    # datos.loc[datos['no2'].isnull(),'no2_qf'] = 9    
+    # datos['nh4'][datos['nh4']<0] = None
+    # datos.loc[datos['nh4'].isnull(),'nh4_qf'] = 9
+    # datos['sio4'][datos['sio4']<0] = None
+    # datos.loc[datos['sio4'].isnull(),'sio4_qf'] = 9
+    # datos['tcarbn'][datos['tcarbn']<0] = None 
+    # datos.loc[datos['tcarbn'].isnull(),'tcarbn_qf'] = 9    
+    # datos['doc'][datos['doc']<0] = None
+    # datos.loc[datos['doc'].isnull(),'doc_qf'] = 9      
+    # datos['cdom'][datos['cdom']<0] = None
+    # datos.loc[datos['cdom'].isnull(),'cdom_qf'] = 9     
+    # datos['clorofila_a'][datos['clorofila_a']<0] = None 
+    # datos.loc[datos['clorofila_a'].isnull(),'clorofila_a_qf'] = 9
+    # datos['alkali'][datos['alkali']<0] = None 
+    # datos.loc[datos['alkali'].isnull(),'alkali_qf'] = 9
+    # datos['phts25P0_unpur'][datos['phts25P0_unpur']<0] = None 
+    # datos.loc[datos['phts25P0_unpur'].isnull(),'phts25P0_unpur_qf'] = 9
+    # datos['phts25P0_pur'][datos['phts25P0_pur']<0] = None 
+    # datos.loc[datos['phts25P0_pur'].isnull(),'phts25P0_pur_qf'] = 9
+    # datos['r_clor'][datos['r_clor']<0] = None 
+    # datos.loc[datos['r_clor'].isnull(),'r_clor_qf'] = 9
+    # datos['r_per_qf'][datos['r_per']<0] = 9
+    # datos['r_per'][datos['r_per']<0] = None 
+    # datos.loc[datos['r_per'].isnull(),'r_per_qf'] = 9
+    # datos['co3_temp'][datos['co3_temp']<0] = None 
     
-    # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
-    estaciones_programa            = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
-    indices_dataframe              = numpy.arange(0,estaciones_programa.shape[0],1,dtype=int)    
-    estaciones_programa['id_temp'] = indices_dataframe
-    estaciones_programa.set_index('id_temp',drop=True,append=False,inplace=True)
+    # datos = datos.replace({numpy.nan:None})
     
-    ## Identifica la estación asociada a cada registro
+    # return datos
+
+
+
+
+
+
+#####################################################################################
+######## FUNCION PARA INSERTAR LOS DATOS, YA AJUSTADOS, EN LA BASE DE DATOS  ########
+#####################################################################################
+
+def inserta_datos(datos,min_dist,nombre_programa,id_programa,direccion_host,base_datos,usuario,contrasena,puerto):
+  
+    ### IDENTIFICA LAS ESTACIONES MUESTREADAS Y EVALUA SI YA EXISTEN EN LA BASE DE DATOS (TABLA ESTACIONES)
     
-    # Columna para punteros de estaciones
     datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
     
-    # Genera un dataframe con la combinación única de latitud/longitud en los muestreos
-    estaciones_muestradas             = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
-    estaciones_muestradas['identif']  = numpy.zeros(estaciones_muestradas.shape[0],dtype=int)
-    estaciones_muestradas['io_nueva'] = numpy.ones(estaciones_muestradas.shape[0],dtype=int)
-    estaciones_muestradas['nombre']   = [None]*estaciones_muestradas.shape[0]
-    
-    if len(tabla_estaciones['id_estacion'])>0:
-        id_ultima_estacion_bd = max(tabla_estaciones['id_estacion'])
-    else:
-        id_ultima_estacion_bd = 1
-        
-    icount_nuevas_estaciones = 1
+    proy_datos                = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
     
     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
     cursor = conn.cursor()
     
-    # Encuentra el nombre asociado a cada par de lat/lon y si está incluida en la base de datos (io_nueva = 0 ya incluida en la base de datos; 1 NO incluida en la base de datos)
-    for idato in range(estaciones_muestradas.shape[0]):
-        
-        # Encuentra el nombre asignado en los datos importados a cada nueva estación 
-        aux = (datos ['latitud'] == estaciones_muestradas['latitud'][idato]) & (datos ['longitud'] == estaciones_muestradas['longitud'][idato])
-        if any(aux) is True:
-            indices_datos = [i for i, x in enumerate(aux) if x]
-            estaciones_muestradas['nombre'][idato]  = datos['estacion'][indices_datos[0]]
+    for iregistro in range(datos.shape[0]):  
     
-        # comprueba si la estación muestreada está entre las incluidas en la base de datos (dentro del programa correspondiente)
-        aux = (estaciones_programa['latitud'] == estaciones_muestradas['latitud'][idato]) & (estaciones_programa['longitud'] == estaciones_muestradas['longitud'][idato])
-        # Si la estación muestreada está incluida, asigna a la estación muestreada el identificador utilizado en la base de datos
-        if any(aux) is True:
-            indices = [i for i, x in enumerate(aux) if x]
-            estaciones_muestradas['io_nueva'][idato]  = 0
-            
-            estaciones_muestradas['identif'][idato]  = estaciones_programa['id_estacion'][indices[0]]
-        # Si no está incluida, continúa con la numeración de las estaciones e inserta un nuevo registro en la base de datos
-        else:
-            estaciones_muestradas['identif'][idato]  = id_ultima_estacion_bd+icount_nuevas_estaciones 
-            icount_nuevas_estaciones                 = icount_nuevas_estaciones + 1
-         
-            datos_insercion = (str(estaciones_muestradas['nombre'][idato]),round(estaciones_muestradas['latitud'][idato],4),round(estaciones_muestradas['longitud'][idato],4),int(id_programa))
-                 
-            instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s);"   
+        # Busca el identificador de la estacion
+        instruccion_sql = 'SELECT id_estacion,longitud,latitud FROM estaciones WHERE programa = %s ;'
+        cursor.execute(instruccion_sql,(str(id_programa)))
+        estaciones_disponibles =cursor.fetchall()
+        conn.commit()     
+        
+        # Si no hay registros de estaciones en la bas de datos, insertar la estación muestreada directamente
+        if len(estaciones_disponibles) == 0:
+            datos_insercion = (str(datos['estacion'][iregistro]),round(datos['latitud'][iregistro],4),round(datos['longitud'][iregistro],4),int(id_programa))
+            instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
             cursor.execute(instruccion_sql, (datos_insercion))
             conn.commit() 
-             
-        # Asigna a la matriz de datos la estación asociada a cada registro
-        datos['id_estacion_temp'][indices_datos] = estaciones_muestradas['identif'][idato]
     
+            datos['id_estacion_temp'][iregistro] = 1
+        
+        # En caso contrario, buscar si hay una estación en el mismo punto (+- min_dist)
+        else:
+            
+            vector_distancias      = numpy.zeros(len(estaciones_disponibles))
+            vector_identificadores = numpy.zeros(len(estaciones_disponibles),dtype=int)
+            
+            # Determina la distancia de cada registro a las estaciones incluidas en la base de datos
+            for iestacion_disponible in range(len(estaciones_disponibles)):
+                x_muestreo, y_muestreo = proy_datos(datos['longitud'][iregistro], datos['latitud'][iregistro], inverse=False)
+                x_bd, y_bd             = proy_datos(float(estaciones_disponibles[iestacion_disponible][1]), float(float(estaciones_disponibles[iestacion_disponible][2])), inverse=False)
+                distancia              = math.sqrt((((x_muestreo-x_bd)**2) + ((y_muestreo-y_bd)**2)))
+                
+                vector_distancias[iestacion_disponible]      = distancia
+                vector_identificadores[iestacion_disponible] = int(estaciones_disponibles[iestacion_disponible][0])
+                
+            # Si la distancia a alguna de las estaciones es menor a la distancia mínima, la estación ya está en la base de datos
+            if min(vector_distancias) <= min_dist :
+                ipos_minimo = numpy.argmin(vector_distancias)
+                datos['id_estacion_temp'][iregistro] = int(estaciones_disponibles[ipos_minimo][0])
+                
+            # En caso contrario, la estación es nueva y se añade a la base de datos
+            else:
+                indice_insercion = max(vector_identificadores) + 1
+                datos_insercion = (str(datos['estacion'][iregistro]),round(datos['latitud'][iregistro],4),round(datos['longitud'][iregistro],4),int(id_programa))
+                instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO NOTHING;"   
+                cursor.execute(instruccion_sql, (datos_insercion))
+                conn.commit() 
+        
+                datos['id_estacion_temp'][iregistro] = indice_insercion
+                
     cursor.close()
-    conn.close() 
-
-    # elimina la informacion cargada y que no se vaya a exportar, para liberar memoria
-    del(estaciones_muestradas,estaciones_programa,tabla_estaciones)
+    conn.close()
     
-    return datos     
-
-
-
-###########################################################################
-######## FUNCION PARA ENCONTRAR EL IDENTIFICADOR DE CADA REGISTRO  ########
-###########################################################################
-
-def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto):
-    
+     
     ### DETERMINA EL NUMERO DE REGISTRO DE CADA MUESTREO 
     
     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -357,6 +414,7 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
      
     
     for idato in range(datos.shape[0]):
+    #for idato in range(300): 
     
         nombre_muestreo = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
     
@@ -401,7 +459,7 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
         
     
         else:
-                                                                                                                                                                                                                          
+            
             instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
             cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
             conn.commit()
@@ -410,27 +468,17 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
             cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
             id_muestreos_bd =cursor.fetchone()
             conn.commit() 
-                    
+        
         datos['id_muestreo_temp'][idato] =  id_muestreos_bd[0]
     
     cursor.close()
     conn.close() 
-
-    return datos
-
-
-
-
-
-
-#####################################################################################
-######## FUNCION PARA INSERTAR LOS DATOS, YA AJUSTADOS, EN LA BASE DE DATOS  ########
-#####################################################################################
-
-
-def inserta_datos(datos,nombre_programa,id_programa,direccion_host,base_datos,usuario,contrasena,puerto):
- 
-       
+    
+    
+    
+    
+    
+    
     ### INSERTA LOS DATOS EN LA TABLA DE MUESTREOS PUNTUALES FISICA
     
     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -473,9 +521,18 @@ def inserta_datos(datos,nombre_programa,id_programa,direccion_host,base_datos,us
         cursor.execute(instruccion_sql,datos_insercion)
         conn.commit()
         
+    cursor.close()
+    conn.close()
+    
+    
+    
     
     ### INSERTA LOS DATOS EN LA TABLA DE MUESTREOS PUNTUALES BIOGEOQUIMICOS
-
+    
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor()
+    
+    for idato in range(datos.shape[0]):
     
         # Intenta insertar los muestreos. Si ya existe el muestreo, actualiza las variables biogeoquímicas con los datos cargados. 
         # De lo contrario, añade el registro correspondiente al nuevo muestreo
@@ -538,7 +595,11 @@ def inserta_datos(datos,nombre_programa,id_programa,direccion_host,base_datos,us
     conn.close()
         
  
+     
  
+    
+ 
+    
     
     
  
@@ -547,6 +608,7 @@ def inserta_datos(datos,nombre_programa,id_programa,direccion_host,base_datos,us
 ###################################################################################################
     
 def actualiza_estado(datos,fecha_actualizacion,id_programa,nombre_programa,itipo_informacion,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto):
+
 
     
     # Busca de cuántos años diferentes contiene información el dataframe
@@ -590,7 +652,7 @@ def actualiza_estado(datos,fecha_actualizacion,id_programa,nombre_programa,itipo
                 datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,None,fecha_actualizacion,None,email_contacto]
             
             # Inserta la información en la base de datos
-            instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado,EXCLUDED.contacto_muestreo,EXCLUDED.contacto_post_procesado);"               
+            instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado,EXCLUDED.contacto_muestreo,EXCLUDED.contacto_post_procesado);"   
             cursor.execute(instruccion_sql, (datos_insercion))
             conn.commit()
 
@@ -652,46 +714,37 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 
 
-# base_datos     = 'COAC'
-# usuario        = 'postgres'
-# contrasena     = 'm0nt34lt0'
-# puerto         = '5432'
-# direccion_host = '193.146.155.99'
 
 
 
 
-# listado_variables = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VARIABLES.xlsx'
+
+
 
     
   
-# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2015.xlsx'   
-# datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
-# datos = control_calidad(datos_radiales,listado_variables)
-# id_programa = 3
-# nombre_programa = "RADIAL CORUÑA"
+# # # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2015.xlsx'   
+# # # datos_radiales = lectura_datos_radiales(nombre_archivo,base_datos,usuario,contrasena,puerto) 
 
+#nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
+#datos_pelacus = lectura_datos_pelacus(nombre_archivo,base_datos,usuario,contrasena,puerto)    
+# datos = control_calidad(datos_pelacus,listado_variables)  
+# id_programa = 1
+# min_dist = 50
+# nombre_programa = "PELACUS"
 
-# # # # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
-# # # # datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
-# # # # datos = control_calidad(datos_pelacus,listado_variables)
-# # # # id_programa = 1
-# # # # min_dist = 50
-# # # # nombre_programa = "PELACUS"
-
-# print(datetime.datetime.now())
-
-# datos = evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-
-# print(datetime.datetime.now())
-
-# evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-
-# print(datetime.datetime.now())
-
-# inserta_datos(datos,nombre_programa,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+# # # datos = control_calidad(datos_radiales,listado_variables)  
  
-# print(datetime.datetime.now())
+# # # id_programa = 3
+# # # min_dist = 50
+# # # nombre_programa = "RADIAL CORUÑA"
+
+#datos = datos_pelacus
+#archivo_variables_base_datos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VARIABLES.xlsx'  
+
+
+
+
 
 
 
