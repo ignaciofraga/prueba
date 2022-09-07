@@ -146,7 +146,7 @@ else:
     
     # Representa y ordena la leyenda
     etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
-    plt.legend(patches, etiquetas_leyenda, loc='lower left', bbox_to_anchor=(-0.1, -0.1),fontsize=8)
+    plt.legend(patches, etiquetas_leyenda, loc='lower left', bbox_to_anchor=(-0.1, -0.3),fontsize=8)
     
     
     
