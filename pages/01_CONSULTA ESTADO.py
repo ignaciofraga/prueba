@@ -43,14 +43,6 @@ df_programas = psql.read_sql('SELECT * FROM programas', conn)
 conn.close()
 
 # Despliega un formulario para elegir el programa y la fecha a consultar
-
-## Bara de selección de fecha de consulta. 
-num_semanas_intervalo = 12
-t_actual            = datetime.date.today()
-t_inicial           = t_actual-datetime.timedelta(weeks=num_semanas_intervalo) 
-
-#tiempo_consulta = st.sidebar.slider("Selecciona fecha de consulta",min_value = t_inicial,max_value = t_actual,value = t_actual,step= datetime.timedelta(days=7),format="DD/MM/YYYY")
-#st.sidebar.write("Fecha consultada:", tiempo_consulta.strftime("%d-%m-%Y"))
 with st.form("Formulario seleccion"):
     col1, col2 = st.columns(2,gap="small")
     #nombre_programa, tiempo_consulta = st.columns((1, 1))
@@ -62,14 +54,6 @@ with st.form("Formulario seleccion"):
     # Botón de envío para confirmar selección
     submitted = st.form_submit_button("Enviar")
 
-
-
-# with st.form("Formulario seleccion"):
-#     nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
-#     tiempo_consulta = st.slider("Selecciona fecha de consulta",min_value = t_inicial,max_value = t_actual,value = t_actual,step= datetime.timedelta(days=7),format="DD/MM/YYYY")
-
-#     # Botón de envío para confirmar selección
-#     submitted = st.form_submit_button("Enviar")
 
 # Recupera el identificador del programa seleccionado
 id_programa = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
@@ -195,8 +179,7 @@ else:
     ### Muestra la informacion en la web ###
     ########################################
     
-    
-    
+      
     #Division en dos columnas, una para tabla otra para la imagen
     col1, col2 = st.columns(2,gap="medium")
     
@@ -222,6 +205,10 @@ else:
         fig.savefig(buf, format="png",bbox_inches='tight')
         st.image(buf)
 
+    # Vuelta a la division en una única columna
+    col1 = st.columns(1,gap="medium")
+
+    with col1:
         # Condicional para realizar el procesado sólo si hay datos disponibles         
         if datos_disponibles.shape[0] == 0:
             
