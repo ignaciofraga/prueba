@@ -52,7 +52,7 @@ t_inicial           = t_actual-datetime.timedelta(weeks=num_semanas_intervalo)
 #tiempo_consulta = st.sidebar.slider("Selecciona fecha de consulta",min_value = t_inicial,max_value = t_actual,value = t_actual,step= datetime.timedelta(days=7),format="DD/MM/YYYY")
 #st.sidebar.write("Fecha consultada:", tiempo_consulta.strftime("%d-%m-%Y"))
 with st.form("Formulario seleccion"):
-    nombre_programa, tiempo_consulta = st.columns((1, 1))
+    nombre_programa, tiempo_consulta = st.columns((0, 2))
     nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
     tiempo_consulta = st.date_input("Selecciona fecha de consulta",datetime.date.today())
 
