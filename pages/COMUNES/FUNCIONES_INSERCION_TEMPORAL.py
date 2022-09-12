@@ -258,7 +258,90 @@ def control_calidad(datos,archivo_variables_base_datos):
 
     return datos    
    
+    # # Carga información de las variables utilizadas en la base de datos  
+    # datos_general     = pandas.read_excel(archivo_variables_base_datos, 'variables')    
+    
+    # variables_muestreo = [x for x in datos_general['parametros_muestreo'] if str(x) != 'nan']
+    # variables_fisicas  = [x for x in datos_general['variables_fisicas'] if str(x) != 'nan']    
+    # variables_biogeoquimicas  = [x for x in datos_general['variables_biogeoquimicas'] if str(x) != 'nan'] 
+    
+    # listado_variables = variables_muestreo + variables_biogeoquimicas + variables_fisicas
 
+    # # Comprueba si falta alguna variable y si es así añade una columna de None
+    # for ivariable in range(len(listado_variables)):
+    #     if listado_variables[ivariable] not in datos:
+    #         datos[listado_variables[ivariable]] = None 
+            
+    # # Reordena las columnas del dataframe para que tengan el mismo orden que el listado de variables
+    # datos = datos.reindex(columns=listado_variables)
+
+    # # Eliminar los registros sin dato de latitud,longitud, profundidad o fecha 
+    # datos = datos[datos['latitud'].notna()]
+    # datos = datos[datos['longitud'].notna()]  
+    # datos = datos[datos['profundidad'].notna()] 
+    # datos = datos[datos['fecha_muestreo'].notna()] 
+    
+    # # Elimina los registros con datos de profundidad negativos
+    # datos = datos.drop(datos[datos.profundidad < 0].index)
+     
+    # # Corregir los valores positivos de longitud, pasándolos a negativos (algunos datos de Pelacus tienen este error)
+    # datos['longitud'] = -1*datos['longitud'].abs()  
+
+    # # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
+    # indices_dataframe        = numpy.arange(0,datos.shape[0],1,dtype=int)    
+    # datos['id_temp'] = indices_dataframe
+    # datos.set_index('id_temp',drop=False,append=False,inplace=True)
+
+    # # # Cambia los valores -999 por None y asigna bandera de calidad correspondiente (por precaucion)
+    # # Variables fisicas
+
+    # datos['temperatura_ctd'][datos['temperatura_ctd']<0] = None
+    # datos.loc[datos['temperatura_ctd'].isnull(),'temperatura_ctd_qf'] = 9
+    # datos['salinidad_ctd'][datos['salinidad_ctd']<0] = None
+    # datos.loc[datos['salinidad_ctd'].isnull(),'salinidad_ctd_qf'] = 9
+    # datos['par_ctd'][datos['par_ctd']<0] = None
+    # datos.loc[datos['par_ctd'].isnull(),'par_ctd_qf'] = 9
+    # datos['turbidez_ctd'][datos['turbidez_ctd']<0] = None
+    # datos.loc[datos['turbidez_ctd'].isnull(),'turbidez_ctd_qf'] = 9
+    # # Variables biogeoquimicas
+    # datos['fluorescencia_ctd'][datos['fluorescencia_ctd']<0] = None
+    # datos.loc[datos['fluorescencia_ctd'].isnull(),'fluorescencia_ctd_qf'] = 9
+    # datos['oxigeno_ctd'][datos['oxigeno_ctd']<0] = None
+    # datos.loc[datos['oxigeno_ctd'].isnull(),'oxigeno_ctd_qf'] = 9    
+    # datos['oxigeno_wk'][datos['oxigeno_wk']<0] = None
+    # datos.loc[datos['oxigeno_wk'].isnull(),'oxigeno_wk_qf'] = 9
+    # datos['no3'][datos['no3']<0] = None 
+    # datos.loc[datos['no3'].isnull(),'no3_qf'] = 9
+    # datos['no2'][datos['no2']<0] = None 
+    # datos.loc[datos['no2'].isnull(),'no2_qf'] = 9    
+    # datos['nh4'][datos['nh4']<0] = None
+    # datos.loc[datos['nh4'].isnull(),'nh4_qf'] = 9
+    # datos['sio4'][datos['sio4']<0] = None
+    # datos.loc[datos['sio4'].isnull(),'sio4_qf'] = 9
+    # datos['tcarbn'][datos['tcarbn']<0] = None 
+    # datos.loc[datos['tcarbn'].isnull(),'tcarbn_qf'] = 9    
+    # datos['doc'][datos['doc']<0] = None
+    # datos.loc[datos['doc'].isnull(),'doc_qf'] = 9      
+    # datos['cdom'][datos['cdom']<0] = None
+    # datos.loc[datos['cdom'].isnull(),'cdom_qf'] = 9     
+    # datos['clorofila_a'][datos['clorofila_a']<0] = None 
+    # datos.loc[datos['clorofila_a'].isnull(),'clorofila_a_qf'] = 9
+    # datos['alkali'][datos['alkali']<0] = None 
+    # datos.loc[datos['alkali'].isnull(),'alkali_qf'] = 9
+    # datos['phts25P0_unpur'][datos['phts25P0_unpur']<0] = None 
+    # datos.loc[datos['phts25P0_unpur'].isnull(),'phts25P0_unpur_qf'] = 9
+    # datos['phts25P0_pur'][datos['phts25P0_pur']<0] = None 
+    # datos.loc[datos['phts25P0_pur'].isnull(),'phts25P0_pur_qf'] = 9
+    # datos['r_clor'][datos['r_clor']<0] = None 
+    # datos.loc[datos['r_clor'].isnull(),'r_clor_qf'] = 9
+    # datos['r_per_qf'][datos['r_per']<0] = 9
+    # datos['r_per'][datos['r_per']<0] = None 
+    # datos.loc[datos['r_per'].isnull(),'r_per_qf'] = 9
+    # datos['co3_temp'][datos['co3_temp']<0] = None 
+    
+    # datos = datos.replace({numpy.nan:None})
+    
+    # return datos
 
 
 
@@ -872,13 +955,6 @@ nombre_programa = "RADIAL CORUÑA"
 print(datetime.datetime.now())
 
 datos = evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-
-
-
-
-
-
-
 
 print(datetime.datetime.now())
 

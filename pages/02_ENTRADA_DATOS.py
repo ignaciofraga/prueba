@@ -120,12 +120,22 @@ for archivo_subido in listado_archivos_subidos:
     ## Introduce los datos en la base de datos
     # try:
  
+    with st.spinner('Comprobando los datos ya disponibles en la base de datos'):
+
+        datos = FUNCIONES_INSERCION.evalua_estaciones(datos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)  
+
+        datos = FUNCIONES_INSERCION.evalua_registros(datos,programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+
+
     with st.spinner('Insertando datos en la base de datos'):
 
-        FUNCIONES_INSERCION.inserta_datos(datos,min_dist,programa_elegido,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
-    
+        FUNCIONES_INSERCION.inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+
+        FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+        
     texto_exito = 'Datos del archivo ' + archivo_subido.name + ' insertados en la base de datos correctamente'
     st.success(texto_exito)
+
         
     # except:
     #     texto_error = 'Error en la subida de los datos del archivo ' + archivo_subido.name
