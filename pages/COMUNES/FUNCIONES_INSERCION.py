@@ -164,7 +164,7 @@ def lectura_datos_pelacus(nombre_archivo):
 ##########################################################################
 ######## FUNCION PARA APLICAR CONTROL DE CALIDA BÁSICO LOS DATOS  ########
 ##########################################################################
-def control_calidad(datos,archivo_variables_base_datos):
+def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
  
 
     # Recupera la tabla con los registros de muestreos físicos
@@ -653,7 +653,7 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
   
 # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2016.xlsx'   
 # datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
-# datos = control_calidad(datos_radiales,listado_variables)
+# datos = control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)
 # id_programa = 3
 # nombre_programa = "RADIAL CORUÑA"
 
@@ -667,7 +667,7 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 # print('inicio',datetime.datetime.now())
 
-# datos = evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)  
+#datos = evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)  
 
 # print('evalua estaciones',datetime.datetime.now())
 

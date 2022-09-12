@@ -110,7 +110,7 @@ for archivo_subido in listado_archivos_subidos:
     
     ## Realiza un control de calidad primario a los datos importados   
     try:
-        datos = FUNCIONES_INSERCION.control_calidad(datos,archivo_variables_base_datos) 
+        datos = FUNCIONES_INSERCION.control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto) 
         texto_exito = 'Control de calidad de los datos del archivo ' + archivo_subido.name + ' realizado correctamente'
         st.success(texto_exito)
     except:
