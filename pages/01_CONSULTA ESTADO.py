@@ -301,11 +301,14 @@ else:
         # Añade las coordenadas de cada muestreo, a partir de la estación asociada
         datos_muestreo['latitud']  = numpy.zeros(datos_muestreo.shape[0])
         datos_muestreo['longitud'] = numpy.zeros(datos_muestreo.shape[0])    
+        datos_muestreo['estacion_temp'] = [None]*datos_muestreo.shape[0]
         for iregistro in range(datos_muestreo.shape[0]):
             datos_muestreo['latitud'][iregistro] = temporal_estaciones['latitud'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]]
             datos_muestreo['longitud'][iregistro] = temporal_estaciones['longitud'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]]  
+            datos_muestreo['estacion_temp'][iregistro] = temporal_estaciones['nombre_estacion'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]] 
         del(temporal_estaciones)
-        #datos_muestreo = datos_muestreo.drop(columns=['estacion'])
+        datos_muestreo = datos_muestreo.drop(columns=['estacion'])
+        datos_muestreo = datos_muestreo.rename(columns={"estacion_temp":"estacion"})
         
         # Une los dataframes resultantes
         datos_compuesto = pandas.concat([datos_muestreo, datos_fisicos, datos_biogeoquimicos], axis=1, join='inner')
