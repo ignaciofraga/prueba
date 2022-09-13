@@ -95,7 +95,7 @@ else:
     estado_procesos_programa['estado']    = ''
     estado_procesos_programa['contacto']  = ''
     estado_procesos_programa['id_estado'] = 0
-    estado_procesos_programa['fecha utlima actualizacion'] = [None]*estado_procesos_programa.shape[0]
+    estado_procesos_programa['fecha actualizacion'] = [None]*estado_procesos_programa.shape[0]
     
     nombre_estados  = ['No disponible','Pendiente de análisis','Analizado','Post-Procesado']
     colores_estados = ['#CD5C5C','#F4A460','#87CEEB','#66CDAA','#2E8B57']
@@ -107,7 +107,7 @@ else:
             if tiempo_consulta >= (estado_procesos_programa['fecha_post_procesado'][ianho]):     
                 estado_procesos_programa['id_estado'][ianho] = 3
                 estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho] 
-                estado_procesos_programa['fecha utlima actualizacion'][ianho] = estado_procesos_programa['fecha_post_procesado'][ianho].strftime("%m/%d/%Y")
+                estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_post_procesado'][ianho].strftime("%m/%d/%Y")
         else:
             
             # Caso 2. Fecha de consulta posterior al análisis de laboratorio pero anterior a realizar el post-procesado.
@@ -115,14 +115,14 @@ else:
                 if tiempo_consulta >= (estado_procesos_programa['fecha_analisis_laboratorio'][ianho]):  # estado_procesos_programa['fecha_analisis_laboratorio'][ianho] is not None:     
                     estado_procesos_programa['id_estado'][ianho] = 2
                     estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_muestreo'][ianho] 
-                    estado_procesos_programa['fecha utlima actualizacion'][ianho] = estado_procesos_programa['fecha_analisis_laboratorio'][ianho].strftime("%m/%d/%Y")
+                    estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_analisis_laboratorio'][ianho].strftime("%m/%d/%Y")
             else:
                 # Caso 1. Fecha de consulta posterior a terminar la campaña pero anterior al análisis en laboratorio, o análisis no disponible. 
                 if pandas.isnull(estado_procesos_programa['fecha_final_muestreo'][ianho]) is False:
                     if tiempo_consulta >= (estado_procesos_programa['fecha_final_muestreo'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
                         estado_procesos_programa['id_estado'][ianho] = 1 
                         estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_muestreo'][ianho]
-                        estado_procesos_programa['fecha utlima actualizacion'][ianho] = estado_procesos_programa['fecha_final_muestreo'][ianho].strftime("%m/%d/%Y")
+                        estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_final_muestreo'][ianho].strftime("%m/%d/%Y")
                         
     
         estado_procesos_programa['estado'][ianho] = nombre_estados[estado_procesos_programa['id_estado'][ianho]]
@@ -159,7 +159,7 @@ else:
     
     # Genera un dataframe con las columnas que se quieran mostrar en la web
     datos_visor = estado_procesos_programa.drop(columns=['nombre_programa','fecha_final_muestreo','fecha_analisis_laboratorio','fecha_post_procesado','id_estado','contacto_muestreo','contacto_post_procesado'])
-    datos_visor = datos_visor[['año','estado','fecha utlima actualizacion','contacto']]
+    datos_visor = datos_visor[['año','estado','fecha actualizacion','contacto']]
     
     cellsytle_jscode = st_aggrid.shared.JsCode(
     """function(params) {
