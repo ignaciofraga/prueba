@@ -161,6 +161,8 @@ else:
     datos_visor = estado_procesos_programa.drop(columns=['nombre_programa','fecha_final_muestreo','fecha_analisis_laboratorio','fecha_post_procesado','id_estado','contacto_muestreo','contacto_post_procesado'])
     datos_visor = datos_visor[['año','estado','fecha actualizacion','contacto']]
     
+    datos_visor = datos_visor.sort_values(by=['año'])
+    
     cellsytle_jscode = st_aggrid.shared.JsCode(
     """function(params) {
     if (params.value.includes('No disponible'))

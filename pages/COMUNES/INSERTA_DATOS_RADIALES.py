@@ -17,13 +17,6 @@ pandas.options.mode.chained_assignment = None
 import datetime
 
 # Parámetros de la base de datos
-base_datos     = 'IEO_Coruna'
-usuario        = 'postgres'
-contrasena     = 'IEO2022'
-puerto         = '5432'
-direccion_host = 'localhost'
-
-
 base_datos     = 'COAC'
 usuario        = 'postgres'
 contrasena     = 'm0nt34lt0'
@@ -33,7 +26,6 @@ direccion_host = '193.146.155.99'
 # Parámetros
 programa_muestreo = 'RADIAL CORUÑA'
 
-archivo_variables_base_datos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VARIABLES.xlsx'  
 directorio_datos             = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES'
 
 itipo_informacion = 1 # 1-dato nuevo (analisis laboratorio)  2-dato re-analizado (control calidad)   
@@ -43,6 +35,10 @@ email_contacto    = 'prueba@ieo.csic.es'
 fecha_actualizacion = datetime.date.today()
 
 ### PROCESADO ###
+
+# Recupera el identificador del programa de muestreo
+id_programa = FUNCIONES_INSERCION.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+
 
 # Listado de archivos disponibles
 from os import listdir
@@ -57,21 +53,24 @@ for iarchivo in range(len(listado_archivos)):
  
     print('Leyendo los datos contenidos en el archivo excel')
     datos_radiales = FUNCIONES_INSERCION.lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto)
-    
+   
     # Realiza un control de calidad primario a los datos importados   
     print('Realizando control de calidad')
-    datos_radiales_corregido = FUNCIONES_INSERCION.control_calidad(datos_radiales,archivo_variables_base_datos)  
+    datos,textos_aviso = FUNCIONES_INSERCION.control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto) 
      
-    # Recupera el identificador del programa de muestreo
-    id_programa = FUNCIONES_INSERCION.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
-    
+
     # Introduce los datos en la base de datos
     print('Introduciendo los datos en la base de datos')
-    datos = FUNCIONES_INSERCION.evalua_estaciones(datos_radiales_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-    
+
+    datos = FUNCIONES_INSERCION.evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)  
+
     datos = FUNCIONES_INSERCION.evalua_registros(datos,programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+
+    FUNCIONES_INSERCION.inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+
+    FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
     
-    FUNCIONES_INSERCION.inserta_datos(datos,programa_muestreo,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+
           
     # Actualiza estado
     print('Actualizando el estado de los procesos')
