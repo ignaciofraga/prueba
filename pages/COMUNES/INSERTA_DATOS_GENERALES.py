@@ -235,9 +235,9 @@ for iprograma in range(tabla_programas.shape[0]):
         
         for idatos_programa  in range(fechas_programa.shape[0]):   
             # Inserta la información en la base de datos
-            datos_insercion     = [int(tabla_programas['id_programa'][iprograma]),tabla_programas['nombre_programa'][iprograma],int(fechas_programa['año'][idatos_programa]),fechas_programa['fecha_muestreo'][idatos_programa],fechas_programa['fecha_analisis_laboratorio'][idatos_programa],fechas_programa['fecha_post_procesado'][idatos_programa]]
+            datos_insercion     = [int(tabla_programas['id_programa'][iprograma]),tabla_programas['nombre_programa'][iprograma],int(fechas_programa['año'][idatos_programa]),fechas_programa['fecha_muestreo'][idatos_programa],fechas_programa['fecha_analisis_laboratorio'][idatos_programa],fechas_programa['fecha_post_procesado'][idatos_programa],None,None]
         
-            instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado);"   
+            instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado,EXCLUDED.contacto_muestreo,EXCLUDED.contacto_post_procesado);"   
             cursor.execute(instruccion_sql, (datos_insercion))
             conn.commit()
         
