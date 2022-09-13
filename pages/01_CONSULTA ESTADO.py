@@ -159,7 +159,7 @@ else:
     
     # Genera un dataframe con las columnas que se quieran mostrar en la web
     datos_visor = estado_procesos_programa.drop(columns=['nombre_programa','fecha_final_muestreo','fecha_analisis_laboratorio','fecha_post_procesado','id_estado','contacto_muestreo','contacto_post_procesado'])
-    datos_visor = datos_visor['año','estado','fecha utlima actualizacion','contacto']
+    #datos_visor = datos_visor['año','estado','fecha utlima actualizacion','contacto']
     
     cellsytle_jscode = st_aggrid.shared.JsCode(
     """function(params) {
