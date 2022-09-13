@@ -270,9 +270,9 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
 
 def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto):
 
-    con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    conn       = create_engine(con_engine)
-    tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+    con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    conn_psql        = create_engine(con_engine)
+    tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
      
     
     # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
@@ -287,21 +287,17 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
     
     # Genera un dataframe con la combinación única de latitud/longitud en los muestreos
-    estaciones_muestradas             = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
-    estaciones_muestradas['identif']  = numpy.zeros(estaciones_muestradas.shape[0],dtype=int)
-    estaciones_muestradas['io_nueva'] = numpy.ones(estaciones_muestradas.shape[0],dtype=int)
-    estaciones_muestradas['nombre']   = [None]*estaciones_muestradas.shape[0]
+    estaciones_muestradas                      = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
+    estaciones_muestradas['id_estacion']           = numpy.zeros(estaciones_muestradas.shape[0],dtype=int)
+    estaciones_muestradas['io_nueva_estacion'] = numpy.ones(estaciones_muestradas.shape[0],dtype=int)
+    estaciones_muestradas['nombre_estacion']   = [None]*estaciones_muestradas.shape[0]
+    
     
     if len(tabla_estaciones['id_estacion'])>0:
         id_ultima_estacion_bd = max(tabla_estaciones['id_estacion'])
     else:
         id_ultima_estacion_bd = 0
         
-    icount_nuevas_estaciones = 1
-    
-    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    cursor = conn.cursor()
-    
     # Encuentra el nombre asociado a cada par de lat/lon y si está incluida en la base de datos (io_nueva = 0 ya incluida en la base de datos; 1 NO incluida en la base de datos)
     for idato in range(estaciones_muestradas.shape[0]):
         
@@ -309,32 +305,39 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         aux = (datos ['latitud'] == estaciones_muestradas['latitud'][idato]) & (datos ['longitud'] == estaciones_muestradas['longitud'][idato])
         if any(aux) is True:
             indices_datos = [i for i, x in enumerate(aux) if x]
-            estaciones_muestradas['nombre'][idato]  = datos['estacion'][indices_datos[0]]
+            estaciones_muestradas['nombre_estacion'][idato]  = datos['estacion'][indices_datos[0]]
     
         # comprueba si la estación muestreada está entre las incluidas en la base de datos (dentro del programa correspondiente)
         aux = (estaciones_programa['latitud'] == estaciones_muestradas['latitud'][idato]) & (estaciones_programa['longitud'] == estaciones_muestradas['longitud'][idato])
         # Si la estación muestreada está incluida, asigna a la estación muestreada el identificador utilizado en la base de datos
         if any(aux) is True:
             indices = [i for i, x in enumerate(aux) if x]
-            estaciones_muestradas['io_nueva'][idato]  = 0
+            estaciones_muestradas['io_nueva_estacion'][idato]  = 0
             
-            estaciones_muestradas['identif'][idato]  = estaciones_programa['id_estacion'][indices[0]]
+            estaciones_muestradas['id_estacion'][idato]  = estaciones_programa['id_estacion'][indices[0]]
         # Si no está incluida, continúa con la numeración de las estaciones e inserta un nuevo registro en la base de datos
         else:
-            estaciones_muestradas['identif'][idato]  = id_ultima_estacion_bd+icount_nuevas_estaciones 
-            icount_nuevas_estaciones                 = icount_nuevas_estaciones + 1
-         
-            datos_insercion = (str(estaciones_muestradas['nombre'][idato]),round(estaciones_muestradas['latitud'][idato],4),round(estaciones_muestradas['longitud'][idato],4),int(id_programa))
+            id_ultima_estacion_bd                    = id_ultima_estacion_bd + 1
+            estaciones_muestradas['id_estacion'][idato]  = id_ultima_estacion_bd 
                  
-            instruccion_sql = "INSERT INTO estaciones (nombre_estacion,latitud,longitud,programa) VALUES (%s,%s,%s,%s);"   
-            cursor.execute(instruccion_sql, (datos_insercion))
-            conn.commit() 
-             
         # Asigna a la matriz de datos la estación asociada a cada registro
-        datos['id_estacion_temp'][indices_datos] = estaciones_muestradas['identif'][idato]
+        datos['id_estacion_temp'][indices_datos] = estaciones_muestradas['id_estacion'][idato]
     
-    cursor.close()
-    conn.close() 
+    
+    if numpy.count_nonzero(estaciones_muestradas['io_nueva_estacion']) > 0:
+    
+        # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
+        nuevos_muestreos  = estaciones_muestradas[estaciones_muestradas['io_nueva_estacion']==1]
+        # Mantén sólo las columnas que interesan
+        exporta_registros = nuevos_muestreos[['id_estacion','nombre_estacion','latitud','longitud']]
+        # Añade columna con el identiicador del programa
+        exporta_registros['programa'] = numpy.zeros(exporta_registros.shape[0],dtype=int)
+        exporta_registros['programa'] = id_programa
+        # corrije el indice del dataframe 
+        exporta_registros.set_index('id_estacion',drop=True,append=False,inplace=True)
+    
+        # Inserta el dataframe resultante en la base de datos 
+        exporta_registros.to_sql('estaciones', conn_psql,if_exists='append')
 
     # elimina la informacion cargada y que no se vaya a exportar, para liberar memoria
     del(estaciones_muestradas,estaciones_programa,tabla_estaciones)
@@ -350,73 +353,72 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
 
 def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto):
     
-    ### DETERMINA EL NUMERO DE REGISTRO DE CADA MUESTREO 
+    # Recupera la tabla con los registros de los muestreos
+    con_engine      = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    conn_psql       = create_engine(con_engine)
+    tabla_muestreos = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
     
-    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    cursor = conn.cursor()
     
-    datos['id_muestreo_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
-     
     
-    for idato in range(datos.shape[0]):
+    # si no hay ningun valor en la tabla de registro, meter directamente todos los datos registrados
+    if tabla_muestreos.shape[0] == 0:
+        
+        # genera un dataframe con las variables que interesa introducir en la base de datos
+        exporta_registros                    = datos[['id_estacion_temp','profundidad','fecha_muestreo','configuracion_perfilador','configuracion_superficie']]
+        # Elimina duplicados (por precaucion)
+        exporta_registros = exporta_registros.drop_duplicates()
+        # añade el indice de cada registro
+        indices_registros                    = numpy.arange(1,(exporta_registros.shape[0]+1))    
+        exporta_registros['id_muestreo']     = indices_registros
+        # renombra la columna con información de la estación muetreada
+        exporta_registros                    = exporta_registros.rename(columns={"id_estacion_temp":"estacion"})
+        # añade el nombre del muestreo
+        exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
+        for idato in range(exporta_registros.shape[0]):    
+            exporta_registros['nombre_muestreo'][idato]  = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
     
-        nombre_muestreo = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
-    
-        # Por seguridad, convierte el identificador de botella a entero si éste existe
-        if datos['botella'][idato] is not None:
-            id_botella = int(datos['botella'][idato])
-        else:
-            id_botella = None
             
-        # Por incompatibilidad con POSTGRESQL hay que "desmontar" y volver a montar las fechas
-        anho           = datos['fecha_muestreo'][idato].year # 
-        mes            = datos['fecha_muestreo'][idato].month
-        dia            = datos['fecha_muestreo'][idato].day
-        fecha_consulta = datetime.date(anho,mes,dia) 
-        
-        # Intenta insertar el muestreo correspondiente al registro. Si ya existe en la base de datos no hará nada, de lo contrario añadirá el nuevo muestreo
-        # Distinta instrucción según haya información de hora o no (para hacer el script más tolerante a fallos)
-        
-        if datos['hora_muestreo'][idato] is not None:
-            # Si es un string conviertelo a time
-            if isinstance(datos['hora_muestreo'][idato], str) is True:
-                hora_temporal = datetime.datetime.strptime(datos['hora_muestreo'][idato],'%H:%M')
-            # Si es un datetime conviertelo a time
-            elif isinstance(datos['hora_muestreo'][idato], datetime.datetime) is True:
-                hora_temporal = datos['hora_muestreo'][idato].time()
+        # Inserta en base de datos        
+        exporta_registros.set_index('id_muestreo',drop=True,append=False,inplace=True)
+        exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append') 
+    
+    # En caso contrario hay que ver registro a registro, si ya está incluido en la base de datos
+    else:
+    
+        ultimo_registro_bd         = max(tabla_muestreos['id_muestreo'])
+        datos['io_nuevo_muestreo'] = numpy.zeros(datos.shape[0],dtype=int)
+        datos['id_muestreo_temp']  = numpy.zeros(datos.shape[0],dtype=int)
+    
+        for idato in range(datos.shape[0]):
+            df_temporal = tabla_muestreos.loc[(tabla_muestreos['estacion'] == datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo'] == datos['fecha_muestreo'][idato]) & (tabla_muestreos['profundidad'] == datos['profundidad'][idato]) & (tabla_muestreos['configuracion_perfilador'] == datos['configuracion_perfilador'][idato])  & (tabla_muestreos['configuracion_superficie'] == datos['configuracion_superficie'][idato])]
+            # Registro ya incluido, recuperar el identificador
+            if df_temporal.shape[0] >0:
+                datos['id_muestreo_temp'] [idato] =  df_temporal.iloc[0]['id_muestreo']
+            # Nuevo registro
             else:
-                hora_temporal= datos['hora_muestreo'][idato]
-            
-            # Por incompatibilidad con POSTGRESQL también hay que "desmontar" y volver a montar las horas
-            hora          = hora_temporal.hour
-            minuto        = hora_temporal.minute
-            hora_consulta = datetime.time(hora,minuto) 
+                # Asigna el identificador (siguiente al máximo disponible)
+                ultimo_registro_bd                = ultimo_registro_bd + 1
+                datos['id_muestreo_temp'][idato]  = ultimo_registro_bd               
+                datos['io_nuevo_muestreo'][idato] = 1 
                 
-            instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,hora_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
-            cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,hora_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
-            conn.commit()
-     
-            instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND hora_muestreo=%s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
-            cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,datos['hora_muestreo'][idato],round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
-            id_muestreos_bd =cursor.fetchone()
-            conn.commit()     
         
+        if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
+        
+            # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
+            nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
+            # Mantén sólo las columnas que interesan
+            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','profundidad','configuracion_perfilador','configuracion_superficie']]
+            # Cambia el nombre de la columna de estaciones
+            exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion","id_muestreo_temp":"id_muestreo"})
+            # añade el nombre del muestreo
+            exporta_registros['nombre_muestreo'] = [None]*nuevos_muestreos.shape[0]
+            for idato in range(exporta_registros.shape[0]):    
+                exporta_registros['nombre_muestreo'][idato]         = nombre_programa + '_' + str(exporta_registros['fecha_muestreo'][idato].year) + '_E' + str(exporta_registros['estacion'][idato])
     
-        else:
-                                                                                                                                                                                                                          
-            instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
-            cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
-            conn.commit()
-                
-            instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
-            cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
-            id_muestreos_bd =cursor.fetchone()
-            conn.commit() 
-                    
-        datos['id_muestreo_temp'][idato] =  id_muestreos_bd[0]
     
-    cursor.close()
-    conn.close() 
+            # # Inserta el dataframe resultante en la base de datos 
+            exporta_registros.set_index('id_muestreo',drop=True,append=False,inplace=True)
+            exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append')    
 
     return datos
 
@@ -651,23 +653,22 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
     
   
-# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2016.xlsx'   
+# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2018.xlsx'   
 # datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
 # datos = control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)
 # id_programa = 3
 # nombre_programa = "RADIAL CORUÑA"
 
 
-# # # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
-# # # datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
-# # # datos = control_calidad(datos_pelacus,listado_variables)
-# # # id_programa = 1
-# # # min_dist = 50
-# # # nombre_programa = "PELACUS"
+# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
+# datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
+# datos = control_calidad(datos_pelacus,direccion_host,base_datos,usuario,contrasena,puerto)
+# id_programa = 1
+# nombre_programa = "PELACUS"
 
-# print('inicio',datetime.datetime.now())
+# # print('inicio',datetime.datetime.now())
 
-#datos = evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)  
+# datos = evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)  
 
 # print('evalua estaciones',datetime.datetime.now())
 
@@ -675,40 +676,33 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 # print('evalua registros',datetime.datetime.now())
 
-# inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
-
-# print('inserta datos fisica',datetime.datetime.now())
-
-# inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
-
-# print('inserta datos biogeoquimica',datetime.datetime.now())
-
-
-
 # # Recupera la tabla con los registros de los muestreos
 # con_engine      = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
 # conn_psql       = create_engine(con_engine)
 # tabla_muestreos = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
 
 
-# ### RETOMAR AQUI 
 
 # # si no hay ningun valor en la tabla de registro, meter directamente todos los datos registrados
 # if tabla_muestreos.shape[0] == 0:
     
 #     # genera un dataframe con las variables que interesa introducir en la base de datos
-#     exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','profundidad','configuracion_perfilador','configuracion_superficie']]
+#     exporta_registros                    = datos[['id_estacion_temp','profundidad','fecha_muestreo','configuracion_perfilador','configuracion_superficie']]
+#     # Elimina duplicados (por precaucion)
+#     exporta_registros = exporta_registros.drop_duplicates()
 #     # añade el indice de cada registro
-#     indices_registros                    = numpy.arange(1,(datos.shape[0]+1))    
+#     indices_registros                    = numpy.arange(1,(exporta_registros.shape[0]+1))    
 #     exporta_registros['id_muestreo']     = indices_registros
 #     # renombra la columna con información de la estación muetreada
 #     exporta_registros                    = exporta_registros.rename(columns={"id_estacion_temp":"estacion"})
 #     # añade el nombre del muestreo
-#     exporta_registros['nombre_muestreo'] = []
+#     exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
 #     for idato in range(exporta_registros.shape[0]):    
-#         exporta_registros[idato]         = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
-            
+#         exporta_registros['nombre_muestreo'][idato]  = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
+
+        
 #     # Inserta en base de datos        
+#     exporta_registros.set_index('id_muestreo',drop=True,append=False,inplace=True)
 #     exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append') 
 
 # # En caso contrario hay que ver registro a registro, si ya está incluido en la base de datos
@@ -717,254 +711,49 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 #     id_muestreo_temporal       = numpy.zeros(datos.shape[0],dtype=int)
 #     ultimo_registro_bd         = max(tabla_muestreos['id_muestreo'])
 #     datos['io_nuevo_muestreo'] = numpy.zeros(datos.shape[0],dtype=int)
+#     datos['id_muestreo_temp']  = numpy.zeros(datos.shape[0],dtype=int)
 
 #     for idato in range(datos.shape[0]):
 #         df_temporal = tabla_muestreos.loc[(tabla_muestreos['estacion'] == datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo'] == datos['fecha_muestreo'][idato]) & (tabla_muestreos['profundidad'] == datos['profundidad'][idato]) & (tabla_muestreos['configuracion_perfilador'] == datos['configuracion_perfilador'][idato])  & (tabla_muestreos['configuracion_superficie'] == datos['configuracion_superficie'][idato])]
 #         # Registro ya incluido, recuperar el identificador
 #         if df_temporal.shape[0] >0:
-#             id_muestreo_temporal[idato] =  df_temporal.iloc[0]['id_muestreo']
+#             datos['id_muestreo_temp'] [idato] =  df_temporal.iloc[0]['id_muestreo']
 #         # Nuevo registro
 #         else:
 #             # Asigna el identificador (siguiente al máximo disponible)
 #             ultimo_registro_bd                = ultimo_registro_bd + 1
-#             id_muestreo_temporal[idato]       = ultimo_registro_bd
+#             datos['id_muestreo_temp'][idato]  = ultimo_registro_bd
 #             nombre_muestreo                   = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
             
 #             datos['io_nuevo_muestreo'][idato] = 1 
             
-#     # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
-#     nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
-#     # Mantén sólo las columnas que interesan
-#     exporta_registros = nuevos_muestreos[['id_estacion_temp','fecha_muestreo','profundidad','configuracion_perfilador','configuracion_superficie']]
-#     # Cambia el nombre de la columna de estaciones
-#     exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion"})
-#     # añade el nombre del muestreo
-#     exporta_registros['nombre_muestreo'] = []
-#     for idato in range(exporta_registros.shape[0]):    
-#         exporta_registros[idato]         = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
+    
+#     if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
+    
+#         # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
+#         nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
+#         # Mantén sólo las columnas que interesan
+#         exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','profundidad','configuracion_perfilador','configuracion_superficie']]
+#         # Cambia el nombre de la columna de estaciones
+#         exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion","id_muestreo_temp":"id_muestreo"})
+#         # añade el nombre del muestreo
+#         exporta_registros['nombre_muestreo'] = [None]*nuevos_muestreos.shape[0]
+#         for idato in range(exporta_registros.shape[0]):    
+#             exporta_registros['nombre_muestreo'][idato]         = nombre_programa + '_' + str(exporta_registros['fecha_muestreo'][idato].year) + '_E' + str(exporta_registros['estacion'][idato])
 
 
-#     # # Inserta el dataframe resultante en la base de datos 
-#     exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append')    
+#         # # Inserta el dataframe resultante en la base de datos 
+#         exporta_registros.set_index('id_muestreo',drop=True,append=False,inplace=True)
+#         exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append')    
                 
-  
-    #         # Añade el registro en el dataframe con los valores de la base de datos
-    #         tabla_muestreos.loc[-1] = [id_muestreo_temporal[idato],nombre_muestreo,datos['id_estacion_temp'][idato], datos['fecha_muestreo'][idato], datos['hora_muestreo'][idato],datos['profundidad'][idato], datos['botella'][idato],datos['configuracion_perfilador'][idato],datos['configuracion_superficie'][idato]]  # adding a row
-    #         tabla_muestreos.index = tabla_muestreos.index + 1
-
-    # # Reasigna indices por si se añadieron nuevos registros
-    # indices_dataframe        = numpy.arange(0,tabla_muestreos.shape[0],1,dtype=int)    
-    # tabla_muestreos['index'] = indices_dataframe
-    # tabla_muestreos.set_index('index',drop=False,append=False,inplace=True)
-    
-    # # Añade información del identificador de muestreo a los datos
-    # datos['id_muestreo_temp'] =  id_muestreo_temporal
-    
-    # # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
-    # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    # cursor = conn.cursor()
-    # cursor.execute("TRUNCATE muestreos_discretos;")
-    # conn.commit()
-    # cursor.close()
-    # conn.close() 
-    
-    # # Inserta el dataframe resultante en la base de datos 
-    # tabla_muestreos.to_sql('muestreos_discretos', conn_psql,if_exists='append')    
-    
-    
-
-# # Genera un dataframe solo con las variales biogeoquimicas de los datos a importar 
-# datos_muestreo = datos[['id_estacion_temp','fluorescencia_ctd','fluorescencia_ctd_qf','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk_qf',
-#                              'no3','no3_qf','no2','no2_qf','nh4','nh4_qf','po4','po4_qf','sio4','sio4_qf','tcarbn','tcarbn_qf','doc','doc_qf',
-#                              'cdom','cdom_qf','clorofila_a','clorofila_a_qf','alkali','alkali_qf','phts25p0_unpur','phts25p0_unpur_qf','phts25p0_pur','phts25p0_pur_qf','r_clor','r_clor_qf','r_per','r_per_qf','co3_temp']]    
-
-# d_muestreo SERIAL PRIMARY KEY,'
-# ' nombre_muestreo text,'
-# ' estacion int NOT NULL,'
-# ' fecha_muestreo date NOT NULL,'
-# ' hora_muestreo time,'
-# ' profundidad NUMERIC (6, 2) NOT NULL,'
-# ' botella int,'
-# ' configuracion_perfilador int NOT NULL,'
-# ' configuracion_superficie int NOT NULL,'
-# ) 
-
-
-
-# datos_biogeoquimica = datos_biogeoquimica.rename(columns={"id_muestreo_temp": "muestreo"})
-
-# # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
-# for idato in range(tabla_registros_biogoquim.shape[0]):
-#     try:
-#         tabla_registros_biogoquim = tabla_registros_biogoquim.drop(tabla_registros_biogoquim[tabla_registros_biogoquim.muestreo == datos_biogeoquimica['muestreo'][idato]].index)
-#     except:
-#         pass
-    
-# # Une ambos dataframes, el que contiene los datos nuevo y el que tiene los datos que ya están en la base de datos
-# datos_conjuntos = pandas.concat([tabla_registros_biogoquim, datos_biogeoquimica])
-    
-# vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
-# datos_conjuntos['id_disc_biogeoquim'] = vector_identificadores
-
-# datos_conjuntos.set_index('id_disc_biogeoquim',drop=True,append=False,inplace=True)
-
-# # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
-# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-# cursor = conn.cursor()
-# instruccion_sql = "TRUNCATE datos_discretos_biogeoquimica;"
-# cursor.execute(instruccion_sql)
-# conn.commit()
-# cursor.close()
-# conn.close() 
-
-# # Inserta el dataframe resultante en la base de datos 
-# datos_conjuntos.to_sql('datos_discretos_biogeoquimica', conn_psql,if_exists='append')
-
-
-
-   # ### DETERMINA EL NUMERO DE REGISTRO DE CADA MUESTREO 
-   
-   # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-   # cursor = conn.cursor()
-   
-   # datos['id_muestreo_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
-    
-   
-   # for idato in range(datos.shape[0]):
-   
-   #     nombre_muestreo = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
-   
-   #     # Por seguridad, convierte el identificador de botella a entero si éste existe
-   #     if datos['botella'][idato] is not None:
-   #         id_botella = int(datos['botella'][idato])
-   #     else:
-   #         id_botella = None
-           
-   #     # Por incompatibilidad con POSTGRESQL hay que "desmontar" y volver a montar las fechas
-   #     anho           = datos['fecha_muestreo'][idato].year # 
-   #     mes            = datos['fecha_muestreo'][idato].month
-   #     dia            = datos['fecha_muestreo'][idato].day
-   #     fecha_consulta = datetime.date(anho,mes,dia) 
-       
-   #     # Intenta insertar el muestreo correspondiente al registro. Si ya existe en la base de datos no hará nada, de lo contrario añadirá el nuevo muestreo
-   #     # Distinta instrucción según haya información de hora o no (para hacer el script más tolerante a fallos)
-       
-   #     if datos['hora_muestreo'][idato] is not None:
-   #         # Si es un string conviertelo a time
-   #         if isinstance(datos['hora_muestreo'][idato], str) is True:
-   #             hora_temporal = datetime.datetime.strptime(datos['hora_muestreo'][idato],'%H:%M')
-   #         # Si es un datetime conviertelo a time
-   #         elif isinstance(datos['hora_muestreo'][idato], datetime.datetime) is True:
-   #             hora_temporal = datos['hora_muestreo'][idato].time()
-   #         else:
-   #             hora_temporal= datos['hora_muestreo'][idato]
-           
-   #         # Por incompatibilidad con POSTGRESQL también hay que "desmontar" y volver a montar las horas
-   #         hora          = hora_temporal.hour
-   #         minuto        = hora_temporal.minute
-   #         hora_consulta = datetime.time(hora,minuto) 
-               
-   #         instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,hora_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
-   #         cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,hora_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
-   #         conn.commit()
-    
-   #         instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND hora_muestreo=%s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
-   #         cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,datos['hora_muestreo'][idato],round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
-   #         id_muestreos_bd =cursor.fetchone()
-   #         conn.commit()     
-       
-   
-   #     else:
-                                                                                                                                                                                                                         
-   #         instruccion_sql = "INSERT INTO muestreos_discretos (nombre_muestreo,estacion,fecha_muestreo,profundidad,botella,configuracion_perfilador,configuracion_superficie) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_muestreo,profundidad,configuracion_perfilador,configuracion_superficie) DO NOTHING;"   
-   #         cursor.execute(instruccion_sql, (nombre_muestreo,int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),id_botella,int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
-   #         conn.commit()
-               
-   #         instruccion_sql = "SELECT id_muestreo FROM muestreos_discretos WHERE estacion = %s AND fecha_muestreo = %s AND profundidad = %s AND configuracion_perfilador = %s AND configuracion_superficie = %s;"
-   #         cursor.execute(instruccion_sql, (int(datos['id_estacion_temp'][idato]),fecha_consulta,round(datos['profundidad'][idato],2),int(datos['configuracion_perfilador'][idato]),int(datos['configuracion_superficie'][idato])))
-   #         id_muestreos_bd =cursor.fetchone()
-   #         conn.commit() 
-                   
-   #     datos['id_muestreo_temp'][idato] =  id_muestreos_bd[0]
-   
-   # cursor.close()
-   # conn.close() 
-
-   # return datos
+        
+        
+        
+     
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-### DETERMINA EL NUMERO DE REGISTRO DE CADA MUESTREO 
-
-
-
-# # Recupera la tabla con los registros de muestreos físicos
-# con_engine                = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-# conn_psql                      = create_engine(con_engine)
-# tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
-
-# # Genera un dataframe solo con las variales fisicas de los datos a importar 
-# datos_fisica = datos[['temperatura_ctd', 'temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf','par_ctd','par_ctd_qf','turbidez_ctd','turbidez_ctd_qf','id_muestreo_temp']]
-# datos_fisica = datos_fisica.rename(columns={"id_muestreo_temp": "muestreo"})
-
-# # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
-# for idato in range(datos_fisica.shape[0]):
-#     try:
-#         tabla_registros_fisica = tabla_registros_fisica.drop(tabla_registros_fisica[tabla_registros_fisica.muestreo == datos_fisica['muestreo'][idato]].index)
-#     except:
-#         pass
-    
-# # Une ambos dataframes, el que contiene los datos nuevo y el que tiene los datos que ya están en la base de datos
-# datos_conjuntos = pandas.concat([tabla_registros_fisica, datos_fisica])
-    
-# vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
-# datos_conjuntos['id_disc_fisica'] = vector_identificadores
-
-# datos_conjuntos.set_index('id_disc_fisica',drop=True,append=False,inplace=True)
-
-# # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
-# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-# cursor = conn.cursor()
-# instruccion_sql = "TRUNCATE datos_discretos_fisica;"
-# cursor.execute(instruccion_sql)
-# conn.commit()
-# cursor.close()
-# conn.close() 
-
-# # Inserta el dataframe resultante en la base de datos 
-# datos_conjuntos.to_sql('datos_discretos_fisica', conn_psql,if_exists='append')
-
-
-                       
-                       #dtype={'datefld': sqlalchemy.DateTime(),'intfld':  sqlalchemy.types.INTEGER(),'strfld': sqlalchemy.types.NVARCHAR(length=255),'floatfld': sqlalchemy.types.Float(precision=3, asdecimal=True),'booleanfld': sqlalchemy.types.Boolean})
-
-
-
-
-#indexes_to_keep = set(range(tabla_registros_fisica.shape[0])) - set(datos_fisica['muestreo'])
-#registros_fisica_mantener = tabla_registros_fisica.take(list(indexes_to_keep))
-# 
-
-# df3 = pd.concat([df1.set_index('id'), 
-                 #df2.set_index('id')], axis=1).reset_index()
-# # Comprueba si los registros ya están disponibles en la base de datos
-# datos_fisica['id_disc_fisica'] = numpy.zeros(datos.shape[0],dtype=int)
-# for idato in range(datos.shape[0]):
-#     # Si el registro ya está en la base de datos eliminarlo del dataframe temporal
-#     if datos['id_muestreo_temp'][idato] in datos_fisica['muestreo'].values:
-#         datos_fisicos.drop([idato])      
 
 
