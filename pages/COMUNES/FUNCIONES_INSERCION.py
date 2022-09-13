@@ -367,11 +367,11 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
     if tabla_muestreos.shape[0] == 0:
     
         # genera un dataframe con las variables que interesa introducir en la base de datos
-        exporta_registros                    = datos[['id_estacion_temp','profundidad','fecha_muestreo','configuracion_perfilador','configuracion_superficie']]
+        exporta_registros                    = datos[['id_estacion_temp','profundidad','fecha_muestreo','hora_muestreo','configuracion_perfilador','configuracion_superficie']]
         # añade el indice de cada registro
         indices_registros                    = numpy.arange(1,(exporta_registros.shape[0]+1))    
         exporta_registros['id_muestreo']     = indices_registros
-        # renombra la columna con información de la estación muetreada
+        # renombra la columna con información de la estación muestreada
         exporta_registros                    = exporta_registros.rename(columns={"id_estacion_temp":"estacion"})
         # añade el nombre del muestreo
         exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
@@ -407,7 +407,7 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
             # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
             nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
             # Mantén sólo las columnas que interesan
-            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','profundidad','configuracion_perfilador','configuracion_superficie']]
+            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','hora_muestreo','profundidad','configuracion_perfilador','configuracion_superficie']]
             # Cambia el nombre de la columna de estaciones
             exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion","id_muestreo_temp":"id_muestreo"})
             # añade el nombre del muestreo
@@ -419,8 +419,7 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
             # # Inserta el dataframe resultante en la base de datos 
             exporta_registros.set_index('id_muestreo',drop=True,append=False,inplace=True)
             exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append')    
-    
-    
+
 
     return datos
 
@@ -626,94 +625,34 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     
 # base_datos     = 'COAC'
 # usuario        = 'postgres'
 # contrasena     = 'm0nt34lt0'
 # puerto         = '5432'
 # direccion_host = '193.146.155.99'
-
-
-
-
-# # # listado_variables = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VARIABLES.xlsx'
-
-    
-  
-# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2013.xlsx'   
+ 
+# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2014.xlsx'   
 # datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
 # datos = control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)
 # id_programa = 3
 # nombre_programa = "RADIAL CORUÑA"
 
+# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
+# datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
+# datos = control_calidad(datos_pelacus,direccion_host,base_datos,usuario,contrasena,puerto)
+# id_programa = 1
+# nombre_programa = "PELACUS"
 
-# # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
-# # datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
-# # datos = control_calidad(datos_pelacus,direccion_host,base_datos,usuario,contrasena,puerto)
-# # id_programa = 1
-# # nombre_programa = "PELACUS"
-
-# # # print('inicio',datetime.datetime.now())
+# # # # print('inicio',datetime.datetime.now())
 
 # datos = evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)  
 
 # # print('evalua estaciones',datetime.datetime.now())
 
-# datos = evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+# # datos = evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# # print('evalua registros',datetime.datetime.now())
-
-
-# # Recupera la tabla con los registros de muestreos físicos
-# con_engine                = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-# conn_psql                      = create_engine(con_engine)
-# tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
-
-# # Genera un dataframe solo con las variales fisicas de los datos a importar 
-# datos_fisica = datos[['temperatura_ctd', 'temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf','par_ctd','par_ctd_qf','turbidez_ctd','turbidez_ctd_qf','id_muestreo_temp']]
-# datos_fisica = datos_fisica.rename(columns={"id_muestreo_temp": "muestreo"})
-
-# # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
-# for idato in range(datos_fisica.shape[0]):
-#     try:
-#         tabla_registros_fisica = tabla_registros_fisica.drop(tabla_registros_fisica[tabla_registros_fisica.muestreo == datos_fisica['muestreo'][idato]].index)
-#     except:
-#         pass
-    
-# # Une ambos dataframes, el que contiene los datos nuevo y el que tiene los datos que ya están en la base de datos
-# datos_conjuntos = pandas.concat([tabla_registros_fisica, datos_fisica])
-    
-# vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
-# datos_conjuntos['id_disc_fisica'] = vector_identificadores
-
-# datos_conjuntos.set_index('id_disc_fisica',drop=True,append=False,inplace=True)
-
-# # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
-# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-# cursor = conn.cursor()
-# instruccion_sql = "TRUNCATE datos_discretos_fisica;"
-# cursor.execute(instruccion_sql)
-# conn.commit()
-# cursor.close()
-# conn.close() 
-
-# # Inserta el dataframe resultante en la base de datos 
-# datos_conjuntos.to_sql('datos_discretos_fisica', conn_psql,if_exists='append')
+# # # print('evalua registros',datetime.datetime.now())
 
 
 
