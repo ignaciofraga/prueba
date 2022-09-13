@@ -208,7 +208,7 @@ dataframe_variables.set_index('id_variable',drop =True,append=False,inplace=True
 con_engine                = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
 conn_psql                 = create_engine(con_engine)
 
-dataframe_variables.to_sql('variables_procesado', conn_psql,if_exists='append')
+dataframe_variables.to_sql('variables_procesado', conn_psql,if_exists='replace')
 
 # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
 # cursor = conn.cursor()

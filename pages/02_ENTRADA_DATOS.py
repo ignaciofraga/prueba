@@ -100,22 +100,22 @@ for archivo_subido in listado_archivos_subidos:
 
     # Programa Radiales (2-Vigo, 3-Coruña, 4-Santander)    
     if id_programa_elegido == 2 or id_programa_elegido == 3 or id_programa_elegido == 4: 
-        try:    
-            datos = FUNCIONES_INSERCION.lectura_datos_radiales(archivo_subido,direccion_host,base_datos,usuario,contrasena,puerto)
-            texto_exito = 'Lectura del archivo ' + archivo_subido.name + ' realizada correctamente'
-            st.success(texto_exito)
-        except:
-            texto_error = 'Error en la lectura del archivo ' + archivo_subido.name
-            st.warning(texto_error, icon="⚠️")
+        # try:    
+        datos = FUNCIONES_INSERCION.lectura_datos_radiales(archivo_subido,direccion_host,base_datos,usuario,contrasena,puerto)
+        texto_exito = 'Lectura del archivo ' + archivo_subido.name + ' realizada correctamente'
+        st.success(texto_exito)
+        # except:
+        #     texto_error = 'Error en la lectura del archivo ' + archivo_subido.name
+        #     st.warning(texto_error, icon="⚠️")
     
     ## Realiza un control de calidad primario a los datos importados   
-    try:
-        datos = FUNCIONES_INSERCION.control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto) 
-        texto_exito = 'Control de calidad de los datos del archivo ' + archivo_subido.name + ' realizado correctamente'
-        st.success(texto_exito)
-    except:
-        texto_error = 'Error en el control de calidad de los datos del archivo ' + archivo_subido.name
-        st.warning(texto_error, icon="⚠️")
+    #try:
+    datos = FUNCIONES_INSERCION.control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto) 
+    texto_exito = 'Control de calidad de los datos del archivo ' + archivo_subido.name + ' realizado correctamente'
+    st.success(texto_exito)
+    # except:
+    #     texto_error = 'Error en el control de calidad de los datos del archivo ' + archivo_subido.name
+    #     st.warning(texto_error, icon="⚠️")
 
     ## Introduce los datos en la base de datos
     # try:
