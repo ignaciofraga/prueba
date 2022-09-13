@@ -68,7 +68,7 @@ id_programa_elegido = int(df_programas['id_programa'][df_programas['nombre_progr
 # Encuentra el identificador asociado al tipo de dato
 for iorigen in range(len(listado_opciones)):
     if listado_opciones[iorigen] == tipo_dato_elegido:
-        id_opcion_elegida = iorigen
+        id_opcion_elegida = iorigen + 1
         
 ### Subida de archivos
 
