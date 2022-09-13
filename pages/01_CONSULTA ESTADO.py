@@ -305,7 +305,12 @@ else:
         for iregistro in range(datos_muestreo.shape[0]):
             datos_muestreo['latitud'][iregistro] = temporal_estaciones['latitud'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]]
             datos_muestreo['longitud'][iregistro] = temporal_estaciones['longitud'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]]  
-            datos_muestreo['estacion_temp'][iregistro] = str(temporal_estaciones['nombre_estacion'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]])
+            
+            aux = temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]
+            if any(aux) is True:
+                indices_datos = [i for i, x in enumerate(aux) if x]
+                datos_muestreo['estacion_temp'][iregistro]  = temporal_estaciones['nombre_estacion'][indices_datos[0]]
+                
         datos_muestreo = datos_muestreo.drop(columns=['estacion'])
         datos_muestreo = datos_muestreo.rename(columns={"estacion_temp":"estacion"})
         
