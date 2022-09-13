@@ -632,14 +632,14 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 
     
-base_datos     = 'COAC'
-usuario        = 'postgres'
-contrasena     = 'm0nt34lt0'
-puerto         = '5432'
-direccion_host = '193.146.155.99'
+# base_datos     = 'COAC'
+# usuario        = 'postgres'
+# contrasena     = 'm0nt34lt0'
+# puerto         = '5432'
+# direccion_host = '193.146.155.99'
  
-nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2013.xlsx'   
-datos          = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
+# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2013.xlsx'   
+# datos          = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
 # datos,textos_aviso = control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)
 # id_programa = 3
 # nombre_programa = "RADIAL CORUÑA"
