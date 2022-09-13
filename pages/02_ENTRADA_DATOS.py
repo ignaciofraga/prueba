@@ -100,7 +100,7 @@ for archivo_subido in listado_archivos_subidos:
     if id_programa_elegido == 2 or id_programa_elegido == 3 or id_programa_elegido == 4: 
         try:    
             datos = FUNCIONES_INSERCION.lectura_datos_radiales(archivo_subido,direccion_host,base_datos,usuario,contrasena,puerto)
-            texto_exito = 'Lectura del archivo ' + archivo_subido.name + ' realizada correctamente'
+            texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
             st.success(texto_exito)
         except:
             texto_error = 'Error en la lectura del archivo ' + archivo_subido.name
