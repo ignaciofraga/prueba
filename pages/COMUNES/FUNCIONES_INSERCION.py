@@ -224,6 +224,9 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
     datos = datos[datos['profundidad'].notna()] 
     datos = datos[datos['fecha_muestreo'].notna()] 
     
+    # Elimina los registros con datos de profundidad negativos
+    datos = datos.drop(datos[datos.profundidad < 0].index)
+    
     # Elimina registros duplicados en el mismo punto y a la misma hora(por precaucion)
     num_reg_inicial = datos.shape[0]
     datos           = datos.drop_duplicates(subset=['latitud','longitud','profundidad','fecha_muestreo','hora_muestreo'], keep='last')    
@@ -231,9 +234,7 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
     if num_reg_final < num_reg_inicial:
         textos_aviso.append('Se han eliminado registros correspondientes a una misma fecha y punto')
     
-    # Elimina los registros con datos de profundidad negativos
-    datos = datos.drop(datos[datos.profundidad < 0].index)
-     
+    
     # Corregir los valores positivos de longitud, pasándolos a negativos (algunos datos de Pelacus tienen este error)
     datos['longitud'] = -1*datos['longitud'].abs()  
     
@@ -631,14 +632,14 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 
     
-# base_datos     = 'COAC'
-# usuario        = 'postgres'
-# contrasena     = 'm0nt34lt0'
-# puerto         = '5432'
-# direccion_host = '193.146.155.99'
+base_datos     = 'COAC'
+usuario        = 'postgres'
+contrasena     = 'm0nt34lt0'
+puerto         = '5432'
+direccion_host = '193.146.155.99'
  
-# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2014.xlsx'   
-# datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
+nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2013.xlsx'   
+datos          = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
 # datos,textos_aviso = control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)
 # id_programa = 3
 # nombre_programa = "RADIAL CORUÑA"
@@ -658,7 +659,6 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 # # datos = evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
 # # # print('evalua registros',datetime.datetime.now())
-
 
 
 
