@@ -232,7 +232,7 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
     datos           = datos.drop_duplicates(subset=['latitud','longitud','profundidad','fecha_muestreo','hora_muestreo'], keep='last')    
     num_reg_final   = datos.shape[0]
     if num_reg_final < num_reg_inicial:
-        textos_aviso.append('Se han eliminado registros correspondientes a una misma fecha y punto')
+        textos_aviso.append('Se han eliminado registros correspondientes a una misma fecha, hora,profundidad y estación')
     
     
     # Corregir los valores positivos de longitud, pasándolos a negativos (algunos datos de Pelacus tienen este error)
@@ -547,9 +547,7 @@ def actualiza_estado(datos,fecha_actualizacion,id_programa,nombre_programa,itipo
     for ianho in range(len(anhos_muestreados)):
         
         anho_procesado = anhos_muestreados[ianho]
-        
-        #anho_procesado = 2045
-        
+               
         # Selecciona la información de cada uno de los años 
         fechas_anuales  = datos['fecha_muestreo'][datos['año']==anhos_muestreados[ianho]]
         

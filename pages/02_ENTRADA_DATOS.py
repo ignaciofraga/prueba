@@ -23,8 +23,6 @@ from pages.COMUNES import FUNCIONES_INSERCION
 logo_IEO_reducido            =  'DATOS/IMAGENES/ieo.ico'
 archivo_plantilla            =  'DATOS/PLANTILLA.xlsx'
 archivo_instrucciones        =  'DATOS/INSTRUCCIONES_PLANTILLA.zip'
-archivo_variables_base_datos =  'DATOS/VARIABLES.xlsx'
-min_dist                     = 50
 
 ##### FUNCIONES AUXILIARES ######
 
@@ -92,7 +90,7 @@ for archivo_subido in listado_archivos_subidos:
     if id_programa_elegido == 1: 
         try:
             datos       = FUNCIONES_INSERCION.lectura_datos_pelacus(archivo_subido)
-            texto_exito = 'Lectura del archivo ' + archivo_subido.name + ' realizada correctamente'
+            texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
             st.success(texto_exito)
         except:
             texto_error = 'Error en la lectura del archivo ' + archivo_subido.name
@@ -100,47 +98,46 @@ for archivo_subido in listado_archivos_subidos:
 
     # Programa Radiales (2-Vigo, 3-Coruña, 4-Santander)    
     if id_programa_elegido == 2 or id_programa_elegido == 3 or id_programa_elegido == 4: 
-        # try:    
-        datos = FUNCIONES_INSERCION.lectura_datos_radiales(archivo_subido,direccion_host,base_datos,usuario,contrasena,puerto)
-        texto_exito = 'Lectura del archivo ' + archivo_subido.name + ' realizada correctamente'
-        st.success(texto_exito)
-        # except:
-        #     texto_error = 'Error en la lectura del archivo ' + archivo_subido.name
-        #     st.warning(texto_error, icon="⚠️")
+        try:    
+            datos = FUNCIONES_INSERCION.lectura_datos_radiales(archivo_subido,direccion_host,base_datos,usuario,contrasena,puerto)
+            texto_exito = 'Lectura del archivo ' + archivo_subido.name + ' realizada correctamente'
+            st.success(texto_exito)
+        except:
+            texto_error = 'Error en la lectura del archivo ' + archivo_subido.name
+            st.warning(texto_error, icon="⚠️")
     
-    ## Realiza un control de calidad primario a los datos importados   
-    #try:
-    datos,textos_aviso = FUNCIONES_INSERCION.control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto) 
-    texto_exito = 'Control de calidad de los datos del archivo ' + archivo_subido.name + ' realizado correctamente'
-    st.success(texto_exito)
-    if len(textos_aviso)>0:
-        for iaviso in range(len(textos_aviso)):
-            st.warning(textos_aviso[iaviso], icon="⚠️")
+    # Realiza un control de calidad primario a los datos importados   
+    try:
+        datos,textos_aviso = FUNCIONES_INSERCION.control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto) 
+        texto_exito = 'Control de calidad de los datos del archivo ' + archivo_subido.name + ' realizado correctamente'
+        st.success(texto_exito)
+        if len(textos_aviso)>0:
+            for iaviso in range(len(textos_aviso)):
+                st.warning(textos_aviso[iaviso], icon="⚠️")
         
-    # except:
-    #     texto_error = 'Error en el control de calidad de los datos del archivo ' + archivo_subido.name
-    #     st.warning(texto_error, icon="⚠️")
+    except:
+        texto_error = 'Error en el control de calidad de los datos del archivo ' + archivo_subido.name
+        st.warning(texto_error, icon="⚠️")
 
-    ## Introduce los datos en la base de datos
-    # try:
+    # Introduce los datos en la base de datos
+    try:
  
-    with st.spinner('Insertando datos en la base de datos'):
+        with st.spinner('Insertando datos en la base de datos'):
+    
+            datos = FUNCIONES_INSERCION.evalua_estaciones(datos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)  
+    
+            datos = FUNCIONES_INSERCION.evalua_registros(datos,programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+            FUNCIONES_INSERCION.inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+            FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+            
+        texto_exito = 'Datos del archivo ' + archivo_subido.name + ' insertados en la base de datos correctamente'
+        st.success(texto_exito)
 
-        datos = FUNCIONES_INSERCION.evalua_estaciones(datos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)  
-
-        datos = FUNCIONES_INSERCION.evalua_registros(datos,programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
-
-        FUNCIONES_INSERCION.inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
-
-        FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
-        
-    texto_exito = 'Datos del archivo ' + archivo_subido.name + ' insertados en la base de datos correctamente'
-    st.success(texto_exito)
-
-        
-    # except:
-    #     texto_error = 'Error en la subida de los datos del archivo ' + archivo_subido.name
-    #     st.warning(texto_error, icon="⚠️")
+    except:
+        texto_error = 'Error en la subida de los datos del archivo ' + archivo_subido.name
+        st.warning(texto_error, icon="⚠️")
         
     # # Actualiza estado
     # try:

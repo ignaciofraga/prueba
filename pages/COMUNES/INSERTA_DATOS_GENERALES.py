@@ -210,69 +210,65 @@ conn_psql                 = create_engine(con_engine)
 
 dataframe_variables.to_sql('variables_procesado', conn_psql,if_exists='replace')
 
-# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-# cursor = conn.cursor()
-
-
-# for d in parametros_muestreo:
-#     cursor.execute("INSERT into variables_procesado(parametros_muestreo) VALUES (%s)", d)
-#     conn.commit() 
-    
-# str_valores = ''
-# # Inserta los datos de cada programa
-# for imuestreo in range(len(parametros_muestreo)-1):
-#     str_valores = str_valores + '%s,'
-# str_valores = str_valores + '%s'
-    
-# instruccion_sql = "INSERT INTO variables_procesado (parametros_muestreo) VALUES (%s) ;"   
-# cursor.execute(instruccion_sql, (parametros_muestreo))
-# conn.commit()  
-
-
 
 
 
 ### AÑADE LOS REGISTROS DE ENTRADA DE LOS TIEMPOS/FECHAS DE LAS DIFERENTES CAMPAÑAS
 
-# vector_tiempos      = pandas.date_range(datetime.date.today()-datetime.timedelta(days=2),datetime.date.today(),freq='d')
-# fecha_inicio_config = datetime.date(1995,1,1)
 
-# id_buque              = [1,2,3]
-# centro_asociado       = ['CORUNA','VIGO','SANTANDER']
-# sensores_tsg          = ['TSG_SBE','TSG_SBE','TSG_SBE']
-# num_serie_tsg         = ['NTSG001','NTSG001','NTSG001']
-# propietario_tsg       = ['COAC','COVIGO','UTM'] 
-# fecha_calibracion_tsg = vector_tiempos
+archivo_fechas = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/TIEMPOS.xlsx'
 
-# # Encuentra el identificador correspondiente a cada centro
-# instruccion_sql = "SELECT id_centro FROM centros_oceanograficos;"
-# cursor.execute(instruccion_sql)
-# id_centro =cursor.fetchall()
-# conn.commit()
+con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+conn_psql        = create_engine(con_engine)
+tabla_programas  = psql.read_sql('SELECT * FROM programas', conn_psql)
 
-# instruccion_sql = "SELECT nombre_centro FROM centros_oceanograficos;"
-# cursor.execute(instruccion_sql)
-# nombre_centro =cursor.fetchall()
-# conn.commit()
+for iprograma in range(tabla_programas.shape[0]):
+    
+    try:
+        
+        fechas_programa = pandas.read_excel(archivo_fechas,sheet_name=tabla_programas['nombre_programa'][iprograma])
+        
+        fechas_programa.replace({numpy.nan: None}, inplace = True)
+        
+        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        cursor = conn.cursor()   
+        
+        for idatos_programa  in range(fechas_programa.shape[0]):   
+            # Inserta la información en la base de datos
+            datos_insercion     = [int(tabla_programas['id_programa'][iprograma]),tabla_programas['nombre_programa'][iprograma],int(fechas_programa['año'][idatos_programa]),fechas_programa['fecha_muestreo'][idatos_programa],fechas_programa['fecha_analisis_laboratorio'][idatos_programa],fechas_programa['fecha_post_procesado'][idatos_programa]]
+        
+            instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado);"   
+            cursor.execute(instruccion_sql, (datos_insercion))
+            conn.commit()
+        
+        cursor.close()
+        conn.close()
 
-# id_asociado = numpy.zeros(len(centro_asociado))
-# for icentro in range(len(centro_asociado)):
-#     for icompara in range(len(id_centro)):
-#         if centro_asociado[icentro] == nombre_centro[icompara][0]:
-#            id_asociado[icentro] = id_centro[icompara][0]
-
-
-# # Inserta los datos de cada configuracion del perfilador
-# for iconfiguracion in range(len(sensores_tsg)):
-#     instruccion_sql = "INSERT INTO configuracion_superficie (id_config_superficie,buque,centro_asociado,fecha_inicio,sensor_tsg,num_serie_tsg,propietario_tsg,fecha_calibracion_tsg) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_config_superficie) DO UPDATE SET (buque,centro_asociado,fecha_inicio,sensor_tsg,num_serie_tsg,propietario_tsg,fecha_calibracion_tsg) = (EXCLUDED.buque,EXCLUDED.centro_asociado,EXCLUDED.fecha_inicio,EXCLUDED.sensor_tsg,EXCLUDED.num_serie_tsg,EXCLUDED.propietario_tsg,EXCLUDED.fecha_calibracion_tsg);"   
-#     cursor.execute(instruccion_sql, (iconfiguracion+1,int(id_buque[iconfiguracion]),id_asociado[iconfiguracion],fecha_inicio_config,sensores_tsg[iconfiguracion],num_serie_tsg[iconfiguracion],propietario_tsg[iconfiguracion],fecha_calibracion_tsg[iconfiguracion]))
-#     conn.commit() 
+    except:
+        pass
 
 
-# cursor.close()
-# conn.close()
+# for iprograma in range(tabla_programas.shape[0]):
+#     try:
 
+#         fechas_programa = pandas.read_excel(archivo_fechas,sheet_name=tabla_programas['nombre_programa'][iprograma])
+        
+#         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+#         cursor = conn.cursor()   
+        
+#         for idatos_programa  in range(fechas_programa.shape[0]):   
+#             # Inserta la información en la base de datos
+#             datos_insercion     = [int(tabla_programas['id_programa'][iprograma]),tabla_programas['nombre_programa'][iprograma],int(fechas_programa['año'][idatos_programa]),fechas_programa['fecha_muestreo'][idatos_programa],fechas_programa['fecha_analisis_laboratorio'][idatos_programa],fechas_programa['fecha_post_procesado'][idatos_programa]]
+        
+#             instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado);"   
+#             cursor.execute(instruccion_sql, (datos_insercion))
+#             conn.commit()
+        
+#         cursor.close()
+#         conn.close()
 
+#     except:
+#         pass
 
 
 
