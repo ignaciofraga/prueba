@@ -166,7 +166,8 @@ def lectura_datos_pelacus(nombre_archivo):
 ##########################################################################
 def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
  
-
+    textos_aviso = [] 
+    
     # Recupera la tabla con los registros de muestreos físicos
     con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql          = create_engine(con_engine)
@@ -224,7 +225,11 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
     datos = datos[datos['fecha_muestreo'].notna()] 
     
     # Elimina registros duplicados en el mismo punto y a la misma hora(por precaucion)
-    datos = datos.drop_duplicates(subset=['latitud','longitud','profundidad','fecha_muestreo','hora_muestreo'], keep='last')    
+    num_reg_inicial = datos.shape[0]
+    datos           = datos.drop_duplicates(subset=['latitud','longitud','profundidad','fecha_muestreo','hora_muestreo'], keep='last')    
+    num_reg_final   = datos.shape[0]
+    if num_reg_final < num_reg_inicial:
+        textos_aviso.append('Se han eliminado registros correspondientes a una misma fecha y punto')
     
     # Elimina los registros con datos de profundidad negativos
     datos = datos.drop(datos[datos.profundidad < 0].index)
@@ -260,7 +265,7 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
         qf_variable = variables_biogeoquimicas[ivariable_biogeoquimica] + '_qf'
         datos.loc[datos[variables_biogeoquimicas[ivariable_biogeoquimica]].isnull(),qf_variable] = 9
 
-    return datos    
+    return datos,textos_aviso    
  
     
  
@@ -634,13 +639,13 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
  
 # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2014.xlsx'   
 # datos_radiales = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
-# datos = control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)
+# datos,textos_aviso = control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)
 # id_programa = 3
 # nombre_programa = "RADIAL CORUÑA"
 
 # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
 # datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
-# datos = control_calidad(datos_pelacus,direccion_host,base_datos,usuario,contrasena,puerto)
+# datos,textos_aviso = control_calidad(datos_pelacus,direccion_host,base_datos,usuario,contrasena,puerto)
 # id_programa = 1
 # nombre_programa = "PELACUS"
 
