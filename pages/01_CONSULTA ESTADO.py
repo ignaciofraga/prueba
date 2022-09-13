@@ -314,6 +314,11 @@ else:
         datos_muestreo = datos_muestreo.drop(columns=['estacion'])
         datos_muestreo = datos_muestreo.rename(columns={"estacion_temp":"estacion"})
         
+        
+        datos_muestreo = datos_muestreo[['nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','latitud','longitud',	'profundidad','botella'	]]
+
+        
+        
         del(temporal_estaciones)        
         
         # Une los dataframes resultantes
