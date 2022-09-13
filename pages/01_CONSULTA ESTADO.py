@@ -228,6 +228,7 @@ else:
     else:
     
         # Selecciona el año del que se quiere descargar datos
+        datos_disponibles = datos_disponibles.sort_values(by=['año'])
         seleccion = st.selectbox('Selecciona el año del cual se quiere descargar los datos (entre los años disponibles)',        
             datos_disponibles['año'])
     
