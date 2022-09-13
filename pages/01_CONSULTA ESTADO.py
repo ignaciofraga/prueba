@@ -216,8 +216,13 @@ else:
         fig.savefig(buf, format="png",bbox_inches='tight')
         st.image(buf)
 
+
+
+
+
     # Vuelta a la division en una única columna
     st.columns(1,gap="medium")
+
 
 
     # Condicional para realizar el procesado sólo si hay datos disponibles         
@@ -284,7 +289,6 @@ else:
         datos_muestreo.set_index('id_temp',drop=True,append=False,inplace=True)      
         datos_muestreo = datos_muestreo.drop(columns=['id_muestreo','configuracion_perfilador','configuracion_superficie'])
         datos_muestreo['fecha_muestreo'] = pandas.to_datetime(datos_muestreo['fecha_muestreo']).dt.date
-        #datos_muestreo['hora_muestreo'] = datos_muestreo['hora_muestreo'].apply(lambda x: x.replace(tzinfo=None))   
         try:
             datos_muestreo['hora_muestreo'] = datos_muestreo['hora_muestreo'].apply(lambda x: x.replace(tzinfo=None))   
         except:
@@ -301,7 +305,7 @@ else:
             datos_muestreo['latitud'][iregistro] = temporal_estaciones['latitud'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]]
             datos_muestreo['longitud'][iregistro] = temporal_estaciones['longitud'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]]  
         del(temporal_estaciones)
-        datos_muestreo = datos_muestreo.drop(columns=['estacion'])
+        #datos_muestreo = datos_muestreo.drop(columns=['estacion'])
         
         # Une los dataframes resultantes
         datos_compuesto = pandas.concat([datos_muestreo, datos_fisicos, datos_biogeoquimicos], axis=1, join='inner')
@@ -329,7 +333,6 @@ else:
             help= 'Descarga un archivo .csv con los datos solicitados',
             mime="application/vnd.ms-excel"
         )
-
 
 
 

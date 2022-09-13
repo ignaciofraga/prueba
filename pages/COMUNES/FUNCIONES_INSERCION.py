@@ -109,7 +109,10 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
                                                     "R_CLOR":"r_clor","R_CLOR_FLAG_W":"r_clor_qf","R_PER":"r_per","R_PER_FLAG_W":"r_per_qf","CO3_TMP":"co3_temp"
                                                     })    
     
-        
+    
+    # Añade una columan con el QF de la temperatura, igual al de la salinidad
+    datos_radiales['temperatura_ctd_qf'] = datos_radiales['salinidad_ctd_qf'] 
+    
     return datos_radiales
  
     
@@ -373,7 +376,7 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
     if tabla_muestreos.shape[0] == 0:
     
         # genera un dataframe con las variables que interesa introducir en la base de datos
-        exporta_registros                    = datos[['id_estacion_temp','profundidad','fecha_muestreo','hora_muestreo','configuracion_perfilador','configuracion_superficie']]
+        exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','hora_muestreo','profundidad','botella','configuracion_perfilador','configuracion_superficie']]
         # añade el indice de cada registro
         indices_registros                    = numpy.arange(1,(exporta_registros.shape[0]+1))    
         exporta_registros['id_muestreo']     = indices_registros
@@ -413,7 +416,7 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
             # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
             nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
             # Mantén sólo las columnas que interesan
-            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','hora_muestreo','profundidad','configuracion_perfilador','configuracion_superficie']]
+            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','hora_muestreo','profundidad','botella','configuracion_perfilador','configuracion_superficie']]
             # Cambia el nombre de la columna de estaciones
             exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion","id_muestreo_temp":"id_muestreo"})
             # añade el nombre del muestreo
