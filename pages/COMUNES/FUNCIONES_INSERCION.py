@@ -491,6 +491,9 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
             exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','hora_muestreo','profundidad','botella','configuracion_perfilador','configuracion_superficie']]
             # Cambia el nombre de la columna de estaciones
             exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion","id_muestreo_temp":"id_muestreo"})
+            # Indice temporal
+            exporta_registros['indice_temporal'] = numpy.arange(0,exporta_registros.shape[0])
+            exporta_registros.set_index('indice_temporal',drop=True,append=False,inplace=True)
             # añade el nombre del muestreo
             exporta_registros['nombre_muestreo'] = [None]*nuevos_muestreos.shape[0]
             for idato in range(exporta_registros.shape[0]):    
@@ -711,11 +714,11 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 # puerto         = '5432'
 # direccion_host = '193.146.155.99'
  
-# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2013.xlsx'   
-# datos          = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
-# datos,textos_aviso = control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)
-# id_programa = 3
-# nombre_programa = "RADIAL CORUÑA"
+# # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2013.xlsx'   
+# # datos          = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
+# # datos,textos_aviso = control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)
+# # id_programa = 3
+# # nombre_programa = "RADIAL CORUÑA"
 
 # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
 # datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
@@ -723,122 +726,11 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 # id_programa = 1
 # nombre_programa = "PELACUS"
 
-# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/RADPROF_2021.xlsm'   
-# datos          = lectura_datos_radprof(nombre_archivo) 
-# datos,textos_aviso = control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto)
-# id_programa = 5
-# nombre_programa = "RADPROF"
-
-
-
-# con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-# conn_psql        = create_engine(con_engine)
-# tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
- 
-
-# # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
-# estaciones_programa            = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
-# indices_dataframe              = numpy.arange(0,estaciones_programa.shape[0],1,dtype=int)    
-# estaciones_programa['id_temp'] = indices_dataframe
-# estaciones_programa.set_index('id_temp',drop=True,append=False,inplace=True)
-
-# ## Identifica la estación asociada a cada registro
-
-# # Columna para punteros de estaciones
-# datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
-
-# # Genera un dataframe con la combinación única de latitud/longitud en los muestreos
-# estaciones_muestradas                      = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
-# estaciones_muestradas['id_estacion']           = numpy.zeros(estaciones_muestradas.shape[0],dtype=int)
-# estaciones_muestradas['io_nueva_estacion'] = numpy.ones(estaciones_muestradas.shape[0],dtype=int)
-# estaciones_muestradas['nombre_estacion']   = [None]*estaciones_muestradas.shape[0]
-
-# # Comprueba que las estaciones no están próximas entre sí (y son la misma pero con pequeñas diferencias en las coordenadas)
-# proy_datos = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
-# dist_min   = 750
-
-# for iestacion in range(estaciones_muestradas.shape[0]-1):
-#     x_ref, y_ref = proy_datos(estaciones_muestradas['longitud'][iestacion], estaciones_muestradas['latitud'][iestacion], inverse=False)
-#     for isiguientes in range(iestacion+1,estaciones_muestradas.shape[0]):
-#         x_compara, y_compara  = proy_datos(estaciones_muestradas['longitud'][isiguientes], estaciones_muestradas['latitud'][isiguientes], inverse=False)
-#         distancia             = math.sqrt((((x_ref-x_compara)**2) + ((y_ref-y_compara)**2)))
-
-#         if distancia < dist_min:
-#             aux = (datos ['latitud'] == estaciones_muestradas['latitud'][isiguientes]) & (datos ['longitud'] == estaciones_muestradas['longitud'][isiguientes])
-#             if any(aux) is True:
-#                 indices_datos = [i for i, x in enumerate(aux) if x]
-#                 datos['latitud'][indices_datos] = estaciones_muestradas['latitud'][iestacion]
-#                 datos['longitud'][indices_datos] = estaciones_muestradas['longitud'][iestacion]            
-   
-# # vuelve a generar el dataframe de muestreos (por si había estaciones iguales)
-# del(estaciones_muestradas)
-# estaciones_muestradas                      = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
-# estaciones_muestradas['id_estacion']       = numpy.zeros(estaciones_muestradas.shape[0],dtype=int)
-# estaciones_muestradas['io_nueva_estacion'] = numpy.ones(estaciones_muestradas.shape[0],dtype=int)
-# estaciones_muestradas['nombre_estacion']   = [None]*estaciones_muestradas.shape[0]
-
-
-
-
-# if len(tabla_estaciones['id_estacion'])>0:
-#     id_ultima_estacion_bd = max(tabla_estaciones['id_estacion'])
-# else:
-#     id_ultima_estacion_bd = 0
-    
-# # Encuentra el nombre asociado a cada par de lat/lon y si está incluida en la base de datos (io_nueva = 0 ya incluida en la base de datos; 1 NO incluida en la base de datos)
-# for idato in range(estaciones_muestradas.shape[0]):
-    
-#     # Encuentra el nombre asignado en los datos importados a cada nueva estación 
-#     aux = (datos ['latitud'] == estaciones_muestradas['latitud'][idato]) & (datos ['longitud'] == estaciones_muestradas['longitud'][idato])
-#     if any(aux) is True:
-#         indices_datos = [i for i, x in enumerate(aux) if x]
-#         estaciones_muestradas['nombre_estacion'][idato]  = datos['estacion'][indices_datos[0]]
-
-    
-
-
-
-#     # comprueba si la estación muestreada está entre las incluidas en la base de datos (dentro del programa correspondiente)
-#     aux = (estaciones_programa['latitud'] == estaciones_muestradas['latitud'][idato]) & (estaciones_programa['longitud'] == estaciones_muestradas['longitud'][idato])
-#     # Si la estación muestreada está incluida, asigna a la estación muestreada el identificador utilizado en la base de datos
-#     if any(aux) is True:
-#         indices = [i for i, x in enumerate(aux) if x]
-#         estaciones_muestradas['io_nueva_estacion'][idato]  = 0
-        
-#         estaciones_muestradas['id_estacion'][idato]  = estaciones_programa['id_estacion'][indices[0]]
-#     # Si no está incluida, continúa con la numeración de las estaciones e inserta un nuevo registro en la base de datos
-#     else:
-#         id_ultima_estacion_bd                    = id_ultima_estacion_bd + 1
-#         estaciones_muestradas['id_estacion'][idato]  = id_ultima_estacion_bd 
-             
-#     # Asigna a la matriz de datos la estación asociada a cada registro
-#     datos['id_estacion_temp'][indices_datos] = estaciones_muestradas['id_estacion'][idato]
-
-
-# if numpy.count_nonzero(estaciones_muestradas['io_nueva_estacion']) > 0:
-
-#     # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
-#     nuevos_muestreos  = estaciones_muestradas[estaciones_muestradas['io_nueva_estacion']==1]
-#     # Mantén sólo las columnas que interesan
-#     exporta_registros = nuevos_muestreos[['id_estacion','nombre_estacion','latitud','longitud']]
-#     # Añade columna con el identiicador del programa
-#     exporta_registros['programa'] = numpy.zeros(exporta_registros.shape[0],dtype=int)
-#     exporta_registros['programa'] = id_programa
-#     # corrije el indice del dataframe 
-#     exporta_registros.set_index('id_estacion',drop=True,append=False,inplace=True)
-
-#     # Inserta el dataframe resultante en la base de datos 
-#     exporta_registros.to_sql('estaciones', conn_psql,if_exists='append')
-
-
-
-
-
-
-
-
-
-
+# # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/RADPROF_2021.xlsm'   
+# # datos          = lectura_datos_radprof(nombre_archivo) 
+# # datos,textos_aviso = control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+# # id_programa = 5
+# # nombre_programa = "RADPROF"
 
 
 
