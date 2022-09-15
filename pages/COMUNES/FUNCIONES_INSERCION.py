@@ -678,7 +678,6 @@ def actualiza_estado(datos,fecha_actualizacion,id_programa,nombre_programa,itipo
         
         # Si no hay datos, genera un vector de valores nulos
         if len(datos_bd) == 0:
-            datos_bd = [None]*8
                 
             # Genera el vector con los datos a insertar. diferente según sea análisis o post-procesado
             if itipo_informacion == 1: # La información a insertar es un nuevo registro de análisis de laboratorio
@@ -692,7 +691,7 @@ def actualiza_estado(datos,fecha_actualizacion,id_programa,nombre_programa,itipo
             
             
             # Inserta la información en la base de datos
-            instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_entrada_datos,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_entrada_datos,contacto_analisis_laboratorio,contacto_post_procesado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_entrada_datos,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_entrada_datos,contacto_analisis_laboratorio,contacto_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_entrada_datos,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado,EXCLUDED.contacto_muestreo,EXCLUDED.contacto_entrada_datos,EXCLUDED.contacto_analisis_laboratorio,EXCLUDED.contacto_post_procesado);"   
+            instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_entrada_datos,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_entrada_datos,contacto_analisis_laboratorio,contacto_post_procesado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_entrada_datos,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_entrada_datos,contacto_analisis_laboratorio,contacto_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_entrada_datos,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado,EXCLUDED.contacto_muestreo,EXCLUDED.contacto_entrada_datos,EXCLUDED.contacto_analisis_laboratorio,EXCLUDED.contacto_post_procesado);"   
             cursor.execute(instruccion_sql, (datos_insercion))
             conn.commit()
 
