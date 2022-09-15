@@ -234,7 +234,7 @@ def lectura_datos_estadillo(nombre_archivo,nombre_plantilla):
         texto_error = 'Los datos de entrada no se ajustan a la plantilla. Revisar el formato del archivo'
     
     else:
-        texto_error = [None]
+        texto_error = []
     
     # corrije el formato de las fechas
     for idato in range(datos_entrada.shape[0]):
