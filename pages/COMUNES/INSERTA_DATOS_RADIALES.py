@@ -29,7 +29,7 @@ programa_muestreo = 'RADIAL CORUÑA'
 directorio_datos             = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES'
 
 itipo_informacion = 1 # 1-dato nuevo (analisis laboratorio)  2-dato re-analizado (control calidad)   
-email_contacto    = 'prueba@ieo.csic.es'
+email_contacto    = 'laboratorio@ieo.csic.es'
 
 
 fecha_actualizacion = datetime.date.today()

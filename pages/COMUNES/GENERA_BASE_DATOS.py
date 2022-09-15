@@ -144,9 +144,12 @@ listado_variables = ('(id_proceso SERIAL PRIMARY KEY,'
 ' nombre_programa text NOT NULL,'
 ' año int NOT NULL,'
 ' fecha_final_muestreo date,'
+' fecha_entrada_datos date,'
 ' fecha_analisis_laboratorio date,'
 ' fecha_post_procesado date,'
 ' contacto_muestreo text,'
+' contacto_entrada_datos text,'
+' contacto_analisis_laboratorio text,'
 ' contacto_post_procesado text,'
 ) 
 
@@ -426,6 +429,7 @@ listado_variables = ('(id_muestreo SERIAL PRIMARY KEY,'
 ' botella int,'
 ' configuracion_perfilador int NOT NULL,'
 ' configuracion_superficie int NOT NULL,'
+' id_tubo_nutrientes int,'
 ) 
 
 listado_dependencias = ('FOREIGN KEY (estacion)'

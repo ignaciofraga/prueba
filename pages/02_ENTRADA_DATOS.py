@@ -49,7 +49,7 @@ col1, col2 = st.columns(2)
 with col1:
     # Formulario 
     # Listado del tipo de dato a introducir      
-    listado_opciones = ['Análisis de laboratorio (nuevos datos)','Procesado o revisión de datos ya disponibles']
+    listado_opciones = ['Datos de NUTRIENTES procedentes de análisis de laboratorio','Datos de NUTRIENTES procesados o revisados','Datos de MUESTREOS ']
     
     # Selección de programa, tipo de dato y correo de contacto
     programa_elegido  = st.selectbox('Selecciona el programa al que corresponden los datos a insertar',(df_programas['nombre_programa']))
@@ -85,27 +85,45 @@ col1 = st.columns(1)
 listado_archivos_subidos = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)
 for archivo_subido in listado_archivos_subidos:
 
-    ## Lectura de los datos subidos
-    # Programa PELACUS   
-    if id_programa_elegido == 1: 
+    
+    # Opciones 1 y 2, lectura de datos de nutrientes
+    if id_opcion_elegida == 1 or id_opcion_elegida == 2:
+        ## Lectura de los datos subidos 
+        # Programa PELACUS   
+        if id_programa_elegido == 1: 
+            try:
+                datos       = FUNCIONES_INSERCION.lectura_datos_pelacus(archivo_subido)
+                texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
+                st.success(texto_exito)
+            except:
+                texto_error = 'Error en la lectura del archivo ' + archivo_subido.name
+                st.warning(texto_error, icon="⚠️")
+    
+        # Programa Radiales (2-Vigo, 3-Coruña, 4-Santander)    
+        if id_programa_elegido == 2 or id_programa_elegido == 3 or id_programa_elegido == 4: 
+            try:    
+                datos = FUNCIONES_INSERCION.lectura_datos_radiales(archivo_subido,direccion_host,base_datos,usuario,contrasena,puerto)
+                texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
+                st.success(texto_exito)
+            except:
+                texto_error = 'Error en la lectura del archivo ' + archivo_subido.name
+                st.warning(texto_error, icon="⚠️")
+        
+    # Opcion 3, lectura de estadillo con datos de entrada
+    if id_opcion_elegida == 3:
         try:
-            datos       = FUNCIONES_INSERCION.lectura_datos_pelacus(archivo_subido)
+            datos,texto_error = FUNCIONES_INSERCION.lectura_datos_estadillo(archivo_subido,archivo_plantilla)
             texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
             st.success(texto_exito)
+            if len(texto_error)>0:
+                for iaviso in range(len(texto_error)):
+                    st.warning(texto_error[iaviso], icon="⚠️")
+        
         except:
             texto_error = 'Error en la lectura del archivo ' + archivo_subido.name
             st.warning(texto_error, icon="⚠️")
 
-    # Programa Radiales (2-Vigo, 3-Coruña, 4-Santander)    
-    if id_programa_elegido == 2 or id_programa_elegido == 3 or id_programa_elegido == 4: 
-        try:    
-            datos = FUNCIONES_INSERCION.lectura_datos_radiales(archivo_subido,direccion_host,base_datos,usuario,contrasena,puerto)
-            texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
-            st.success(texto_exito)
-        except:
-            texto_error = 'Error en la lectura del archivo ' + archivo_subido.name
-            st.warning(texto_error, icon="⚠️")
-    
+
     # Realiza un control de calidad primario a los datos importados   
     try:
         datos,textos_aviso = FUNCIONES_INSERCION.control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto) 

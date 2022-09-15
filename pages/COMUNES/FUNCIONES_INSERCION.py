@@ -212,6 +212,41 @@ def lectura_datos_radprof(nombre_archivo):
     return datos_radprof_recorte
 
 
+
+
+
+##########################################################
+######## FUNCION PARA LEER ESTADILLOS DE ENTRADA  ########
+########################################################## 
+    
+def lectura_datos_estadillo(nombre_archivo,nombre_plantilla):
+
+    
+    # Importa el .xlsx
+    datos_entrada = pandas.read_excel(nombre_archivo, 'datos',dtype={'hora_muestreo': datetime.time})
+    
+    ## Comprueba el formato de los datos
+    
+    # Verifica si están todas las columnas, comparando con una plantilla
+    datos_plantilla = pandas.read_excel(nombre_plantilla, 'datos') 
+    
+    if pandas.Series(datos_entrada.columns).isin(datos_plantilla.columns).all() is False:
+        texto_error = 'Los datos de entrada no se ajustan a la plantilla. Revisar el formato del archivo'
+    
+    else:
+        texto_error = [None]
+    
+    # corrije el formato de las fechas
+    for idato in range(datos_entrada.shape[0]):
+        datos_entrada['fecha_muestreo'][idato] = (datos_entrada['fecha_muestreo'][idato]).date()
+        
+    # Añade el identificador de la configuración del perfilador y la superficie (darle una vuelta a esto)
+    datos_entrada['configuracion_perfilador'] = numpy.ones(datos_entrada.shape[0])
+    datos_entrada['configuracion_superficie'] = numpy.ones(datos_entrada.shape[0])
+
+    return datos_entrada,texto_error 
+
+
 ##########################################################################
 ######## FUNCION PARA APLICAR CONTROL DE CALIDA BÁSICO LOS DATOS  ########
 ##########################################################################
@@ -448,7 +483,7 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
     if tabla_muestreos.shape[0] == 0:
     
         # genera un dataframe con las variables que interesa introducir en la base de datos
-        exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','hora_muestreo','profundidad','botella','configuracion_perfilador','configuracion_superficie']]
+        exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','hora_muestreo','profundidad','botella','configuracion_perfilador','configuracion_superficie','id_tubo_nutrientes']]
         # añade el indice de cada registro
         indices_registros                    = numpy.arange(1,(exporta_registros.shape[0]+1))    
         exporta_registros['id_muestreo']     = indices_registros
@@ -488,7 +523,7 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
             # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
             nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
             # Mantén sólo las columnas que interesan
-            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','hora_muestreo','profundidad','botella','configuracion_perfilador','configuracion_superficie']]
+            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','hora_muestreo','profundidad','botella','configuracion_perfilador','configuracion_superficie','id_tubo_nutrientes']]
             # Cambia el nombre de la columna de estaciones
             exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion","id_muestreo_temp":"id_muestreo"})
             # Indice temporal
@@ -647,20 +682,24 @@ def actualiza_estado(datos,fecha_actualizacion,id_programa,nombre_programa,itipo
                 
             # Genera el vector con los datos a insertar. diferente según sea análisis o post-procesado
             if itipo_informacion == 1: # La información a insertar es un nuevo registro de análisis de laboratorio
-                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,fecha_actualizacion,None,email_contacto,None]
+                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,None,fecha_actualizacion,None,None,None,email_contacto,None]
             
             if itipo_informacion == 2: # La información a insertar es un registro de post-procesado 
-                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,None,fecha_actualizacion,None,email_contacto]
+                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,None,None,fecha_actualizacion,None,None,None,email_contacto]
+            
+            if itipo_informacion == 3: # La información a insertar es un registro de entrada de datos 
+                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,fecha_actualizacion,None,None,None,email_contacto,None,None]
+            
             
             # Inserta la información en la base de datos
-            instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado,EXCLUDED.contacto_muestreo,EXCLUDED.contacto_post_procesado);"   
+            instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_entrada_datos,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_entrada_datos,contacto_analisis_laboratorio,contacto_post_procesado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_entrada_datos,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_entrada_datos,contacto_analisis_laboratorio,contacto_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_entrada_datos,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado,EXCLUDED.contacto_muestreo,EXCLUDED.contacto_entrada_datos,EXCLUDED.contacto_analisis_laboratorio,EXCLUDED.contacto_post_procesado);"   
             cursor.execute(instruccion_sql, (datos_insercion))
             conn.commit()
 
         # Si la base de datos ya contiene registros del programa y año a insertar, actualizar las fechas correspondientes
         else:
             if itipo_informacion == 1:
-                instruccion_sql = "UPDATE estado_procesos SET fecha_analisis_laboratorio = %s,contacto_muestreo = %s WHERE programa = %s AND año = %s;"   
+                instruccion_sql = "UPDATE estado_procesos SET fecha_analisis_laboratorio = %s,contacto_analisis_laboratorio = %s WHERE programa = %s AND año = %s;"   
                 cursor.execute(instruccion_sql, (fecha_actualizacion,email_contacto,int(id_programa),int(anho_procesado)))
                 conn.commit()                
 
@@ -668,6 +707,11 @@ def actualiza_estado(datos,fecha_actualizacion,id_programa,nombre_programa,itipo
                 instruccion_sql = "UPDATE estado_procesos SET fecha_post_procesado = %s,contacto_post_procesado = %s WHERE programa = %s AND año = %s;"   
                 cursor.execute(instruccion_sql, (fecha_actualizacion,email_contacto,int(id_programa),int(anho_procesado)))
                 conn.commit()  
+                
+            if itipo_informacion == 3:
+                instruccion_sql = "UPDATE estado_procesos SET fecha_entrada_datos = %s,contacto_entrada_datos = %s WHERE programa = %s AND año = %s;"   
+                cursor.execute(instruccion_sql, (fecha_actualizacion,email_contacto,int(id_programa),int(anho_procesado)))
+                conn.commit() 
     
     cursor.close()
     conn.close()    
@@ -714,11 +758,48 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 # puerto         = '5432'
 # direccion_host = '193.146.155.99'
  
-# # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2013.xlsx'   
-# # datos          = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
-# # datos,textos_aviso = control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)
-# # id_programa = 3
-# # nombre_programa = "RADIAL CORUÑA"
+
+# nombre_archivo   = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/ENTRADAS/Datos_Botellas_RADCOR_salida_08092022.xlsx'   
+# nombre_plantilla = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/ENTRADAS/PLANTILLA.xlsx'   
+
+# id_programa       = 3
+# programa_muestreo = "RADIAL CORUÑA"
+
+
+# # Importa el .xlsx
+# datos_entrada = pandas.read_excel(nombre_archivo, 'datos',dtype={'hora_muestreo': datetime.time})
+
+# ## Comprueba el formato de los datos
+
+# # Verifica si están todas las columnas, comparando con una plantilla
+# datos_plantilla = pandas.read_excel(nombre_plantilla, 'datos') 
+
+# if pandas.Series(datos_entrada.columns).isin(datos_plantilla.columns).all() is False:
+#     io_error  = 1
+#     texto_error = 'Los datos de entrada no se ajustan a la plantilla. Revisar el formato del archivo'
+
+# # corrije el formato de las fechas
+# for idato in range(datos_entrada.shape[0]):
+#     datos_entrada['fecha_muestreo'][idato] = (datos_entrada['fecha_muestreo'][idato]).date()
+    
+# # Añade el identificador de la configuración del perfilador y la superficie (darle una vuelta a esto)
+# datos_entrada['configuracion_perfilador'] = numpy.ones(datos_entrada.shape[0])
+# datos_entrada['configuracion_superficie'] = numpy.ones(datos_entrada.shape[0])
+
+
+
+# datos,textos_aviso = control_calidad(datos_entrada,direccion_host,base_datos,usuario,contrasena,puerto) 
+    
+# datos = evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)  
+
+# datos = evalua_registros(datos,programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+ 
+
+# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2013.xlsx'   
+# datos          = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
+# datos,textos_aviso = control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+# id_programa = 3
+# nombre_programa = "RADIAL CORUÑA"
 
 # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
 # datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
@@ -737,15 +818,15 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 
 
-# # # # print('inicio',datetime.datetime.now())
+# # # print('inicio',datetime.datetime.now())
 
-# datos = evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)  
+#datos = evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)  
 
-# # print('evalua estaciones',datetime.datetime.now())
+# print('evalua estaciones',datetime.datetime.now())
 
-# # datos = evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+# datos = evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# # # print('evalua registros',datetime.datetime.now())
+# # print('evalua registros',datetime.datetime.now())
 
 
 
