@@ -14,6 +14,7 @@ import psycopg2
 import pandas.io.sql as psql
 from sqlalchemy import create_engine
 
+
 pandas.options.mode.chained_assignment = None
 
 
@@ -103,7 +104,7 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
                                                     "CTDTMP":"temperatura_ctd","CTDSAL":"salinidad_ctd","CTDSAL_FLAG_W":"salinidad_ctd_qf",
                                                     "CTDOXY":"oxigeno_ctd","CTDOXY_FLAG_W":"oxigeno_ctd_qf","CTDPAR":"par_ctd","CTDPAR_FLAG_W":"par_ctd_qf",
                                                     "CTDTURB":"turbidez_ctd","CTDTURB_FLAG_W":"turbidez_ctd_qf","OXYGEN":"oxigeno_wk","OXYGEN_FLAG_W":"oxigeno_wk_qf",
-                                                    "SILCAT":"sio4","SILCAT_FLAG_W":"sio4_qf","NITRAT":"no3","NITRAT_FLAG_W":"no3_qf","NITRIT":"no2","NITRIT_FLAG_W":"no2_qf",
+                                                    "SILCAT":"sio2","SILCAT_FLAG_W":"sio2_qf","NITRAT":"no3","NITRAT_FLAG_W":"no3_qf","NITRIT":"no2","NITRIT_FLAG_W":"no2_qf",
                                                     "PHSPHT":"po4","PHSPHT_FLAG_W":"po4_qf","TCARBN":"tcarbn","TCARBN_FLAG_W":"tcarbn_qf","ALKALI":"alkali","ALKALI_FLAG_W":"alkali_qf",
                                                     "PHTS25P0_UNPUR":"phts25p0_unpur","PHTS25P0_UNPUR_FLAG_W":"phts25p0_unpur_qf","PHTS25P0_PUR":"phts25p0_pur","PHTS25P0_PUR_FLAG_W":"phts25p0_pur_qf",
                                                     "R_CLOR":"r_clor","R_CLOR_FLAG_W":"r_clor_qf","R_PER":"r_per","R_PER_FLAG_W":"r_per_qf","CO3_TMP":"co3_temp"
@@ -153,7 +154,7 @@ def lectura_datos_pelacus(nombre_archivo):
 
     # Renombra las columnas para mantener una denominación homogénea
     datos_pelacus = datos_pelacus.rename(columns={"campaña":"programa","cast":"nombre_muestreo","fecha":"fecha_muestreo","hora":"hora_muestreo","estación":"estacion",
-                                                  "Latitud":"latitud","Longitud":"longitud","t_CTD":"temperatura_ctd","Sal_CTD":"salinidad_ctd","SiO2":"sio4","SiO2_flag":"sio4_qf",
+                                                  "Latitud":"latitud","Longitud":"longitud","t_CTD":"temperatura_ctd","Sal_CTD":"salinidad_ctd","SiO2":"sio2","SiO2_flag":"sio2_qf",
                                                   "NO3":"no3","NO3T_flag":"no3_qf","NO2":"no2","NO2_flag":"no2_qf","NH4":"nh4","NH4_flag":"nh4_qf","PO4":"po4","PO4_flag":"po4_qf","Cla":"clorofila_a"
                                                   })
 
@@ -162,6 +163,53 @@ def lectura_datos_pelacus(nombre_archivo):
 
 
 
+
+
+############################################################################
+######## FUNCION PARA LEER DATOS CON EL FORMATO DE CAMPAÑA RADPROF  ########
+############################################################################ 
+    
+def lectura_datos_radprof(nombre_archivo):
+  
+    # Importa el .xlsx
+    datos_radprof = pandas.read_excel(nombre_archivo, 'DatosFinales',skiprows=1)
+    
+    # Define una columna índice
+    indices_dataframe         = numpy.arange(0,datos_radprof.shape[0],1,dtype=int)
+    datos_radprof['id_temp'] = indices_dataframe
+    datos_radprof.set_index('id_temp',drop=True,append=False,inplace=True)
+    
+    # Añade información de la configuración de perfilador y superficie (TEMPORAL!!!!)
+    datos_radprof['configuracion_superficie'] = numpy.ones(datos_radprof.shape[0],dtype=int)
+    datos_radprof['configuracion_perfilador'] = numpy.ones(datos_radprof.shape[0],dtype=int)
+    
+    # Cambia, en el dataframe, una única columna de fecha/hora por dos columnas: una de fecha y otra de hora
+    datos_radprof['fecha_muestreo'] = [None]*datos_radprof.shape[0]
+    datos_radprof['hora_muestreo']  = [None]*datos_radprof.shape[0]
+    for idato in range(datos_radprof.shape[0]):
+        datos_radprof['fecha_muestreo'][idato] = (datos_radprof['Date'][idato]).date()
+        datos_radprof['hora_muestreo'][idato]  = (datos_radprof['Date'][idato]).time()
+        datos_radprof['st'][idato]             = str(datos_radprof['st'][idato])
+        
+    # Calcula la columna de NO3 a partir de la suma NO3+NO2
+    datos_radprof['no3']    =  datos_radprof['NO3+NO2 umol/Kg'] - datos_radprof['NO2 umol/kg']
+    datos_radprof['no3_qf'] =  datos_radprof['Flag_TON'] 
+       
+    # Renombra las columnas para mantener una denominación homogénea
+    datos_radprof = datos_radprof.rename(columns={"ID":"nombre_muestreo","st":"estacion","Niskin":"botella",
+                                                  "Lat":"latitud","Lon":"longitud","CTDPRS":"profundidad","CTDtemp":"temperatura_ctd","SALCTD":"salinidad_ctd",
+                                                  "SiO2 umol/Kg":"sio2","Flag_SiO2":"sio2_qf",
+                                                  "NO2 umol/kg":"no2","Flag_NO2":"no2_qf","PO4 umol/Kg":"po4","Flag_PO4":"po4_qf"
+                                                  })
+    
+    
+    # Mantén solo las columnas que interesan
+    datos_radprof_recorte = datos_radprof[['nombre_muestreo', 'estacion','botella','fecha_muestreo','hora_muestreo','latitud','longitud','profundidad','temperatura_ctd','salinidad_ctd',
+                                           'no3','no3_qf','no2','no2_qf','sio2','sio2_qf','po4','po4_qf','configuracion_superficie','configuracion_perfilador']]
+
+    del(datos_radprof)
+
+    return datos_radprof_recorte
 
 
 ##########################################################################
@@ -304,6 +352,30 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     estaciones_muestradas['io_nueva_estacion'] = numpy.ones(estaciones_muestradas.shape[0],dtype=int)
     estaciones_muestradas['nombre_estacion']   = [None]*estaciones_muestradas.shape[0]
     
+    # Comprueba que las estaciones no están próximas entre sí (y son la misma pero con pequeñas diferencias en las coordenadas)
+    proy_datos = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
+    dist_min   = 750
+    
+    for iestacion in range(estaciones_muestradas.shape[0]-1):
+        x_ref, y_ref = proy_datos(estaciones_muestradas['longitud'][iestacion], estaciones_muestradas['latitud'][iestacion], inverse=False)
+        for isiguientes in range(iestacion+1,estaciones_muestradas.shape[0]):
+            x_compara, y_compara  = proy_datos(estaciones_muestradas['longitud'][isiguientes], estaciones_muestradas['latitud'][isiguientes], inverse=False)
+            distancia             = math.sqrt((((x_ref-x_compara)**2) + ((y_ref-y_compara)**2)))
+    
+            if distancia < dist_min:
+                aux = (datos ['latitud'] == estaciones_muestradas['latitud'][isiguientes]) & (datos ['longitud'] == estaciones_muestradas['longitud'][isiguientes])
+                if any(aux) is True:
+                    indices_datos = [i for i, x in enumerate(aux) if x]
+                    datos['latitud'][indices_datos] = estaciones_muestradas['latitud'][iestacion]
+                    datos['longitud'][indices_datos] = estaciones_muestradas['longitud'][iestacion]            
+       
+    # vuelve a generar el dataframe de muestreos (por si había estaciones iguales)
+    del(estaciones_muestradas)
+    estaciones_muestradas                      = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
+    estaciones_muestradas['id_estacion']       = numpy.zeros(estaciones_muestradas.shape[0],dtype=int)
+    estaciones_muestradas['io_nueva_estacion'] = numpy.ones(estaciones_muestradas.shape[0],dtype=int)
+    estaciones_muestradas['nombre_estacion']   = [None]*estaciones_muestradas.shape[0]
+  
     
     if len(tabla_estaciones['id_estacion'])>0:
         id_ultima_estacion_bd = max(tabla_estaciones['id_estacion'])
@@ -493,7 +565,7 @@ def inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrase
     
     # Genera un dataframe solo con las variales biogeoquimicas de los datos a importar 
     datos_biogeoquimica = datos[['id_muestreo_temp','fluorescencia_ctd','fluorescencia_ctd_qf','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk_qf',
-                                 'no3','no3_qf','no2','no2_qf','nh4','nh4_qf','po4','po4_qf','sio4','sio4_qf','tcarbn','tcarbn_qf','doc','doc_qf',
+                                 'no3','no3_qf','no2','no2_qf','nh4','nh4_qf','po4','po4_qf','sio2','sio2_qf','tcarbn','tcarbn_qf','doc','doc_qf',
                                  'cdom','cdom_qf','clorofila_a','clorofila_a_qf','alkali','alkali_qf','phts25p0_unpur','phts25p0_unpur_qf','phts25p0_pur','phts25p0_pur_qf','r_clor','r_clor_qf','r_per','r_per_qf','co3_temp']]    
     datos_biogeoquimica = datos_biogeoquimica.rename(columns={"id_muestreo_temp": "muestreo"})
     
@@ -650,6 +722,128 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 # datos,textos_aviso = control_calidad(datos_pelacus,direccion_host,base_datos,usuario,contrasena,puerto)
 # id_programa = 1
 # nombre_programa = "PELACUS"
+
+# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/RADPROF_2021.xlsm'   
+# datos          = lectura_datos_radprof(nombre_archivo) 
+# datos,textos_aviso = control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+# id_programa = 5
+# nombre_programa = "RADPROF"
+
+
+
+# con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+# conn_psql        = create_engine(con_engine)
+# tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
+ 
+
+# # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
+# estaciones_programa            = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
+# indices_dataframe              = numpy.arange(0,estaciones_programa.shape[0],1,dtype=int)    
+# estaciones_programa['id_temp'] = indices_dataframe
+# estaciones_programa.set_index('id_temp',drop=True,append=False,inplace=True)
+
+# ## Identifica la estación asociada a cada registro
+
+# # Columna para punteros de estaciones
+# datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+
+# # Genera un dataframe con la combinación única de latitud/longitud en los muestreos
+# estaciones_muestradas                      = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
+# estaciones_muestradas['id_estacion']           = numpy.zeros(estaciones_muestradas.shape[0],dtype=int)
+# estaciones_muestradas['io_nueva_estacion'] = numpy.ones(estaciones_muestradas.shape[0],dtype=int)
+# estaciones_muestradas['nombre_estacion']   = [None]*estaciones_muestradas.shape[0]
+
+# # Comprueba que las estaciones no están próximas entre sí (y son la misma pero con pequeñas diferencias en las coordenadas)
+# proy_datos = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
+# dist_min   = 750
+
+# for iestacion in range(estaciones_muestradas.shape[0]-1):
+#     x_ref, y_ref = proy_datos(estaciones_muestradas['longitud'][iestacion], estaciones_muestradas['latitud'][iestacion], inverse=False)
+#     for isiguientes in range(iestacion+1,estaciones_muestradas.shape[0]):
+#         x_compara, y_compara  = proy_datos(estaciones_muestradas['longitud'][isiguientes], estaciones_muestradas['latitud'][isiguientes], inverse=False)
+#         distancia             = math.sqrt((((x_ref-x_compara)**2) + ((y_ref-y_compara)**2)))
+
+#         if distancia < dist_min:
+#             aux = (datos ['latitud'] == estaciones_muestradas['latitud'][isiguientes]) & (datos ['longitud'] == estaciones_muestradas['longitud'][isiguientes])
+#             if any(aux) is True:
+#                 indices_datos = [i for i, x in enumerate(aux) if x]
+#                 datos['latitud'][indices_datos] = estaciones_muestradas['latitud'][iestacion]
+#                 datos['longitud'][indices_datos] = estaciones_muestradas['longitud'][iestacion]            
+   
+# # vuelve a generar el dataframe de muestreos (por si había estaciones iguales)
+# del(estaciones_muestradas)
+# estaciones_muestradas                      = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
+# estaciones_muestradas['id_estacion']       = numpy.zeros(estaciones_muestradas.shape[0],dtype=int)
+# estaciones_muestradas['io_nueva_estacion'] = numpy.ones(estaciones_muestradas.shape[0],dtype=int)
+# estaciones_muestradas['nombre_estacion']   = [None]*estaciones_muestradas.shape[0]
+
+
+
+
+# if len(tabla_estaciones['id_estacion'])>0:
+#     id_ultima_estacion_bd = max(tabla_estaciones['id_estacion'])
+# else:
+#     id_ultima_estacion_bd = 0
+    
+# # Encuentra el nombre asociado a cada par de lat/lon y si está incluida en la base de datos (io_nueva = 0 ya incluida en la base de datos; 1 NO incluida en la base de datos)
+# for idato in range(estaciones_muestradas.shape[0]):
+    
+#     # Encuentra el nombre asignado en los datos importados a cada nueva estación 
+#     aux = (datos ['latitud'] == estaciones_muestradas['latitud'][idato]) & (datos ['longitud'] == estaciones_muestradas['longitud'][idato])
+#     if any(aux) is True:
+#         indices_datos = [i for i, x in enumerate(aux) if x]
+#         estaciones_muestradas['nombre_estacion'][idato]  = datos['estacion'][indices_datos[0]]
+
+    
+
+
+
+#     # comprueba si la estación muestreada está entre las incluidas en la base de datos (dentro del programa correspondiente)
+#     aux = (estaciones_programa['latitud'] == estaciones_muestradas['latitud'][idato]) & (estaciones_programa['longitud'] == estaciones_muestradas['longitud'][idato])
+#     # Si la estación muestreada está incluida, asigna a la estación muestreada el identificador utilizado en la base de datos
+#     if any(aux) is True:
+#         indices = [i for i, x in enumerate(aux) if x]
+#         estaciones_muestradas['io_nueva_estacion'][idato]  = 0
+        
+#         estaciones_muestradas['id_estacion'][idato]  = estaciones_programa['id_estacion'][indices[0]]
+#     # Si no está incluida, continúa con la numeración de las estaciones e inserta un nuevo registro en la base de datos
+#     else:
+#         id_ultima_estacion_bd                    = id_ultima_estacion_bd + 1
+#         estaciones_muestradas['id_estacion'][idato]  = id_ultima_estacion_bd 
+             
+#     # Asigna a la matriz de datos la estación asociada a cada registro
+#     datos['id_estacion_temp'][indices_datos] = estaciones_muestradas['id_estacion'][idato]
+
+
+# if numpy.count_nonzero(estaciones_muestradas['io_nueva_estacion']) > 0:
+
+#     # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
+#     nuevos_muestreos  = estaciones_muestradas[estaciones_muestradas['io_nueva_estacion']==1]
+#     # Mantén sólo las columnas que interesan
+#     exporta_registros = nuevos_muestreos[['id_estacion','nombre_estacion','latitud','longitud']]
+#     # Añade columna con el identiicador del programa
+#     exporta_registros['programa'] = numpy.zeros(exporta_registros.shape[0],dtype=int)
+#     exporta_registros['programa'] = id_programa
+#     # corrije el indice del dataframe 
+#     exporta_registros.set_index('id_estacion',drop=True,append=False,inplace=True)
+
+#     # Inserta el dataframe resultante en la base de datos 
+#     exporta_registros.to_sql('estaciones', conn_psql,if_exists='append')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # # # # print('inicio',datetime.datetime.now())
 

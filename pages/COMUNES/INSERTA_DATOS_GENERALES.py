@@ -194,7 +194,7 @@ conn.close()
 ### Información de las variables a utilizar en el procesado ###
 
 parametros_muestreo = ['nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','profundidad','botella','configuracion_perfilador','configuracion_superficie','programa','latitud','longitud']
-var_biogeoquimica   = ['oxigeno_ctd','fluorescencia_ctd','oxigeno_wk','sio4','no3','no2','nh4','po4','clorofila_a','tcarbn','doc','cdom','alkali','phts25p0_unpur','phts25p0_pur','r_clor','r_per','co3_temp']
+var_biogeoquimica   = ['oxigeno_ctd','fluorescencia_ctd','oxigeno_wk','sio2','no3','no2','nh4','po4','clorofila_a','tcarbn','doc','cdom','alkali','phts25p0_unpur','phts25p0_pur','r_clor','r_per','co3_temp']
 var_fisicas         = ['temperatura_ctd','salinidad_ctd','par_ctd','turbidez_ctd']
 
 # compón un dataframe con todas las variables
