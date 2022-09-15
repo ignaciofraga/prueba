@@ -44,20 +44,41 @@ conn = init_connection()
 df_programas = psql.read_sql('SELECT * FROM programas', conn)
 conn.close()
 
-col1, col2 = st.columns(2)
+# col1, col2 = st.columns(2)
 
-with col1:
-    # Formulario 
-    # Listado del tipo de dato a introducir      
-    listado_opciones = ['Datos de NUTRIENTES procedentes de análisis de laboratorio','Datos de NUTRIENTES procesados o revisados','Datos de MUESTREOS ']
+# with col1:
+#     # Formulario 
+#     # Listado del tipo de dato a introducir      
+#     listado_opciones = ['Datos de NUTRIENTES procedentes de análisis de laboratorio','Datos de NUTRIENTES procesados o revisados','Datos de MUESTREOS ']
     
-    # Selección de programa, tipo de dato y correo de contacto
-    programa_elegido  = st.selectbox('Selecciona el programa al que corresponden los datos a insertar',(df_programas['nombre_programa']))
-    tipo_dato_elegido = st.selectbox('Selecciona el origen de los datos a insertar', (listado_opciones))
-    email_contacto    = st.text_input('Correo de contacto', "...@ieo.csic.es")
+#     # Selección de programa, tipo de dato y correo de contacto
+#     programa_elegido  = st.selectbox('Selecciona el programa al que corresponden los datos a insertar',(df_programas['nombre_programa']))
+#     tipo_dato_elegido = st.selectbox('Selecciona el origen de los datos a insertar', (listado_opciones))
+#     email_contacto    = st.text_input('Correo de contacto', "...@ieo.csic.es")
 
-with col2:
-    fecha_actualizacion = st.date_input("Selecciona fecha de procesado",datetime.date.today())
+# with col2:
+#     fecha_actualizacion = st.date_input("Selecciona fecha de procesado",datetime.date.today())
+
+# Despliega un formulario para elegir el programa y la fecha a consultar
+with st.form("Formulario seleccion"):
+
+    listado_opciones = ['Datos de NUTRIENTES procedentes de análisis de laboratorio','Datos de NUTRIENTES procesados o revisados','Datos de MUESTREOS ']
+    tipo_dato_elegido = st.selectbox('Selecciona el origen de los datos a insertar', (listado_opciones))
+    
+    col1, col2 = st.columns(2,gap="small")
+    #nombre_programa, tiempo_consulta = st.columns((1, 1))
+    with col1:
+        programa_elegido  = st.selectbox('Selecciona el programa al que corresponden los datos a insertar',(df_programas['nombre_programa']))
+    with col2:
+        email_contacto    = st.text_input('Correo de contacto', "...@ieo.csic.es")
+
+    # Botón de envío para confirmar selección
+    submitted = st.form_submit_button("Enviar")
+
+
+
+
+fecha_actualizacion = datetime.date.today()
 
 
 ### Recupera los identificadores de la selección hecha
