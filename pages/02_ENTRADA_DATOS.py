@@ -142,7 +142,6 @@ for archivo_subido in listado_archivos_subidos:
     # Actualiza estado
     try:
         
-        st.text(id_opcion_elegida)
         FUNCIONES_INSERCION.actualiza_estado(datos,fecha_actualizacion,id_programa_elegido,programa_elegido,id_opcion_elegida,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
      
         texto_exito = 'Las fechas de procesado contenidas en la base de datos han sido actualizadas correctamente'
