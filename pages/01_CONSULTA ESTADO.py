@@ -114,22 +114,22 @@ else:
             if pandas.isnull(estado_procesos_programa['fecha_analisis_laboratorio'][ianho]) is False:
                 if tiempo_consulta >= (estado_procesos_programa['fecha_analisis_laboratorio'][ianho]):  # estado_procesos_programa['fecha_analisis_laboratorio'][ianho] is not None:     
                     estado_procesos_programa['id_estado'][ianho] = 2
-                    estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_muestreo'][ianho] 
+                    estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_analisis_laboratorio'][ianho] 
                     estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_analisis_laboratorio'][ianho].strftime("%m/%d/%Y")
                 else:
-                    if tiempo_consulta >= (estado_procesos_programa['fecha_final_muestreo'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
+                    if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
                         estado_procesos_programa['id_estado'][ianho] = 1 
-                        estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_muestreo'][ianho]
-                        estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_final_muestreo'][ianho].strftime("%m/%d/%Y")
+                        estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_entrada_datos'][ianho]
+                        estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_entrada_datos'][ianho].strftime("%m/%d/%Y")
                                             
             
             else:
                 # Caso 1. Fecha de consulta posterior a terminar la campaña pero anterior al análisis en laboratorio, o análisis no disponible. 
-                if pandas.isnull(estado_procesos_programa['fecha_final_muestreo'][ianho]) is False:
-                    if tiempo_consulta >= (estado_procesos_programa['fecha_final_muestreo'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
+                if pandas.isnull(estado_procesos_programa['fecha_entrada_datos'][ianho]) is False:
+                    if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
                         estado_procesos_programa['id_estado'][ianho] = 1 
-                        estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_muestreo'][ianho]
-                        estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_final_muestreo'][ianho].strftime("%m/%d/%Y")
+                        estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_entrada_datos'][ianho]
+                        estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_entrada_datos'][ianho].strftime("%m/%d/%Y")
                         
     
         estado_procesos_programa['estado'][ianho] = nombre_estados[estado_procesos_programa['id_estado'][ianho]]
