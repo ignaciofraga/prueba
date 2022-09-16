@@ -63,10 +63,6 @@ with st.form("Formulario seleccion"):
 
 
 
-
-fecha_actualizacion = datetime.date.today()
-
-
 ### Recupera los identificadores de la selección hecha
 
 # Recupera el identificador del programa seleccionado
@@ -77,6 +73,18 @@ for iorigen in range(len(listado_opciones)):
     if listado_opciones[iorigen] == tipo_dato_elegido:
         id_opcion_elegida = iorigen + 1
         
+st.text(id_opcion_elegida)
+        
+# Si se elige introducir un estadillo, recordar que se ajusten a la plantilla
+if id_opcion_elegida ==3:
+    texto_error = 'IMPORTANTE. Los datos a subir deben ajustarse a la plantilla falicitada' 
+    st.warning(texto_error, icon="⚠️")
+
+    st.download_button('DESCARGAR PLANTILLA E INSTRUCCIONES', archivo_instrucciones, file_name='PLANTILLA.zip')        
+        
+    
+fecha_actualizacion = datetime.date.today()    
+    
 ### Subida de archivos
 
 # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
@@ -174,45 +182,7 @@ for archivo_subido in listado_archivos_subidos:
     except:
         texto_error = 'Error al actualizar las fechas de procesado en la base de datos'
         st.warning(texto_error, icon="⚠️")    
-    
-    # del(datos)
-        
-    # texto = 'inicia 1 ' + (datetime.datetime.now()).strftime('%H:%M:%S')
-    # st.text(texto)
-
-    # datos = FUNCIONES_INSERCION.evalua_estaciones(datos_corregidos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
  
-    # texto = 'estaciones ' + (datetime.datetime.now()).strftime('%H:%M:%S')
-    # st.text(texto)
-
-    # datos = FUNCIONES_INSERCION.evalua_registros(datos,programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
-
-    # texto = 'registros ' + (datetime.datetime.now()).strftime('%H:%M:%S')
-    # st.text(texto)
-    
-
- 
-    
-  
-  
-    
-### Despliega un formulario para elegir el programa y el tipo de información a insertar
-
-# # Listado del tipo de dato a introducir      
-# listado_opciones = ['Análisis de laboratorio','Procesado o revisión de datos ya disponibles']
-
-# with st.form("Formulario insercion"):
-#     st.write("Selecciona el origen y tipo de los datos a insertar")
-#     programa_elegido  = st.selectbox('Selecciona el programa al que corresponden los datos a insertar',(df_programas['nombre_programa']))
-#     tipo_dato_elegido = st.selectbox('Selecciona el origen de los datos a insertar', (listado_opciones))
-#     email_contacto    = st.text_input('Correo de contacto', "...@ieo.csic.es")
-
-#     # Botón de envío para confirmar selección
-#     submitted = st.form_submit_button("Enviar")
-#     if submitted:
-#         st.write("Resultado de la selección. Programa: ", programa_elegido, ". Tipo de dato: ", tipo_dato_elegido)
-  
-    
   
     
   
