@@ -22,7 +22,7 @@ from pages.COMUNES import FUNCIONES_INSERCION
 
 logo_IEO_reducido            =  'DATOS/IMAGENES/ieo.ico'
 archivo_plantilla            =  'DATOS/PLANTILLA.xlsx'
-archivo_instrucciones        =  'DATOS/INSTRUCCIONES_PLANTILLA.zip'
+archivo_instrucciones        =  'DATOS/PLANTILLA.zip'
 
 ##### FUNCIONES AUXILIARES ######
 
