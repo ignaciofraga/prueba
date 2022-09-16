@@ -78,7 +78,15 @@ if id_opcion_elegida ==3:
     texto_error = 'IMPORTANTE. Los datos a subir deben ajustarse a la plantilla falicitada' 
     st.warning(texto_error, icon="⚠️")
 
-    st.download_button('DESCARGAR PLANTILLA E INSTRUCCIONES', archivo_instrucciones, file_name='PLANTILLA.zip')        
+#    st.download_button('DESCARGAR PLANTILLA E INSTRUCCIONES', archivo_instrucciones, file_name='PLANTILLA.zip')        
+
+    with open(archivo_instrucciones, "rb") as fp:
+        btn = st.download_button(
+            label="DESCARGAR PLANTILLA E INSTRUCCIONES",
+            data=fp,
+            file_name="PLANTILLA.zip",
+            mime="application/zip"
+        )
         
     
 fecha_actualizacion = datetime.date.today()    
