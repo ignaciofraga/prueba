@@ -72,9 +72,7 @@ id_programa_elegido = int(df_programas['id_programa'][df_programas['nombre_progr
 for iorigen in range(len(listado_opciones)):
     if listado_opciones[iorigen] == tipo_dato_elegido:
         id_opcion_elegida = iorigen + 1
-        
-st.text(id_opcion_elegida)
-        
+                
 # Si se elige introducir un estadillo, recordar que se ajusten a la plantilla
 if id_opcion_elegida ==3:
     texto_error = 'IMPORTANTE. Los datos a subir deben ajustarse a la plantilla falicitada' 
