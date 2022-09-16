@@ -751,12 +751,113 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 
     
-# base_datos     = 'COAC'
-# usuario        = 'postgres'
-# contrasena     = 'm0nt34lt0'
-# puerto         = '5432'
-# direccion_host = '193.146.155.99'
+base_datos     = 'COAC'
+usuario        = 'postgres'
+contrasena     = 'm0nt34lt0'
+puerto         = '5432'
+direccion_host = '193.146.155.99'
  
+
+id_programa       = 3
+programa_muestreo = "RADIAL CORUÑA"
+
+
+con_engine                = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+conn_psql                 = create_engine(con_engine)
+
+#conn = init_connection()
+df_programas = psql.read_sql('SELECT * FROM programas', conn_psql)
+#conn.close()
+
+
+tabla_estaciones    = psql.read_sql('SELECT * FROM estaciones', conn_psql)
+estaciones_programa = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
+indices_dataframe   = numpy.arange(0,estaciones_programa.shape[0],1,dtype=int) 
+
+# # Primero recupera los registros correspondientes al periodo evaluado y al año consultado
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+
+cursor = conn.cursor()
+instruccion_sql = "SELECT id_muestreo,nombre_muestreo,fecha_muestreo,hora_muestreo,estacion,botella,profundidad,id_tubo_nutrientes FROM muestreos_discretos INNER JOIN estaciones ON muestreos_discretos.estacion = estaciones.id_estacion WHERE estaciones.programa = %s;"
+cursor.execute(instruccion_sql,(str(id_programa)))
+registros_consulta = cursor.fetchall()
+conn.commit()
+cursor.close()
+conn.close()
+
+
+dataframe_registros = pandas.DataFrame(registros_consulta, columns=['id_muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','botella','profundidad','id_tubo_nutrientes'])
+
+# Mantén sólo los registros con datos de id_nutrientes
+dataframe_registros = dataframe_registros[dataframe_registros['id_tubo_nutrientes'].notna()]
+
+# Busca las fechas disponibles 
+dataframe_temporal = dataframe_registros.drop_duplicates('fecha_muestreo')
+listado_fechas     = dataframe_temporal['fecha_muestreo']
+
+
+# Seleccionas una fecha
+fecha_seleccionada = datetime.date(2022,9,8)
+
+
+# Recupera los registros correspondientes a esa fecha
+dataframe_fecha = dataframe_registros[dataframe_registros['fecha_muestreo']==fecha_seleccionada]
+
+# Ajusta el numero de los indices
+indices_dataframe          = numpy.arange(0,dataframe_fecha.shape[0],1,dtype=int)    
+dataframe_fecha['id_temp'] = indices_dataframe
+dataframe_fecha.set_index('id_temp',drop=True,append=False,inplace=True)
+
+# Recupera las coordenadas a partir de la estación asignada
+dataframe_fecha['latitud'] = numpy.zeros(dataframe_fecha.shape[0])
+dataframe_fecha['longitud'] = numpy.zeros(dataframe_fecha.shape[0])
+for idato in range(dataframe_fecha.shape[0]):
+    dataframe_fecha['latitud'][idato]  = estaciones_programa['latitud'][estaciones_programa['id_estacion']==dataframe_fecha['estacion'][idato]]
+    dataframe_fecha['longitud'][idato] = estaciones_programa['longitud'][estaciones_programa['id_estacion']==dataframe_fecha['estacion'][idato]]
+
+# Recupera las propiedades físicas del registro (temperatura, salinidad....)
+tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
+dataframe_fecha['temperatura_ctd'] = numpy.zeros(dataframe_fecha.shape[0])
+dataframe_fecha['salinidad_ctd'] = numpy.zeros(dataframe_fecha.shape[0])
+for idato in range(dataframe_fecha.shape[0]):
+    dataframe_fecha['temperatura_ctd'][idato]  = tabla_registros_fisica['temperatura_ctd'][tabla_registros_fisica['muestreo']==dataframe_fecha['id_muestreo'][idato]]
+    dataframe_fecha['salinidad_ctd'][idato]    = tabla_registros_fisica['salinidad_ctd'][tabla_registros_fisica['muestreo']==dataframe_fecha['id_muestreo'][idato]]
+
+# Quita la columna de estación
+dataframe_fecha = dataframe_fecha.drop(columns=['estacion','id_muestreo'])
+
+# Ajusta el orden de las columnas
+dataframe_fecha = dataframe_fecha[['nombre_muestreo','fecha_muestreo','hora_muestreo','latitud','longitud','botella','id_tubo_nutrientes','profundidad','temperatura_ctd','salinidad_ctd']]
+
+# Ordena en función del número de tubo
+dataframe_fecha = dataframe_fecha.sort_values(by=['id_tubo_nutrientes'])
+
+
+#estaciones_programa['latitud'].where(estaciones_programa['id_estacion'] == dataframe_fecha['estacion'][idato])
+
+
+#dataframe_registros = dataframe_registros.drop_duplicates('fecha_muestreo')
+
+# id_registro        = numpy.zeros(len(registros_consulta))
+# fechas_muestreo    = [None]*len(registros_consulta)
+# id_tubo_nutrientes = numpy.zeros(len(registros_consulta))
+# for idato in range(len(registros_consulta)):
+#     id_registro[idato] = registros_consulta[idato][0]
+#     fechas_muestreo[idato] = registros_consulta[idato][1]
+#     id_tubo_nutrientes[idato] = registros_consulta[idato][2]
+    
+# # Busca los registros con datos de identificador de tubo de nutrientes disponible
+# indices             = numpy.argwhere(~numpy.isnan(id_tubo_nutrientes))    
+# id_registro         = id_registro[indices]
+# fechas_muestreo     = fechas_muestreo[indices[0,0]]
+# id_tubo_nutrientes  = id_tubo_nutrientes[indices]
+# dataframe_registros = pandas.DataFrame({'id_muestreo':id_registro,'fecha_muestreo': fechas_muestreo, 'id_tubo_nutrientes': id_tubo_nutrientes})
+
+# # Encuentra las fechas disponibles
+# dataframe_registros.drop_duplicates('fecha_muestreo')
+# listado_fechas =dataframe_registros['fecha_muestreo'] 
+
+# indices_datafram
 
 # nombre_archivo   = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/ENTRADAS/Datos_Botellas_RADCOR_salida_08092022.xlsx'   
 # nombre_plantilla = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/ENTRADAS/PLANTILLA.xlsx'   
