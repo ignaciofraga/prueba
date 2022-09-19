@@ -28,5 +28,5 @@ st.image(imagen_pagina)
 
 # Autentica al usuario
 if FUNCIONES_AUXILIARES.check_password():
-    st.write("Here goes your normal Streamlit app...")
-    st.button("Click me")
+    st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
+
