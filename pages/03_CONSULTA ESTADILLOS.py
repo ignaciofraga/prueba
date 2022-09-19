@@ -119,7 +119,7 @@ if len(listado_fechas) > 0:
     dataframe_fecha = dataframe_fecha.drop(columns=['estacion','id_muestreo'])
     
     # Ajusta el orden de las columnas
-    dataframe_fecha = dataframe_fecha[['nombre_muestreo','fecha_muestreo','hora_muestreo','latitud','longitud','botella','id_tubo_nutrientes','profundidad','temperatura_ctd','salinidad_ctd']]
+    dataframe_fecha = dataframe_fecha[['nombre_muestreo','fecha_muestreo','hora_muestreo','latitud','longitud','botella','id_tubo_nutrientes','presion_ctd','temperatura_ctd','salinidad_ctd']]
     
     # Ordena en función del número de tubo
     dataframe_fecha = dataframe_fecha.sort_values(by=['id_tubo_nutrientes'])
