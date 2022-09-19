@@ -425,8 +425,9 @@ listado_variables = ('(id_muestreo SERIAL PRIMARY KEY,'
 ' estacion int NOT NULL,'
 ' fecha_muestreo date NOT NULL,'
 ' hora_muestreo time,'
-' profundidad NUMERIC (6, 2) NOT NULL,'
+' presion_ctd NUMERIC (6, 2) NOT NULL,'
 ' botella int,'
+' num_cast int,'
 ' configuracion_perfilador int NOT NULL,'
 ' configuracion_superficie int NOT NULL,'
 ' id_tubo_nutrientes int,'
@@ -443,7 +444,7 @@ listado_dependencias = ('FOREIGN KEY (estacion)'
 'ON UPDATE CASCADE ON DELETE CASCADE'
 )
 
-listado_unicidades = (', UNIQUE (estacion,fecha_muestreo,hora_muestreo,profundidad,configuracion_superficie,configuracion_perfilador))')
+listado_unicidades = (', UNIQUE (estacion,fecha_muestreo,hora_muestreo,presion_ctd,configuracion_superficie,configuracion_perfilador))')
 
 instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
 

@@ -95,12 +95,15 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
         if datos_radiales['fluorescencia_ctd'][idato] < 0:
             datos_radiales['fluorescencia_ctd'][idato]    = None 
             datos_radiales['fluorescencia_ctd_qf'][idato] = 9    
-    
-    datos_radiales = datos_radiales.drop(columns=['CTDOXY_CAL','CTDOXY_CAL_FLAG_W','EXPOCODE','CTDFLOUR_SCUFA', 'CTDFLUOR_AFL','CTDFLUOR_SP','CTDFLOUR_SCUFA_FLAG_W','CTDFLUOR_AFL_FLAG_W','CTDFLUOR_SP_FLAG_W'])
+        
+    # Asigna el valor del cast. Si es un texto no asigna valor
+    datos_radiales['num_cast'] = numpy.ones(datos_radiales.shape[0])
+        
+    datos_radiales = datos_radiales.drop(columns=['CTDOXY_CAL','CTDOXY_CAL_FLAG_W','CTDFLOUR_SCUFA', 'CTDFLUOR_AFL','CTDFLUOR_SP','CTDFLOUR_SCUFA_FLAG_W','CTDFLUOR_AFL_FLAG_W','CTDFLUOR_SP_FLAG_W'])
      
     # Renombra las columnas para mantener un mismo esquema de nombres   
-    datos_radiales = datos_radiales.rename(columns={"DATE": "fecha_muestreo", "STNNBR": "estacion",
-                                                    "LATITUDE":"latitud","LONGITUDE":"longitud","BTLNBR":"botella","CTDPRS":"profundidad",
+    datos_radiales = datos_radiales.rename(columns={"DATE": "fecha_muestreo", "STNNBR": "estacion", 'EXPOCODE':'nombre_muestreo',
+                                                    "LATITUDE":"latitud","LONGITUDE":"longitud","BTLNBR":"botella","CTDPRS":"presion_ctd",
                                                     "CTDTMP":"temperatura_ctd","CTDSAL":"salinidad_ctd","CTDSAL_FLAG_W":"salinidad_ctd_qf",
                                                     "CTDOXY":"oxigeno_ctd","CTDOXY_FLAG_W":"oxigeno_ctd_qf","CTDPAR":"par_ctd","CTDPAR_FLAG_W":"par_ctd_qf",
                                                     "CTDTURB":"turbidez_ctd","CTDTURB_FLAG_W":"turbidez_ctd_qf","OXYGEN":"oxigeno_wk","OXYGEN_FLAG_W":"oxigeno_wk_qf",
@@ -141,19 +144,40 @@ def lectura_datos_pelacus(nombre_archivo):
     datos_pelacus['configuracion_perfilador'] = numpy.ones(datos_pelacus.shape[0],dtype=int)
     
     # Genera una columna con la profundidad. Usar el valor real (si existe) o la teórica en caso contrario
-    datos_pelacus['profundidad'] = numpy.zeros(datos_pelacus.shape[0])
+    datos_pelacus['presion_ctd'] = numpy.zeros(datos_pelacus.shape[0])
     for idato in range(datos_pelacus.shape[0]):
         if datos_pelacus['Prof_real'][idato] is not None:
-            datos_pelacus['profundidad'][idato] = datos_pelacus['Prof_real'][idato]
+            datos_pelacus['presion_ctd'][idato] = datos_pelacus['Prof_real'][idato]
         if datos_pelacus['Prof_real'][idato] is None and datos_pelacus['Prof_teor.'][idato] is not None:
-            datos_pelacus['profundidad'][idato] = datos_pelacus['Prof_teor.'][idato]        
+            datos_pelacus['presion_ctd'][idato] = datos_pelacus['Prof_teor.'][idato]        
         if datos_pelacus['Prof_real'][idato] is None and datos_pelacus['Prof_teor.'][idato] is None:
-            datos_pelacus['profundidad'][idato] = -999    
-   
-    datos_pelacus = datos_pelacus.drop(columns=['Prof_est','Prof_real', 'Prof_teor.'])
+            datos_pelacus['presion_ctd'][idato] = -999    
+  
+    datos_pelacus = datos_pelacus.drop(columns=['Prof_est','Prof_real', 'Prof_teor.'])  
+  
+    # Asigna el valor del cast. Si es un texto no asigna valor
+    datos_pelacus['num_cast'] = numpy.ones(datos_pelacus.shape[0])
+    for idato in range(datos_pelacus.shape[0]):
+        try: # Si es entero
+            datos_pelacus['num_cast'][idato] = int(datos_pelacus['cast'][idato])           
+        except:
+            pass
 
+    # Asigna el identificador de cada muestreo siguiendo las indicaciones de EXPOCODE. 
+    datos_pelacus['nombre_muestreo'] = [None]*datos_pelacus.shape[0]
+    for idato in range(datos_pelacus.shape[0]):    
+        datos_pelacus['nombre_muestreo'][idato] = '29XX' + datos_pelacus['fecha'][idato].strftime("%Y%m%d")
+
+    # Corrige las horas (diferente formato)
+    for idato in range(datos_pelacus.shape[0]): 
+        if datos_pelacus['hora'][idato] is not None:
+            try: 
+                datos_pelacus['hora'][idato] = datetime.datetime.strptime(datos_pelacus['hora'][idato], '%H:%M').time()
+            except:
+                pass
+            
     # Renombra las columnas para mantener una denominación homogénea
-    datos_pelacus = datos_pelacus.rename(columns={"campaña":"programa","cast":"nombre_muestreo","fecha":"fecha_muestreo","hora":"hora_muestreo","estación":"estacion",
+    datos_pelacus = datos_pelacus.rename(columns={"campaña":"programa","fecha":"fecha_muestreo","hora":"hora_muestreo","estación":"estacion",
                                                   "Latitud":"latitud","Longitud":"longitud","t_CTD":"temperatura_ctd","Sal_CTD":"salinidad_ctd","SiO2":"sio2","SiO2_flag":"sio2_qf",
                                                   "NO3":"no3","NO3T_flag":"no3_qf","NO2":"no2","NO2_flag":"no2_qf","NH4":"nh4","NH4_flag":"nh4_qf","PO4":"po4","PO4_flag":"po4_qf","Cla":"clorofila_a"
                                                   })
@@ -195,16 +219,22 @@ def lectura_datos_radprof(nombre_archivo):
     datos_radprof['no3']    =  datos_radprof['NO3+NO2 umol/Kg'] - datos_radprof['NO2 umol/kg']
     datos_radprof['no3_qf'] =  datos_radprof['Flag_TON'] 
        
+    # Asigna el identificador de cada muestreo siguiendo las indicaciones de EXPOCODE. 
+    datos_radprof['nombre_muestreo'] = [None]*datos_radprof.shape[0]
+    for idato in range(datos_radprof.shape[0]):    
+        datos_radprof['nombre_muestreo'][idato] = '29XX' + datos_radprof['Date'][idato].strftime("%Y%m%d")
+
+    
     # Renombra las columnas para mantener una denominación homogénea
-    datos_radprof = datos_radprof.rename(columns={"ID":"nombre_muestreo","st":"estacion","Niskin":"botella",
-                                                  "Lat":"latitud","Lon":"longitud","CTDPRS":"profundidad","CTDtemp":"temperatura_ctd","SALCTD":"salinidad_ctd",
+    datos_radprof = datos_radprof.rename(columns={"st":"estacion","Niskin":"botella","Cast":'num_cast',
+                                                  "Lat":"latitud","Lon":"longitud","CTDPRS":"presion_ctd","CTDtemp":"temperatura_ctd","SALCTD":"salinidad_ctd",
                                                   "SiO2 umol/Kg":"sio2","Flag_SiO2":"sio2_qf",
                                                   "NO2 umol/kg":"no2","Flag_NO2":"no2_qf","PO4 umol/Kg":"po4","Flag_PO4":"po4_qf"
                                                   })
     
     
     # Mantén solo las columnas que interesan
-    datos_radprof_recorte = datos_radprof[['nombre_muestreo', 'estacion','botella','fecha_muestreo','hora_muestreo','latitud','longitud','profundidad','temperatura_ctd','salinidad_ctd',
+    datos_radprof_recorte = datos_radprof[['nombre_muestreo', 'estacion','botella','fecha_muestreo','hora_muestreo','latitud','longitud','presion_ctd','num_cast','temperatura_ctd','salinidad_ctd',
                                            'no3','no3_qf','no2','no2_qf','sio2','sio2_qf','po4','po4_qf','configuracion_superficie','configuracion_perfilador']]
 
     del(datos_radprof)
@@ -245,6 +275,10 @@ def lectura_datos_estadillo(nombre_archivo,nombre_plantilla):
     datos_entrada['configuracion_superficie'] = numpy.ones(datos_entrada.shape[0])
 
     return datos_entrada,texto_error 
+
+
+
+
 
 
 ##########################################################################
@@ -307,18 +341,18 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
     # Eliminar los registros sin dato de latitud,longitud, profundidad o fecha 
     datos = datos[datos['latitud'].notna()]
     datos = datos[datos['longitud'].notna()]  
-    datos = datos[datos['profundidad'].notna()] 
+    datos = datos[datos['presion_ctd'].notna()] 
     datos = datos[datos['fecha_muestreo'].notna()] 
     
     # Elimina los registros con datos de profundidad negativos
-    datos = datos.drop(datos[datos.profundidad < 0].index)
+    datos = datos.drop(datos[datos.presion_ctd < 0].index)
     
     # Elimina registros duplicados en el mismo punto y a la misma hora(por precaucion)
     num_reg_inicial = datos.shape[0]
-    datos           = datos.drop_duplicates(subset=['latitud','longitud','profundidad','fecha_muestreo','hora_muestreo'], keep='last')    
+    datos           = datos.drop_duplicates(subset=['latitud','longitud','presion_ctd','fecha_muestreo','hora_muestreo'], keep='last')    
     num_reg_final   = datos.shape[0]
     if num_reg_final < num_reg_inicial:
-        textos_aviso.append('Se han eliminado registros correspondientes a una misma fecha, hora,profundidad y estación')
+        textos_aviso.append('Se han eliminado registros correspondientes a una misma fecha, hora, profundidad y estación')
     
     
     # Corregir los valores positivos de longitud, pasándolos a negativos (algunos datos de Pelacus tienen este error)
@@ -333,7 +367,7 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
     for idato in range(datos.shape[0]):
         datos['longitud'][idato] = round(datos['longitud'][idato],4)
         datos['latitud'][idato] = round(datos['latitud'][idato],4)
-        datos['profundidad'][idato] = round(datos['profundidad'][idato],2)      
+        datos['presion_ctd'][idato] = round(datos['presion_ctd'][idato],2)      
 
     # # # Cambia los valores -999 por None y asigna bandera de calidad correspondiente (por precaucion)
     # # Variables fisicas
@@ -483,16 +517,16 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
     if tabla_muestreos.shape[0] == 0:
     
         # genera un dataframe con las variables que interesa introducir en la base de datos
-        exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','hora_muestreo','profundidad','botella','configuracion_perfilador','configuracion_superficie','id_tubo_nutrientes']]
+        exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','hora_muestreo','presion_ctd','botella','num_cast','configuracion_perfilador','configuracion_superficie','id_tubo_nutrientes']]
         # añade el indice de cada registro
         indices_registros                    = numpy.arange(1,(exporta_registros.shape[0]+1))    
         exporta_registros['id_muestreo']     = indices_registros
         # renombra la columna con información de la estación muestreada
         exporta_registros                    = exporta_registros.rename(columns={"id_estacion_temp":"estacion"})
-        # añade el nombre del muestreo
+        # # añade el nombre del muestreo
         exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
         for idato in range(exporta_registros.shape[0]):    
-            exporta_registros['nombre_muestreo'][idato]  = nombre_programa + '_' + str(datos['fecha_muestreo'][idato].year) + '_E' + str(datos['id_estacion_temp'][idato])
+            exporta_registros['nombre_muestreo'][idato]  = nombre_programa + '_E' + str(datos['id_estacion_temp'][idato]) + '_' + datos['nombre_muestreo'][idato]
             datos['id_muestreo_temp'] [idato]            = idato + 1
             
         # Inserta en base de datos        
@@ -506,7 +540,7 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
         datos['io_nuevo_muestreo'] = numpy.zeros(datos.shape[0],dtype=int)
             
         for idato in range(datos.shape[0]):
-            df_temporal = tabla_muestreos.loc[(tabla_muestreos['estacion'] == datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo'] == datos['fecha_muestreo'][idato]) & (tabla_muestreos['profundidad'] == datos['profundidad'][idato]) & (tabla_muestreos['configuracion_perfilador'] == datos['configuracion_perfilador'][idato])  & (tabla_muestreos['configuracion_superficie'] == datos['configuracion_superficie'][idato])]
+            df_temporal = tabla_muestreos.loc[(tabla_muestreos['estacion'] == datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo'] == datos['fecha_muestreo'][idato])  & (tabla_muestreos['hora_muestreo'] == datos['hora_muestreo'][idato]) & (tabla_muestreos['presion_ctd'] == datos['presion_ctd'][idato]) & (tabla_muestreos['configuracion_perfilador'] == datos['configuracion_perfilador'][idato])  & (tabla_muestreos['configuracion_superficie'] == datos['configuracion_superficie'][idato])]
             # Registro ya incluido, recuperar el identificador
             if df_temporal.shape[0] >0:
                 datos['id_muestreo_temp'] [idato] =  df_temporal.iloc[0]['id_muestreo']
@@ -523,7 +557,8 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
             # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
             nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
             # Mantén sólo las columnas que interesan
-            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','hora_muestreo','profundidad','botella','configuracion_perfilador','configuracion_superficie','id_tubo_nutrientes']]
+            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','hora_muestreo','presion_ctd','botella','num_cast','configuracion_perfilador','configuracion_superficie','id_tubo_nutrientes']]
+                        
             # Cambia el nombre de la columna de estaciones
             exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion","id_muestreo_temp":"id_muestreo"})
             # Indice temporal
@@ -532,7 +567,7 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
             # añade el nombre del muestreo
             exporta_registros['nombre_muestreo'] = [None]*nuevos_muestreos.shape[0]
             for idato in range(exporta_registros.shape[0]):    
-                exporta_registros['nombre_muestreo'][idato]         = nombre_programa + '_' + str(exporta_registros['fecha_muestreo'][idato].year) + '_E' + str(exporta_registros['estacion'][idato])
+                exporta_registros['nombre_muestreo'][idato]         = nombre_programa + '_E' + str(datos['id_estacion_temp'][idato]) + '_' + datos['nombre_muestreo'][idato]
     
     
             # # Inserta el dataframe resultante en la base de datos 
@@ -751,149 +786,72 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 
     
-base_datos     = 'COAC'
-usuario        = 'postgres'
-contrasena     = 'm0nt34lt0'
-puerto         = '5432'
-direccion_host = '193.146.155.99'
+# base_datos     = 'COAC'
+# usuario        = 'postgres'
+# contrasena     = 'm0nt34lt0'
+# puerto         = '5432'
+# direccion_host = '193.146.155.99'
  
 
-id_programa       = 3
-programa_muestreo = "RADIAL CORUÑA"
+# nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx'   
+# datos_pelacus = lectura_datos_pelacus(nombre_archivo)    
+# datos,textos_aviso = control_calidad(datos_pelacus,direccion_host,base_datos,usuario,contrasena,puerto)
+# id_programa = 1
+# nombre_programa = "PELACUS"
 
+ 
+# # Realiza un control de calidad primario a los datos importados   
+# print('Realizando control de calidad') 
+# datos,textos_aviso = control_calidad(datos_pelacus,direccion_host,base_datos,usuario,contrasena,puerto) 
+      
+# # Introduce los datos en la base de datos
+# print('Introduciendo los datos en la base de datos')
 
-con_engine                = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-conn_psql                 = create_engine(con_engine)
-
-#conn = init_connection()
-df_programas = psql.read_sql('SELECT * FROM programas', conn_psql)
-#conn.close()
-
-
-tabla_estaciones    = psql.read_sql('SELECT * FROM estaciones', conn_psql)
-estaciones_programa = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
-indices_dataframe   = numpy.arange(0,estaciones_programa.shape[0],1,dtype=int) 
-
-# # Primero recupera los registros correspondientes al periodo evaluado y al año consultado
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-
-cursor = conn.cursor()
-instruccion_sql = "SELECT id_muestreo,nombre_muestreo,fecha_muestreo,hora_muestreo,estacion,botella,profundidad,id_tubo_nutrientes FROM muestreos_discretos INNER JOIN estaciones ON muestreos_discretos.estacion = estaciones.id_estacion WHERE estaciones.programa = %s;"
-cursor.execute(instruccion_sql,(str(id_programa)))
-registros_consulta = cursor.fetchall()
-conn.commit()
-cursor.close()
-conn.close()
-
-
-dataframe_registros = pandas.DataFrame(registros_consulta, columns=['id_muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','botella','profundidad','id_tubo_nutrientes'])
-
-# Mantén sólo los registros con datos de id_nutrientes
-dataframe_registros = dataframe_registros[dataframe_registros['id_tubo_nutrientes'].notna()]
-
-# Busca las fechas disponibles 
-dataframe_temporal = dataframe_registros.drop_duplicates('fecha_muestreo')
-listado_fechas     = dataframe_temporal['fecha_muestreo']
-
-
-# Seleccionas una fecha
-fecha_seleccionada = datetime.date(2022,9,8)
-
-
-# Recupera los registros correspondientes a esa fecha
-dataframe_fecha = dataframe_registros[dataframe_registros['fecha_muestreo']==fecha_seleccionada]
-
-# Ajusta el numero de los indices
-indices_dataframe          = numpy.arange(0,dataframe_fecha.shape[0],1,dtype=int)    
-dataframe_fecha['id_temp'] = indices_dataframe
-dataframe_fecha.set_index('id_temp',drop=True,append=False,inplace=True)
-
-# Recupera las coordenadas a partir de la estación asignada
-dataframe_fecha['latitud'] = numpy.zeros(dataframe_fecha.shape[0])
-dataframe_fecha['longitud'] = numpy.zeros(dataframe_fecha.shape[0])
-for idato in range(dataframe_fecha.shape[0]):
-    dataframe_fecha['latitud'][idato]  = estaciones_programa['latitud'][estaciones_programa['id_estacion']==dataframe_fecha['estacion'][idato]]
-    dataframe_fecha['longitud'][idato] = estaciones_programa['longitud'][estaciones_programa['id_estacion']==dataframe_fecha['estacion'][idato]]
-
-# Recupera las propiedades físicas del registro (temperatura, salinidad....)
-tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
-dataframe_fecha['temperatura_ctd'] = numpy.zeros(dataframe_fecha.shape[0])
-dataframe_fecha['salinidad_ctd'] = numpy.zeros(dataframe_fecha.shape[0])
-for idato in range(dataframe_fecha.shape[0]):
-    dataframe_fecha['temperatura_ctd'][idato]  = tabla_registros_fisica['temperatura_ctd'][tabla_registros_fisica['muestreo']==dataframe_fecha['id_muestreo'][idato]]
-    dataframe_fecha['salinidad_ctd'][idato]    = tabla_registros_fisica['salinidad_ctd'][tabla_registros_fisica['muestreo']==dataframe_fecha['id_muestreo'][idato]]
-
-# Quita la columna de estación
-dataframe_fecha = dataframe_fecha.drop(columns=['estacion','id_muestreo'])
-
-# Ajusta el orden de las columnas
-dataframe_fecha = dataframe_fecha[['nombre_muestreo','fecha_muestreo','hora_muestreo','latitud','longitud','botella','id_tubo_nutrientes','profundidad','temperatura_ctd','salinidad_ctd']]
-
-# Ordena en función del número de tubo
-dataframe_fecha = dataframe_fecha.sort_values(by=['id_tubo_nutrientes'])
-
-
-#estaciones_programa['latitud'].where(estaciones_programa['id_estacion'] == dataframe_fecha['estacion'][idato])
-
-
-#dataframe_registros = dataframe_registros.drop_duplicates('fecha_muestreo')
-
-# id_registro        = numpy.zeros(len(registros_consulta))
-# fechas_muestreo    = [None]*len(registros_consulta)
-# id_tubo_nutrientes = numpy.zeros(len(registros_consulta))
-# for idato in range(len(registros_consulta)):
-#     id_registro[idato] = registros_consulta[idato][0]
-#     fechas_muestreo[idato] = registros_consulta[idato][1]
-#     id_tubo_nutrientes[idato] = registros_consulta[idato][2]
-    
-# # Busca los registros con datos de identificador de tubo de nutrientes disponible
-# indices             = numpy.argwhere(~numpy.isnan(id_tubo_nutrientes))    
-# id_registro         = id_registro[indices]
-# fechas_muestreo     = fechas_muestreo[indices[0,0]]
-# id_tubo_nutrientes  = id_tubo_nutrientes[indices]
-# dataframe_registros = pandas.DataFrame({'id_muestreo':id_registro,'fecha_muestreo': fechas_muestreo, 'id_tubo_nutrientes': id_tubo_nutrientes})
-
-# # Encuentra las fechas disponibles
-# dataframe_registros.drop_duplicates('fecha_muestreo')
-# listado_fechas =dataframe_registros['fecha_muestreo'] 
-
-# indices_datafram
-
-# nombre_archivo   = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/ENTRADAS/Datos_Botellas_RADCOR_salida_08092022.xlsx'   
-# nombre_plantilla = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/ENTRADAS/PLANTILLA.xlsx'   
-
-# id_programa       = 3
-# programa_muestreo = "RADIAL CORUÑA"
-
-
-# # Importa el .xlsx
-# datos_entrada = pandas.read_excel(nombre_archivo, 'datos',dtype={'hora_muestreo': datetime.time})
-
-# ## Comprueba el formato de los datos
-
-# # Verifica si están todas las columnas, comparando con una plantilla
-# datos_plantilla = pandas.read_excel(nombre_plantilla, 'datos') 
-
-# if pandas.Series(datos_entrada.columns).isin(datos_plantilla.columns).all() is False:
-#     io_error  = 1
-#     texto_error = 'Los datos de entrada no se ajustan a la plantilla. Revisar el formato del archivo'
-
-# # corrije el formato de las fechas
-# for idato in range(datos_entrada.shape[0]):
-#     datos_entrada['fecha_muestreo'][idato] = (datos_entrada['fecha_muestreo'][idato]).date()
-    
-# # Añade el identificador de la configuración del perfilador y la superficie (darle una vuelta a esto)
-# datos_entrada['configuracion_perfilador'] = numpy.ones(datos_entrada.shape[0])
-# datos_entrada['configuracion_superficie'] = numpy.ones(datos_entrada.shape[0])
-
-
-
-# datos,textos_aviso = control_calidad(datos_entrada,direccion_host,base_datos,usuario,contrasena,puerto) 
-    
 # datos = evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)  
 
-# datos = evalua_registros(datos,programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
- 
+#datos = evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+
+
+
+
+
+
+# # Recupera la tabla con los registros de muestreos físicos
+# con_engine                = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+# conn_psql                 = create_engine(con_engine)
+# tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
+
+# # Genera un dataframe solo con las variales fisicas de los datos a importar 
+# datos_fisica = datos[['temperatura_ctd', 'temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf','par_ctd','par_ctd_qf','turbidez_ctd','turbidez_ctd_qf','id_muestreo_temp']]
+# datos_fisica = datos_fisica.rename(columns={"id_muestreo_temp": "muestreo"})
+
+# # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
+# for idato in range(datos_fisica.shape[0]):
+#     try:
+#         tabla_registros_fisica = tabla_registros_fisica.drop(tabla_registros_fisica[tabla_registros_fisica.muestreo == datos_fisica['muestreo'][idato]].index)
+#     except:
+#         pass
+    
+# # Une ambos dataframes, el que contiene los datos nuevo y el que tiene los datos que ya están en la base de datos
+# datos_conjuntos = pandas.concat([tabla_registros_fisica, datos_fisica])
+    
+# vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
+# datos_conjuntos['id_disc_fisica'] = vector_identificadores
+
+# datos_conjuntos.set_index('id_disc_fisica',drop=True,append=False,inplace=True)
+
+# # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
+# instruccion_sql = "TRUNCATE datos_discretos_fisica;"
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close() 
+
+# # Inserta el dataframe resultante en la base de datos 
+# datos_conjuntos.to_sql('datos_discretos_fisica', conn_psql,if_exists='append')
+
 
 # nombre_archivo = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/RADIAL_BTL_COR_2013.xlsx'   
 # datos          = lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto) 
