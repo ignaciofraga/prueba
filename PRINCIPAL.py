@@ -11,6 +11,9 @@ from PIL import Image
 
 from pages.COMUNES import FUNCIONES_AUXILIARES
 
+from vipages import ENTRADA_DATOS
+
+
 logo_IEO_principal = 'DATOS/IMAGENES/logo-CSIC.jpg'
 logo_IEO_reducido  = 'DATOS/IMAGENES/ieo.ico'
 
@@ -29,4 +32,7 @@ st.image(imagen_pagina)
 # Autentica al usuario
 if FUNCIONES_AUXILIARES.check_password():
     st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
+    ENTRADA_DATOS.createPage()
+    # app.add_page('page1', page1.app)
+    # app.add_page('page2', page2.app)
 
