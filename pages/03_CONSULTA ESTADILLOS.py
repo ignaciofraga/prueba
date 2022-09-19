@@ -76,7 +76,7 @@ cursor.close()
 conn.close()
 
 
-dataframe_registros = pandas.DataFrame(registros_consulta, columns=['id_muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','botella','profundidad','id_tubo_nutrientes'])
+dataframe_registros = pandas.DataFrame(registros_consulta, columns=['id_muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','botella','presion_ctd','id_tubo_nutrientes'])
 
 # Mantén sólo los registros con datos de id_nutrientes
 dataframe_registros = dataframe_registros[dataframe_registros['id_tubo_nutrientes'].notna()]
