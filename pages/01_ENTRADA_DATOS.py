@@ -40,7 +40,7 @@ def init_connection():
 
 # Encabezados y titulos 
 st.set_page_config(page_title='ENTRADA DE DATOS', layout="wide",page_icon=logo_IEO_reducido) 
-st.title('Servicio de entrada de datos en la base de datos del C.O de A Coruña')
+st.title('Servicio de entrada de datos del C.O de A Coruña')
 
 # Recupera la tabla de los programas disponibles en la base de datos, como un dataframe
 conn = init_connection()
