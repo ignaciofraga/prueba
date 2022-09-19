@@ -75,7 +75,7 @@ for iorigen in range(len(listado_opciones)):
                 
 # Si se elige introducir un estadillo, recordar que se ajusten a la plantilla
 if id_opcion_elegida ==3:
-    texto_error = 'IMPORTANTE. Los datos a subir deben ajustarse a la plantilla falicitada' 
+    texto_error = 'IMPORTANTE. Los datos a subir deben ajustarse a la plantilla facilitada' 
     st.warning(texto_error, icon="⚠️")
 
 #    st.download_button('DESCARGAR PLANTILLA E INSTRUCCIONES', archivo_instrucciones, file_name='PLANTILLA.zip')        
