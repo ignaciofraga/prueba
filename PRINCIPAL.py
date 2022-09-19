@@ -11,7 +11,7 @@ from PIL import Image
 
 from pages.COMUNES import FUNCIONES_AUXILIARES
 
-from vipages import ENTRADA_DATOS
+from pages import ENTRADA_DATOS
 
 
 logo_IEO_principal = 'DATOS/IMAGENES/logo-CSIC.jpg'
