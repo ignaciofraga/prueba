@@ -56,12 +56,12 @@ def check_password():
         st.text_input(
             "Password", type="password", on_change=password_entered, key="password"
         )
-        st.error("😕 User not known or password incorrect")
+        st.error("Usuario no incluido o contraseña incorrecta.")
         return False
     else:
         # Password correct.
         return True
 
-if check_password():
-    st.write("Here goes your normal Streamlit app...")
-    st.button("Click me")
+# if check_password():
+#     st.write("Here goes your normal Streamlit app...")
+#     st.button("Click me")

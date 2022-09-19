@@ -16,7 +16,7 @@ import pandas.io.sql as psql
 
 import datetime
 
-from pages.COMUNES import FUNCIONES_INSERCION
+from pages.COMUNES import FUNCIONES_AUXILIARES
 
 # DATOS BASE
 
