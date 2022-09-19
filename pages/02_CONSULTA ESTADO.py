@@ -330,7 +330,7 @@ else:
         
          
         ## Botón para exportar los resultados
-        nombre_archivo =  nombre_programa + str(anho_consulta) + '.xlsx'
+        nombre_archivo =  nombre_programa + '_' + str(anho_consulta) + '.xlsx'
     
         output = BytesIO()
         writer = pandas.ExcelWriter(output, engine='xlsxwriter')
