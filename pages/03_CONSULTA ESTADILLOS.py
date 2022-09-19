@@ -125,7 +125,7 @@ if len(listado_fechas) > 0:
     dataframe_fecha = dataframe_fecha.sort_values(by=['id_tubo_nutrientes'])
    
     ## Botón para exportar los resultados
-    nombre_archivo =  'ESTADILLO_' + nombre_programa + fecha_seleccionada.strftime("%m/%d/%Y") + '.xlsx'
+    nombre_archivo =  'ESTADILLO_' + nombre_programa + '_' + fecha_seleccionada.strftime("%m/%d/%Y") + '.xlsx'
 
     output = BytesIO()
     writer = pandas.ExcelWriter(output, engine='xlsxwriter')
