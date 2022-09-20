@@ -35,6 +35,8 @@ paginas = {"ENTRADA DATOS": AUXILIAR.entrada_datos,
 
 seleccion = st.sidebar.radio("Elige la página: ",tuple(paginas.keys()))
 
+st.session_state.page_select = paginas[seleccion]
+
 #paginas[seleccion]()
 
 # # Autentica al usuario
