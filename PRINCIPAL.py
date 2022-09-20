@@ -35,7 +35,7 @@ paginas = {"ENTRADA DATOS": AUXILIAR.entrada_datos,
 
 seleccion = st.sidebar.radio("Elige la página: ",tuple(paginas.keys()))
 
-paginas[seleccion]()
+#paginas[seleccion]()
 
 # # Autentica al usuario
 # if FUNCIONES_AUXILIARES.check_password():
