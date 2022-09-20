@@ -28,6 +28,9 @@ st.title("Servicio de información de nutrientes del C.O de A Coruña")
 
 st.image(imagen_pagina)
 
+st.markdown("PÁGINA PRINCIPAL")
+st.sidebar.markdown("PÁGINA PRINCIPAL")
+
 # # Autentica al usuario
 # if FUNCIONES_AUXILIARES.check_password():
 #     st.write("USUARIO IDENTIFICADO CORRECTAMENTE")

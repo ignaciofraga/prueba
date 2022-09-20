@@ -38,6 +38,9 @@ def init_connection():
 
 # if FUNCIONES_AUXILIARES.check_password():
 
+st.markdown("ENTRADA DE DATOS")
+st.sidebar.markdown("ENTRADA DE DATOS")    
+
 # Encabezados y titulos 
 st.set_page_config(page_title='ENTRADA DE DATOS', layout="wide",page_icon=logo_IEO_reducido) 
 st.title('Servicio de entrada de datos del C.O de A Coruña')
