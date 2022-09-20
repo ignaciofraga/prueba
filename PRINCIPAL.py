@@ -32,7 +32,7 @@ def principal():
 
 io_acceso, usuario = AUXILIAR.check_password()
 
-
+st.text(io_acceso, usuario)
 
 # if AUXILIAR.check_password():
 #     #st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
