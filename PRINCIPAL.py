@@ -32,10 +32,9 @@ def principal():
 
 io_acceso, usuario = AUXILIAR.check_password()
 
-st.text(io_acceso, usuario)
-
-# if AUXILIAR.check_password():
-#     #st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
+if io_acceso is True:
+    st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
+    st.write(usuario)
     
     
 #     paginas = {"PRINCIPAL": principal,
