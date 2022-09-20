@@ -34,7 +34,7 @@ io_acceso, usuario = AUXILIAR.check_password()
 
 if io_acceso is True:
 #    st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
-    st.write(usuario)
+    #st.write(usuario)
     
     if usuario == 'usuario_interno':
     
@@ -54,9 +54,9 @@ if io_acceso is True:
        
         
         
-#     seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
+    seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
     
-#     paginas[seleccion]()
+    paginas[seleccion]()
 
 # # Autentica al usuario
 # if FUNCIONES_AUXILIARES.check_password():
