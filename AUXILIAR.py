@@ -33,6 +33,45 @@ def init_connection():
 
 
 
+# def check_password():
+#     """Returns `True` if the user had a correct password."""
+
+#     def password_entered():
+#         """Checks whether a password entered by the user is correct."""
+#         if (
+#             st.session_state["username"] in st.secrets["passwords"]
+#             and st.session_state["password"]
+#             == st.secrets["passwords"][st.session_state["username"]]
+#         ):
+#             st.session_state["password_correct"] = True
+#             del st.session_state["password"]  # don't store username + password
+#             del st.session_state["username"]
+#         else:
+#             st.session_state["password_correct"] = False
+
+#     if "password_correct" not in st.session_state:
+        
+#         # First run, show inputs for username + password.
+#         st.text('Introduzca sus datos de usuario y contraseña para acceder al servicio')
+#         st.text_input("Usuario", on_change=password_entered, key="username")
+#         st.text_input(
+#             "Contraseña", type="password", on_change=password_entered, key="password"
+#         )
+
+#         return False
+#     elif not st.session_state["password_correct"]:
+#         # Password not correct, show input + error.
+#         st.text_input("Usuario", on_change=password_entered, key="username")
+#         st.text_input(
+#             "Contraseña", type="password", on_change=password_entered, key="password"
+#         )
+#         st.error("Usuario no incluido o contraseña incorrecta.")
+#         return False
+#     else:
+#         # Password correct.
+#         return True
+
+
 def check_password():
     """Returns `True` if the user had a correct password."""
 
@@ -52,8 +91,8 @@ def check_password():
     if "password_correct" not in st.session_state:
         
         # First run, show inputs for username + password.
-        st.text('LOg-in')
-        st.text_input("Usuario", on_change=password_entered, key="username")
+        st.text('Introduzca sus datos de usuario y contraseña para acceder al servicio')
+        username = st.text_input("Usuario", on_change=password_entered, key="username")
         st.text_input(
             "Contraseña", type="password", on_change=password_entered, key="password"
         )
@@ -61,7 +100,7 @@ def check_password():
         return False
     elif not st.session_state["password_correct"]:
         # Password not correct, show input + error.
-        st.text_input("Usuario", on_change=password_entered, key="username")
+        username = st.text_input("Usuario", on_change=password_entered, key="username")
         st.text_input(
             "Contraseña", type="password", on_change=password_entered, key="password"
         )
@@ -69,20 +108,7 @@ def check_password():
         return False
     else:
         # Password correct.
-        return True
-
-
-# with st.form("Formulario seleccion"):
-#     col1, col2 = st.columns(2,gap="small")
-#     #nombre_programa, tiempo_consulta = st.columns((1, 1))
-#     with col1:
-#         nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
-#     with col2:
-#         tiempo_consulta = st.date_input("Selecciona fecha de consulta",datetime.date.today())
-
-#     # Botón de envío para confirmar selección
-#     submitted = st.form_submit_button("Enviar")
-
+        return True,username
 
 
 

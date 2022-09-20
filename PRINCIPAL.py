@@ -29,9 +29,12 @@ def principal():
     # Añade el logo del IEO
     st.image(imagen_pagina)
 
+ivar, username = AUXILIAR.check_password()
+st.text(username)
 
 if AUXILIAR.check_password():
-    st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
+    #st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
+    
     
     paginas = {"PRINCIPAL": principal,
         "ENTRADA DATOS": AUXILIAR.entrada_datos,
