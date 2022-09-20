@@ -35,9 +35,11 @@ def init_connection():
 ##### WEB STREAMLIT #####
 
 # if FUNCIONES_AUXILIARES.check_password():
+
+st.sidebar.markdown("CONSULTA ESTADO")     
     
 ### Encabezados y titulos 
-st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
+#st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
 st.title('Servicio de consulta de información disponible del C.O de A Coruña')
 
 

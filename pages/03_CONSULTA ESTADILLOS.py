@@ -33,9 +33,11 @@ def init_connection():
 ##### WEB STREAMLIT #####
 
 # if FUNCIONES_AUXILIARES.check_password():
+ 
+st.sidebar.markdown("CONSULTA ESTADILLOS")    
     
 ### Encabezados y titulos 
-st.set_page_config(page_title='CONSULTA ESTADILLOS', layout="wide",page_icon=logo_IEO_reducido) 
+#st.set_page_config(page_title='CONSULTA ESTADILLOS', layout="wide",page_icon=logo_IEO_reducido) 
 st.title('Servicio de consulta de estadillos de datos muestreados')
 
 # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación

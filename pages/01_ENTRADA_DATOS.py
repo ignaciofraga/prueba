@@ -38,7 +38,7 @@ def init_connection():
 
 # if FUNCIONES_AUXILIARES.check_password():
 
-st.markdown("ENTRADA DE DATOS")
+#st.markdown("ENTRADA DE DATOS")
 st.sidebar.markdown("ENTRADA DE DATOS")    
 
 # Encabezados y titulos 
