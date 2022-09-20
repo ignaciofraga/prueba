@@ -21,14 +21,18 @@ imagen_pagina = Image.open(logo_IEO_principal)
 
 # Encabezados y titulos 
 st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO_reducido) 
-st.title("Servicio de información de nutrientes del C.O de A Coruña")
 
-# Añade el logo del IEO
+def principal():
+
+    st.title("Servicio de información de nutrientes del C.O de A Coruña")
+
+    # Añade el logo del IEO
+    st.image(imagen_pagina)
 
 
-st.image(imagen_pagina)
 
-paginas = {"ENTRADA DATOS": AUXILIAR.entrada_datos,
+paginas = {"PRINCIPAL": principal,
+    "ENTRADA DATOS": AUXILIAR.entrada_datos,
     "CONSULTA ESTADO": AUXILIAR.consulta_estado}
 #    "CONSULTA ESTADILLOS": TEMP.CONSULTA_ESTADILLOS
 #}
