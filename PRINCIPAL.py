@@ -28,8 +28,8 @@ st.title("Servicio de información de nutrientes del C.O de A Coruña")
 
 st.image(imagen_pagina)
 
-paginas = {"ENTRADA DATOS": AUXILIAR.entrada_datos}
-#    "CONSULTA ESTADO": TEMP.CONSULTA_ESTADO,
+paginas = {"ENTRADA DATOS": AUXILIAR.entrada_datos,
+    "CONSULTA ESTADO": AUXILIAR.consulta_estado}
 #    "CONSULTA ESTADILLOS": TEMP.CONSULTA_ESTADILLOS
 #}
 
