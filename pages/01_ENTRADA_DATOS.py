@@ -42,7 +42,7 @@ st.markdown("ENTRADA DE DATOS")
 st.sidebar.markdown("ENTRADA DE DATOS")    
 
 # Encabezados y titulos 
-st.set_page_config(page_title='ENTRADA DE DATOS', layout="wide",page_icon=logo_IEO_reducido) 
+#st.set_page_config(page_title='ENTRADA DE DATOS', layout="wide",page_icon=logo_IEO_reducido) 
 st.title('Servicio de entrada de datos del C.O de A Coruña')
 
 # Recupera la tabla de los programas disponibles en la base de datos, como un dataframe
