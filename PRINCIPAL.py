@@ -11,7 +11,7 @@ from PIL import Image
 
 #from pages.COMUNES import FUNCIONES_AUXILIARES
 
-from TEMP import ENTRADA_DATOS,CONSULTA_ESTADO,CONSULTA_ESTADILLOS
+import TEMP #import ENTRADA_DATOS,CONSULTA_ESTADO,CONSULTA_ESTADILLOS
 
 logo_IEO_principal = 'DATOS/IMAGENES/logo-CSIC.jpg'
 logo_IEO_reducido  = 'DATOS/IMAGENES/ieo.ico'
@@ -28,9 +28,9 @@ st.title("Servicio de información de nutrientes del C.O de A Coruña")
 
 st.image(imagen_pagina)
 
-paginas = {"ENTRADA DATOS": ENTRADA_DATOS,
-    "CONSULTA ESTADO": CONSULTA_ESTADO,
-    "CONSULTA ESTADILLOS": CONSULTA_ESTADILLOS
+paginas = {"ENTRADA DATOS": TEMP.ENTRADA_DATOS,
+    "CONSULTA ESTADO": TEMP.CONSULTA_ESTADO,
+    "CONSULTA ESTADILLOS": TEMP.CONSULTA_ESTADILLOS
 }
 
 seleccion = st.sidebar.radio("Elige la página: ",tuple(paginas.keys()))
