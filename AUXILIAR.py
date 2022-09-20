@@ -97,7 +97,7 @@ def check_password():
             "Contraseña", type="password", on_change=password_entered, key="password"
         )
 
-        return False
+        return False,username
     elif not st.session_state["password_correct"]:
         # Password not correct, show input + error.
         username = st.text_input("Usuario", on_change=password_entered, key="username")
@@ -105,7 +105,7 @@ def check_password():
             "Contraseña", type="password", on_change=password_entered, key="password"
         )
         st.error("Usuario no incluido o contraseña incorrecta.")
-        return False
+        return False,username
     else:
         # Password correct.
         return True,username
