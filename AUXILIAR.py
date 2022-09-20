@@ -50,29 +50,14 @@ def check_password():
             st.session_state["password_correct"] = False
 
     if "password_correct" not in st.session_state:
-        # with st.form("Formulario log-in"):
-        #     #nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
-        #     username = st.text_input("Usuario", on_change=password_entered)
-        #     #tiempo_consulta = st.date_input("Selecciona fecha de consulta",datetime.date.today())
-        #     password = st.text_input(
-        #     "Contraseña", type="password", on_change=password_entered)
-        #     # Botón de envío para confirmar selección
-        #     submitted = st.form_submit_button("Enviar")        
         
-        form = st.form("my_form")
         # First run, show inputs for username + password.
-        form.text_input("Usuario", on_change=password_entered, key="username")
-        form.text_input(
+        st.text('LOg-in')
+        st.text_input("Usuario", on_change=password_entered, key="username")
+        st.text_input(
             "Contraseña", type="password", on_change=password_entered, key="password"
         )
-        
-        # # First run, show inputs for username + password.
-        # st.text_input("Usuario", on_change=password_entered, key="username")
-        # st.text_input(
-        #     "Contraseña", type="password", on_change=password_entered, key="password"
-        # )
-        
-        
+
         return False
     elif not st.session_state["password_correct"]:
         # Password not correct, show input + error.
