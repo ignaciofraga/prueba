@@ -204,7 +204,7 @@ else:
     with col1:
         st.header("Listado de datos")
         
-        st.dataframe(data=datos_visor, width=None, height=None)
+        st.dataframe(data=(datos_visor,datos_visor.style.highlight_max(axis=0)), width=None, height=None)
         
         # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_visor)
         # gb.configure_column("estado", cellStyle=cellsytle_jscode)
