@@ -22,6 +22,11 @@ imagen_pagina = Image.open(logo_IEO_principal)
 # Encabezados y titulos 
 st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO_reducido) 
 
+st.title("Servicio de información de nutrientes del C.O de A Coruña")
+
+# Añade el logo del IEO
+st.image(imagen_pagina)
+
 def principal():
 
     st.title("Servicio de información de nutrientes del C.O de A Coruña")
@@ -30,16 +35,18 @@ def principal():
     st.image(imagen_pagina)
 
 
-
-paginas = {"PRINCIPAL": principal,
-    "ENTRADA DATOS": AUXILIAR.entrada_datos,
-    "CONSULTA ESTADO": AUXILIAR.consulta_estado}
-#    "CONSULTA ESTADILLOS": TEMP.CONSULTA_ESTADILLOS
-#}
-
-seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
-
-paginas[seleccion]()
+if AUXILIAR.check_password():
+    st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
+    
+    paginas = {"PRINCIPAL": principal,
+        "ENTRADA DATOS": AUXILIAR.entrada_datos,
+        "CONSULTA ESTADO": AUXILIAR.consulta_estado}
+    #    "CONSULTA ESTADILLOS": TEMP.CONSULTA_ESTADILLOS
+    #}
+    
+    seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
+    
+    paginas[seleccion]()
 
 # # Autentica al usuario
 # if FUNCIONES_AUXILIARES.check_password():
