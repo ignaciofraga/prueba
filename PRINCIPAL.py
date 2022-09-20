@@ -34,7 +34,7 @@ io_acceso, usuario = AUXILIAR.check_password()
 
 if io_acceso is True:
 #    st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
-#    st.write(usuario)
+    st.write(usuario)
     
     if usuario == 'usuario_interno':
     
