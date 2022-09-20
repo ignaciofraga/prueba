@@ -17,127 +17,119 @@ import psycopg2
 
 import pandas.io.sql as psql
 
-# from pages.COMUNES import FUNCIONES_AUXILIARES
-
 pandas.options.mode.chained_assignment = None
-
-
-logo_IEO_reducido  = 'DATOS/IMAGENES/ieo.ico'
-
-
-##### FUNCIONES AUXILIARES ######
 
 # Funcion para recuperar los parámetros de conexión a partir de los "secrets" establecidos en Streamlit
 def init_connection():
     return psycopg2.connect(**st.secrets["postgres"])
 
 
-##### WEB STREAMLIT #####
+def pagina_programa(nombre_programa,logo_IEO_reducido):
 
-# if FUNCIONES_AUXILIARES.check_password():
+    ### Consulta a la base de datos las fechas de los distintos procesos
 
-st.sidebar.markdown("CONSULTA ESTADO")     
+    conn = init_connection()
+    cursor = conn.cursor()
+
+    # Identificador del programa (PELACUS en este caso)
+    instruccion_sql = "SELECT id_programa FROM programas WHERE nombre_programa = '" + nombre_programa + "' ;"
+    cursor.execute(instruccion_sql)
+    id_programa =cursor.fetchone()[0]
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    # # Recupera la información de la tabla como un dataframe
+    conn = init_connection()
+    # cursor = conn.cursor()
+    # cursor.execute("SELECT * From estado_procesos")
+    # data = cursor.fetchall()
+    # cols = [column[0] for column in data.description]
+    # temporal_estado_procesos= pandas.DataFrame.from_records(data = data, columns = cols)
+
+    # temporal_estado_procesos = pandas.read_sql_query('select * from "estado_procesos"',conn=engine)
+
+
+    temporal_estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
+
     
-### Encabezados y titulos 
-#st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
-st.title('Servicio de consulta de información disponible del C.O de A Coruña')
 
 
-# Recupera la tabla de los programas disponibles como un dataframe
-conn = init_connection()
-df_programas = psql.read_sql('SELECT * FROM programas', conn)
-conn.close()
-
-# Despliega un formulario para elegir el programa y la fecha a consultar
-with st.form("Formulario seleccion"):
-    col1, col2 = st.columns(2,gap="small")
-    #nombre_programa, tiempo_consulta = st.columns((1, 1))
-    with col1:
-        nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
-    with col2:
-        tiempo_consulta = st.date_input("Selecciona fecha de consulta",datetime.date.today())
-
-    # Botón de envío para confirmar selección
-    submitted = st.form_submit_button("Enviar")
-
-
-# Recupera el identificador del programa seleccionado
-id_programa = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
-
-### Consulta a la base de datos las fechas de los distintos procesos (muestreo, análisis y post-procesado)
-
-# Recupera la tabla del estado de los procesos como un dataframe
-conn = init_connection()
-temporal_estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
-conn.close()
-
-# Extrae los datos disponibles del programa consultado 
-estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['programa']==id_programa]
-
-# Bucle if para desplegar información únicamente si hay información del programa seleccionado
-if estado_procesos_programa.shape[0] == 0:
-    
-    st.warning('No se dispone de información acerca del estado del programa de muestreo seleccionado', icon="⚠️")
-
-else:
-
-    # Quita del dataframe las columnas con el identificador del programa y el número registro (no interesa mostrarlo en la web)
+    # Extrae los datos disponibles del programa y quita del dataframe el identificador del programa y el registro
+    estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['programa']==id_programa]
     estado_procesos_programa = estado_procesos_programa.drop(['id_proceso','programa'], axis = 1)
-    
-    # Reemplaza los nan por None
     estado_procesos_programa = estado_procesos_programa.fillna(numpy.nan).replace([numpy.nan], [None])
-    
+
     # Actualiza el indice del dataframe 
     indices_dataframe         = numpy.arange(0,estado_procesos_programa.shape[0],1,dtype=int)
     estado_procesos_programa['id_temp'] = indices_dataframe
     estado_procesos_programa.set_index('id_temp',drop=True,append=False,inplace=True)
-    
-       
 
-    
-    
-    
+    ## Convierte las fechas a tiempos
+    for idato in range(estado_procesos_programa.shape[0]):
+        if estado_procesos_programa['fecha_final_muestreo'][idato] is not None:
+            estado_procesos_programa['fecha_final_muestreo'][idato] = datetime.datetime.strptime(estado_procesos_programa['fecha_final_muestreo'][idato], '%Y-%m-%d').date()
+        if estado_procesos_programa['fecha_analisis_laboratorio'][idato] is not None:
+            estado_procesos_programa['fecha_analisis_laboratorio'][idato] = datetime.datetime.strptime(estado_procesos_programa['fecha_analisis_laboratorio'][idato], '%Y-%m-%d').date()
+        if estado_procesos_programa['fecha_post_procesado'][idato] is not None:    
+            estado_procesos_programa['fecha_post_procesado'][idato] = datetime.datetime.strptime(estado_procesos_programa['fecha_post_procesado'][idato], '%Y-%m-%d').date()
+
+
+    ### Encabezados y titulos 
+    titulo = 'Campaña ' + nombre_programa
+    st.set_page_config(page_title=nombre_programa, layout="wide",page_icon=logo_IEO_reducido) 
+    st.title(titulo)
+
+
+
+    ## Bara de selección de fecha de consulta. 
+    num_semanas_intervalo = 12
+    t_actual            = datetime.date.today()
+    t_inicial           = t_actual-datetime.timedelta(weeks=num_semanas_intervalo) 
+
+    tiempo_consulta = st.sidebar.slider(
+          "Selecciona fecha de consulta",
+          min_value = t_inicial,
+          max_value = t_actual,
+          value     = t_actual,
+          step      = datetime.timedelta(days=7),
+          format="DD/MM/YYYY")
+    st.sidebar.write("Fecha consultada:", tiempo_consulta.strftime("%d-%m-%Y"))
+
+    #tiempo_consulta = datetime.date(2019,12,5)
+
     ### Determina el estado de cada proceso, en la fecha seleccionada
     estado_procesos_programa['estado']    = ''
-    estado_procesos_programa['contacto']  = ''
+    estado_procesos_programa['contacto']    = ''
     estado_procesos_programa['id_estado'] = 0
-    estado_procesos_programa['fecha actualizacion'] = [None]*estado_procesos_programa.shape[0]
     
     nombre_estados  = ['No disponible','Pendiente de análisis','Analizado','Post-Procesado']
     colores_estados = ['#CD5C5C','#F4A460','#87CEEB','#66CDAA','#2E8B57']
-    
+
     for ianho in range(estado_procesos_programa.shape[0]):
-    
+
         # Caso 3. Fecha de consulta posterior al post-procesado.
         if pandas.isnull(estado_procesos_programa['fecha_post_procesado'][ianho]) is False:
             if tiempo_consulta >= (estado_procesos_programa['fecha_post_procesado'][ianho]):     
                 estado_procesos_programa['id_estado'][ianho] = 3
                 estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho] 
-                estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_post_procesado'][ianho].strftime("%m/%d/%Y")
+            
         else:
             
             # Caso 2. Fecha de consulta posterior al análisis de laboratorio pero anterior a realizar el post-procesado.
             if pandas.isnull(estado_procesos_programa['fecha_analisis_laboratorio'][ianho]) is False:
                 if tiempo_consulta >= (estado_procesos_programa['fecha_analisis_laboratorio'][ianho]):  # estado_procesos_programa['fecha_analisis_laboratorio'][ianho] is not None:     
                     estado_procesos_programa['id_estado'][ianho] = 2
-                    estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_analisis_laboratorio'][ianho] 
-                    estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_analisis_laboratorio'][ianho].strftime("%m/%d/%Y")
-                else:
-                    if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
-                        estado_procesos_programa['id_estado'][ianho] = 1 
-                        estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_entrada_datos'][ianho]
-                        estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_entrada_datos'][ianho].strftime("%m/%d/%Y")
-                                            
-            
+                    estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_muestreo'][ianho] 
+                    
             else:
                 # Caso 1. Fecha de consulta posterior a terminar la campaña pero anterior al análisis en laboratorio, o análisis no disponible. 
-                if pandas.isnull(estado_procesos_programa['fecha_entrada_datos'][ianho]) is False:
-                    if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
+                if pandas.isnull(estado_procesos_programa['fecha_final_muestreo'][ianho]) is False:
+                    if tiempo_consulta >= (estado_procesos_programa['fecha_final_muestreo'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
                         estado_procesos_programa['id_estado'][ianho] = 1 
-                        estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_entrada_datos'][ianho]
-                        estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_entrada_datos'][ianho].strftime("%m/%d/%Y")
-                        
-    
+                        estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_muestreo'][ianho]
+
+
         estado_procesos_programa['estado'][ianho] = nombre_estados[estado_procesos_programa['id_estado'][ianho]]
                     
         
@@ -151,31 +143,29 @@ else:
         except:
             pass
     porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),0)
-    
+
     # Construye el gráfico
     cm              = 1/2.54 # pulgadas a cm
     fig, ax1 = plt.subplots(figsize=(8*cm, 8*cm))
     #ax1.pie(num_valores, explode=explode_estados, colors=listado_colores,labels=listado_estados, autopct='%1.1f%%', shadow=True, startangle=90)
     patches, texts= ax1.pie(num_valores, colors=colores_estados,shadow=True, startangle=90,radius=1.2)
     ax1.axis('equal')  # Para representar el pie-chart como un circulo
-    
+
     # Representa y ordena la leyenda
     etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
-    plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(-0.1, -0.3),fontsize=8)
-    
-    
-    
-    
-    
+    plt.legend(patches, etiquetas_leyenda, loc='lower left', bbox_to_anchor=(-0.1, 1.),fontsize=8)
+
+
+
+
+
     # Genera un subset del dataframe con los años en los que hay datos, entre los que se seleccionará la fecha a descargar
-    datos_disponibles = estado_procesos_programa.loc[estado_procesos_programa['id_estado'] >= 2]
-    
+    datos_disponibles = estado_procesos_programa.loc[estado_procesos_programa['id_estado'] >= 3]
+
     # Genera un dataframe con las columnas que se quieran mostrar en la web
     datos_visor = estado_procesos_programa.drop(columns=['nombre_programa','fecha_final_muestreo','fecha_analisis_laboratorio','fecha_post_procesado','id_estado','contacto_muestreo','contacto_post_procesado'])
-    datos_visor = datos_visor[['año','estado','fecha actualizacion','contacto']]
-    
-    datos_visor = datos_visor.sort_values(by=['año'])
-    
+
+
     cellsytle_jscode = st_aggrid.shared.JsCode(
     """function(params) {
     if (params.value.includes('No disponible'))
@@ -187,70 +177,51 @@ else:
     if (params.value.includes('Post-Procesado'))
     {return {'color': 'black', 'backgroundColor': '#66CDAA'}}
     };""")
-    
+
       
-    #    if (params.value.includes('Procesado secundario'))
-    #    {return {'color': 'black', 'backgroundColor': '#2E8B57'}}
-    
+#    if (params.value.includes('Procesado secundario'))
+#    {return {'color': 'black', 'backgroundColor': '#2E8B57'}}
+
     ########################################
     ### Muestra la informacion en la web ###
     ########################################
-    
-      
+
+
+
     #Division en dos columnas, una para tabla otra para la imagen
     col1, col2 = st.columns(2,gap="medium")
-    
+
     # Representacion de la tabla de estados
     with col1:
         st.header("Listado de datos")
+        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_visor)
+        gb.configure_column("estado", cellStyle=cellsytle_jscode)
+
+        gridOptions = gb.build()
         
-        st.dataframe(data=(datos_visor,datos_visor.style.highlight_max(axis=0)), width=None, height=None)
-        
-        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_visor)
-        # gb.configure_column("estado", cellStyle=cellsytle_jscode)
-    
-        # gridOptions = gb.build()
-        
-        # data = st_aggrid.AgGrid(
-        #     datos_visor,
-        #     gridOptions=gridOptions,
-        #     enable_enterprise_modules=True,
-        #     allow_unsafe_jscode=True
-        #     )    
-    
+        data = st_aggrid.AgGrid(
+            datos_visor,
+            gridOptions=gridOptions,
+            enable_enterprise_modules=True,
+            allow_unsafe_jscode=True
+            )    
+
     with col2:
         
         # Representa el pie-chart con el estado de los procesos
         buf = BytesIO()
         fig.savefig(buf, format="png",bbox_inches='tight')
         st.image(buf)
-
-
-
-
-
-    # Vuelta a la division en una única columna
-    st.columns(1,gap="medium")
-
-
-
-    # Condicional para realizar el procesado sólo si hay datos disponibles         
-    if datos_disponibles.shape[0] == 0:
         
-        st.warning('En la fecha consultada no había ningún dato disponible', icon="⚠️")
-        
-    else:
-    
         # Selecciona el año del que se quiere descargar datos
-        datos_disponibles = datos_disponibles.sort_values(by=['año'])
-        seleccion = st.selectbox('Selecciona el año del cual se quiere descargar los datos (entre los años disponibles)',        
+        seleccion = st.selectbox('Selecciona el año a descargar (entre los disponibles)',        
             datos_disponibles['año'])
-    
-    
+
+
         anho_consulta         = seleccion #☺datos_disponibles['año'][0]
         fecha_inicio_consulta = datetime.date(anho_consulta,1,1)
         fecha_final_consulta  = datetime.date(anho_consulta+1,1,1)
-    
+
         
         # Primero recupera los registros correspondientes al periodo evaluado y al año consultado
         conn = init_connection()
@@ -265,20 +236,30 @@ else:
         
         indices_dataframe         = numpy.arange(0,len(registros_consulta),1,dtype=int)
         
-        # A continuacion recupera las tablas de estaciones, muestreos, datos biogeoquimicos y físicos
+        # # A continuacion recupera las tablas de datos biogeoquimicos y físicos
         
         conn = init_connection()
+        cursor = conn.cursor()
         
-        temporal_estaciones          = psql.read_sql('SELECT * FROM estaciones', conn)
+        query = cursor.execute("SELECT * From estaciones")
+        cols = [column[0] for column in query.description]
+        temporal_estaciones= pandas.DataFrame.from_records(data = query.fetchall(), columns = cols)
         
-        temporal_muestreos           = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-     
-        temporal_datos_biogeoquimica = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+        query = cursor.execute("SELECT * From muestreos_discretos")
+        cols = [column[0] for column in query.description]
+        temporal_muestreos= pandas.DataFrame.from_records(data = query.fetchall(), columns = cols)
+                
+        query = cursor.execute("SELECT * From datos_discretos_biogeoquimica")
+        cols = [column[0] for column in query.description]
+        temporal_datos_biogeoquimica= pandas.DataFrame.from_records(data = query.fetchall(), columns = cols)
+                    
+        query = cursor.execute("SELECT * From datos_discretos_fisica")
+        cols = [column[0] for column in query.description]
+        temporal_datos_fisica= pandas.DataFrame.from_records(data = query.fetchall(), columns = cols)
         
-        temporal_datos_fisica        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
-               
+        cursor.close()
         conn.close()    
-              
+      
         # Compón dataframes con los registros que interesan y elimina el temporal, para reducir la memoria ocupada
         # En cada dataframe hay que re-definir el indice del registro para luego poder juntar los 3 dataframes 
         datos_biogeoquimicos            = temporal_datos_biogeoquimica[temporal_datos_biogeoquimica['muestreo'].isin(registros_consulta)]
@@ -298,11 +279,12 @@ else:
         datos_muestreo.set_index('id_temp',drop=True,append=False,inplace=True)      
         datos_muestreo = datos_muestreo.drop(columns=['id_muestreo','configuracion_perfilador','configuracion_superficie'])
         datos_muestreo['fecha_muestreo'] = pandas.to_datetime(datos_muestreo['fecha_muestreo']).dt.date
+        #datos_muestreo['hora_muestreo'] = datos_muestreo['hora_muestreo'].apply(lambda x: x.replace(tzinfo=None))   
         try:
             datos_muestreo['hora_muestreo'] = datos_muestreo['hora_muestreo'].apply(lambda x: x.replace(tzinfo=None))   
         except:
             pass
-    
+
         del(temporal_muestreos)
         
         
@@ -310,25 +292,11 @@ else:
         # Añade las coordenadas de cada muestreo, a partir de la estación asociada
         datos_muestreo['latitud']  = numpy.zeros(datos_muestreo.shape[0])
         datos_muestreo['longitud'] = numpy.zeros(datos_muestreo.shape[0])    
-        datos_muestreo['estacion_temp'] = [None]*datos_muestreo.shape[0]
         for iregistro in range(datos_muestreo.shape[0]):
             datos_muestreo['latitud'][iregistro] = temporal_estaciones['latitud'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]]
             datos_muestreo['longitud'][iregistro] = temporal_estaciones['longitud'][temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]]  
-            
-            aux = temporal_estaciones['id_estacion']==datos_muestreo['estacion'][iregistro]
-            if any(aux) is True:
-                indices_datos = [i for i, x in enumerate(aux) if x]
-                datos_muestreo['estacion_temp'][iregistro]  = temporal_estaciones['nombre_estacion'][indices_datos[0]]
-                
+        del(temporal_estaciones)
         datos_muestreo = datos_muestreo.drop(columns=['estacion'])
-        datos_muestreo = datos_muestreo.rename(columns={"estacion_temp":"estacion"})
-        
-        
-        datos_muestreo = datos_muestreo[['nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','num_cast','latitud','longitud','presion_ctd','botella']]
-
-        
-        
-        del(temporal_estaciones)        
         
         # Une los dataframes resultantes
         datos_compuesto = pandas.concat([datos_muestreo, datos_fisicos, datos_biogeoquimicos], axis=1, join='inner')
@@ -339,8 +307,8 @@ else:
         
          
         ## Botón para exportar los resultados
-        nombre_archivo =  nombre_programa + '_' + str(anho_consulta) + '.xlsx'
-    
+        nombre_archivo =  nombre_programa + str(anho_consulta) + '.xlsx'
+
         output = BytesIO()
         writer = pandas.ExcelWriter(output, engine='xlsxwriter')
         datos_compuesto.to_excel(writer, index=False, sheet_name='DATOS')
@@ -348,7 +316,7 @@ else:
         worksheet = writer.sheets['DATOS']
         writer.save()
         datos_exporta = output.getvalue()
-    
+
         st.download_button(
             label="DESCARGA LOS DATOS SELECCIONADOS",
             data=datos_exporta,
@@ -358,5 +326,6 @@ else:
         )
 
 
-    
+
+
 
