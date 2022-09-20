@@ -51,6 +51,8 @@ st.text_input(
     "Contraseña", type="password", on_change=password_entered, key="password"
 )
 
+st.text(username)
+
 # if AUXILIAR.check_password():
 #     #st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
     
