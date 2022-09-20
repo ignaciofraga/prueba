@@ -33,16 +33,27 @@ def principal():
 io_acceso, usuario = AUXILIAR.check_password()
 
 if io_acceso is True:
-    st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
-    st.write(usuario)
+#    st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
+#    st.write(usuario)
     
+    if usuario == 'usuario_interno':
     
-#     paginas = {"PRINCIPAL": principal,
-#         "ENTRADA DATOS": AUXILIAR.entrada_datos,
-#         "CONSULTA ESTADO": AUXILIAR.consulta_estado}
-#     #    "CONSULTA ESTADILLOS": TEMP.CONSULTA_ESTADILLOS
-#     #}
+        paginas = {"PRINCIPAL": principal,
+            "ENTRADA DATOS": AUXILIAR.entrada_datos,
+            "CONSULTA ESTADO": AUXILIAR.consulta_estado}
+        #    "CONSULTA ESTADILLOS": TEMP.CONSULTA_ESTADILLOS
+        #}
+        
+    if usuario == 'usuario_externo':
     
+        paginas = {"PRINCIPAL": principal,
+            "ENTRADA DATOS": AUXILIAR.entrada_datos}
+        #    "CONSULTA ESTADILLOS": TEMP.CONSULTA_ESTADILLOS
+        #}
+        
+       
+        
+        
 #     seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
     
 #     paginas[seleccion]()
