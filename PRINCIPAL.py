@@ -37,11 +37,9 @@ paginas = {"PRINCIPAL": principal,
 #    "CONSULTA ESTADILLOS": TEMP.CONSULTA_ESTADILLOS
 #}
 
-seleccion = st.sidebar.radio("Elige la página: ",tuple(paginas.keys()))
+seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
 
-st.session_state.page_select = paginas[seleccion]
-
-#paginas[seleccion]()
+paginas[seleccion]()
 
 # # Autentica al usuario
 # if FUNCIONES_AUXILIARES.check_password():
