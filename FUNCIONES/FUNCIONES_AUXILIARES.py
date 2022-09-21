@@ -40,6 +40,8 @@ def check_password():
                 
         if io_autorizado == 1:
            st.session_state["password_correct"] = True
+           st.session_state["password"] = contrasena
+           st.session_state["username"] = usuario
         else:
             st.session_state["password_correct"] = False
 
