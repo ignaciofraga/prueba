@@ -17,7 +17,7 @@ from PIL import Image
 
 #import FUNCIONES_INSERCION
 from FUNCIONES import FUNCIONES_INSERCION
-from FUCIONES.FUNCIONES_AUXILIARES import init_connection
+from FUNCIONES.FUNCIONES_AUXILIARES import init_connection
 
 
 # from pages.COMUNES import FUNCIONES_AUXILIARES
