@@ -22,7 +22,7 @@ def init_connection():
 def log_in():
     
     
-    if st.session_state.username is None:
+    if st.session_state["username"] is None:
   
         # Recupera las contraseñas y usuarios de la base de datos
         conn        = init_connection()
