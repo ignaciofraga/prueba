@@ -5,63 +5,45 @@ Created on Fri Aug  5 08:44:36 2022
 @author: ifraga
 """
 
-
+# Importa las funciones a utilizar
 import streamlit as st
 from PIL import Image
 
-#from pages.COMUNES import FUNCIONES_AUXILIARES
+import FUNCIONES_AUXILIARES 
+import PAGINAS
 
-import AUXILIAR #import ENTRADA_DATOS,CONSULTA_ESTADO,CONSULTA_ESTADILLOS
+# Datos comunes utilizados por la aplicación
+logo_IEO_principal    = 'DATOS/IMAGENES/logo-CSIC.jpg'
+logo_IEO_reducido     = 'DATOS/IMAGENES/ieo.ico'
+archivo_plantilla     = 'DATOS/PLANTILLA.xlsx'
+archivo_instrucciones = 'DATOS/PLANTILLA.zip'
 
-logo_IEO_principal = 'DATOS/IMAGENES/logo-CSIC.jpg'
-logo_IEO_reducido  = 'DATOS/IMAGENES/ieo.ico'
 
+# Encabezado  
 imagen_logo   = Image.open(logo_IEO_reducido)
-imagen_pagina = Image.open(logo_IEO_principal)
-
-# Encabezados y titulos 
 st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO_reducido) 
 
-def principal():
-
-    st.title("Servicio de información de nutrientes del C.O de A Coruña")
-
-    # Añade el logo del IEO
-    st.image(imagen_pagina)
+# Identificación y acceso
+io_acceso, usuario = FUNCIONES_AUXILIARES.check_password()
 
 
-io_acceso, usuario = AUXILIAR.check_password()
-
+# Si el usuario está autorizado, despliega las webs a las que tiene acceso
 if io_acceso is True:
-#    st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
-    #st.write(usuario)
     
     if usuario == 'usuario_interno':
     
-        paginas = {"PRINCIPAL": principal,
-            "ENTRADA DATOS": AUXILIAR.entrada_datos,
-            "CONSULTA ESTADO": AUXILIAR.consulta_estado}
-        #    "CONSULTA ESTADILLOS": TEMP.CONSULTA_ESTADILLOS
-        #}
-        
+        paginas = {"PRINCIPAL": PAGINAS.principal(logo_IEO_principal),
+                   "ENTRADA DATOS": PAGINAS.entrada_datos(archivo_plantilla,archivo_instrucciones),
+                   "CONSULTA ESTADO": PAGINAS.consulta_estado}
+ 
     if usuario == 'usuario_externo':
     
-        paginas = {"PRINCIPAL": principal,
-            "ENTRADA DATOS": AUXILIAR.entrada_datos}
-        #    "CONSULTA ESTADILLOS": TEMP.CONSULTA_ESTADILLOS
-        #}
-        
-       
-        
-        
+        paginas = {"PRINCIPAL": PAGINAS.principal,
+                   "ENTRADA DATOS": PAGINAS.entrada_datos(archivo_plantilla,archivo_instrucciones)}
+               
     seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
     
     paginas[seleccion]()
 
-# # Autentica al usuario
-# if FUNCIONES_AUXILIARES.check_password():
-#     st.write("USUARIO IDENTIFICADO CORRECTAMENTE")
-#     ENTRADA_DATOS.createPage()
-    # app.add_page('page1', page1.app)
-    # app.add_page('page2', page2.app)
+
 

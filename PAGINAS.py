@@ -1,138 +1,66 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jul 28 11:56:39 2022
+Created on Wed Sep 21 08:05:55 2022
 
 @author: ifraga
 """
-
-# Carga de módulos
-
 import streamlit as st
-import psycopg2
-
-
 import pandas.io.sql as psql
-
-
 import datetime
+import pandas 
+import matplotlib.pyplot as plt
+import st_aggrid 
+from io import BytesIO
+import numpy
+import psycopg2
+from PIL import Image
+
+import FUNCIONES_INSERCION
+from FUNCIONES_AUXILIARES import init_connection
+
 
 # from pages.COMUNES import FUNCIONES_AUXILIARES
-from TEMP.COMUNES import FUNCIONES_INSERCION
 
-# DATOS BASE
-
-logo_IEO_reducido            =  'DATOS/IMAGENES/ieo.ico'
-archivo_plantilla            =  'DATOS/PLANTILLA.xlsx'
-archivo_instrucciones        =  'DATOS/PLANTILLA.zip'
-
-##### FUNCIONES AUXILIARES ######
-
-# Funcion para recuperar los parámetros de conexión a partir de los "secrets" establecidos en Streamlit
-def init_connection():
-    return psycopg2.connect(**st.secrets["postgres"])
+pandas.options.mode.chained_assignment = None
 
 
-
-# def check_password():
-#     """Returns `True` if the user had a correct password."""
-
-#     def password_entered():
-#         """Checks whether a password entered by the user is correct."""
-#         if (
-#             st.session_state["username"] in st.secrets["passwords"]
-#             and st.session_state["password"]
-#             == st.secrets["passwords"][st.session_state["username"]]
-#         ):
-#             st.session_state["password_correct"] = True
-#             del st.session_state["password"]  # don't store username + password
-#             del st.session_state["username"]
-#         else:
-#             st.session_state["password_correct"] = False
-
-#     if "password_correct" not in st.session_state:
-        
-#         # First run, show inputs for username + password.
-#         st.text('Introduzca sus datos de usuario y contraseña para acceder al servicio')
-#         st.text_input("Usuario", on_change=password_entered, key="username")
-#         st.text_input(
-#             "Contraseña", type="password", on_change=password_entered, key="password"
-#         )
-
-#         return False
-#     elif not st.session_state["password_correct"]:
-#         # Password not correct, show input + error.
-#         st.text_input("Usuario", on_change=password_entered, key="username")
-#         st.text_input(
-#             "Contraseña", type="password", on_change=password_entered, key="password"
-#         )
-#         st.error("Usuario no incluido o contraseña incorrecta.")
-#         return False
-#     else:
-#         # Password correct.
-#         return True
+###############################################################################
+####################### PÁGINA PRINCIPAL ######################################
+###############################################################################
 
 
-def check_password():
-    """Returns `True` if the user had a correct password."""
+def principal(logo_IEO_principal):
 
-    def password_entered():
-        """Checks whether a password entered by the user is correct."""
-        if (
-            st.session_state["username"] in st.secrets["passwords"]
-            and st.session_state["password"]
-            == st.secrets["passwords"][st.session_state["username"]]
-        ):
-            st.session_state["password_correct"] = True
-#            del st.session_state["password"]  # don't store username + password
-#            del st.session_state["username"]
-        else:
-            st.session_state["password_correct"] = False
+    st.title("Servicio de información de nutrientes del C.O de A Coruña")
 
-    if "password_correct" not in st.session_state:
-        
-        # First run, show inputs for username + password.
-        st.text('Introduzca sus datos de usuario y contraseña para acceder al servicio')
-        st.text_input("Usuario", on_change=password_entered, key="username")
-        st.text_input(
-            "Contraseña", type="password", on_change=password_entered, key="password"
-        )
-
-        return False,st.session_state["username"]
-    elif not st.session_state["password_correct"]:
-        # Password not correct, show input + error.
-        st.text_input("Usuario", on_change=password_entered, key="username")
-        st.text_input(
-            "Contraseña", type="password", on_change=password_entered, key="password"
-        )
-        st.error("Usuario no incluido o contraseña incorrecta.")
-        return False,st.session_state["username"]
-    else:
-        # Password correct.
-        return True,st.session_state["username"]
+    # Añade el logo del IEO
+    imagen_pagina = Image.open(logo_IEO_principal) 
+    st.image(imagen_pagina)
 
 
 
-def entrada_datos():
-    ##### WEB STREAMLIT #####
-    
-    # if FUNCIONES_AUXILIARES.check_password():
-    
-    #st.markdown("ENTRADA DE DATOS")
-    st.sidebar.markdown("ENTRADA DE DATOS")    
+
+
+###############################################################################
+################## PÁGINA DE ENTRADA DE DATOS #################################
+###############################################################################
+
+
+def entrada_datos(archivo_plantilla,archivo_instrucciones):
     
     # Encabezados y titulos 
     #st.set_page_config(page_title='ENTRADA DE DATOS', layout="wide",page_icon=logo_IEO_reducido) 
     st.title('Servicio de entrada de datos del C.O de A Coruña')
-    
+
     # Recupera la tabla de los programas disponibles en la base de datos, como un dataframe
     conn = init_connection()
     df_programas = psql.read_sql('SELECT * FROM programas', conn)
     conn.close()
-    
-    
+
+
     # Despliega un formulario para elegir el programa y la fecha a consultar
     with st.form("Formulario seleccion"):
-    
+
         listado_opciones = ['Datos de NUTRIENTES procedentes de análisis de laboratorio','Datos de NUTRIENTES procesados o revisados','Datos de MUESTREOS ']
         tipo_dato_elegido = st.selectbox('Selecciona el tipo de información que se va a subir', (listado_opciones))
         
@@ -142,17 +70,17 @@ def entrada_datos():
             programa_elegido  = st.selectbox('Selecciona el programa al que corresponde la información',(df_programas['nombre_programa']))
         with col2:
             email_contacto    = st.text_input('Correo de contacto', "...@ieo.csic.es")
-    
+
         # Botón de envío para confirmar selección
-        submitted = st.form_submit_button("Enviar")
-    
-    
-    
+        st.form_submit_button("Enviar")
+
+
+
     ### Recupera los identificadores de la selección hecha
-    
+
     # Recupera el identificador del programa seleccionado
     id_programa_elegido = int(df_programas['id_programa'][df_programas['nombre_programa']==programa_elegido].values[0])
-    
+
     # Encuentra el identificador asociado al tipo de dato
     for iorigen in range(len(listado_opciones)):
         if listado_opciones[iorigen] == tipo_dato_elegido:
@@ -162,9 +90,9 @@ def entrada_datos():
     if id_opcion_elegida ==3:
         texto_error = 'IMPORTANTE. Los datos a subir deben ajustarse a la plantilla facilitada' 
         st.warning(texto_error, icon="⚠️")
-    
+
     #    st.download_button('DESCARGAR PLANTILLA E INSTRUCCIONES', archivo_instrucciones, file_name='PLANTILLA.zip')        
-    
+
         with open(archivo_instrucciones, "rb") as fp:
             btn = st.download_button(
                 label="DESCARGAR PLANTILLA E INSTRUCCIONES",
@@ -177,20 +105,20 @@ def entrada_datos():
     fecha_actualizacion = datetime.date.today()    
         
     ### Subida de archivos
-    
+
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host = st.secrets["postgres"].host
     base_datos     = st.secrets["postgres"].dbname
     usuario        = st.secrets["postgres"].user
     contrasena     = st.secrets["postgres"].password
     puerto         = st.secrets["postgres"].port
-    
+
     col1 = st.columns(1)
-    
+
     # Boton para subir los archivos de datos
     listado_archivos_subidos = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)
     for archivo_subido in listado_archivos_subidos:
-    
+
         
         # Opciones 1 y 2, lectura de datos de nutrientes
         if id_opcion_elegida == 1 or id_opcion_elegida == 2:
@@ -228,8 +156,8 @@ def entrada_datos():
             except:
                 texto_error = 'Error en la lectura del archivo ' + archivo_subido.name
                 st.warning(texto_error, icon="⚠️")
-    
-    
+
+
         # Realiza un control de calidad primario a los datos importados   
         try:
             datos,textos_aviso = FUNCIONES_INSERCION.control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto) 
@@ -242,23 +170,23 @@ def entrada_datos():
         except:
             texto_error = 'Error en el control de calidad de los datos del archivo ' + archivo_subido.name
             st.warning(texto_error, icon="⚠️")
-    
+
         # Introduce los datos en la base de datos
         # try:
      
         with st.spinner('Insertando datos en la base de datos'):
-    
+
             datos = FUNCIONES_INSERCION.evalua_estaciones(datos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)  
-    
+
             datos = FUNCIONES_INSERCION.evalua_registros(datos,programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
-    
+
             FUNCIONES_INSERCION.inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
-    
+
             FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
             
         texto_exito = 'Datos del archivo ' + archivo_subido.name + ' insertados en la base de datos correctamente'
         st.success(texto_exito)
-    
+
         # except:
         #     texto_error = 'Error en la subida de los datos del archivo ' + archivo_subido.name
         #     st.warning(texto_error, icon="⚠️")
@@ -274,21 +202,39 @@ def entrada_datos():
             texto_error = 'Error al actualizar las fechas de procesado en la base de datos'
             st.warning(texto_error, icon="⚠️")    
      
-        
-     
-        
-     
-        
-     
       
-def consulta_estado():
-
-    ##### WEB STREAMLIT #####
-    
-    # if FUNCIONES_AUXILIARES.check_password():
-    
-    st.sidebar.markdown("CONSULTA ESTADO")     
+     
         
+     
+        
+     
+        
+     
+        
+     
+        
+     
+        
+     
+        
+     
+        
+     
+        
+     
+        
+     
+        
+     
+        
+     
+###############################################################################
+############### PÁGINA DE CONSULTA DEL ESTADO DE LOS PROCESOS #################
+###############################################################################
+
+def consulta_estado():
+        
+             
     ### Encabezados y titulos 
     #st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
     st.title('Servicio de consulta de información disponible del C.O de A Coruña')
@@ -309,7 +255,7 @@ def consulta_estado():
             tiempo_consulta = st.date_input("Selecciona fecha de consulta",datetime.date.today())
     
         # Botón de envío para confirmar selección
-        submitted = st.form_submit_button("Enviar")
+        st.form_submit_button("Enviar")
     
     
     # Recupera el identificador del programa seleccionado
@@ -342,10 +288,6 @@ def consulta_estado():
         indices_dataframe         = numpy.arange(0,estado_procesos_programa.shape[0],1,dtype=int)
         estado_procesos_programa['id_temp'] = indices_dataframe
         estado_procesos_programa.set_index('id_temp',drop=True,append=False,inplace=True)
-        
-           
-    
-        
         
         
         ### Determina el estado de cada proceso, en la fecha seleccionada
@@ -604,11 +546,141 @@ def consulta_estado():
                 help= 'Descarga un archivo .csv con los datos solicitados',
                 mime="application/vnd.ms-excel"
             )
+
+
+   
     
-            
-          
-            
+    
+    
+    
+    
+    
+    
+    
+    
+    
       
     
-  
-  
+    
+###############################################################################
+################# PÁGINA DE CONSULTA DE ESTADILLOS ############################
+###############################################################################    
+    
+    
+def consulta_estadillos():    
+    
+    ### Encabezados y titulos 
+    #st.set_page_config(page_title='CONSULTA ESTADILLOS', layout="wide",page_icon=logo_IEO_reducido) 
+    st.title('Servicio de consulta de estadillos de datos muestreados')
+    
+    # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    direccion_host = st.secrets["postgres"].host
+    base_datos     = st.secrets["postgres"].dbname
+    usuario        = st.secrets["postgres"].user
+    contrasena     = st.secrets["postgres"].password
+    puerto         = st.secrets["postgres"].port
+    
+    
+    # Recupera las tablas de los programas y estaciones disponibles como  dataframes
+    conn = init_connection()
+    df_programas  = psql.read_sql('SELECT * FROM programas', conn)
+    df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+    conn.close()
+    
+    
+    # Selecciona el programa del que se quieren buscar estadillos
+    nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere recuperar el estadillo',(df_programas['nombre_programa']))
+    
+    id_programa      = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
+    
+    
+    # Determina las fechas de las que hay información de datos de nutrientes
+    estaciones_programa = df_estaciones[df_estaciones['programa'] == id_programa]
+    
+    indices_dataframe   = numpy.arange(0,estaciones_programa.shape[0],1,dtype=int) 
+    
+    # # Primero recupera los registros correspondientes al periodo evaluado y al año consultado
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    
+    cursor = conn.cursor()
+    instruccion_sql = "SELECT id_muestreo,nombre_muestreo,fecha_muestreo,hora_muestreo,estacion,botella,presion_ctd,id_tubo_nutrientes FROM muestreos_discretos INNER JOIN estaciones ON muestreos_discretos.estacion = estaciones.id_estacion WHERE estaciones.programa = %s;"
+    cursor.execute(instruccion_sql,(str(id_programa)))
+    registros_consulta = cursor.fetchall()
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    
+    dataframe_registros = pandas.DataFrame(registros_consulta, columns=['id_muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','botella','presion_ctd','id_tubo_nutrientes'])
+    
+    # Mantén sólo los registros con datos de id_nutrientes
+    dataframe_registros = dataframe_registros[dataframe_registros['id_tubo_nutrientes'].notna()]
+    
+    # Busca las fechas disponibles 
+    dataframe_temporal = dataframe_registros.drop_duplicates('fecha_muestreo')
+    listado_fechas     = dataframe_temporal['fecha_muestreo']
+    
+    if len(listado_fechas) > 0:
+    
+        # Seleccionas una fecha
+        fecha_seleccionada = st.selectbox('Selecciona la fecha de la que se quiere recuperar el estadillo',(listado_fechas))
+        
+        # Recupera los registros correspondientes a esa fecha
+        dataframe_fecha = dataframe_registros[dataframe_registros['fecha_muestreo']==fecha_seleccionada]
+        
+        # Ajusta el numero de los indices
+        indices_dataframe          = numpy.arange(0,dataframe_fecha.shape[0],1,dtype=int)    
+        dataframe_fecha['id_temp'] = indices_dataframe
+        dataframe_fecha.set_index('id_temp',drop=True,append=False,inplace=True)
+        
+        # Recupera las coordenadas a partir de la estación asignada
+        dataframe_fecha['latitud'] = numpy.zeros(dataframe_fecha.shape[0])
+        dataframe_fecha['longitud'] = numpy.zeros(dataframe_fecha.shape[0])
+        for idato in range(dataframe_fecha.shape[0]):
+            dataframe_fecha['latitud'][idato]  = estaciones_programa['latitud'][estaciones_programa['id_estacion']==dataframe_fecha['estacion'][idato]]
+            dataframe_fecha['longitud'][idato] = estaciones_programa['longitud'][estaciones_programa['id_estacion']==dataframe_fecha['estacion'][idato]]
+        
+        # Recupera las propiedades físicas del registro (temperatura, salinidad....)
+        conn = init_connection()
+        tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+        conn.close()
+        dataframe_fecha['temperatura_ctd'] = numpy.zeros(dataframe_fecha.shape[0])
+        dataframe_fecha['salinidad_ctd'] = numpy.zeros(dataframe_fecha.shape[0])
+        for idato in range(dataframe_fecha.shape[0]):
+            dataframe_fecha['temperatura_ctd'][idato]  = tabla_registros_fisica['temperatura_ctd'][tabla_registros_fisica['muestreo']==dataframe_fecha['id_muestreo'][idato]]
+            dataframe_fecha['salinidad_ctd'][idato]    = tabla_registros_fisica['salinidad_ctd'][tabla_registros_fisica['muestreo']==dataframe_fecha['id_muestreo'][idato]]
+        
+        # Quita la columna de estación
+        dataframe_fecha = dataframe_fecha.drop(columns=['estacion','id_muestreo'])
+        
+        # Ajusta el orden de las columnas
+        dataframe_fecha = dataframe_fecha[['nombre_muestreo','fecha_muestreo','hora_muestreo','latitud','longitud','botella','id_tubo_nutrientes','presion_ctd','temperatura_ctd','salinidad_ctd']]
+        
+        # Ordena en función del número de tubo
+        dataframe_fecha = dataframe_fecha.sort_values(by=['id_tubo_nutrientes'])
+       
+        ## Botón para exportar los resultados
+        nombre_archivo =  'ESTADILLO_' + nombre_programa + '_' + fecha_seleccionada.strftime("%m/%d/%Y") + '.xlsx'
+    
+        output = BytesIO()
+        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+        dataframe_fecha.to_excel(writer, index=False, sheet_name='DATOS')
+        workbook = writer.book
+        worksheet = writer.sheets['DATOS']
+        writer.save()
+        datos_exporta = output.getvalue()
+    
+        st.download_button(
+            label="DESCARGA LOS DATOS SELECCIONADOS",
+            data=datos_exporta,
+            file_name=nombre_archivo,
+            help= 'Descarga un archivo .csv con el estadillo solicitado',
+            mime="application/vnd.ms-excel"
+        )
+        
+    else:
+        
+        texto_error = 'No hay estadillos de entrada correspondientes al programa ' + nombre_programa
+        st.warning(texto_error, icon="⚠️")
+
+
