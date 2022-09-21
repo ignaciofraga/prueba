@@ -31,7 +31,6 @@ with st.form("Formulario autenticación"):
     tipo_usuario_elegido = st.selectbox('Selecciona el tipo de usuario', (listado_usuarios))
     
     col1, col2 = st.columns(2,gap="small")
-    #nombre_programa, tiempo_consulta = st.columns((1, 1))
     with col1:
         tipo_usuario_elegido = st.selectbox('Selecciona el tipo de usuario', (listado_usuarios))
     with col2:
