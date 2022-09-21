@@ -21,8 +21,8 @@ def init_connection():
 
 def log_in():
     
-    
-    #if st.session_state is None:
+
+    # Si no está autenticado (no existe username), procede a identificar al usuario
     if 'username' not in st.session_state:
         # Recupera las contraseñas y usuarios de la base de datos
         conn        = init_connection()
@@ -35,11 +35,9 @@ def log_in():
         # Despliega un formulario para introducir el nombre de usuario y la contraseña
         with st.form("Introduzca sus datos de usuario y contraseña para acceder al servicio'"):
     
-            col1, col2 = st.columns(2,gap="small")
-            #nombre_programa, tiempo_consulta = st.columns((1, 1))
+            col1, col2 = st.columns(2,gap="small")  
             with col1:
                 usuario = st.selectbox('Selecciona el usuario',(listado_usuarios))
-            #st.text_input("Usuario", on_change=password_entered, key="username")
             with col2:
                 contrasena = st.text_input("Contraseña", type="password")
 
@@ -52,7 +50,7 @@ def log_in():
             if usuario == listado_usuarios[iusuario_bd] and contrasena == listado_contrasenas[iusuario_bd]:
                 io_autorizado = 1 # Autorizado!
                 
-                
+        # Si el usuario está autorizado, devuelve "true" y añade al estado de la sesión el nombre de usuario
         if io_autorizado == 1:
            st.session_state["username"] = usuario
            return True
