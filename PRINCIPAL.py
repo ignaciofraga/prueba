@@ -45,7 +45,7 @@ st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO
 
 
 
-st.text(st.session_state["username"])
+#st.text(st.session_state["username"])
 
 
 # Si el usuario está autorizado, despliega las webs a las que tiene acceso
