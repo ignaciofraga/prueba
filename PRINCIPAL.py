@@ -28,8 +28,7 @@ st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO
 with st.form("Formulario autenticación"):
 
     listado_usuarios = ['1','2']
-    tipo_usuario_elegido = st.selectbox('Selecciona el tipo de usuario', (listado_usuarios))
-    
+ 
     col1, col2 = st.columns(2,gap="small")
     with col1:
         tipo_usuario_elegido = st.selectbox('Selecciona el tipo de usuario', (listado_usuarios))
@@ -37,7 +36,7 @@ with st.form("Formulario autenticación"):
         contrasena           = st.text_input("Contraseña", type="password")
 
     # Botón de envío para confirmar selección
-submitted = st.form_submit_button("Submit")
+    submitted = st.form_submit_button("Submit")
 
 
 # # Si el usuario está autorizado, despliega las webs a las que tiene acceso
