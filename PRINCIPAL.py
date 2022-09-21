@@ -30,13 +30,13 @@ io_acceso, usuario = FUNCIONES_AUXILIARES.check_password()
 # Si el usuario está autorizado, despliega las webs a las que tiene acceso
 if io_acceso is True:
     
-    if usuario == 'usuario_interno':
+    if usuario == '1':
     
         paginas = {"PRINCIPAL": PAGINAS.principal(logo_IEO_principal),
                    "ENTRADA DATOS": PAGINAS.entrada_datos(archivo_plantilla,archivo_instrucciones),
                    "CONSULTA ESTADO": PAGINAS.consulta_estado}
  
-    if usuario == 'usuario_externo':
+    if usuario == '2':
     
         paginas = {"PRINCIPAL": PAGINAS.principal,
                    "ENTRADA DATOS": PAGINAS.entrada_datos(archivo_plantilla,archivo_instrucciones)}
