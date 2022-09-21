@@ -23,27 +23,41 @@ logo_IEO_reducido     = 'DATOS/IMAGENES/ieo.ico'
 imagen_logo   = Image.open(logo_IEO_reducido)
 st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO_reducido) 
 
-# Identificación y acceso
-io_acceso, usuario = FUNCIONES_AUXILIARES.check_password()
 
 
 # Si el usuario está autorizado, despliega las webs a las que tiene acceso
-if io_acceso is True:
+if FUNCIONES_AUXILIARES.check_password() is True:
     
-    if usuario == '1':
     
-        paginas = {"PRINCIPAL": PAGINAS.principal,
-                   "ENTRADA DATOS": PAGINAS.entrada_datos,
-                   "CONSULTA ESTADO": PAGINAS.consulta_estado}
- 
-    if usuario == '2':
+    paginas = {"PRINCIPAL": PAGINAS.principal,
+               "ENTRADA DATOS": PAGINAS.entrada_datos,
+               "CONSULTA ESTADO": PAGINAS.consulta_estado}
     
-        paginas = {"PRINCIPAL": PAGINAS.principal,
-                   "ENTRADA DATOS": PAGINAS.entrada_datos}
-               
     seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
     
     paginas[seleccion]()
+
+# # Identificación y acceso
+# io_acceso, usuario = FUNCIONES_AUXILIARES.check_password()
+
+
+# # Si el usuario está autorizado, despliega las webs a las que tiene acceso
+# if io_acceso is True:
+    
+#     if usuario == '1':
+    
+#         paginas = {"PRINCIPAL": PAGINAS.principal,
+#                    "ENTRADA DATOS": PAGINAS.entrada_datos,
+#                    "CONSULTA ESTADO": PAGINAS.consulta_estado}
+ 
+#     if usuario == '2':
+    
+#         paginas = {"PRINCIPAL": PAGINAS.principal,
+#                    "ENTRADA DATOS": PAGINAS.entrada_datos}
+               
+#     seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
+    
+#     paginas[seleccion]()
 
 
 
