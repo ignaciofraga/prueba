@@ -32,17 +32,27 @@ def log_in():
         listado_usuarios    = df_usuarios['nombre_usuario']
         listado_contrasenas = df_usuarios['password']
     
-        # Despliega un formulario para introducir el nombre de usuario y la contraseña
-        with st.form("Introduzca sus datos de usuario y contraseña para acceder al servicio'"):
+        # # Despliega un formulario para introducir el nombre de usuario y la contraseña
+        # with st.form("Introduzca sus datos de usuario y contraseña para acceder al servicio'"):
     
-            col1, col2 = st.columns(2,gap="small")  
-            with col1:
-                usuario = st.selectbox('Selecciona el usuario',(listado_usuarios))
-            with col2:
-                contrasena = st.text_input("Contraseña", type="password")
+        #     col1, col2 = st.columns(2,gap="small")  
+        #     with col1:
+        #         usuario = st.selectbox('Selecciona el usuario',(listado_usuarios))
+        #     with col2:
+        #         contrasena = st.text_input("Contraseña", type="password")
 
-            # Botón de envío para confirmar selección
-            st.form_submit_button("Enviar")   
+        #     # Botón de envío para confirmar selección
+        #     st.form_submit_button("Enviar")  
+        
+        # Despliega un formulario para introducir el nombre de usuario y la contraseña
+        st.write("Introduzca sus datos de usuario y contraseña para acceder al servicio")
+    
+        col1, col2 = st.columns(2,gap="small")  
+        with col1:
+            usuario = st.selectbox('Selecciona el usuario',(listado_usuarios))
+        with col2:
+            contrasena = st.text_input("Contraseña", type="password")
+
            
         # comprueba si la contraseña introducida corresponde al usuario seleccionado    
         io_autorizado = 0 # por defecto no autorizado
@@ -106,6 +116,11 @@ def log_in():
     # else:
     #     # Password correct.
     #     return True
+    
+    
+    
+    
+    
 
 # def check_password(listado_usuarios):
 #     """Returns `True` if the user had a correct password."""
