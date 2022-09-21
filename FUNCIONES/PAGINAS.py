@@ -30,7 +30,9 @@ pandas.options.mode.chained_assignment = None
 ###############################################################################
 
 
-def principal(logo_IEO_principal):
+def principal():
+
+    logo_IEO_principal    = 'DATOS/IMAGENES/logo-CSIC.jpg'    
 
     st.title("Servicio de información de nutrientes del C.O de A Coruña")
 
@@ -47,7 +49,10 @@ def principal(logo_IEO_principal):
 ###############################################################################
 
 
-def entrada_datos(archivo_plantilla,archivo_instrucciones):
+def entrada_datos():
+    
+    archivo_plantilla     = 'DATOS/PLANTILLA.xlsx'
+    archivo_instrucciones = 'DATOS/PLANTILLA.zip'
     
     # Encabezados y titulos 
     #st.set_page_config(page_title='ENTRADA DE DATOS', layout="wide",page_icon=logo_IEO_reducido) 

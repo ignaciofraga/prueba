@@ -13,10 +13,10 @@ from FUNCIONES import FUNCIONES_AUXILIARES
 from FUNCIONES import PAGINAS
 
 # Datos comunes utilizados por la aplicación
-logo_IEO_principal    = 'DATOS/IMAGENES/logo-CSIC.jpg'
+# logo_IEO_principal    = 'DATOS/IMAGENES/logo-CSIC.jpg'
 logo_IEO_reducido     = 'DATOS/IMAGENES/ieo.ico'
-archivo_plantilla     = 'DATOS/PLANTILLA.xlsx'
-archivo_instrucciones = 'DATOS/PLANTILLA.zip'
+# archivo_plantilla     = 'DATOS/PLANTILLA.xlsx'
+# archivo_instrucciones = 'DATOS/PLANTILLA.zip'
 
 
 # Encabezado  
@@ -32,14 +32,14 @@ if io_acceso is True:
     
     if usuario == '1':
     
-        paginas = {"PRINCIPAL": PAGINAS.principal(logo_IEO_principal),
-                   "ENTRADA DATOS": PAGINAS.entrada_datos(archivo_plantilla,archivo_instrucciones),
+        paginas = {"PRINCIPAL": PAGINAS.principal,
+                   "ENTRADA DATOS": PAGINAS.entrada_datos,
                    "CONSULTA ESTADO": PAGINAS.consulta_estado}
  
     if usuario == '2':
     
         paginas = {"PRINCIPAL": PAGINAS.principal,
-                   "ENTRADA DATOS": PAGINAS.entrada_datos(archivo_plantilla,archivo_instrucciones)}
+                   "ENTRADA DATOS": PAGINAS.entrada_datos}
                
     seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
     
