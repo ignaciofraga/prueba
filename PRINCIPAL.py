@@ -45,11 +45,12 @@ st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO
 
 
 
-listado_usuarios = ['1','2']
+
 
 
 # Si el usuario está autorizado, despliega las webs a las que tiene acceso
-if FUNCIONES_AUXILIARES.check_password() is True:
+# if FUNCIONES_AUXILIARES.check_password() is True:
+if FUNCIONES_AUXILIARES.log_in() is True:
     
     # claúsula para manetener el nombre de usuario y poder identificar qu´w webs desplegar
     if 'usuario' not in st.session_state:
