@@ -15,7 +15,8 @@ import numpy
 import psycopg2
 from PIL import Image
 
-import FUNCIONES_INSERCION
+#import FUNCIONES_INSERCION
+from FUNCIONES import FUNCIONES_INSERCION
 from FUNCIONES_AUXILIARES import init_connection
 
 
