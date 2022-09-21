@@ -32,28 +32,18 @@ def log_in():
         listado_usuarios    = df_usuarios['nombre_usuario']
         listado_contrasenas = df_usuarios['password']
     
-        # # Despliega un formulario para introducir el nombre de usuario y la contraseña
-        # with st.form("Introduzca sus datos de usuario y contraseña para acceder al servicio'"):
-    
-        #     col1, col2 = st.columns(2,gap="small")  
-        #     with col1:
-        #         usuario = st.selectbox('Selecciona el usuario',(listado_usuarios))
-        #     with col2:
-        #         contrasena = st.text_input("Contraseña", type="password")
-
-        #     # Botón de envío para confirmar selección
-        #     st.form_submit_button("Enviar")  
-        
         # Despliega un formulario para introducir el nombre de usuario y la contraseña
-        st.write("Introduzca sus datos de usuario y contraseña para acceder al servicio")
-    
-        col1, col2 = st.columns(2,gap="small")  
-        with col1:
-            usuario = st.selectbox('Selecciona el usuario',(listado_usuarios))
-        with col2:
-            contrasena = st.text_input("Contraseña", type="password")
+        with st.form('formulario'):
+            st.write("Introduzca sus datos de usuario y contraseña para acceder al servicio")
+            col1, col2 = st.columns(2,gap="small")  
+            with col1:
+                usuario = st.selectbox('Selecciona el usuario',(listado_usuarios))
+            with col2:
+                contrasena = st.text_input("Contraseña", type="password")
 
-           
+            # Botón de envío para confirmar selección
+            st.form_submit_button("Enviar")  
+                   
         # comprueba si la contraseña introducida corresponde al usuario seleccionado    
         io_autorizado = 0 # por defecto no autorizado
         for iusuario_bd in range(len(listado_usuarios)):
@@ -63,6 +53,7 @@ def log_in():
         # Si el usuario está autorizado, devuelve "true" y añade al estado de la sesión el nombre de usuario
         if io_autorizado == 1:
            st.session_state['usuario'] = usuario
+           del formulario
            return True
         else:
            return False
