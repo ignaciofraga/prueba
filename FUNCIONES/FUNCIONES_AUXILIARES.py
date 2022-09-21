@@ -80,20 +80,22 @@ def check_password(listado_usuarios):
         
         # First run, show inputs for username + password.
         st.write('Introduzca sus datos de usuario y contraseña para acceder al servicio')
-        st.selectbox('Selecciona el usuario',(listado_usuarios),on_change=password_entered, key="username")
+        col1, col2 = st.columns(2,gap="small")
+        with col1:
+            st.selectbox('Selecciona el usuario',(listado_usuarios),on_change=password_entered, key="username")
         #st.text_input("Usuario", on_change=password_entered, key="username")
-        st.text_input(
-            "Contraseña", type="password", on_change=password_entered, key="password"
-        )
+        with col2:
+            st.text_input("Contraseña", type="password", on_change=password_entered, key="password")
 
         return False
     elif not st.session_state["password_correct"]:
         # Password not correct, show input + error.
-        st.selectbox('Selecciona el usuario',(listado_usuarios),on_change=password_entered, key="username")
+        col1, col2 = st.columns(2,gap="small")
+        with col1:
+            st.selectbox('Selecciona el usuario',(listado_usuarios),on_change=password_entered, key="username")
         #st.text_input("Usuario", on_change=password_entered, key="username")
-        st.text_input(
-            "Contraseña", type="password", on_change=password_entered, key="password"
-        )
+        with col2:
+            st.text_input("Contraseña", type="password", on_change=password_entered, key="password")
         st.error("Usuario no reconocido o contraseña incorrecta.")
         return False
     else:

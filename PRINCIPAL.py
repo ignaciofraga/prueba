@@ -54,10 +54,6 @@ if FUNCIONES_AUXILIARES.check_password(listado_usuarios) is True:
     # claúsula para manetener el nombre de usuario y poder identificar qu´w webs desplegar
     if 'usuario' not in st.session_state:
         st.session_state['usuario'] = st.session_state["username"]
-
-    #st.text(usuario)
-    st.write(st.session_state.usuario)
-    
     
     paginas = {"PRINCIPAL": PAGINAS.principal,
                 "ENTRADA DATOS": PAGINAS.entrada_datos,
