@@ -25,17 +25,33 @@ st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO
 
 
 
-# Si el usuario está autorizado, despliega las webs a las que tiene acceso
-if FUNCIONES_AUXILIARES.check_password() is True:
+with st.form("Formulario autenticación"):
+
+    listado_usuarios = ['1','2']
+    tipo_usuario_elegido = st.selectbox('Selecciona el tipo de usuario', (listado_usuarios))
+    
+    col1, col2 = st.columns(2,gap="small")
+    #nombre_programa, tiempo_consulta = st.columns((1, 1))
+    with col1:
+        tipo_usuario_elegido = st.selectbox('Selecciona el tipo de usuario', (listado_usuarios))
+    with col2:
+        contrasena           = st.text_input("Contraseña", type="password")
+
+    # Botón de envío para confirmar selección
+    st.form_submit_button("Enviar")
+
+
+# # Si el usuario está autorizado, despliega las webs a las que tiene acceso
+# if FUNCIONES_AUXILIARES.check_password() is True:
     
     
-    paginas = {"PRINCIPAL": PAGINAS.principal,
-               "ENTRADA DATOS": PAGINAS.entrada_datos,
-               "CONSULTA ESTADO": PAGINAS.consulta_estado}
+#     paginas = {"PRINCIPAL": PAGINAS.principal,
+#                "ENTRADA DATOS": PAGINAS.entrada_datos,
+#                "CONSULTA ESTADO": PAGINAS.consulta_estado}
     
-    seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
+#     seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
     
-    paginas[seleccion]()
+#     paginas[seleccion]()
 
 # # Identificación y acceso
 # io_acceso, usuario = FUNCIONES_AUXILIARES.check_password()
