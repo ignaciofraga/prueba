@@ -52,11 +52,20 @@ if FUNCIONES_AUXILIARES.log_in() is True:
     if 'usuario' not in st.session_state:
         st.session_state['usuario'] = st.session_state["username"]
     
-    paginas = {"PRINCIPAL": PAGINAS.principal,
-                "ENTRADA DATOS": PAGINAS.entrada_datos,
-                "CONSULTA ESTADO": PAGINAS.consulta_estado}
+        if st.session_state['usuario'] == 'Usuario interno IEO':
+        
+            paginas = {"INICIO": PAGINAS.principal,
+                        "ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
+                        "CONSULTA ESTADO PROCESADO": PAGINAS.consulta_estado,
+                        "CONSULTA ESTADILLOS": PAGINAS.consulta_estadillos,
+                        }
+            
+        if st.session_state['usuario'] == 'Usuario externo':
+            
+            paginas = {"INICIO": PAGINAS.principal,
+                        "ENTRADA ESTADILLOS": PAGINAS.entrada_estadillos}
     
-    seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
+    seleccion = st.sidebar.selectbox("Elige la página a mostrar: ",tuple(paginas.keys()))
     
     paginas[seleccion]()
 

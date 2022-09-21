@@ -44,7 +44,7 @@ conn.commit()
 # Inserta los datos de usuarios y contraseñas
 ##### ESTOS VALORES TIENEN QUE SER LOS MISMOS QUE EN LA APP STREAMLIT ######
 
-usuarios   = ['Usuario_interno_IEO','Usuario_externo']
+usuarios   = ['Usuario interno IEO','Usuario externo']
 contrasena = ['IEO_2022','2022_IEO']
 
 for iusuario in range(len(usuarios)):
