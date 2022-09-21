@@ -37,7 +37,7 @@ with st.form("Formulario autenticación"):
         contrasena           = st.text_input("Contraseña", type="password")
 
     # Botón de envío para confirmar selección
-    st.form_submit_button("Enviar")
+    submitted = st.form_submit_button("Submit")
 
 
 # # Si el usuario está autorizado, despliega las webs a las que tiene acceso
