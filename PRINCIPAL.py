@@ -25,23 +25,6 @@ st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO
 
 
 
-# with st.form("Formulario autenticación"):
-
-#     listado_usuarios = ['1','2']
- 
-#     col1, col2 = st.columns(2,gap="small")
-#     with col1:
-#         tipo_usuario_elegido = st.selectbox('Selecciona el tipo de usuario', (listado_usuarios))
-#     with col2:
-#         contrasena           = st.text_input("Contraseña", type="password")
-
-#     # Botón de envío para confirmar selección
-#     submitted = st.form_submit_button("Submit")
-
-
-
-
-
 
 
 # Si el usuario está autorizado, despliega las webs a las que tiene acceso
@@ -49,27 +32,27 @@ st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO
 if FUNCIONES_AUXILIARES.log_in() is True:
     
     # claúsula para manetener el nombre de usuario y poder identificar qué webs desplegar
-    # if 'usuario' not in st.session_state:
+    if 'usuario' in st.session_state:
     #     st.session_state['usuario'] = st.session_state["username"]
     
-    PAGINAS.principal()
+
     
-    if st.session_state["username"] == 'Usuario interno IEO':
-    
-        paginas = {"INICIO": PAGINAS.principal,
-                    "ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
-                    "CONSULTA ESTADO PROCESADO": PAGINAS.consulta_estado,
-                    "CONSULTA ESTADILLOS": PAGINAS.consulta_estadillos,
-                    }
+        if st.session_state["usuario"] == 'Usuario interno IEO':
         
-    if st.session_state["username"] == 'Usuario externo':
+            paginas = {"INICIO": PAGINAS.principal,
+                        "ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
+                        "CONSULTA ESTADO PROCESADO": PAGINAS.consulta_estado,
+                        "CONSULTA ESTADILLOS": PAGINAS.consulta_estadillos,
+                        }
+            
+        if st.session_state["usuario"] == 'Usuario externo':
+            
+            paginas = {"INICIO": PAGINAS.principal,
+                        "ENTRADA ESTADILLOS": PAGINAS.entrada_estadillos}
         
-        paginas = {"INICIO": PAGINAS.principal,
-                    "ENTRADA ESTADILLOS": PAGINAS.entrada_estadillos}
-    
-    seleccion = st.sidebar.selectbox("Elige la página a mostrar: ",tuple(paginas.keys()))
-    
-    paginas[seleccion]()
+        seleccion = st.sidebar.selectbox("Elige la página a mostrar: ",tuple(paginas.keys()))
+        
+        paginas[seleccion]()
 
 # # Identificación y acceso
 # io_acceso, usuario = FUNCIONES_AUXILIARES.check_password()
