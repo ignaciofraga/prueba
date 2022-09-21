@@ -52,6 +52,7 @@ def log_in():
             if usuario == listado_usuarios[iusuario_bd] and contrasena == listado_contrasenas[iusuario_bd]:
                 io_autorizado = 1 # Autorizado!
                 
+                
         if io_autorizado == 1:
            st.session_state["username"] = usuario
            return True
