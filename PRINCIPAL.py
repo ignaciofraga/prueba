@@ -9,8 +9,8 @@ Created on Fri Aug  5 08:44:36 2022
 import streamlit as st
 from PIL import Image
 
-import FUNCIONES_AUXILIARES 
-import PAGINAS
+from FUNCIONES import FUNCIONES_AUXILIARES 
+from FUNCIONES import PAGINAS
 
 # Datos comunes utilizados por la aplicación
 logo_IEO_principal    = 'DATOS/IMAGENES/logo-CSIC.jpg'
