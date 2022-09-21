@@ -48,22 +48,22 @@ st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO
 # if FUNCIONES_AUXILIARES.check_password() is True:
 if FUNCIONES_AUXILIARES.log_in() is True:
     
-    # claúsula para manetener el nombre de usuario y poder identificar qu´w webs desplegar
-    if 'usuario' not in st.session_state:
-        st.session_state['usuario'] = st.session_state["username"]
+    # claúsula para manetener el nombre de usuario y poder identificar qué webs desplegar
+    # if 'usuario' not in st.session_state:
+    #     st.session_state['usuario'] = st.session_state["username"]
     
-        if st.session_state['usuario'] == 'Usuario interno IEO':
+    if st.session_state["username"] == 'Usuario interno IEO':
+    
+        paginas = {"INICIO": PAGINAS.principal,
+                    "ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
+                    "CONSULTA ESTADO PROCESADO": PAGINAS.consulta_estado,
+                    "CONSULTA ESTADILLOS": PAGINAS.consulta_estadillos,
+                    }
         
-            paginas = {"INICIO": PAGINAS.principal,
-                        "ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
-                        "CONSULTA ESTADO PROCESADO": PAGINAS.consulta_estado,
-                        "CONSULTA ESTADILLOS": PAGINAS.consulta_estadillos,
-                        }
-            
-        if st.session_state['usuario'] == 'Usuario externo':
-            
-            paginas = {"INICIO": PAGINAS.principal,
-                        "ENTRADA ESTADILLOS": PAGINAS.entrada_estadillos}
+    if st.session_state["username"] == 'Usuario externo':
+        
+        paginas = {"INICIO": PAGINAS.principal,
+                    "ENTRADA ESTADILLOS": PAGINAS.entrada_estadillos}
     
     seleccion = st.sidebar.selectbox("Elige la página a mostrar: ",tuple(paginas.keys()))
     
