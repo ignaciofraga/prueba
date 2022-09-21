@@ -51,7 +51,12 @@ st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO
 # Si el usuario está autorizado, despliega las webs a las que tiene acceso
 if FUNCIONES_AUXILIARES.check_password() is True:
     
-    st.text(st.session_state["username"])
+    try:
+        usuario = st.session_state["username"]
+    except:
+        pass
+    st.text(usuario)
+    
     
     paginas = {"PRINCIPAL": PAGINAS.principal,
                 "ENTRADA DATOS": PAGINAS.entrada_datos,
