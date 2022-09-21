@@ -23,7 +23,7 @@ def log_in():
     
 
     # Si no está autenticado (no existe username), procede a identificar al usuario
-    if 'username' not in st.session_state:
+    if 'usuario' not in st.session_state:
         # Recupera las contraseñas y usuarios de la base de datos
         conn        = init_connection()
         df_usuarios = psql.read_sql('SELECT * FROM usuarios_app', conn)
