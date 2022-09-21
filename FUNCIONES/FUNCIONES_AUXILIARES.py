@@ -25,21 +25,26 @@ def check_password():
     df_usuarios = psql.read_sql('SELECT * FROM usuarios_app', conn)
     conn.close()   
     
-    listado_usuarios = df_usuarios['nombre_usuario']
+    listado_usuarios    = df_usuarios['nombre_usuario']
+    listado_contrasenas = df_usuarios['password']
     
     
     """Returns `True` if the user had a correct password."""
 
     def password_entered():
         """Checks whether a password entered by the user is correct."""
+        # if (
+        #     st.session_state["username"] in st.secrets["passwords"]
+        #     and st.session_state["password"]
+        #     == st.secrets["passwords"][st.session_state["username"]]
+        # ):
         if (
-            st.session_state["username"] in st.secrets["passwords"]
+            st.session_state["username"] in listado_contrasenas
             and st.session_state["password"]
-            == st.secrets["passwords"][st.session_state["username"]]
+            == listado_contrasenas[st.session_state["username"]]
         ):
+            
             st.session_state["password_correct"] = True
-#            del st.session_state["password"]  # don't store username + password
-#            del st.session_state["username"]
         else:
             st.session_state["password_correct"] = False
 
