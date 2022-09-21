@@ -52,6 +52,8 @@ if FUNCIONES_AUXILIARES.log_in() is True:
     # if 'usuario' not in st.session_state:
     #     st.session_state['usuario'] = st.session_state["username"]
     
+    PAGINAS.principal()
+    
     if st.session_state["username"] == 'Usuario interno IEO':
     
         paginas = {"INICIO": PAGINAS.principal,
