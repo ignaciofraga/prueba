@@ -22,8 +22,8 @@ def init_connection():
 def log_in():
     
     
-    if st.session_state is None:
-  
+    #if st.session_state is None:
+    if 'username' not in st.session_state:
         # Recupera las contraseñas y usuarios de la base de datos
         conn        = init_connection()
         df_usuarios = psql.read_sql('SELECT * FROM usuarios_app', conn)
