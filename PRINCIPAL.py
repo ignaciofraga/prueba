@@ -24,7 +24,7 @@ st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO
 if FUNCIONES_AUXILIARES.log_in() is True:
     
     # claúsula para manetener el nombre de usuario y poder identificar qué webs desplegar
-    if 'usuario' not in st.session_state:
+    if 'usuario' in st.session_state:
     #     st.session_state['usuario'] = st.session_state["username"]
 
         if st.session_state["usuario"] == 'Usuario interno IEO':
