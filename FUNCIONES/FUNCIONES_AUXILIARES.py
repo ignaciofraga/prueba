@@ -52,7 +52,7 @@ def log_in():
                 
         # Si el usuario está autorizado, devuelve "true" y añade al estado de la sesión el nombre de usuario
         if io_autorizado == 1:
-           st.session_state["usuario"] = usuario
+           st.session_state['usuario'] = usuario
            return True
         else:
            return False
