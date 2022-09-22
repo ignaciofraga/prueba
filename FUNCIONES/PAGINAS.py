@@ -996,6 +996,7 @@ def evolucion_analisis():
     
     # Cambia el formato de los ejes
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
+    ax.set_xticks( fechas_referencia )
     
     # Añade leyenda
     plt.legend(nombre_estados, bbox_to_anchor = (0.85, 1.085), ncol=len(nombre_estados)) # ,loc="upper left"
