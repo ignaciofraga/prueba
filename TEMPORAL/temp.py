@@ -80,7 +80,7 @@ for itiempo in range(num_meses):
             
                 # Caso 3. Fecha de consulta posterior al post-procesado.
                 if pandas.isnull(estado_procesos_programa['fecha_post_procesado'][ianho]) is False:
-                    if tiempo_consulta >= (estado_procesos_programa['fecha_post_procesado'][ianho]):     
+                    if tiempo_consulta.date() >= (estado_procesos_programa['fecha_post_procesado'][ianho]):     
                         estado_procesos_programa['id_estado'][ianho] = 3
                 else:
                     
@@ -89,13 +89,13 @@ for itiempo in range(num_meses):
                         if tiempo_consulta >= (estado_procesos_programa['fecha_analisis_laboratorio'][ianho]):  # estado_procesos_programa['fecha_analisis_laboratorio'][ianho] is not None:     
                             estado_procesos_programa['id_estado'][ianho] = 2
                         else:
-                            if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
+                            if tiempo_consulta.date()  >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
                                 estado_procesos_programa['id_estado'][ianho] = 1 
                                                                     
                     else:
                         # Caso 1. Fecha de consulta posterior a terminar la campaña pero anterior al análisis en laboratorio, o análisis no disponible. 
                         if pandas.isnull(estado_procesos_programa['fecha_entrada_datos'][ianho]) is False:
-                            if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
+                            if tiempo_consulta.date()  >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
                                 estado_procesos_programa['id_estado'][ianho] = 1 
                                 
                         
@@ -113,7 +113,7 @@ for itiempo in range(num_meses):
 fig, ax           = plt.subplots()
 fechas_referencia = pandas.date_range(tiempo_inicio_consulta,tiempo_final_consulta,freq='m')
 anchura_barra     = 4
-etiquetas         = ['P','RV','RC','RS','RP']
+etiquetas         = df_programas['abreviatura']
 
 # Bucle con cada programa de muestreo
 valor_maximo_programa = numpy.zeros(df_programas.shape[0])
@@ -170,8 +170,16 @@ fig.set_size_inches(16.5, 5.5)
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
 
 # Añade leyenda
-plt.legend(nombre_estados, bbox_to_anchor = (0.85, 1.1), ncol=len(nombre_estados)) # ,loc="upper left"
+plt.legend(nombre_estados, bbox_to_anchor = (0.85, 1.085), ncol=len(nombre_estados)) # ,loc="upper left"
 
 # Añade nombre a los ejes
 plt.xlabel('Fecha')
 plt.ylabel('Años de muestreo')
+
+# Añade un cuadro de texto explicado las abreviaturas
+textstr = ''
+for iprograma in range(df_programas.shape[0]):
+    textstr = textstr + df_programas['abreviatura'][iprograma] + '=' + df_programas['nombre_programa'][iprograma] + '; '
+#textstr = 'P=PELACUS RV = RADIALES VIGO RC = RADIALES CORUÑA  RS = RADIALES SANTANDER RP = RADPROF '
+ax.text(0.15, 1.125, textstr, transform=ax.transAxes, fontsize=11,
+        verticalalignment='top', bbox={'edgecolor':'none','facecolor':'white'})

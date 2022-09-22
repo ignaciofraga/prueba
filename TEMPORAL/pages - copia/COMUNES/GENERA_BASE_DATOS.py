@@ -105,6 +105,7 @@ conn.commit()
 listado_variables = ('(id_programa int PRIMARY KEY,'
 ' nombre_programa text NOT NULL,'
 ' centro_asociado int NOT NULL,'
+' abreviatura text,'
 ) 
 
 listado_dependencias = ('FOREIGN KEY (centro_asociado)'

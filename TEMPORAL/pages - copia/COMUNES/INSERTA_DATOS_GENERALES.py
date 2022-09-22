@@ -69,6 +69,7 @@ conn.close()
 
 programas       = ['PELACUS','RADIAL VIGO','RADIAL CORUÑA','RADIAL SANTANDER','RADPROF']
 centro_asociado = ['CORUNA','VIGO','CORUNA','SANTANDER','CORUNA']
+abreviatura     = ['P','RV','RC','RS','RP']
 
 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
 cursor = conn.cursor()
@@ -93,8 +94,8 @@ for icentro in range(len(centro_asociado)):
 
 # Inserta los datos de cada programa
 for iprograma in range(len(programas)):
-    instruccion_sql = "INSERT INTO programas (id_programa,nombre_programa,centro_asociado) VALUES (%s,%s,%s) ON CONFLICT (id_programa) DO UPDATE SET (nombre_programa,centro_asociado) = (EXCLUDED.nombre_programa, EXCLUDED.centro_asociado);"   
-    cursor.execute(instruccion_sql, (iprograma+1,programas[iprograma],id_asociado[iprograma]))
+    instruccion_sql = "INSERT INTO programas (id_programa,nombre_programa,centro_asociado,abreviatura) VALUES (%s,%s,%s,%s) ON CONFLICT (id_programa) DO UPDATE SET (nombre_programa,centro_asociado,abreviatura) = (EXCLUDED.nombre_programa, EXCLUDED.centro_asociado, EXCLUDED.abreviatura);"   
+    cursor.execute(instruccion_sql, (iprograma+1,programas[iprograma],id_asociado[iprograma],abreviatura[iprograma]))
     conn.commit()    
 
 

@@ -866,16 +866,16 @@ def evolucion_analisis():
     # Recupera la tabla del estado de los procesos como un dataframe
     temporal_estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
     conn.close()
-
+    
     # Estados
     nombre_estados  = ['No disponible','Pendiente de análisis','Analizado','Post-Procesado']
     colores_estados = ['#CD5C5C','#F4A460','#87CEEB','#66CDAA','#2E8B57']
-
-
-
+    
+    
+    
     # Contador
     num_valores = numpy.zeros((num_meses,df_programas.shape[0],len(nombre_estados)),dtype=int)
-
+    
     for itiempo in range(num_meses):
         
         tiempo_consulta = fechas_referencia[itiempo]
@@ -908,7 +908,7 @@ def evolucion_analisis():
                 
                     # Caso 3. Fecha de consulta posterior al post-procesado.
                     if pandas.isnull(estado_procesos_programa['fecha_post_procesado'][ianho]) is False:
-                        if tiempo_consulta >= (estado_procesos_programa['fecha_post_procesado'][ianho]):     
+                        if tiempo_consulta.date() >= (estado_procesos_programa['fecha_post_procesado'][ianho]):     
                             estado_procesos_programa['id_estado'][ianho] = 3
                     else:
                         
@@ -917,13 +917,13 @@ def evolucion_analisis():
                             if tiempo_consulta >= (estado_procesos_programa['fecha_analisis_laboratorio'][ianho]):  # estado_procesos_programa['fecha_analisis_laboratorio'][ianho] is not None:     
                                 estado_procesos_programa['id_estado'][ianho] = 2
                             else:
-                                if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
+                                if tiempo_consulta.date()  >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
                                     estado_procesos_programa['id_estado'][ianho] = 1 
                                                                         
                         else:
                             # Caso 1. Fecha de consulta posterior a terminar la campaña pero anterior al análisis en laboratorio, o análisis no disponible. 
                             if pandas.isnull(estado_procesos_programa['fecha_entrada_datos'][ianho]) is False:
-                                if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
+                                if tiempo_consulta.date()  >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
                                     estado_procesos_programa['id_estado'][ianho] = 1 
                                     
                             
@@ -934,15 +934,15 @@ def evolucion_analisis():
                         num_valores[itiempo,iprograma,ivalor] = estado_procesos_programa['id_estado'].value_counts()[ivalor]
                     except:
                         pass
-
+    
             
-
-
+    
+    
     fig, ax           = plt.subplots()
     fechas_referencia = pandas.date_range(tiempo_inicio_consulta,tiempo_final_consulta,freq='m')
     anchura_barra     = 4
-    etiquetas         = ['P','RV','RC','RS','RP']
-
+    etiquetas         = df_programas['abreviatura']
+    
     # Bucle con cada programa de muestreo
     valor_maximo_programa = numpy.zeros(df_programas.shape[0])
     for iprograma in range(df_programas.shape[0]): 
@@ -958,7 +958,7 @@ def evolucion_analisis():
         valores_acumulados = numpy.cumsum(valores_programa,axis =1)
         acumulados_mod     = numpy.c_[ numpy.zeros(valores_acumulados.shape[0]), valores_acumulados]
         acumulados_mod     = numpy.delete(acumulados_mod, -1, axis = 1)
-
+    
         # Determina la posición de las etiquetas y la máxima altura (para luego definir el rango del eje y)
         etiqueta_altura                   = valores_acumulados[:,-1] + 1.5
         valor_maximo_programa [iprograma] = max(etiqueta_altura)
@@ -969,7 +969,7 @@ def evolucion_analisis():
             posicion_fondo = acumulados_mod[:,igrafico]
             
             plt.bar(fechas_programa, num_valores[:,iprograma,igrafico], anchura_barra, bottom = posicion_fondo ,color=colores_estados[igrafico],edgecolor='k')
-
+    
         # Añade una etiqueta para identificar al programa
         etiqueta_nombre   = [etiquetas[iprograma]]*num_valores.shape[0]
         for ibarra in range(num_valores.shape[0]):
@@ -984,25 +984,33 @@ def evolucion_analisis():
                 ax.text(fechas_programa[ibarra], valores_acumulados[ibarra,2] , str(valores_programa[ibarra,2]), ha="center", va="bottom")
             if valores_programa[ibarra,3] > 0:
                 ax.text(fechas_programa[ibarra], valores_acumulados[ibarra,3] , str(valores_programa[ibarra,3]), ha="center", va="bottom")
-
-
-
-
+    
+    
+    
+    
     # Ajusta límites del gráfico
     plt.ylim([0, max(valor_maximo_programa)+2])
          
     # Ajusta tamaño 
     fig.set_size_inches(16.5, 5.5)
-
+    
     # Cambia el formato de los ejes
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
-
+    
     # Añade leyenda
-    plt.legend(nombre_estados, bbox_to_anchor = (0.85, 1.1), ncol=len(nombre_estados)) # ,loc="upper left"
-
+    plt.legend(nombre_estados, bbox_to_anchor = (0.85, 1.085), ncol=len(nombre_estados)) # ,loc="upper left"
+    
     # Añade nombre a los ejes
     plt.xlabel('Fecha')
     plt.ylabel('Años de muestreo')
+    
+    # Añade un cuadro de texto explicado las abreviaturas
+    textstr = ''
+    for iprograma in range(df_programas.shape[0]):
+        textstr = textstr + df_programas['abreviatura'][iprograma] + '=' + df_programas['nombre_programa'][iprograma] + '; '
+    #textstr = 'P=PELACUS RV = RADIALES VIGO RC = RADIALES CORUÑA  RS = RADIALES SANTANDER RP = RADPROF '
+    ax.text(0.15, 1.125, textstr, transform=ax.transAxes, fontsize=11,
+            verticalalignment='top', bbox={'edgecolor':'none','facecolor':'white'})
     
     buf = BytesIO()
     fig.savefig(buf, format="png",bbox_inches='tight')
