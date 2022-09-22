@@ -835,15 +835,16 @@ def evolucion_analisis():
     st.title('Servicio de consulta de la evolución en los muestreos procesados')
     
 
+    listado_meses = numpy.arange(2,12,dtype=int)
+
     # Despliega un formulario para elegir el programa y la fecha a consultar
     with st.form("Formulario seleccion"):
         col1, col2 = st.columns(2,gap="small")
         #nombre_programa, tiempo_consulta = st.columns((1, 1))
         with col1:
             tiempo_final_consulta = st.date_input("Selecciona la fecha de finalización del periodo de consulta",datetime.date.today())
-            tiempo_referencia     = tiempo_final_consulta + relativedelta(months=-6)
         with col2:
-            tiempo_inicio_consulta = st.date_input("Selecciona la fecha de comienzo del periodo de consulta",tiempo_referencia)
+            num_meses = st.selectbox("Selecciona el número de meses del periodo de consulta",listado_meses,index=4)
   
         texto_error = 'Para visualizar correctamente los resultados se recomienda un periodo de consulta de 6 meses.'
         st.warning(texto_error, icon="⚠️")   
@@ -853,7 +854,8 @@ def evolucion_analisis():
         
     # num_meses              = 6
     # tiempo_final_consulta  = datetime.date.today()
-    # tiempo_inicio_consulta = tiempo_final_consulta + relativedelta(months=-6)
+    
+    tiempo_inicio_consulta = tiempo_final_consulta + relativedelta(months=-num_meses)
 
     fechas_referencia = pandas.date_range(tiempo_inicio_consulta,tiempo_final_consulta,freq='m')
 
@@ -1001,3 +1003,7 @@ def evolucion_analisis():
     # Añade nombre a los ejes
     plt.xlabel('Fecha')
     plt.ylabel('Años de muestreo')
+    
+    buf = BytesIO()
+    fig.savefig(buf, format="png",bbox_inches='tight')
+    st.image(buf)
