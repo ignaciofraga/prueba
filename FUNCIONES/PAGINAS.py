@@ -846,7 +846,7 @@ def evolucion_analisis():
         with col2:
             num_meses = st.selectbox("Selecciona el número de meses del periodo de consulta",listado_meses,index=4)
   
-        texto_error = 'Para visualizar correctamente los resultados se recomienda un periodo de consulta de 6 meses.'
+        texto_error = 'Para visualizar correctamente los resultados se recomienda evitar periodos de consulta elevados.'
         st.warning(texto_error, icon="⚠️")   
   
         # Botón de envío para confirmar selección
