@@ -1015,3 +1015,5 @@ def evolucion_analisis():
     buf = BytesIO()
     fig.savefig(buf, format="png",bbox_inches='tight')
     st.image(buf)
+    
+    st.download_button("DESCARGAR GRÁFICO",buf,'GRAFICO.png')
