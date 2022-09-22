@@ -948,7 +948,7 @@ def evolucion_analisis():
         
         # Desplaza las fechas para representar cada programa separado de los demás
         for ifecha in range(fechas_referencia.shape[0]):
-            fechas_programa    = fechas_referencia + datetime.timedelta(days=-2+anchura_barra*iprograma)
+            fechas_programa    = fechas_referencia + datetime.timedelta(days=-8+anchura_barra*iprograma)
         
         # Extrae los valores de muestras en cada estado para el programa correspondiente
         valores_programa   = num_valores[:,iprograma,:]
