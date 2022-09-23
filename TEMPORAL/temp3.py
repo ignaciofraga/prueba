@@ -25,16 +25,16 @@ contrasena     = 'm0nt34lt0'
 puerto         = '5432'
 direccion_host = '193.146.155.99'
 
-num_meses              = 6
+num_meses_previos      = 6
 tiempo_final_consulta  = datetime.date.today()
-tiempo_inicio_consulta = tiempo_final_consulta + relativedelta(months=-num_meses)
+tiempo_inicio_consulta = tiempo_final_consulta + relativedelta(months=-num_meses_previos)
 
-fechas_referencia = pandas.date_range(tiempo_inicio_consulta,tiempo_final_consulta,freq='m')
-
-fechas_aux        = pandas.date_range(fechas_referencia[-1],tiempo_final_consulta,periods=2)
-#fechas_referencia = fechas_referencia.union(fechas_aux)
-
-fechas_final = fechas_referencia.union(fechas_aux)
+fechas_final_mes   = pandas.date_range(tiempo_inicio_consulta,tiempo_final_consulta,freq='m')
+if tiempo_final_consulta != (fechas_final_mes[-1]).date():
+    fechas_mes_actual  = pandas.date_range(fechas_final_mes[-1],tiempo_final_consulta,periods=2)
+    fechas_comparacion = fechas_final_mes.union(fechas_mes_actual)
+else:
+    fechas_comparacion  = fechas_final_mes  
 
 # Recupera la tabla de los programas disponibles como un dataframe
 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -51,11 +51,11 @@ colores_estados = ['#CD5C5C','#F4A460','#87CEEB','#66CDAA','#2E8B57']
 
 
 # Contador
-num_valores = numpy.zeros((num_meses,df_programas.shape[0],len(nombre_estados)),dtype=int)
+num_valores = numpy.zeros((len(fechas_comparacion),df_programas.shape[0],len(nombre_estados)),dtype=int)
 
-for itiempo in range(num_meses):
+for itiempo in range(len(fechas_comparacion)):
     
-    tiempo_consulta = fechas_referencia[itiempo]
+    tiempo_consulta = fechas_comparacion[itiempo]
     
     for iprograma in range(df_programas.shape[0]):
     
@@ -116,17 +116,21 @@ for itiempo in range(num_meses):
 
 
 fig, ax           = plt.subplots()
-fechas_referencia = pandas.date_range(tiempo_inicio_consulta,tiempo_final_consulta,freq='m')
-anchura_barra     = 4
+anchura_barra     = 0.125
 etiquetas         = df_programas['abreviatura']
+id_mes            = numpy.arange(0,len(fechas_comparacion))
+
+nombres_meses     =['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+vector_nombres    = [None]*fechas_comparacion.shape[0]
+for idato in range(fechas_comparacion.shape[0]):
+    vector_nombres[idato] = nombres_meses[fechas_comparacion[idato].month-1] + ' ' + fechas_comparacion[idato].strftime("%y")
 
 # Bucle con cada programa de muestreo
 valor_maximo_programa = numpy.zeros(df_programas.shape[0])
 for iprograma in range(df_programas.shape[0]): 
     
-    # Desplaza las fechas para representar cada programa separado de los demás
-    for ifecha in range(fechas_referencia.shape[0]):
-        fechas_programa    = fechas_referencia + datetime.timedelta(days=anchura_barra*iprograma)
+    # Desplaza la coordenada x de cada programa para representarlo separado de los demás
+    posicion_x_programa    = id_mes + anchura_barra*(iprograma - 2)
     
     # Extrae los valores de muestras en cada estado para el programa correspondiente
     valores_programa   = num_valores[:,iprograma,:]
@@ -145,34 +149,31 @@ for iprograma in range(df_programas.shape[0]):
         
         posicion_fondo = acumulados_mod[:,igrafico]
         
-        plt.bar(fechas_programa, num_valores[:,iprograma,igrafico], anchura_barra, bottom = posicion_fondo ,color=colores_estados[igrafico],edgecolor='k')
+        plt.bar(posicion_x_programa, num_valores[:,iprograma,igrafico], anchura_barra, bottom = posicion_fondo ,color=colores_estados[igrafico],edgecolor='k')
 
     # Añade una etiqueta para identificar al programa
     etiqueta_nombre   = [etiquetas[iprograma]]*num_valores.shape[0]
     for ibarra in range(num_valores.shape[0]):
         # Etiqueta con el nombre del programa
-        ax.text(fechas_programa[ibarra], etiqueta_altura[ibarra], etiqueta_nombre[ibarra], ha="center", va="bottom")
+        ax.text(posicion_x_programa[ibarra], etiqueta_altura[ibarra], etiqueta_nombre[ibarra], ha="center", va="bottom")
         # Etiqueta con el valor de cada uno de los estados
         if valores_programa[ibarra,0] > 0:
-            ax.text(fechas_programa[ibarra], valores_acumulados[ibarra,0] , str(valores_programa[ibarra,0]), ha="center", va="bottom")
+            ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,0] , str(valores_programa[ibarra,0]), ha="center", va="bottom")
         if valores_programa[ibarra,1] > 0:
-            ax.text(fechas_programa[ibarra], valores_acumulados[ibarra,1] , str(valores_programa[ibarra,1]), ha="center", va="bottom")
+            ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,1] , str(valores_programa[ibarra,1]), ha="center", va="bottom")
         if valores_programa[ibarra,2] > 0:
-            ax.text(fechas_programa[ibarra], valores_acumulados[ibarra,2] , str(valores_programa[ibarra,2]), ha="center", va="bottom")
+            ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,2] , str(valores_programa[ibarra,2]), ha="center", va="bottom")
         if valores_programa[ibarra,3] > 0:
-            ax.text(fechas_programa[ibarra], valores_acumulados[ibarra,3] , str(valores_programa[ibarra,3]), ha="center", va="bottom")
+            ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,3] , str(valores_programa[ibarra,3]), ha="center", va="bottom")
 
-
-
+# Cambia el nombre de los valores del eje X. De nºs enteros al mes correspondiente
+plt.xticks(id_mes,vector_nombres)
 
 # Ajusta límites del gráfico
 plt.ylim([0, max(valor_maximo_programa)+2])
      
 # Ajusta tamaño 
 fig.set_size_inches(16.5, 5.5)
-
-# Cambia el formato de los ejes
-plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%Y'))
 
 # Añade leyenda
 plt.legend(nombre_estados, bbox_to_anchor = (0.85, 1.085), ncol=len(nombre_estados)) # ,loc="upper left"
