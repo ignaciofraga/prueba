@@ -1059,10 +1059,13 @@ def entrada_procesos_actuales():
         
         col1, col2, col3= st.columns(3,gap="small")
         with col1:
-            num_muestras = st.number_input('Número de muestras:',format='%i',value=round(0))
+            num_muestras = st.number_input('Número de muestras:',format='%i',value=round(1),min_value=1)
             num_muestras = round(num_muestras)
         with col2:
             nombre_programa  = st.selectbox('Selecciona el programa',(df_programas['nombre_programa']))
+            # Recupera el identificador del programa seleccionado
+            id_programa_elegido = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
+
         with col3:
             anho_consulta = st.number_input('Año:',format='%i',value=anho_actual,max_value=anho_actual)
     
@@ -1071,14 +1074,16 @@ def entrada_procesos_actuales():
         # Botón de envío para confirmar selección
         submit = st.form_submit_button("Enviar")
 
-#         if submit == True:
+        if submit == True:
             
-#             conn = init_connection()
-#             cursor = conn.cursor()           
-#             instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,centro_asociado,abreviatura) VALUES (%s,%s,%s,%s) ON CONFLICT (id_programa) DO UPDATE SET (nombre_programa,centro_asociado,abreviatura) = (EXCLUDED.nombre_programa, EXCLUDED.centro_asociado, EXCLUDED.abreviatura);"   
-#             cursor.close()
-#             conn.close()   
+            conn = init_connection()
+            cursor = conn.cursor()           
+            instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,año,num_muestras,fecha_inicio,fecha_estimada_fin) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_proceso,programa,año) DO UPDATE SET (nombre_programa,num_muestras,fecha_inicio,fecha_estimada_fin) = (EXCLUDED.nombre_programa,EXCLUDED.num_muestras,EXCLUDED.fecha_inicio,EXCLUDED.fecha_estimada_fin);"   
+            cursor.execute(instruccion_sql, (descripcion_muestras,id_programa_elegido,nombre_programa,anho_consulta,num_muestras,fecha_actual,fecha_estimada_fin)) 
+            cursor.close()
+            conn.close()   
 
+#' nombre_proceso text NOT NULL,'
 # ' programa int NOT NULL,'
 # ' nombre_programa text NOT NULL,'
 # ' año int NOT NULL,'
