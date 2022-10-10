@@ -1105,7 +1105,7 @@ def entrada_procesos_actuales():
         df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa'])
 
         # Renombra las columnas
-        df_muestreos_curso = df_muestreos_curso.rename(columns={'nombre_proceso':'Muestras','nombre_programa':'Programa','año':'Año','num_muestras':'Número muestras','fecha_inicio':'Inicio','fecha_estimada_fin':'Final estimado'}, inplace=True)
+        df_muestreos_curso = df_muestreos_curso.rename(columns={'nombre_proceso':'Muestras','nombre_programa':'Programa','año':'Año','num_muestras':'Número muestras','fecha_inicio':'Inicio','fecha_estimada_fin':'Final estimado'})
 
         # Muestra una tabla con los análisis en curso
         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
