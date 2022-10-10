@@ -1108,7 +1108,8 @@ def entrada_procesos_actuales():
         df_muestreos_curso = df_muestreos_curso.rename(columns={'nombre_proceso':'Muestras','nombre_programa':'Programa','año':'Año','num_muestras':'Número muestras','fecha_inicio':'Inicio','fecha_estimada_fin':'Final estimado'})
 
         # Ajusta el formato de las fechas
-        df_muestreos_curso['Inicio'] =  pandas.to_datetime(df_muestreos_curso['Inicio'], format='%Y%m%d').dt.date
+        for idato in range(df_muestreos_curso.shape[0]):
+            df_muestreos_curso['Inicio'][idato] =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
 
         # Muestra una tabla con los análisis en curso
         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
