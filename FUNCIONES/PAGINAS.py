@@ -1038,16 +1038,14 @@ def evolucion_analisis():
 ###############################################################################    
     
 def entrada_procesos_actuales():
-       
+
+    # Despliega un botón lateral para seleccionar el tipo de información a introducir       
     entradas     = ['Nuevas muestras a procesar', 'Procesado terminado']
-    
-    
     tipo_entrada = st.sidebar.radio("Indicar la información a introducir",entradas)
-    #('Nuevas muestras a procesar', 'Procesado terminado'))
+
 
     if tipo_entrada == entradas[0]:
-    
-        
+
         st.header('Añadir muestras en proceso')
         
         # Busca el año actual para limitar la fecha de entrada 
@@ -1096,9 +1094,24 @@ def entrada_procesos_actuales():
 
 
     if tipo_entrada == entradas[1]:
-        st.header('Añadir muestras analizadas')
+        st.header('Añadir finalización de muestras analizadas')
+        
+        # Recupera los muestreos en curso
+        conn = init_connection()
+        df_muestreos_curso = psql.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
+        conn.close()
 
-
+        # Muestra una tabla con los análisis en curso
+        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
+    
+        gridOptions = gb.build()
+        
+        # data = st_aggrid.AgGrid(
+        #     datos_visor,
+        #     gridOptions=gridOptions,
+        #     enable_enterprise_modules=True,
+        #     allow_unsafe_jscode=True
+        #     )    
 
 ###############################################################################
 #################### PÁGINA DE PROCESOS EN CURSO ##############################
