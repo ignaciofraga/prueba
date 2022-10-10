@@ -20,7 +20,7 @@ import matplotlib.dates as mdates
 #import FUNCIONES_INSERCION
 from FUNCIONES import FUNCIONES_INSERCION
 from FUNCIONES.FUNCIONES_AUXILIARES import init_connection
-
+from FUNCIONES.FUNCIONES_AUXILIARES import estado_procesos
 
 # from pages.COMUNES import FUNCIONES_AUXILIARES
 
@@ -1096,28 +1096,33 @@ def entrada_procesos_actuales():
     if tipo_entrada == entradas[1]:
         st.header('Añadir finalización de muestras analizadas')
         
-        # Recupera los muestreos en curso
-        conn = init_connection()
-        df_muestreos_curso = psql.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
-        conn.close()
+        # # Recupera los muestreos en curso
+        # conn = init_connection()
+        # df_muestreos_curso = psql.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
+        # conn.close()
 
-        # Elimina las columnas que no interesa mostrar
-        df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa'])
+        # # Elimina las columnas que no interesa mostrar
+        # df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa'])
 
-        # Renombra las columnas
-        df_muestreos_curso = df_muestreos_curso.rename(columns={'nombre_proceso':'Muestras','nombre_programa':'Programa','año':'Año','num_muestras':'Número muestras','fecha_inicio':'Inicio','fecha_estimada_fin':'Final estimado'})
+        # # Renombra las columnas
+        # df_muestreos_curso = df_muestreos_curso.rename(columns={'nombre_proceso':'Muestras','nombre_programa':'Programa','año':'Año','num_muestras':'Número muestras','fecha_inicio':'Inicio','fecha_estimada_fin':'Final estimado'})
 
-        # Ajusta el formato de las fechas
-        for idato in range(df_muestreos_curso.shape[0]):
-            df_muestreos_curso['Inicio'][idato]         =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
-            df_muestreos_curso['Final estimado'][idato] =  df_muestreos_curso['Final estimado'][idato].strftime("%Y-%m-%d")
+        # # Ajusta el formato de las fechas
+        # for idato in range(df_muestreos_curso.shape[0]):
+        #     df_muestreos_curso['Inicio'][idato]         =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
+        #     df_muestreos_curso['Final estimado'][idato] =  df_muestreos_curso['Final estimado'][idato].strftime("%Y-%m-%d")
 
-        st.subheader('Listado de análisis en curso')        
+        # st.subheader('Listado de análisis en curso')        
 
-        # Muestra una tabla con los análisis en curso
-        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
-        gridOptions = gb.build()
-        st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = 200,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+        # # Muestra una tabla con los análisis en curso
+        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
+        # gridOptions = gb.build()
+        # st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = 200,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+
+        st.subheader('Listado de análisis en curso') 
+        estado_procesos()
+
+
 
 ###############################################################################
 #################### PÁGINA DE PROCESOS EN CURSO ##############################
