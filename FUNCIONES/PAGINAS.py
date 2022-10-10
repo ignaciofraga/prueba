@@ -1082,7 +1082,9 @@ def entrada_procesos_actuales():
 #            instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,año,num_muestras,fecha_inicio,fecha_estimada_fin) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_proceso,programa,año) DO UPDATE SET (nombre_programa,num_muestras,fecha_inicio,fecha_estimada_fin) = (EXCLUDED.nombre_programa,EXCLUDED.num_muestras,EXCLUDED.fecha_inicio,EXCLUDED.fecha_estimada_fin);"   
             instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,año,num_muestras,fecha_inicio,fecha_estimada_fin) VALUES (%s,%s,%s,%s,%s,%s,%s);"   
             cursor.execute(instruccion_sql, (descripcion_muestras,id_programa_elegido,nombre_programa,anho_consulta,num_muestras,fecha_actual,fecha_estimada_fin)) 
-            st.text(descripcion_muestras,id_programa_elegido,nombre_programa,anho_consulta,num_muestras,fecha_actual,fecha_estimada_fin)
+            st.text(descripcion_muestras)
+
+#            st.text(descripcion_muestras,id_programa_elegido,nombre_programa,anho_consulta,num_muestras,fecha_actual,fecha_estimada_fin)
             cursor.close()
             conn.close()  
             st.text('holas')
