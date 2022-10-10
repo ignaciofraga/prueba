@@ -89,12 +89,10 @@ def estado_procesos():
     for idato in range(df_muestreos_curso.shape[0]):
         df_muestreos_curso['Inicio'][idato]         =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
         df_muestreos_curso['Final estimado'][idato] =  df_muestreos_curso['Final estimado'][idato].strftime("%Y-%m-%d")
-
-    st.subheader('Listado de análisis en curso')        
-
+      
     # Muestra una tabla con los análisis en curso
     gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
     gridOptions = gb.build()
     st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = 200,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
 
-    
+    return df_muestreos_curso
