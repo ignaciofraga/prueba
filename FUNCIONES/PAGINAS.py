@@ -1059,7 +1059,7 @@ def entrada_procesos_actuales():
         
         col1, col2, col3= st.columns(3,gap="small")
         with col1:
-            num_muestras = st.number_input('Número de muestras:',format='%i')
+            num_muestras = st.number_input('Número de muestras:',format='%i',value=round(0))
             num_muestras = round(num_muestras)
         with col2:
             nombre_programa  = st.selectbox('Selecciona el programa',(df_programas['nombre_programa']))
