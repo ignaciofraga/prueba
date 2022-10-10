@@ -1109,7 +1109,8 @@ def entrada_procesos_actuales():
 
         # Ajusta el formato de las fechas
         for idato in range(df_muestreos_curso.shape[0]):
-            df_muestreos_curso['Inicio'][idato] =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
+            df_muestreos_curso['Inicio'][idato]         =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
+            df_muestreos_curso['Final estimado'][idato] =  df_muestreos_curso['Final estimado'][idato].strftime("%Y-%m-%d")
 
         # Muestra una tabla con los análisis en curso
         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
