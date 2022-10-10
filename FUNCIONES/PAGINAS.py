@@ -1052,15 +1052,15 @@ def entrada_procesos_actuales():
     # Despliega un formulario para elegir el programa y la fecha a consultar
     with st.form("Formulario seleccion"):
         st.text('Define las características de las muestras a procesar')
-        col1, col2, col3, col4 = st.columns(4,gap="small")
-        #nombre_programa, tiempo_consulta = st.columns((1, 1))
+
+        
+        descripcion_muestras = st.text_input('Descipción de las muestras', value="")
+        col1, col2, col3= st.columns(3,gap="small")
         with col1:
-            descripcion_muestras = st.text_input('Descipción de las muestras', value="")
-        with col2:
             num_muestras = st.number_input('Número de muestras:')
-        with col3:
+        with col2:
             nombre_programa  = st.selectbox('Selecciona el programa',(df_programas['nombre_programa']))
-        with col4:
+        with col3:
             anho_consulta = st.number_input('Año:')
     
         # Botón de envío para confirmar selección
