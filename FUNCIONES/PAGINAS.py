@@ -1044,7 +1044,8 @@ def entrada_procesos_actuales():
     st.header('Añadir muestras a procesar')
     
     # Busca el año actual para limitar la fecha de entrada 
-    anho_actual = datetime.datetime.now().year
+    fecha_actual = datetime.date.today()
+    anho_actual = fecha_actual.year
 
     # Recupera la tabla de los programas disponibles como un dataframe
     conn = init_connection()
@@ -1053,21 +1054,37 @@ def entrada_procesos_actuales():
     
     # Despliega un formulario para elegir el programa y la fecha a consultar
     with st.form("Formulario seleccion"):
-        st.text('Define las características de las muestras a procesar')
-
-        
+    
         descripcion_muestras = st.text_input('Descipción de las muestras', value="")
+        
         col1, col2, col3= st.columns(3,gap="small")
         with col1:
-            num_muestras = st.number_input('Número de muestras:')
+            num_muestras = st.number_input('Número de muestras:',format='%i')
+            num_muestras = round(num_muestras)
         with col2:
             nombre_programa  = st.selectbox('Selecciona el programa',(df_programas['nombre_programa']))
         with col3:
             anho_consulta = st.number_input('Año:',format='%i',value=anho_actual,max_value=anho_actual)
     
+        fecha_estimada_fin = st.date_input('Fecha estimada de finalizacion',min_value=fecha_actual,value=fecha_actual)
+    
         # Botón de envío para confirmar selección
         submit = st.form_submit_button("Enviar")
 
+#         if submit == True:
+            
+#             conn = init_connection()
+#             cursor = conn.cursor()           
+#             instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,centro_asociado,abreviatura) VALUES (%s,%s,%s,%s) ON CONFLICT (id_programa) DO UPDATE SET (nombre_programa,centro_asociado,abreviatura) = (EXCLUDED.nombre_programa, EXCLUDED.centro_asociado, EXCLUDED.abreviatura);"   
+#             cursor.close()
+#             conn.close()   
+
+# ' programa int NOT NULL,'
+# ' nombre_programa text NOT NULL,'
+# ' año int NOT NULL,'
+# ' num_muestras int,'
+# ' fecha_inicio date,'
+# ' fecha_estimada_fin date,'
 
     # # Despliega un formulario para elegir el programa y la fecha a consultar
     # with st.form("Formulario seleccion"):
