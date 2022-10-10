@@ -1083,7 +1083,8 @@ def entrada_procesos_actuales():
             instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,año,num_muestras,fecha_inicio,fecha_estimada_fin) VALUES (%s,%s,%s,%s,%s,%s,%s);"   
             cursor.execute(instruccion_sql, (descripcion_muestras,id_programa_elegido,nombre_programa,anho_consulta,num_muestras,fecha_actual,fecha_estimada_fin)) 
             cursor.close()
-            conn.close()   
+            conn.close()  
+            st.text('holas')
 
 #' nombre_proceso text NOT NULL,'
 # ' programa int NOT NULL,'
