@@ -1026,3 +1026,59 @@ def evolucion_analisis():
         st.image(buf)       
         
         st.download_button("DESCARGAR GRÁFICO",buf,'GRAFICO.png')
+        
+        
+        
+        
+        
+        
+        
+###############################################################################
+################# PÁGINA DE EVOLUCION DEL ANALISIS ############################
+###############################################################################    
+    
+def entrada_procesos_actuales():
+    
+    st.title('Información de procesos en curso')
+    
+    st.header('Añadir muestras a procesar')
+    
+
+    # Recupera la tabla de los programas disponibles como un dataframe
+    conn = init_connection()
+    df_programas = psql.read_sql('SELECT * FROM programas', conn)
+    conn.close()
+    
+    # Despliega un formulario para elegir el programa y la fecha a consultar
+    with st.form("Formulario seleccion"):
+        st.text('Define las características de las muestras a procesar')
+        col1, col2, col3, col4 = st.columns(4,gap="small")
+        #nombre_programa, tiempo_consulta = st.columns((1, 1))
+        with col1:
+            descripcion_muestras = st.text_input('Descipción de las muestras', value="")
+        with col2:
+            num_muestras = st.number_input('Número de muestras:')
+        with col3:
+            nombre_programa  = st.selectbox('Selecciona el programa',(df_programas['nombre_programa']))
+        with col4:
+            anho_consulta = st.number_input('Año:')
+    
+        # Botón de envío para confirmar selección
+        submit = st.form_submit_button("Enviar")
+
+
+    # # Despliega un formulario para elegir el programa y la fecha a consultar
+    # with st.form("Formulario seleccion"):
+    #     col1, col2 = st.columns(2,gap="small")
+    #     #nombre_programa, tiempo_consulta = st.columns((1, 1))
+    #     with col1:
+    #         tiempo_final_consulta = st.date_input("Selecciona la fecha de finalización del periodo de consulta",datetime.date.today())
+    #     with col2:
+    #         num_meses_previos = st.selectbox("Selecciona el número de meses del periodo de consulta",listado_meses,index=4)
+  
+    #     texto_error = 'Para visualizar correctamente los resultados se recomienda evitar periodos de consulta elevados.'
+    #     st.warning(texto_error, icon="⚠️")   
+  
+    #     # Botón de envío para confirmar selección
+    #     envio = st.form_submit_button("Enviar")
+        

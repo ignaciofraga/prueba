@@ -33,7 +33,8 @@ if FUNCIONES_AUXILIARES.log_in() is True:
                         "ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
                         "CONSULTA ESTADO PROCESADO": PAGINAS.consulta_estado,
                         "CONSULTA ESTADILLOS": PAGINAS.consulta_estadillos,
-                        "CONSULTA EVOLUCION": PAGINAS.evolucion_analisis
+                        "CONSULTA EVOLUCION": PAGINAS.evolucion_analisis,
+                        "ENTRADA PROCESOS": PAGINAS.entrada_procesos_actuales
                         }
             
         if st.session_state["usuario"] == 'Usuario externo':
