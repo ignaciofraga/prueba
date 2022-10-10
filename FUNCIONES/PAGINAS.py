@@ -1034,80 +1034,79 @@ def evolucion_analisis():
         
         
 ###############################################################################
-################# PÁGINA DE EVOLUCION DEL ANALISIS ############################
+############## PÁGINA PARA INTRODUCIR LAS MUESTRAS EN PROCESO #################
 ###############################################################################    
     
 def entrada_procesos_actuales():
+       
+    entradas     = ['Nuevas muestras a procesar', 'Procesado terminado']
+    tipo_entrada = st.radio("Indicar la información a introducir",entradas)
+    #('Nuevas muestras a procesar', 'Procesado terminado'))
+
+    if tipo_entrada == entradas[0]:
+    
+        
+        st.header('Añadir muestras en proceso')
+        
+        # Busca el año actual para limitar la fecha de entrada 
+        fecha_actual = datetime.date.today()
+        anho_actual = fecha_actual.year
+    
+        # Recupera la tabla de los programas disponibles como un dataframe
+        conn = init_connection()
+        df_programas = psql.read_sql('SELECT * FROM programas', conn)
+        conn.close()
+        
+        # Despliega un formulario para elegir el programa y la fecha a consultar
+        with st.form("Formulario seleccion"):
+        
+            descripcion_muestras = st.text_input('Descipción de las muestras', value="")
+            
+            col1, col2, col3= st.columns(3,gap="small")
+            with col1:
+                num_muestras = st.number_input('Número de muestras:',format='%i',value=round(1),min_value=1)
+                num_muestras = round(num_muestras)
+            with col2:
+                nombre_programa  = st.selectbox('Selecciona el programa',(df_programas['nombre_programa']))
+                # Recupera el identificador del programa seleccionado
+                id_programa_elegido = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
+    
+            with col3:
+                anho_consulta = st.number_input('Año:',format='%i',value=anho_actual,max_value=anho_actual)
+        
+            fecha_estimada_fin = st.date_input('Fecha estimada de finalizacion',min_value=fecha_actual,value=fecha_actual)
+        
+            # Botón de envío para confirmar selección
+            submit = st.form_submit_button("Enviar")
+    
+            if submit == True:
+                
+                conn = init_connection()
+                cursor = conn.cursor()           
+                instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,año,num_muestras,fecha_inicio,fecha_estimada_fin) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_proceso,programa,año) DO UPDATE SET (nombre_programa,num_muestras,fecha_inicio,fecha_estimada_fin) = (EXCLUDED.nombre_programa,EXCLUDED.num_muestras,EXCLUDED.fecha_inicio,EXCLUDED.fecha_estimada_fin);"   
+                cursor.execute(instruccion_sql, (descripcion_muestras,id_programa_elegido,nombre_programa,anho_consulta,num_muestras,fecha_actual,fecha_estimada_fin)) 
+                conn.commit() 
+                cursor.close()
+                conn.close()  
+                
+                texto_exito = 'Muestras ' + descripcion_muestras + ' añadidas a la cola de procesado'
+                st.success(texto_exito)
+
+
+    if tipo_entrada == entradas[1]:
+        st.header('Añadir muestras analizadas')
+
+
+
+###############################################################################
+#################### PÁGINA DE PROCESOS EN CURSO ##############################
+###############################################################################    
+    
+def consulta_procesos_actuales():
     
     st.title('Información de procesos en curso')
     
-    st.header('Añadir muestras a procesar')
-    
-    # Busca el año actual para limitar la fecha de entrada 
-    fecha_actual = datetime.date.today()
-    anho_actual = fecha_actual.year
-
-    # Recupera la tabla de los programas disponibles como un dataframe
+    # Recupera la tabla de los procesos en curso como un dataframe
     conn = init_connection()
-    df_programas = psql.read_sql('SELECT * FROM programas', conn)
+    df_programas = psql.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
     conn.close()
-    
-    # Despliega un formulario para elegir el programa y la fecha a consultar
-    with st.form("Formulario seleccion"):
-    
-        descripcion_muestras = st.text_input('Descipción de las muestras', value="")
-        
-        col1, col2, col3= st.columns(3,gap="small")
-        with col1:
-            num_muestras = st.number_input('Número de muestras:',format='%i',value=round(1),min_value=1)
-            num_muestras = round(num_muestras)
-        with col2:
-            nombre_programa  = st.selectbox('Selecciona el programa',(df_programas['nombre_programa']))
-            # Recupera el identificador del programa seleccionado
-            id_programa_elegido = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
-
-        with col3:
-            anho_consulta = st.number_input('Año:',format='%i',value=anho_actual,max_value=anho_actual)
-    
-        fecha_estimada_fin = st.date_input('Fecha estimada de finalizacion',min_value=fecha_actual,value=fecha_actual)
-    
-        # Botón de envío para confirmar selección
-        submit = st.form_submit_button("Enviar")
-
-        if submit == True:
-            
-            conn = init_connection()
-            cursor = conn.cursor()           
-            instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,año,num_muestras,fecha_inicio,fecha_estimada_fin) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_proceso,programa,año) DO UPDATE SET (nombre_programa,num_muestras,fecha_inicio,fecha_estimada_fin) = (EXCLUDED.nombre_programa,EXCLUDED.num_muestras,EXCLUDED.fecha_inicio,EXCLUDED.fecha_estimada_fin);"   
-            cursor.execute(instruccion_sql, (descripcion_muestras,id_programa_elegido,nombre_programa,anho_consulta,num_muestras,fecha_actual,fecha_estimada_fin)) 
-            conn.commit() 
-            cursor.close()
-            conn.close()  
-            
-            texto_exito = 'Muestras ' + descripcion_muestras + ' añadidas a la cola de procesado'
-            st.success(texto_exito)
-
-
-#' nombre_proceso text NOT NULL,'
-# ' programa int NOT NULL,'
-# ' nombre_programa text NOT NULL,'
-# ' año int NOT NULL,'
-# ' num_muestras int,'
-# ' fecha_inicio date,'
-# ' fecha_estimada_fin date,'
-
-    # # Despliega un formulario para elegir el programa y la fecha a consultar
-    # with st.form("Formulario seleccion"):
-    #     col1, col2 = st.columns(2,gap="small")
-    #     #nombre_programa, tiempo_consulta = st.columns((1, 1))
-    #     with col1:
-    #         tiempo_final_consulta = st.date_input("Selecciona la fecha de finalización del periodo de consulta",datetime.date.today())
-    #     with col2:
-    #         num_meses_previos = st.selectbox("Selecciona el número de meses del periodo de consulta",listado_meses,index=4)
-  
-    #     texto_error = 'Para visualizar correctamente los resultados se recomienda evitar periodos de consulta elevados.'
-    #     st.warning(texto_error, icon="⚠️")   
-  
-    #     # Botón de envío para confirmar selección
-    #     envio = st.form_submit_button("Enviar")
-        
