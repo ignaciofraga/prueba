@@ -1101,6 +1101,9 @@ def entrada_procesos_actuales():
         df_muestreos_curso = psql.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
         conn.close()
 
+        # Elimina las columnas que no interesa mostrar
+        df_muestreos_curso.drop(columns=['id_proceso','programa'])
+
         # Muestra una tabla con los análisis en curso
         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
         gridOptions = gb.build()
