@@ -1043,6 +1043,8 @@ def entrada_procesos_actuales():
     
     st.header('Añadir muestras a procesar')
     
+    # Busca el año actual para limitar la fecha de entrada 
+    anho_actual = datetime.datetime.now().year
 
     # Recupera la tabla de los programas disponibles como un dataframe
     conn = init_connection()
@@ -1061,7 +1063,7 @@ def entrada_procesos_actuales():
         with col2:
             nombre_programa  = st.selectbox('Selecciona el programa',(df_programas['nombre_programa']))
         with col3:
-            anho_consulta = st.number_input('Año:')
+            anho_consulta = st.number_input('Año:',format='%i',value=anho_actual,max_value=anho_actual)
     
         # Botón de envío para confirmar selección
         submit = st.form_submit_button("Enviar")
