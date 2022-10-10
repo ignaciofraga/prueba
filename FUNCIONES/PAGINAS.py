@@ -1102,7 +1102,7 @@ def entrada_procesos_actuales():
         conn.close()
 
         # Elimina las columnas que no interesa mostrar
-        df_muestreos_curso.drop(columns=['id_proceso','programa'])
+        df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa'])
 
         # Muestra una tabla con los análisis en curso
         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
