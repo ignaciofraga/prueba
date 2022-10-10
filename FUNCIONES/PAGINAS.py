@@ -1040,7 +1040,9 @@ def evolucion_analisis():
 def entrada_procesos_actuales():
        
     entradas     = ['Nuevas muestras a procesar', 'Procesado terminado']
-    tipo_entrada = st.radio("Indicar la información a introducir",entradas)
+    
+    
+    tipo_entrada = st.sidebar.radio("Indicar la información a introducir",entradas)
     #('Nuevas muestras a procesar', 'Procesado terminado'))
 
     if tipo_entrada == entradas[0]:
