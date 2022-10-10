@@ -1115,7 +1115,7 @@ def entrada_procesos_actuales():
         # Muestra una tabla con los análisis en curso
         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
         gridOptions = gb.build()
-        st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+        st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = 200,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
 
 ###############################################################################
 #################### PÁGINA DE PROCESOS EN CURSO ##############################
