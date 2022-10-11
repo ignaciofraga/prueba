@@ -1110,13 +1110,13 @@ def entrada_procesos_actuales():
                 
                 st.text(int(1),fecha_actual,nombre_muestra_terminada)
                 
-                conn = init_connection()
-                cursor = conn.cursor() 
-                instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
-                cursor.execute(instruccion_sql, (int(1),fecha_actual,nombre_muestra_terminada))                
-                conn.commit() 
-                cursor.close()
-                conn.close()  
+                # conn = init_connection()
+                # cursor = conn.cursor() 
+                # instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
+                # cursor.execute(instruccion_sql, (int(1),fecha_actual,nombre_muestra_terminada))                
+                # conn.commit() 
+                # cursor.close()
+                # conn.close()  
                 
           
  
