@@ -1110,17 +1110,17 @@ def actualiza_procesos():
     
                 submit = st.form_submit_button("Enviar")
     
-                if submit == True:
+#                if submit == True:
                     
-                    fecha_actual = datetime.date.today()
-                    
-                    conn = init_connection()
-                    cursor = conn.cursor() 
-                    instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
-                    cursor.execute(instruccion_sql, (int(0),fecha_actual,nombre_muestra_terminada))                
-                    conn.commit() 
-                    cursor.close()
-                    conn.close()  
+                fecha_actual = datetime.date.today()
+                
+                conn = init_connection()
+                cursor = conn.cursor() 
+                instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
+                cursor.execute(instruccion_sql, (int(0),fecha_actual,nombre_muestra_terminada))                
+                conn.commit() 
+                cursor.close()
+                conn.close()  
                     
 
     
