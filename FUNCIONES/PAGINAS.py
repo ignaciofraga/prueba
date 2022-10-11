@@ -1094,112 +1094,43 @@ def actualiza_procesos():
 
 
     if tipo_entrada == entradas[1]:
-
-        altura_tabla       = 200 # Altura de la tabla con los procesos en curso         
-
-        # Recupera los muestreos almacenados 
-        conn = init_connection()
-        df_muestreos = psql.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
-        conn.close()
         
-        # Seleccionar los muestreos en curso como aquellos con io_estado = 1
-        df_muestreos_curso = df_muestreos[df_muestreos['io_estado']==1]
+        st.subheader('Listado de análisis en curso')
         
-        # Define una columna índice
-        indices_dataframe            = numpy.arange(0,df_muestreos_curso.shape[0],1,dtype=int)
-        df_muestreos_curso['indice'] = indices_dataframe
-        df_muestreos_curso.set_index('indice',drop=True,append=False,inplace=True)
-    
-        if df_muestreos_curso.shape[0] > 0:
-                
-            # Elimina las columnas que no interesa mostrar
-            df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa','io_estado','fecha_real_fin'])
+        # Muestra el listado de los análisis en curso 
+        altura_tabla       = 200 # Altura de la tabla con los procesos en curso 
+        icontador          = 0   # Contador para refrescar la página
         
-            # Renombra las columnas
-            df_muestreos_curso = df_muestreos_curso.rename(columns={'nombre_proceso':'Muestras','nombre_programa':'Programa','año':'Año','num_muestras':'Número muestras','fecha_inicio':'Inicio','fecha_estimada_fin':'Final estimado'})
+        while icontador < 1: 
         
-            # Ajusta el formato de las fechas
-            for idato in range(df_muestreos_curso.shape[0]):
-                df_muestreos_curso['Inicio'][idato]         =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
-                df_muestreos_curso['Final estimado'][idato] =  df_muestreos_curso['Final estimado'][idato].strftime("%Y-%m-%d")
-              
-            # Muestra una tabla con los análisis en curso
-            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
-            gridOptions = gb.build()
-            st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
-    
-        else:
+            df_muestreos_curso = estado_procesos(altura_tabla)
+            icontador  = 1
             
-            texto_error = 'Actualmente no hay ninguna muestra en proceso.'
-            st.warning(texto_error, icon="⚠️") 
-
-        if df_muestreos_curso.shape[0] > 0:
-
-            # Despliega una selección del análisis a marcar como finalizado
-            with st.form("Formulario seleccion"):
-                       
-                nombre_muestra_terminada  = st.selectbox('Selecciona el análisis terminado',(df_muestreos_curso['Muestras']))
+            if df_muestreos_curso.shape[0] > 0:
     
-                submit = st.form_submit_button("Enviar")
-    
-                if submit == True:
-                    
-                    fecha_actual = datetime.date.today()
-                    
-                    conn = init_connection()
-                    cursor = conn.cursor() 
-                    instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
-                    cursor.execute(instruccion_sql, (int(0),fecha_actual,nombre_muestra_terminada))                
-                    conn.commit() 
-                    cursor.close()
-                    conn.close()  
-                    
-                    texto_exito = 'Estado de las muestras ' + nombre_muestra_terminada + ' actualizado correctamente'
-                    st.success(texto_exito)
-                    
-                    # Actualiza el dataframe con los muestreos en curso
-                    df_muestreos_curso = df_muestreos_curso.drop(df_muestreos_curso[df_muestreos_curso.Muestras == nombre_muestra_terminada].index)
-
-
-
-
-
-
-
-
-
-
-
+                # Despliega una selección del análisis a marcar como finalizado
+                with st.form("Formulario seleccion"):
+                           
+                    nombre_muestra_terminada  = st.selectbox('Selecciona el análisis terminado',(df_muestreos_curso['Muestras']))
         
-        # st.subheader('Listado de análisis en curso')
+                    submit = st.form_submit_button("Enviar")
         
-        # # Muestra el listado de los análisis en curso 
-        # altura_tabla       = 200 # Altura de la tabla con los procesos en curso 
-        # df_muestreos_curso = estado_procesos(altura_tabla)
-        
-        # if df_muestreos_curso.shape[0] > 0:
-
-        #     # Despliega una selección del análisis a marcar como finalizado
-        #     with st.form("Formulario seleccion"):
-                       
-        #         nombre_muestra_terminada  = st.selectbox('Selecciona el análisis terminado',(df_muestreos_curso['Muestras']))
-    
-        #         submit = st.form_submit_button("Enviar")
-    
-        #         if submit == True:
-                    
-        #             fecha_actual = datetime.date.today()
-                    
-        #             conn = init_connection()
-        #             cursor = conn.cursor() 
-        #             instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
-        #             cursor.execute(instruccion_sql, (int(0),fecha_actual,nombre_muestra_terminada))                
-        #             conn.commit() 
-        #             cursor.close()
-        #             conn.close()  
-                    
-        #             texto_exito = 'Estado de las muestras ' + nombre_muestra_terminada + ' actualizado correctamente'
-        #             st.success(texto_exito)
+                    if submit == True:
+                        
+                        fecha_actual = datetime.date.today()
+                        
+                        conn = init_connection()
+                        cursor = conn.cursor() 
+                        instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
+                        cursor.execute(instruccion_sql, (int(0),fecha_actual,nombre_muestra_terminada))                
+                        conn.commit() 
+                        cursor.close()
+                        conn.close()  
+                        
+                        texto_exito = 'Estado de las muestras ' + nombre_muestra_terminada + ' actualizado correctamente'
+                        st.success(texto_exito)
+                        
+                        icontador = 0
 
     
 ###############################################################################
