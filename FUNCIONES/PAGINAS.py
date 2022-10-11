@@ -1114,7 +1114,7 @@ def entrada_procesos_actuales():
                 conn = init_connection()
                 cursor = conn.cursor() 
                 instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
-                cursor.execute(instruccion_sql, (int(1),fecha_actual,nombre_muestra_terminada))                
+                cursor.execute(instruccion_sql, (int(0),fecha_actual,nombre_muestra_terminada))                
                 conn.commit() 
                 cursor.close()
                 conn.close()  
