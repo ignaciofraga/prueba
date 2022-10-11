@@ -1106,9 +1106,11 @@ def entrada_procesos_actuales():
 
             submit = st.form_submit_button("Enviar")
     
-            if submit == True:
+            st.text(int(1),fecha_actual,nombre_muestra_terminada)
+    
+#            if submit == True:
                 
-                st.text(int(1),fecha_actual,nombre_muestra_terminada)
+                
                 
                 
                 # conn = init_connection()
