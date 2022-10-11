@@ -1217,7 +1217,7 @@ def consulta_procesos():
                 
                     else:
                         
-                        texto_error = 'No se terminó ningún análisis en el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
+                        texto_error = 'No se terminó ningún análisis durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
                         st.warning(texto_error, icon="⚠️")  
                 
                 with col2:
@@ -1233,7 +1233,7 @@ def consulta_procesos():
                 
                     else:
                         
-                        texto_error = 'Actualmente no hay ninguna muestra en proceso.'
+                        texto_error = 'No hay ninguna muestra en proceso durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
                         st.warning(texto_error, icon="⚠️")  
             
 
