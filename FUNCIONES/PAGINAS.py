@@ -1106,7 +1106,18 @@ def entrada_procesos_actuales():
             nombre_muestra_terminada  = st.selectbox('Selecciona el análisis terminado',(df_muestreos_curso['Muestras']))
 
             submit = st.form_submit_button("Enviar")
-    
-            fecha_actual = datetime.date.today()
-            st.text(fecha_actual.strftime('%Y%m%d'))
+
+            if submit == True:
+                
+                fecha_actual = datetime.date.today()
+                
+                conn = init_connection()
+                cursor = conn.cursor() 
+                instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
+                cursor.execute(instruccion_sql, (int(1),fecha_actual,nombre_muestra_terminada))                
+                conn.commit() 
+                cursor.close()
+                conn.close()  
+                    
+
     
