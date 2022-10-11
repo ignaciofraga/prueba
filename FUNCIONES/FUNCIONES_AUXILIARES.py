@@ -74,13 +74,16 @@ def log_in():
     
 def estado_procesos():
     
-    # Recupera los muestreos en curso
+    # Recupera los analisis disponibles
     conn = init_connection()
-    df_muestreos_curso = psql.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
+    df_muestreos = psql.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
     conn.close()
+    
+    # Seleccionar los muestreos en curso como aquellos con io_estado = 1
+    df_muestreos_curso = df_muestreos[df_muestreos['io_estado']==1]
 
     # Elimina las columnas que no interesa mostrar
-    df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa'])
+    df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa','io_estado'])
 
     # Renombra las columnas
     df_muestreos_curso = df_muestreos_curso.rename(columns={'nombre_proceso':'Muestras','nombre_programa':'Programa','año':'Año','num_muestras':'Número muestras','fecha_inicio':'Inicio','fecha_estimada_fin':'Final estimado'})
