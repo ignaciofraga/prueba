@@ -1099,38 +1099,34 @@ def actualiza_procesos():
         
         # Muestra el listado de los análisis en curso 
         altura_tabla       = 200 # Altura de la tabla con los procesos en curso 
-        icontador          = 0   # Contador para refrescar la página
         
-        while icontador < 1: 
-        
-            df_muestreos_curso = estado_procesos(altura_tabla)
-            icontador  = 1
-            
-            if df_muestreos_curso.shape[0] > 0:
+        df_muestreos_curso = estado_procesos(altura_tabla)
+
+        if df_muestreos_curso.shape[0] > 0:
+
+            # Despliega una selección del análisis a marcar como finalizado
+            with st.form("Formulario seleccion"):
+                       
+                nombre_muestra_terminada  = st.selectbox('Selecciona el análisis terminado',(df_muestreos_curso['Muestras']))
     
-                # Despliega una selección del análisis a marcar como finalizado
-                with st.form("Formulario seleccion"):
-                           
-                    nombre_muestra_terminada  = st.selectbox('Selecciona el análisis terminado',(df_muestreos_curso['Muestras']))
-        
-                    submit = st.form_submit_button("Enviar")
-        
-                    if submit == True:
-                        
-                        fecha_actual = datetime.date.today()
-                        
-                        conn = init_connection()
-                        cursor = conn.cursor() 
-                        instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
-                        cursor.execute(instruccion_sql, (int(0),fecha_actual,nombre_muestra_terminada))                
-                        conn.commit() 
-                        cursor.close()
-                        conn.close()  
-                        
-                        texto_exito = 'Estado de las muestras ' + nombre_muestra_terminada + ' actualizado correctamente'
-                        st.success(texto_exito)
-                        
-                        icontador = 0
+                submit = st.form_submit_button("Enviar")
+    
+                if submit == True:
+                    
+                    fecha_actual = datetime.date.today()
+                    
+                    conn = init_connection()
+                    cursor = conn.cursor() 
+                    instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
+                    cursor.execute(instruccion_sql, (int(0),fecha_actual,nombre_muestra_terminada))                
+                    conn.commit() 
+                    cursor.close()
+                    conn.close()  
+                    
+                    texto_exito = 'Estado de las muestras ' + nombre_muestra_terminada + ' actualizado correctamente'
+                    st.success(texto_exito)
+                    
+ 
 
     
 ###############################################################################
