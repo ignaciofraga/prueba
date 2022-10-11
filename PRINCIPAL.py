@@ -34,7 +34,8 @@ if FUNCIONES_AUXILIARES.log_in() is True:
                         "CONSULTA ESTADO PROCESADO": PAGINAS.consulta_estado,
                         "CONSULTA ESTADILLOS": PAGINAS.consulta_estadillos,
                         "CONSULTA EVOLUCION": PAGINAS.evolucion_analisis,
-                        "ENTRADA PROCESOS": PAGINAS.entrada_procesos_actuales
+                        "ENTRADA PROCESOS": PAGINAS.entrada_procesos_actuales,
+                        "ESTADO MUESTREOS": PAGINAS.consulta_procesos_actuales
                         }
             
         if st.session_state["usuario"] == 'Usuario externo':

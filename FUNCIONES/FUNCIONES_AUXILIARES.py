@@ -72,9 +72,9 @@ def log_in():
 ####################### FUNCION ESTADO PROCESOS ########################################
 ###############################################################################
     
-def estado_procesos():
+def estado_procesos(altura_tabla):
     
-    # Recupera los analisis disponibles
+    # Recupera los muestreos almacenados 
     conn = init_connection()
     df_muestreos = psql.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
     conn.close()
@@ -82,20 +82,27 @@ def estado_procesos():
     # Seleccionar los muestreos en curso como aquellos con io_estado = 1
     df_muestreos_curso = df_muestreos[df_muestreos['io_estado']==1]
 
-    # Elimina las columnas que no interesa mostrar
-    df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa','io_estado','fecha_real_fin'])
+    if df_muestreos_curso.shape[0] > 0:
+            
+        # Elimina las columnas que no interesa mostrar
+        df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa','io_estado','fecha_real_fin'])
+    
+        # Renombra las columnas
+        df_muestreos_curso = df_muestreos_curso.rename(columns={'nombre_proceso':'Muestras','nombre_programa':'Programa','año':'Año','num_muestras':'Número muestras','fecha_inicio':'Inicio','fecha_estimada_fin':'Final estimado'})
+    
+        # Ajusta el formato de las fechas
+        for idato in range(df_muestreos_curso.shape[0]):
+            df_muestreos_curso['Inicio'][idato]         =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
+            df_muestreos_curso['Final estimado'][idato] =  df_muestreos_curso['Final estimado'][idato].strftime("%Y-%m-%d")
+          
+        # Muestra una tabla con los análisis en curso
+        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
+        gridOptions = gb.build()
+        st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
 
-    # Renombra las columnas
-    df_muestreos_curso = df_muestreos_curso.rename(columns={'nombre_proceso':'Muestras','nombre_programa':'Programa','año':'Año','num_muestras':'Número muestras','fecha_inicio':'Inicio','fecha_estimada_fin':'Final estimado'})
-
-    # Ajusta el formato de las fechas
-    for idato in range(df_muestreos_curso.shape[0]):
-        df_muestreos_curso['Inicio'][idato]         =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
-        df_muestreos_curso['Final estimado'][idato] =  df_muestreos_curso['Final estimado'][idato].strftime("%Y-%m-%d")
-      
-    # Muestra una tabla con los análisis en curso
-    gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
-    gridOptions = gb.build()
-    st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = 200,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+    else:
+        
+        texto_error = 'Actualmente no hay ninguna muestra en proceso.'
+        st.warning(texto_error, icon="⚠️")         
 
     return df_muestreos_curso

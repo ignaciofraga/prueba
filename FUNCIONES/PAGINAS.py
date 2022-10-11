@@ -1044,7 +1044,6 @@ def entrada_procesos_actuales():
     tipo_entrada = st.sidebar.radio("Indicar la información a introducir",entradas)
 
     fecha_actual = datetime.date.today()
-    st.text(fecha_actual.strftime('%Y%m%d'))
 
     if tipo_entrada == entradas[0]:
 
@@ -1058,7 +1057,7 @@ def entrada_procesos_actuales():
         df_programas = psql.read_sql('SELECT * FROM programas', conn)
         conn.close()
         
-        # Despliega un formulario para elegir el programa y la fecha a consultar
+        # Despliega un formulario para introducir los datos de las muestras que se están analizando
         with st.form("Formulario seleccion"):
         
             descripcion_muestras = st.text_input('Descipción de las muestras', value="")
@@ -1096,28 +1095,140 @@ def entrada_procesos_actuales():
 
     if tipo_entrada == entradas[1]:
         
+        st.subheader('Listado de análisis en curso')
+        
         # Muestra el listado de los análisis en curso 
-        st.subheader('Listado de análisis en curso') 
-        df_muestreos_curso = estado_procesos()
+        altura_tabla       = 200 # Altura de la tabla con los procesos en curso 
+        df_muestreos_curso = estado_procesos(altura_tabla)
+        
+        if df_muestreos_curso.shape[0] > 0:
 
-        # Despliega una selección del análisis a marcar como finalizado
-        with st.form("Formulario seleccion"):
-                   
-            nombre_muestra_terminada  = st.selectbox('Selecciona el análisis terminado',(df_muestreos_curso['Muestras']))
-
-            submit = st.form_submit_button("Enviar")
-
-            if submit == True:
-                
-                fecha_actual = datetime.date.today()
-                
-                conn = init_connection()
-                cursor = conn.cursor() 
-                instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
-                cursor.execute(instruccion_sql, (int(0),fecha_actual,nombre_muestra_terminada))                
-                conn.commit() 
-                cursor.close()
-                conn.close()  
+            # Despliega una selección del análisis a marcar como finalizado
+            with st.form("Formulario seleccion"):
+                       
+                nombre_muestra_terminada  = st.selectbox('Selecciona el análisis terminado',(df_muestreos_curso['Muestras']))
+    
+                submit = st.form_submit_button("Enviar")
+    
+                if submit == True:
+                    
+                    fecha_actual = datetime.date.today()
+                    
+                    conn = init_connection()
+                    cursor = conn.cursor() 
+                    instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
+                    cursor.execute(instruccion_sql, (int(0),fecha_actual,nombre_muestra_terminada))                
+                    conn.commit() 
+                    cursor.close()
+                    conn.close()  
                     
 
     
+###############################################################################
+#################### PÁGINA DE PROCESOS EN CURSO ##############################
+###############################################################################    
+    
+def consulta_procesos_actuales():
+    
+    # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
+    entradas     = ['Procesos actualmente en curso', 'Procesado realizados en un periodo de tiempo']
+    tipo_entrada = st.sidebar.radio("Indicar la consulta a realizar",entradas)
+
+
+
+    # Consulta procesos actualmente en curso
+    if tipo_entrada == entradas[0]:    
+    
+        st.subheader('Listado de análisis en curso')
+        
+        # Muestra el listado de los análisis en curso 
+        altura_tabla       = 300 # Altura de la tabla con los procesos en curso 
+        estado_procesos(altura_tabla)
+        
+        
+        
+    # Consulta procesos realizados entre dos fechas
+    if tipo_entrada == entradas[1]:  
+        
+        st.subheader('Listado de procesos realizados y en curso durante un periodo de tiempo')
+        
+        fecha_actual         = datetime.date.today()
+        fecha_inicio_defecto = fecha_actual - datetime.timedelta(days=30)
+        
+        altura_tabla       = 300 # Altura de las tablas con información de los procesos
+        
+        # Despliega un formulario para seleccionar las fechas de inicio y final
+        with st.form("Formulario seleccion"):
+                   
+            col1, col2= st.columns(2,gap="small")
+            
+            with col1:
+                fecha_inicio_consulta = st.date_input('Fecha de incio del periodo de consulta',max_value=fecha_actual,value=fecha_inicio_defecto)
+            with col2:
+                fecha_final_consulta = st.date_input('Fecha de finalización del periodo de consulta',max_value=fecha_actual,value=fecha_actual)
+
+            submit = st.form_submit_button("Consultar")
+    
+            if submit == True:
+
+                # Recupera todos los muestreos almacenados 
+                conn = init_connection()
+                df_muestreos = psql.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
+                conn.close()
+                
+                # Renombra las columnas
+                df_muestreos = df_muestreos.rename(columns={'nombre_proceso':'Muestras','nombre_programa':'Programa','año':'Año','num_muestras':'Número muestras','fecha_inicio':'Inicio','fecha_estimada_fin':'Final estimado','fecha_real_fin':'Final real'})
+                
+                # Genera un dataframe con los procesos terminados entre ambas fechas, elimina las columnas que no interesa mostrar y ajusta el formato de las fechas
+                df_muestreos_terminados = df_muestreos.loc[(df_muestreos['Final real'] >= fecha_inicio_consulta) & (df_muestreos['Final real'] <= fecha_final_consulta)]
+                df_muestreos_terminados = df_muestreos_terminados.drop(columns=['id_proceso','programa','io_estado'])
+                for idato in range(df_muestreos_terminados.shape[0]):
+                    df_muestreos_terminados['Inicio'][idato]         =  df_muestreos_terminados['Inicio'][idato].strftime("%Y-%m-%d")
+                    df_muestreos_terminados['Final estimado'][idato] =  df_muestreos_terminados['Final estimado'][idato].strftime("%Y-%m-%d")    
+                
+            
+                # Genera un dataframe con los procesos en curso, elimina las columnas que no interesa mostrar y ajusta el formato de las fechas
+                df_muestreos_curso = df_muestreos[df_muestreos['io_estado']==1]
+                df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa','io_estado'])
+                for idato in range(df_muestreos_curso.shape[0]):
+                    df_muestreos_curso['Inicio'][idato]         =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
+                    df_muestreos_curso['Final estimado'][idato] =  df_muestreos_curso['Final estimado'][idato].strftime("%Y-%m-%d")
+                                  
+                
+                # Muestra sendos dataframes
+                col1, col2= st.columns(2,gap="small")
+                
+                with col1:
+
+                    st.subheader('Listado de procesos terminados')
+
+                    if df_muestreos_terminados.shape[0] > 0:
+                            
+                        # Muestra una tabla con los análisis en curso
+                        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_terminados)
+                        gridOptions = gb.build()
+                        st_aggrid.AgGrid(df_muestreos_terminados,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+                
+                    else:
+                        
+                        texto_error = 'No se terminó ningún análisis en el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
+                        st.warning(texto_error, icon="⚠️")  
+                
+                with col2:
+                    
+                    st.subheader('Listado de procesos en curso')
+            
+                    if df_muestreos_curso.shape[0] > 0:
+                            
+                        # Muestra una tabla con los análisis en curso
+                        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
+                        gridOptions = gb.build()
+                        st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+                
+                    else:
+                        
+                        texto_error = 'Actualmente no hay ninguna muestra en proceso.'
+                        st.warning(texto_error, icon="⚠️")  
+            
+
+
