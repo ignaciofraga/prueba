@@ -25,18 +25,35 @@ if FUNCIONES_AUXILIARES.log_in() is True:
     
     # claúsula para manetener el nombre de usuario y poder identificar qué webs desplegar
     if 'usuario' in st.session_state:
-    #     st.session_state['usuario'] = st.session_state["username"]
 
-        if st.session_state["usuario"] == 'Usuario interno IEO':
+        if st.session_state["usuario"] == 'Administrador':
         
             paginas = {"INICIO": PAGINAS.principal,
                         "ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
-                        "CONSULTA ESTADO PROCESADO": PAGINAS.consulta_estado,
-                        "CONSULTA ESTADILLOS": PAGINAS.consulta_estadillos,
-                        "CONSULTA EVOLUCION": PAGINAS.evolucion_analisis,
+                        "INFORMACIÓN DISPONIBLE": PAGINAS.consulta_estado,
+                        "DATOS DE MUESTREOS": PAGINAS.consulta_estadillos,
+                        "GRÁFICO DE EVOLUCIÓN": PAGINAS.evolucion_analisis,
                         "ENTRADA PROCESOS": PAGINAS.entrada_procesos_actuales,
-                        "ESTADO MUESTREOS": PAGINAS.consulta_procesos_actuales
+                        "ESTADO DEL PROCESADO DE MUESTRAS": PAGINAS.consulta_procesos
                         }
+            
+            
+        if st.session_state["usuario"] == 'Usuario interno - Laboratorio':
+        
+            paginas = {"INICIO": PAGINAS.principal,
+                        "ACTUALIZA PROCESOS EN CURSO": PAGINAS.actualiza_procesos, 
+                        "DESCARGA DATOS DE MUESTREOS": PAGINAS.consulta_estadillos,
+                        "INTRODUCE DATOS NUTRIENTES": PAGINAS.entrada_datos,
+                        }
+
+            
+        if st.session_state["usuario"] == 'Usuario interno - Supervisión':
+     
+            paginas = {"INICIO": PAGINAS.principal,
+                    "ESTADO DEL PROCESADO DE MUESTRAS": PAGINAS.consulta_procesos, 
+                    "INFORMACIÓN DISPONIBLE": PAGINAS.consulta_estado,
+                    "GRÁFICO DE EVOLUCIÓN": PAGINAS.evolucion_analisis
+                     }           
             
         if st.session_state["usuario"] == 'Usuario externo':
             
@@ -46,28 +63,5 @@ if FUNCIONES_AUXILIARES.log_in() is True:
         seleccion = st.sidebar.selectbox("Elige la página a mostrar: ",tuple(paginas.keys()))
         
         paginas[seleccion]()
-
-# # Identificación y acceso
-# io_acceso, usuario = FUNCIONES_AUXILIARES.check_password()
-
-
-# # Si el usuario está autorizado, despliega las webs a las que tiene acceso
-# if io_acceso is True:
-    
-#     if usuario == '1':
-    
-#         paginas = {"PRINCIPAL": PAGINAS.principal,
-#                     "ENTRADA DATOS": PAGINAS.entrada_datos,
-#                     "CONSULTA ESTADO": PAGINAS.consulta_estado}
- 
-#     if usuario == '2':
-    
-#         paginas = {"PRINCIPAL": PAGINAS.principal,
-#                     "ENTRADA DATOS": PAGINAS.entrada_datos}
-               
-#     seleccion = st.sidebar.selectbox("Elige la página: ",tuple(paginas.keys()))
-    
-#     paginas[seleccion]()
-
 
 

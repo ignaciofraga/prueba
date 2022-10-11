@@ -1037,7 +1037,7 @@ def evolucion_analisis():
 ############## PÁGINA PARA INTRODUCIR LAS MUESTRAS EN PROCESO #################
 ###############################################################################    
     
-def entrada_procesos_actuales():
+def actualiza_procesos():
 
     # Despliega un botón lateral para seleccionar el tipo de información a introducir       
     entradas     = ['Nuevas muestras a procesar', 'Procesado terminado']
@@ -1128,7 +1128,7 @@ def entrada_procesos_actuales():
 #################### PÁGINA DE PROCESOS EN CURSO ##############################
 ###############################################################################    
     
-def consulta_procesos_actuales():
+def consulta_procesos():
     
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
     entradas     = ['Procesos actualmente en curso', 'Procesado realizados en un periodo de tiempo']
@@ -1190,14 +1190,11 @@ def consulta_procesos_actuales():
             
                 # Genera un dataframe con los procesos en curso, elimina las columnas que no interesa mostrar y ajusta el formato de las fechas
                 if fecha_final_consulta == fecha_actual:
-                    st.text('hola')
+                    df_muestreos_curso = df_muestreos[df_muestreos['io_estado']==1]
                 
                 else: 
-                    st.text('adios')
-                    
-                df_muestreos_terminados = df_muestreos.loc[(df_muestreos['Final real'] >= fecha_final_consulta) & (df_muestreos['Inicio'] >= fecha_inicio_consulta)]
-      
-                df_muestreos_curso = df_muestreos[df_muestreos['io_estado']==1]
+                    df_muestreos_curso = df_muestreos.loc[(df_muestreos['Final real'] >= fecha_final_consulta) & (df_muestreos['Inicio'] >= fecha_inicio_consulta)]
+
                 df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa','io_estado'])
                 for idato in range(df_muestreos_curso.shape[0]):
                     df_muestreos_curso['Inicio'][idato]         =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
