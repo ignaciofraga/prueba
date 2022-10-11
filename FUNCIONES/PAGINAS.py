@@ -1126,7 +1126,7 @@ def actualiza_procesos():
                     texto_exito = 'Estado de las muestras ' + nombre_muestra_terminada + ' actualizado correctamente'
                     st.success(texto_exito)
                     
- 
+                    st.experimental_rerun()
 
     
 ###############################################################################
