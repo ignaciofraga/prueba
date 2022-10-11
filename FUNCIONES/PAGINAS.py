@@ -1083,7 +1083,7 @@ def entrada_procesos_actuales():
                 
                 conn = init_connection()
                 cursor = conn.cursor()           
-                instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,año,num_muestras,fecha_inicio,fecha_estimada_fin,fecha_real_fin,io_estado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_proceso,programa,año) DO UPDATE SET (nombre_programa,num_muestras,fecha_inicio,fecha_estimada_fin,fecha_real_fin,io_estado) = (EXCLUDED.nombre_programa,EXCLUDED.num_muestras,EXCLUDED.fecha_inicio,EXCLUDED.fecha_estimada_fin,EXCLUDED.fecha_real_fin,EXCLUDED.io_estado);"   
+                instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,año,num_muestras,fecha_inicio,fecha_estimada_fin,fecha_real_fin,io_estado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_proceso) DO UPDATE SET (programa,año,nombre_programa,num_muestras,fecha_inicio,fecha_estimada_fin,fecha_real_fin,io_estado) = (EXCLUDED.programa,EXCLUDED.año,EXCLUDED.nombre_programa,EXCLUDED.num_muestras,EXCLUDED.fecha_inicio,EXCLUDED.fecha_estimada_fin,EXCLUDED.fecha_real_fin,EXCLUDED.io_estado);"   
                 cursor.execute(instruccion_sql, (descripcion_muestras,id_programa_elegido,nombre_programa,anho_consulta,num_muestras,fecha_actual,fecha_estimada_fin,None,1)) 
                 conn.commit() 
                 cursor.close()
@@ -1110,13 +1110,15 @@ def entrada_procesos_actuales():
                 
                 conn = init_connection()
                 cursor = conn.cursor() 
-                instruccion_sql = "DELETE FROM procesado_actual_nutrientes WHERE nombre_proceso = " + nombre_muestra_terminada + ";"
-                cursor.execute(instruccion_sql) 
+                instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
+                cursor.execute(instruccion_sql, (int(1),fecha_actual,nombre_muestra_terminada))                
                 conn.commit() 
                 cursor.close()
                 conn.close()  
                 
-                
+          
+ 
+    
 ###############################################################################
 #################### PÁGINA DE PROCESOS EN CURSO ##############################
 ###############################################################################    
