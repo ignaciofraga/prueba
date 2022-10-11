@@ -83,7 +83,7 @@ def estado_procesos():
     df_muestreos_curso = df_muestreos[df_muestreos['io_estado']==1]
 
     # Elimina las columnas que no interesa mostrar
-    df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa','io_estado'])
+    df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa','io_estado','fecha_real_fin'])
 
     # Renombra las columnas
     df_muestreos_curso = df_muestreos_curso.rename(columns={'nombre_proceso':'Muestras','nombre_programa':'Programa','año':'Año','num_muestras':'Número muestras','fecha_inicio':'Inicio','fecha_estimada_fin':'Final estimado'})
