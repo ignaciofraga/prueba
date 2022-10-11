@@ -1179,16 +1179,21 @@ def consulta_procesos():
                 # Renombra las columnas
                 df_muestreos = df_muestreos.rename(columns={'nombre_proceso':'Muestras','nombre_programa':'Programa','año':'Año','num_muestras':'Número muestras','fecha_inicio':'Inicio','fecha_estimada_fin':'Final estimado','fecha_real_fin':'Final real'})
                 
-                # Genera un dataframe con los procesos terminados entre ambas fechas, elimina las columnas que no interesa mostrar y ajusta el formato de las fechas
+                # Genera un dataframe con los procesos terminados entre ambas fechas, elimina las columnas que no interesa mostrar, define una columna índice y ajusta el formato de las fechas
                 df_muestreos_terminados = df_muestreos.loc[(df_muestreos['Final real'] >= fecha_inicio_consulta) & (df_muestreos['Final real'] <= fecha_final_consulta)]
                 df_muestreos_terminados = df_muestreos_terminados.drop(columns=['id_proceso','programa','io_estado'])
+                
+                indices_dataframe                 = numpy.arange(0,df_muestreos_terminados.shape[0],1,dtype=int)
+                df_muestreos_terminados['indice'] = indices_dataframe
+                df_muestreos_terminados.set_index('indice',drop=True,append=False,inplace=True)
+                
                 for idato in range(df_muestreos_terminados.shape[0]):
                     df_muestreos_terminados['Inicio'][idato]         =  df_muestreos_terminados['Inicio'][idato].strftime("%Y-%m-%d")
                     df_muestreos_terminados['Final estimado'][idato] =  df_muestreos_terminados['Final estimado'][idato].strftime("%Y-%m-%d")    
                     df_muestreos_terminados['Final real'][idato]     =  df_muestreos_terminados['Final real'][idato].strftime("%Y-%m-%d")    
                                 
             
-                # Genera un dataframe con los procesos en curso, elimina las columnas que no interesa mostrar y ajusta el formato de las fechas
+                # Genera un dataframe con los procesos en curso, elimina las columnas que no interesa mostrar, define una columna índice y ajusta el formato de las fechas
                 if fecha_final_consulta == fecha_actual:
                     df_muestreos_curso = df_muestreos[df_muestreos['io_estado']==1]
                 
@@ -1196,6 +1201,11 @@ def consulta_procesos():
                     df_muestreos_curso = df_muestreos.loc[(df_muestreos['Final real'] >= fecha_final_consulta) & (df_muestreos['Inicio'] >= fecha_inicio_consulta)]
 
                 df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa','io_estado'])
+                
+                indices_dataframe            = numpy.arange(0,df_muestreos_curso.shape[0],1,dtype=int)
+                df_muestreos_curso['indice'] = indices_dataframe
+                df_muestreos_curso.set_index('indice',drop=True,append=False,inplace=True)
+                
                 for idato in range(df_muestreos_curso.shape[0]):
                     df_muestreos_curso['Inicio'][idato]         =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
                     df_muestreos_curso['Final estimado'][idato] =  df_muestreos_curso['Final estimado'][idato].strftime("%Y-%m-%d")
