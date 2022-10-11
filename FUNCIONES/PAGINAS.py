@@ -1083,7 +1083,7 @@ def entrada_procesos_actuales():
                 
                 conn = init_connection()
                 cursor = conn.cursor()           
-                instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,año,num_muestras,fecha_inicio,fecha_estimada_fin) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_proceso,programa,año) DO UPDATE SET (nombre_programa,num_muestras,fecha_inicio,fecha_estimada_fin) = (EXCLUDED.nombre_programa,EXCLUDED.num_muestras,EXCLUDED.fecha_inicio,EXCLUDED.fecha_estimada_fin);"   
+                instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,año,num_muestras,fecha_inicio,fecha_estimada_fin,io_estado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_proceso,programa,año) DO UPDATE SET (nombre_programa,num_muestras,fecha_inicio,fecha_estimada_fin,io_estado) = (EXCLUDED.nombre_programa,EXCLUDED.num_muestras,EXCLUDED.fecha_inicio,EXCLUDED.fecha_estimada_fin,io_estado);"   
                 cursor.execute(instruccion_sql, (descripcion_muestras,id_programa_elegido,nombre_programa,anho_consulta,num_muestras,fecha_actual,fecha_estimada_fin)) 
                 conn.commit() 
                 cursor.close()
