@@ -1108,31 +1108,3 @@ def entrada_procesos_actuales():
     
             st.text(int(1),fecha_actual,nombre_muestra_terminada)
     
-#            if submit == True:
-                
-                
-                
-                
-                # conn = init_connection()
-                # cursor = conn.cursor() 
-                # instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
-                # cursor.execute(instruccion_sql, (int(1),fecha_actual,nombre_muestra_terminada))                
-                # conn.commit() 
-                # cursor.close()
-                # conn.close()  
-                
-          
- 
-    
-###############################################################################
-#################### PÁGINA DE PROCESOS EN CURSO ##############################
-###############################################################################    
-    
-def consulta_procesos_actuales():
-    
-    st.title('Información de procesos en curso')
-    
-    # Recupera la tabla de los procesos en curso como un dataframe
-    conn = init_connection()
-    df_programas = psql.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
-    conn.close()
