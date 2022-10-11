@@ -1107,5 +1107,6 @@ def entrada_procesos_actuales():
 
             submit = st.form_submit_button("Enviar")
     
-            #st.text(nombre_muestra_terminada,fecha_actual.strftime('%Y%m%d'))
+            fecha_actual = datetime.date.today()
+            st.text(fecha_actual.strftime('%Y%m%d'))
     
