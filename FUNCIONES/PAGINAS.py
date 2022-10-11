@@ -1189,6 +1189,14 @@ def consulta_procesos_actuales():
                                 
             
                 # Genera un dataframe con los procesos en curso, elimina las columnas que no interesa mostrar y ajusta el formato de las fechas
+                if fecha_final_consulta == fecha_actual:
+                    st.text('hola')
+                
+                else: 
+                    st.text('adios')
+                    
+                df_muestreos_terminados = df_muestreos.loc[(df_muestreos['Final real'] >= fecha_final_consulta) & (df_muestreos['Inicio'] >= fecha_inicio_consulta)]
+      
                 df_muestreos_curso = df_muestreos[df_muestreos['io_estado']==1]
                 df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa','io_estado'])
                 for idato in range(df_muestreos_curso.shape[0]):
