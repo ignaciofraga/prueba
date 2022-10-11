@@ -9,6 +9,7 @@ import streamlit as st
 import psycopg2
 import pandas.io.sql as psql
 import st_aggrid 
+import numpy
 
 ###############################################################################
 ###################### FUNCION CONEXIÓN #######################################
@@ -81,6 +82,11 @@ def estado_procesos(altura_tabla):
     
     # Seleccionar los muestreos en curso como aquellos con io_estado = 1
     df_muestreos_curso = df_muestreos[df_muestreos['io_estado']==1]
+    
+    # Define una columna índice
+    indices_dataframe            = numpy.arange(0,df_muestreos_curso.shape[0],1,dtype=int)
+    df_muestreos_curso['indice'] = indices_dataframe
+    df_muestreos_curso.set_index('indice',drop=True,append=False,inplace=True)
 
     if df_muestreos_curso.shape[0] > 0:
             
