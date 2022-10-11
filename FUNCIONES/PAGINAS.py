@@ -1185,7 +1185,8 @@ def consulta_procesos_actuales():
                 for idato in range(df_muestreos_terminados.shape[0]):
                     df_muestreos_terminados['Inicio'][idato]         =  df_muestreos_terminados['Inicio'][idato].strftime("%Y-%m-%d")
                     df_muestreos_terminados['Final estimado'][idato] =  df_muestreos_terminados['Final estimado'][idato].strftime("%Y-%m-%d")    
-                
+                    df_muestreos_terminados['Final real'][idato]     =  df_muestreos_terminados['Final real'][idato].strftime("%Y-%m-%d")    
+                                
             
                 # Genera un dataframe con los procesos en curso, elimina las columnas que no interesa mostrar y ajusta el formato de las fechas
                 df_muestreos_curso = df_muestreos[df_muestreos['io_estado']==1]
