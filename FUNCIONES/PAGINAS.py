@@ -1044,6 +1044,7 @@ def entrada_procesos_actuales():
     tipo_entrada = st.sidebar.radio("Indicar la información a introducir",entradas)
 
     fecha_actual = datetime.date.today()
+    st.text(fecha_actual.strftime('%Y%m%d'))
 
     if tipo_entrada == entradas[0]:
 
@@ -1106,5 +1107,5 @@ def entrada_procesos_actuales():
 
             submit = st.form_submit_button("Enviar")
     
-            st.text(nombre_muestra_terminada,fecha_actual.strftime('%Y%m%d'))
+            #st.text(nombre_muestra_terminada,fecha_actual.strftime('%Y%m%d'))
     
