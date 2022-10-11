@@ -1106,5 +1106,5 @@ def entrada_procesos_actuales():
 
             submit = st.form_submit_button("Enviar")
     
-            st.text(int(1),fecha_actual,nombre_muestra_terminada)
+            st.text(fecha_actual,nombre_muestra_terminada)
     
