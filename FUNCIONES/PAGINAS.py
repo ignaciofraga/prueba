@@ -1043,13 +1043,13 @@ def entrada_procesos_actuales():
     entradas     = ['Nuevas muestras a procesar', 'Procesado terminado']
     tipo_entrada = st.sidebar.radio("Indicar la información a introducir",entradas)
 
+    fecha_actual = datetime.date.today()
 
     if tipo_entrada == entradas[0]:
 
         st.header('Añadir muestras en proceso')
         
         # Busca el año actual para limitar la fecha de entrada 
-        fecha_actual = datetime.date.today()
         anho_actual = fecha_actual.year
     
         # Recupera la tabla de los programas disponibles como un dataframe
