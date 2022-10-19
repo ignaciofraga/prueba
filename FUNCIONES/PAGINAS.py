@@ -1335,10 +1335,10 @@ def entrada_salidas_mar():
                 hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto)
 
 
-            personal_comisionado    = st.multiselect('Personal participante',df_personal_comisionado['nombre_apellidos'])
+            personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])
             json_comisionados       = json.dumps(personal_comisionado)
 
-            personal_no_comisionado = st.multiselect('Personal participante',df_personal_no_comisionado['nombre_apellidos'])
+            personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])
             json_no_comisionados    = json.dumps(personal_no_comisionado)
 
 
