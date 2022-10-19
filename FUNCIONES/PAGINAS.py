@@ -1307,7 +1307,7 @@ def entrada_salidas_mar():
         fecha_actual        = datetime.date.today()
         
         hora_defecto_inicio = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
-        hora_defecto_final  = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
+        hora_defecto_final  = datetime.time(14,30,0,0,tzinfo = datetime.timezone.utc)
         
         # Despliega un formulario para seleccionar las fechas de inicio y final
         with st.form("Formulario seleccion"):
