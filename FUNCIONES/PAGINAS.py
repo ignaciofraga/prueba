@@ -1431,7 +1431,7 @@ def entrada_salidas_mar():
         
         
         # Elimina las columnas que no interesa mostrar
-        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','hora_salida','fecha_retorno','hora_retorno',''])
+        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','hora_salida','fecha_retorno','hora_retorno'])
     
         # Renombra las columnas
         df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','buque':'Buque','participantes':'Participantes','observaciones':'Observaciones'})
