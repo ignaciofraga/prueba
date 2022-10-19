@@ -1253,3 +1253,94 @@ def consulta_procesos():
             
 
 
+
+
+
+
+
+###############################################################################
+################# PÁGINA DE ENTRADA DE SALIDAS A MAR ##########################
+###############################################################################    
+    
+def entrada_salidas_mar():
+    
+    # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    direccion_host = st.secrets["postgres"].host
+    base_datos     = st.secrets["postgres"].dbname
+    usuario        = st.secrets["postgres"].user
+    contrasena     = st.secrets["postgres"].password
+    puerto         = st.secrets["postgres"].port
+    
+    # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
+    entradas     = ['Añadir salida al mar', 'Consultar salidas realizadas']
+    tipo_entrada = st.sidebar.radio("Indicar la consulta a realizar",entradas)
+
+    # Recupera la tabla de los programas disponibles en la base de datos, como un dataframe
+    conn = init_connection()
+    df_programas = psql.read_sql('SELECT * FROM programas', conn)
+    conn.close()
+    
+    # Recupera la tabla con los buques disponibles en la base de datos, como un dataframe
+    conn = init_connection()
+    df_buques = psql.read_sql('SELECT * FROM buques', conn)
+    conn.close()
+
+    # tipos de salida en las radiales
+    tipos_radiales = ['Mensual','Semanal']
+        
+    # Consulta procesos realizados entre dos fechas
+    if tipo_entrada == entradas[0]:  
+        
+        st.subheader('Salida al mar')
+        
+        fecha_actual         = datetime.date.today()
+        
+        hora_defecto         = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
+        
+        # Despliega un formulario para seleccionar las fechas de inicio y final
+        with st.form("Formulario seleccion"):
+                   
+            col1, col2= st.columns(2,gap="small")
+            
+            with col1:
+                nombre_salida        = st.text_input('Nombre de la salida', value="")
+                programa_elegido     = st.selectbox('Selecciona el programa de la salida',(df_programas['nombre_programa']))
+                # Recupera el identificador del programa seleccionado
+                id_programa_elegido = int(df_programas['id_programa'][df_programas['nombre_programa']==programa_elegido].values[0])               
+                if id_programa_elegido == 2:
+                    tipo_salida     = st.selectbox('Tipo de radial',(tipos_radiales))
+                else:
+                    tipo_salida     = None
+                   
+            with col2:               
+                fecha_salida  = st.date_input('Fecha de salida',max_value=fecha_actual,value=fecha_actual)
+
+                hora_salida   = st.time_input('Hora de salida (UTC)', value=hora_defecto)
+
+                fecha_regreso = st.date_input('Fecha de regreso',max_value=fecha_actual,value=fecha_actual)
+
+                hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto)
+
+            with col3:
+                buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']))
+                id_buque_elegido = int(df_buques['id_buque'][df_buques['nombre_buque']==buque_elegido].values[0])               
+
+                observaciones = st.text_input('Observaciones', value="")
+
+            submit = st.form_submit_button("Consultar")
+
+    
+            if submit == True:
+               
+                instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,observaciones)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,observaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.observaciones);''' 
+                        
+                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()
+                cursor.execute(instruccion_sql, (nombre_salida,id_programa_elegido,programa_elegido,tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,observaciones))
+                conn.commit()
+                cursor.close()
+                conn.close()
+
+
+

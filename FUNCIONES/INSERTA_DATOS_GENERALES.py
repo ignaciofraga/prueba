@@ -198,8 +198,8 @@ conn.close()
 
 ### Informacion de los usuarios y contraseñas de la aplicacion ###
 
-usuarios       = ['COAC - Administrador','COAC - Laboratorio Nutrientes','COAC - Supervisión Nutrientes','Usuario externo']
-passwords      = ['IEO_2022','IEO_2022','IEO_2022','2022_IEO']
+usuarios       = ['COAC - Administrador','COAC - Laboratorio Nutrientes','COAC - Supervisión Nutrientes','COAC - Radiales','Usuario externo']
+passwords      = ['IEO_2022','IEO_2022','IEO_2022','IEO_2022','2022_IEO']
 
 instruccion_sql = '''INSERT INTO usuarios_app (nombre_usuario,password)
     VALUES (%s,%s) ON CONFLICT (nombre_usuario) DO UPDATE SET (password) = ROW(EXCLUDED.password);''' 

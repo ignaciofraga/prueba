@@ -896,8 +896,8 @@ listado_variables = ('(id_salida SERIAL PRIMARY KEY,'
 ' fecha_retorno date NOT NULL,'
 ' hora_retorno time,'
 ' buque int,'
-' estaciones text,'
-' participantes text,'
+' estaciones json,'
+' participantes json,'
 ' observaciones text,'
 ) 
 
