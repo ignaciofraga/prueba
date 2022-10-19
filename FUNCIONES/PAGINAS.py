@@ -1291,6 +1291,12 @@ def entrada_salidas_mar():
         conn = init_connection()
         df_personal = psql.read_sql('SELECT * FROM personal_salidas', conn)
         conn.close()
+        
+        # Recupera la tabla con las salidas disponibles, como un dataframe
+        conn = init_connection()
+        df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
+        conn.close()
 
         # tipos de salida en las radiales
         tipos_radiales = ['Mensual','Semanal']
@@ -1336,18 +1342,31 @@ def entrada_salidas_mar():
 
     
             if submit == True:
-               
-                instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes,observaciones)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes,observaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes,EXCLUDED.observaciones);''' 
-                        
-                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                cursor = conn.cursor()
-                cursor.execute(instruccion_sql, (nombre_salida,2,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_personal,observaciones))
-                conn.commit()
-                cursor.close()
-                conn.close()
+                
+                io_incluido = 0
+                for isalida in range(df_salidas_radiales.shape[0]):
+                    if df_salidas_radiales['fecha_salida'][isalida] == fecha_salida and df_salidas_radiales['tipo_salida'][isalida] == tipo_salida:
+                        io_incluido = 1
 
-
+                if io_incluido == 0:                     
+                    
+                    instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes,observaciones)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes,observaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes,EXCLUDED.observaciones);''' 
+                            
+                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                    cursor = conn.cursor()
+                    cursor.execute(instruccion_sql, (nombre_salida,2,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_personal,observaciones))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+    
+                    texto_exito = 'Salida añadida correctamente'
+                    st.success(texto_exito)
+                    
+                else:
+                    texto_error = 'La base de datos ya contiene una salida ' + tipo_salida.lower() + ' para la fecha seleccionada'
+                    st.warning(texto_error, icon="⚠️")                      
+                    
 
 
 
