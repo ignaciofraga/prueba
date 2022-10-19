@@ -977,3 +977,37 @@ conn.commit()
 cursor.close()
 conn.close()
 
+
+
+
+#######################################################
+## TABLA CON EL PERSONAL PARTICIPANTE EN LAS SALIDAS ##
+#######################################################
+
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()
+
+nombre_tabla = 'personal_salidas'
+
+# Borra la table si ya existía
+instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+cursor.execute(instruccion_sql)
+conn.commit()
+
+# Crea la tabla de nuevo
+listado_variables = ('(id_personal SERIAL PRIMARY KEY,'
+' nombre_apellidos text NOT NULL,'
+' correo text NOT NULL,'
+' comisionado bool NOT NULL'
+) 
+
+
+listado_unicidades = (', UNIQUE (nombre_apellidos))')
+
+instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
+
+
+cursor.execute(instruccion_sql)
+conn.commit()
+cursor.close()
+conn.close()

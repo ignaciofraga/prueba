@@ -248,6 +248,10 @@ conn.close()
 
 
 
+
+
+
+
 ### AÑADE LOS REGISTROS DE ENTRADA DE LOS TIEMPOS/FECHAS DE LAS DIFERENTES CAMPAÑAS
 
 # vector_tiempos      = pandas.date_range(datetime.date.today()-datetime.timedelta(days=2),datetime.date.today(),freq='d')
