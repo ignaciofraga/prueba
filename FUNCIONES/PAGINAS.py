@@ -1427,14 +1427,19 @@ def entrada_salidas_mar():
         conn = init_connection()
         df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
+        df_buques = psql.read_sql('SELECT * FROM buques', conn)
         conn.close()
         
+        # Añade una columna con el nombre del buque utilizado
+        df_salidas_radiales['Buque'] = [None]*df_salidas_radiales.shape[0]
+        for isalida in range(df_salidas_radiales.shape[0]):
+            df_salidas_radiales['Buque'][isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'][isalida]]
         
         # Elimina las columnas que no interesa mostrar
-        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','hora_salida','fecha_retorno','hora_retorno'])
+        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','hora_salida','fecha_retorno','hora_retorno','buque'])
     
         # Renombra las columnas
-        df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','buque':'Buque','participantes':'Participantes','observaciones':'Observaciones'})
+        df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','participantes':'Participantes','observaciones':'Observaciones'})
     
         # Ajusta el formato de las fechas
         for idato in range(df_salidas_radiales.shape[0]):
