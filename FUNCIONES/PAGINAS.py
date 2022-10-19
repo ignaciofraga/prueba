@@ -1288,8 +1288,10 @@ def entrada_salidas_mar():
         conn.close()
         
         # Recupera la tabla con el personal disponible, como un dataframe
-        conn = init_connection()
-        df_personal = psql.read_sql('SELECT * FROM personal_salidas', conn)
+        conn                       = init_connection()
+        df_personal                = psql.read_sql('SELECT * FROM personal_salidas', conn)
+        df_personal_comisionado    = df_personal[df_personal['personal_salidas']==True]
+        df_personal_no_comisionado = df_personal[df_personal['personal_salidas']==False]
         conn.close()
         
         # Recupera la tabla con las salidas disponibles, como un dataframe
@@ -1332,8 +1334,12 @@ def entrada_salidas_mar():
 
                 hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto)
 
-            personal_seleccionado = st.multiselect('Personal participante',df_personal['nombre_apellidos'])
-            json_personal         = json.dumps(personal_seleccionado)
+
+            personal_comisionado    = st.multiselect('Personal participante',df_personal_comisionado['nombre_apellidos'])
+            json_comisionados       = json.dumps(personal_comisionado)
+
+            personal_no_comisionado = st.multiselect('Personal participante',df_personal_no_comisionado['nombre_apellidos'])
+            json_no_comisionados    = json.dumps(personal_no_comisionado)
 
 
             observaciones = st.text_input('Observaciones', value="")
@@ -1350,12 +1356,12 @@ def entrada_salidas_mar():
 
                 if io_incluido == 0:                     
                     
-                    instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes,observaciones)
-                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes,observaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes,EXCLUDED.observaciones);''' 
+                    instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes_comisionados,EXCLUDED.participantes_no_comisionados,EXCLUDED.observaciones);''' 
                             
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
-                    cursor.execute(instruccion_sql, (nombre_salida,2,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_personal,observaciones))
+                    cursor.execute(instruccion_sql, (nombre_salida,2,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_comisionados,json_no_comisionados,observaciones))
                     conn.commit()
                     cursor.close()
                     conn.close()

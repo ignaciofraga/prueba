@@ -897,7 +897,8 @@ listado_variables = ('(id_salida SERIAL PRIMARY KEY,'
 ' hora_retorno time,'
 ' buque int,'
 ' estaciones json,'
-' participantes json,'
+' participantes_comisionados json,'
+' participantes_no_comisionados json,'
 ' observaciones text,'
 ) 
 
