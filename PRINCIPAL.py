@@ -26,7 +26,7 @@ if FUNCIONES_AUXILIARES.log_in() is True:
     # claúsula para manetener el nombre de usuario y poder identificar qué webs desplegar
     if 'usuario' in st.session_state:
 
-        if st.session_state["usuario"] == 'Administrador':
+        if st.session_state["usuario"] == 'COAC - Administrador':
         
             paginas = {"INICIO": PAGINAS.principal,
                         "ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
@@ -38,7 +38,7 @@ if FUNCIONES_AUXILIARES.log_in() is True:
                         }
             
             
-        if st.session_state["usuario"] == 'Usuario interno - Laboratorio':
+        if st.session_state["usuario"] == 'COAC - Laboratorio Nutrientes':
         
             paginas = {"INICIO": PAGINAS.principal,
                         "ACTUALIZA PROCESOS EN CURSO": PAGINAS.actualiza_procesos, 
@@ -47,7 +47,7 @@ if FUNCIONES_AUXILIARES.log_in() is True:
                         }
 
             
-        if st.session_state["usuario"] == 'Usuario interno - Supervisión':
+        if st.session_state["usuario"] == 'COAC - Supervisión Nutrientes':
      
             paginas = {"INICIO": PAGINAS.principal,
                     "ESTADO DEL PROCESADO DE MUESTRAS": PAGINAS.consulta_procesos, 
