@@ -1378,5 +1378,9 @@ def entrada_salidas_mar():
                     cursor.close()
                     conn.close()
 
+                    texto_exito = 'Participante añadido correctamente'
+                    st.success(texto_exito)
         
-
+                else:
+                    texto_error = 'El participante introducido ya se encuentra en la base de datos '
+                    st.warning(texto_error, icon="⚠️")  
