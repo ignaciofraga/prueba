@@ -63,7 +63,8 @@ if FUNCIONES_AUXILIARES.log_in() is True:
         if st.session_state["usuario"] == 'COAC - Radiales':
             
             paginas = {"INICIO": PAGINAS.principal,
-                        "SALIDAS AL MAR": PAGINAS.entrada_salidas_mar}
+                        "SALIDAS AL MAR": PAGINAS.entrada_salidas_mar,
+                        "ESTADOS DEL MAR":PAGINAS.entrada_estado_mar}
         
         seleccion = st.sidebar.selectbox("Elige la página a mostrar: ",tuple(paginas.keys()))
         

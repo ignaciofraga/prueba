@@ -1416,7 +1416,7 @@ def entrada_salidas_mar():
         df_personal = psql.read_sql('SELECT * FROM personal_salidas', conn)
         conn.close()
 
-        # Despliega un formulario para seleccionar las fechas de inicio y final
+        # Despliega un formulario para introducir los datos
         with st.form("Formulario seleccion"):
                    
             nombre_participante  = st.text_input('Nombre y apellidos del nuevo personal', value="")
@@ -1485,3 +1485,86 @@ def entrada_salidas_mar():
         gridOptions = gb.build()
         st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
 
+
+
+
+
+
+
+
+###############################################################################
+################# PÁGINA DE ENTRADA DE DATOS DEL ESTADO DEL  MAR ##############
+###############################################################################    
+
+def entrada_estado_mar():
+    
+    # Recupera tablas con información utilizada
+    conn                       = init_connection()
+    
+    # Salidas realizadas 
+    df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']    
+    conn.close()
+    
+    
+    # ' salida int NOT NULL,'
+    # ' estacion int NOT NULL,'
+    # ' profundidad int NOT NULL,'
+    # ' nubosidad int,'
+    # ' lluvia boolean,'
+    # ' velocidad_viento int,'
+    # ' direccion_viento text,'
+    # ' mar_viento text,'
+    # ' mar_fondo boolean,'
+    # ' mar_direccion text,'
+    # ' pres_atmosferica int,'
+    # ' temp_aire NUMERIC (3, 1),'
+    # ' marea text,'
+    # ' prof_secchi NUMERIC (4, 1),'
+    # ' max_clorofila NUMERIC (4, 1),'
+    # ' altura_ola NUMERIC (3, 1),'
+    # ) 
+    
+    fecha_salida = st.selectbox('Fecha de salida ',(df_salidas_radiales['fecha_salida']))
+    id_salida    = int(df_salidas_radiales['id_salida'][df_salidas_radiales['fecha_salida']==fecha_salida].values[0])               
+
+    listado_estaciones = json.loads(df_salidas_radiales['estaciones'][id_salida])
+
+    st.text(listado_estaciones)
+    # # Despliega un formulario para seleccionar las fechas de inicio y final
+    # with st.form("Formulario seleccion"):
+               
+    #     nombre_participante  = st.text_input('Nombre y apellidos del nuevo personal', value="")
+
+    #     correo_participante  = st.text_input('Correo del nuevo personal', value="")
+        
+    #     comision             = st.checkbox('Comisionado')
+        
+    #     submit = st.form_submit_button("Añadir participante")
+
+    #     if submit == True:
+
+    #         io_incluido = 0
+    #         for ipersonal in range(df_personal.shape[0]):
+    #             if df_personal['nombre_apellidos'][ipersonal] == nombre_participante:
+    #                 io_incluido = 1
+            
+    #         if io_incluido == 0:
+
+    #             instruccion_sql = '''INSERT INTO personal_salidas (nombre_apellidos,correo,comisionado)
+    #                 VALUES (%s,%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,correo,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.correo,EXCLUDED.comisionado);''' 
+                        
+    #             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    #             cursor = conn.cursor()
+    #             cursor.execute(instruccion_sql, (nombre_participante,correo_participante,comision))
+    #             conn.commit()
+    #             cursor.close()
+    #             conn.close()
+
+    #             texto_exito = 'Participante añadido correctamente'
+    #             st.success(texto_exito)
+    
+    #         else:
+    #             texto_error = 'El participante introducido ya se encuentra en la base de datos '
+    #             st.warning(texto_error, icon="⚠️")
+       
