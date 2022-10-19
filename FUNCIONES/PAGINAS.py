@@ -1341,6 +1341,42 @@ def entrada_salidas_mar():
     # Añade personal participante en las salidas de radial
     if tipo_entrada == entradas[1]: 
 
+        st.subheader('Personal participante')
+        
+        # Recupera la tabla con el personal ya introducido, como un dataframe
+        conn = init_connection()
+        df_personal = psql.read_sql('SELECT * FROM personal_salidas', conn)
+        conn.close()
+
+        # Despliega un formulario para seleccionar las fechas de inicio y final
+        with st.form("Formulario seleccion"):
+                   
+            nombre_participante  = st.text_input('Nombre y apellidos del nuevo personal', value="")
+
+            correo_participante  = st.text_input('Correo del nuevo personal', value="")
+            
+            comision             = st.checkbox('Comisionado')
+            
+            submit = st.form_submit_button("Añadir participante")
+
+            if submit == True:
+
+                io_incluido = 0
+                for ipersonal in range(df_personal.shape[0]):
+                    if df_personal['nombre_apellidos'][ipersonal] == nombre_participante:
+                        io_incluido = 1
+                
+                if io_incluido == 0:
+
+                    instruccion_sql = '''INSERT INTO personal_salidas (nombre_apellidos,correo,comisionado)
+                        VALUES (%s,%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,correo,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.correo,EXCLUDED.comisionado);''' 
+                            
+                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                    cursor = conn.cursor()
+                    cursor.execute(instruccion_sql, (nombre_participante,correo_participante,comision))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
 
         
 
