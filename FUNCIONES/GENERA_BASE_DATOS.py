@@ -28,63 +28,63 @@ direccion_host = '193.146.155.99'
 #### TABLAS CON INFORMACIÓN DE LAS CONDICIONES DE MUESTREO (EQUIV. METADATOS) ####
 
 
-##########################################
-## TABLA CON LOS CENTROS OCEANOGRÁFICOS ##
-##########################################
+# ##########################################
+# ## TABLA CON LOS CENTROS OCEANOGRÁFICOS ##
+# ##########################################
 
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-nombre_tabla = 'centros_oceanograficos'
+# nombre_tabla = 'centros_oceanograficos'
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-# Crea la tabla de nuevo
-listado_variables = ('(id_centro int PRIMARY KEY,'
-' nombre_centro text NOT NULL'
-) 
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_centro int PRIMARY KEY,'
+# ' nombre_centro text NOT NULL'
+# ) 
 
-listado_unicidades = (', UNIQUE (nombre_centro))')
+# listado_unicidades = (', UNIQUE (nombre_centro))')
 
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
 
-#####################################
-## TABLA CON LOS BUQUES UTILIZADOS ##
-#####################################
+# #####################################
+# ## TABLA CON LOS BUQUES UTILIZADOS ##
+# #####################################
 
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-nombre_tabla = 'buques'
+# nombre_tabla = 'buques'
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-# Crea la tabla de nuevo
-listado_variables = ('(id_buque int PRIMARY KEY,'
-' nombre_buque text NOT NULL,'
-' codigo_buque text NOT NULL'
-) 
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_buque int PRIMARY KEY,'
+# ' nombre_buque text NOT NULL,'
+# ' codigo_buque text NOT NULL'
+# ) 
 
-listado_unicidades = (', UNIQUE (nombre_buque,codigo_buque))')
+# listado_unicidades = (', UNIQUE (nombre_buque,codigo_buque))')
 
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
 
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
 # ############################################

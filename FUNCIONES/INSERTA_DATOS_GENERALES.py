@@ -193,6 +193,25 @@ conn.close()
 
 
 
+### Informacion de las estaciones de la radial mensual ###
+
+nombre_estacion = ['E2CO','E3ACO','E3CCO','E3BCO','E4CO']
+latitud         = [43.421667,43.406667,43.393333,43.388333,43.363333]
+longitud        = [-8.436667,-8.416667,-8.4,-8.383333,-8.37]
+
+
+instruccion_sql = '''INSERT INTO estaciones (nombre_estacion,programa,latitud,longitud)
+    VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO UPDATE SET (nombre_estacion,programa,latitud,longitud) = ROW(EXCLUDED.nombre_estacion,EXCLUDED.programa,EXCLUDED.latitud,EXCLUDED.longitud);''' 
+        
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()
+for idato in range(len(nombre_estacion)):
+    cursor.execute(instruccion_sql, (nombre_estacion[idato],int(2),latitud[idato],longitud[idato]))
+    conn.commit()
+cursor.close()
+conn.close()
+
+
 
 
 

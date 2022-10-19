@@ -1287,18 +1287,23 @@ def entrada_salidas_mar():
         df_buques = psql.read_sql('SELECT * FROM buques', conn)
         conn.close()
         
-        # Recupera la tabla con el personal disponible, como un dataframe
+        # Recupera tablas con información utilizada
         conn                       = init_connection()
+        
+        # Personal disponible
         df_personal                = psql.read_sql('SELECT * FROM personal_salidas', conn)
         df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
         df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
         conn.close()
-        
-        # Recupera la tabla con las salidas disponibles, como un dataframe
-        conn = init_connection()
+        # Salidas realizadas 
         df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
+        # Estaciones de muestreo (radiales)
+        df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+        df_estaciones_radiales = df_estaciones[df_estaciones['programa']==2]
+        
         conn.close()
+        
 
         # tipos de salida en las radiales
         tipos_radiales = ['Mensual','Semanal']
@@ -1341,6 +1346,10 @@ def entrada_salidas_mar():
 
             personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])
             json_no_comisionados    = json.dumps(personal_no_comisionado)
+            
+            estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
+            json_estaciones         = json.dumps(estaciones_muestreadas)
+
 
 
             observaciones = st.text_input('Observaciones', value="")
@@ -1376,12 +1385,12 @@ def entrada_salidas_mar():
     
                     if io_incluido == 0:                     
                         
-                        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones)
-                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes_comisionados,EXCLUDED.participantes_no_comisionados,EXCLUDED.observaciones);''' 
+                        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones,estaciones)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes_comisionados,EXCLUDED.participantes_no_comisionados,EXCLUDED.observaciones,EXCLUDED.estaciones);''' 
                                 
                         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                         cursor = conn.cursor()
-                        cursor.execute(instruccion_sql, (nombre_salida,2,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_comisionados,json_no_comisionados,observaciones))
+                        cursor.execute(instruccion_sql, (nombre_salida,2,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_comisionados,json_no_comisionados,observaciones,json_estaciones))
                         conn.commit()
                         cursor.close()
                         conn.close()
