@@ -1529,7 +1529,7 @@ def entrada_estado_mar():
     id_salida    = int(df_salidas_radiales['id_salida'][df_salidas_radiales['fecha_salida']==fecha_salida].values[0])               
 
     st.text(id_salida)
-    listado_estaciones = json.loads(df_salidas_radiales['estaciones'][id_salida])
+    listado_estaciones = json.loads(df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida])
 
     st.text(listado_estaciones)
     # # Despliega un formulario para seleccionar las fechas de inicio y final
