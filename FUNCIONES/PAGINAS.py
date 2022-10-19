@@ -16,6 +16,7 @@ import psycopg2
 from PIL import Image
 from dateutil.relativedelta import relativedelta
 import matplotlib.dates as mdates
+import json
 
 #import FUNCIONES_INSERCION
 from FUNCIONES import FUNCIONES_INSERCION
@@ -1285,6 +1286,11 @@ def entrada_salidas_mar():
         conn = init_connection()
         df_buques = psql.read_sql('SELECT * FROM buques', conn)
         conn.close()
+        
+        # Recupera la tabla con el personal disponible, como un dataframe
+        conn = init_connection()
+        df_personal = psql.read_sql('SELECT * FROM personal_salidas', conn)
+        conn.close()
 
         # tipos de salida en las radiales
         tipos_radiales = ['Mensual','Semanal']
@@ -1320,6 +1326,10 @@ def entrada_salidas_mar():
 
                 hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto)
 
+            personal_seleccionado = st.multiselect('Personal participante',df_personal['nombre_apellidos'])
+            json_personal         = json.dumps(personal_seleccionado)
+
+
             observaciones = st.text_input('Observaciones', value="")
 
             submit = st.form_submit_button("Añadir salida")
@@ -1327,15 +1337,20 @@ def entrada_salidas_mar():
     
             if submit == True:
                
-                instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,observaciones)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,observaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.observaciones);''' 
+                instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes,observaciones)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes,observaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes,EXCLUDED.observaciones);''' 
                         
                 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                 cursor = conn.cursor()
-                cursor.execute(instruccion_sql, (nombre_salida,2,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,observaciones))
+                cursor.execute(instruccion_sql, (nombre_salida,2,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_personal,observaciones))
                 conn.commit()
                 cursor.close()
                 conn.close()
+
+
+
+
+
 
 
     # Añade personal participante en las salidas de radial
