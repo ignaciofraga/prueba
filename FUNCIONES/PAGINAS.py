@@ -1304,9 +1304,10 @@ def entrada_salidas_mar():
         tipos_radiales = ['Mensual','Semanal']
         
         
-        fecha_actual         = datetime.date.today()
+        fecha_actual        = datetime.date.today()
         
-        hora_defecto         = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
+        hora_defecto_inicio = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
+        hora_defecto_final  = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
         
         # Despliega un formulario para seleccionar las fechas de inicio y final
         with st.form("Formulario seleccion"):
@@ -1326,13 +1327,13 @@ def entrada_salidas_mar():
             with col2:               
                 fecha_salida  = st.date_input('Fecha de salida',max_value=fecha_actual,value=fecha_actual)
 
-                hora_salida   = st.time_input('Hora de salida (UTC)', value=hora_defecto)
+                hora_salida   = st.time_input('Hora de salida (UTC)', value=hora_defecto_inicio)
 
             with col3:
                 
                 fecha_regreso = st.date_input('Fecha de regreso',max_value=fecha_actual,value=fecha_actual)
 
-                hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto)
+                hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto_final)
 
 
             personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])
@@ -1349,31 +1350,50 @@ def entrada_salidas_mar():
     
             if submit == True:
                 
-                io_incluido = 0
-                for isalida in range(df_salidas_radiales.shape[0]):
-                    if df_salidas_radiales['fecha_salida'][isalida] == fecha_salida and df_salidas_radiales['tipo_salida'][isalida] == tipo_salida:
-                        io_incluido = 1
+                # Comprueba los datos introducidos
+                io_error = 0
+                if not nombre_salida:
+                    io_error = 1
+                    texto_error = 'La salida debe contener un nombre'
+                    
+                if fecha_regreso == fecha_salida and hora_regreso == hora_salida:
+                    io_error = 1
+                    texto_error = 'La fecha y hora de regreso no puede ser la misma que la de partida'
 
-                if io_incluido == 0:                     
-                    
-                    instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones)
-                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes_comisionados,EXCLUDED.participantes_no_comisionados,EXCLUDED.observaciones);''' 
-                            
-                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                    cursor = conn.cursor()
-                    cursor.execute(instruccion_sql, (nombre_salida,2,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_comisionados,json_no_comisionados,observaciones))
-                    conn.commit()
-                    cursor.close()
-                    conn.close()
-    
-                    texto_exito = 'Salida añadida correctamente'
-                    st.success(texto_exito)
-                    
+                if fecha_regreso < fecha_salida :
+                    io_error = 1
+                    texto_error = 'La fecha de regreso no puede ser anterior a la de partida'
+                                
+                if io_error == 1:
+                    st.warning(texto_error, icon="⚠️")
+                
                 else:
-                    texto_error = 'La base de datos ya contiene una salida ' + tipo_salida.lower() + ' para la fecha seleccionada'
-                    st.warning(texto_error, icon="⚠️")                      
-                    
-
+                
+                    io_incluido = 0
+                    for isalida in range(df_salidas_radiales.shape[0]):
+                        if df_salidas_radiales['fecha_salida'][isalida] == fecha_salida and df_salidas_radiales['tipo_salida'][isalida] == tipo_salida:
+                            io_incluido = 1
+    
+                    if io_incluido == 0:                     
+                        
+                        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes_comisionados,EXCLUDED.participantes_no_comisionados,EXCLUDED.observaciones);''' 
+                                
+                        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                        cursor = conn.cursor()
+                        cursor.execute(instruccion_sql, (nombre_salida,2,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_comisionados,json_no_comisionados,observaciones))
+                        conn.commit()
+                        cursor.close()
+                        conn.close()
+        
+                        texto_exito = 'Salida añadida correctamente'
+                        st.success(texto_exito)
+                        
+                    else:
+                        texto_error = 'La base de datos ya contiene una salida ' + tipo_salida.lower() + ' para la fecha seleccionada'
+                        st.warning(texto_error, icon="⚠️")                      
+                        
+    
 
 
 
