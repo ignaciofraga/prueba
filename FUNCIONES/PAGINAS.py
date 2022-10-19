@@ -1294,7 +1294,6 @@ def entrada_salidas_mar():
         df_personal                = psql.read_sql('SELECT * FROM personal_salidas', conn)
         df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
         df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
-        conn.close()
         # Salidas realizadas 
         df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
