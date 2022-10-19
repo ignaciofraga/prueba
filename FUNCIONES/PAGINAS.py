@@ -1418,3 +1418,31 @@ def entrada_salidas_mar():
                 else:
                     texto_error = 'El participante introducido ya se encuentra en la base de datos '
                     st.warning(texto_error, icon="⚠️")  
+
+
+    # Consulta las salidas realizadas
+    if tipo_entrada == entradas[2]: 
+
+        # Recupera la tabla con las salidas disponibles, como un dataframe
+        conn = init_connection()
+        df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
+        conn.close()
+        
+        
+        # Elimina las columnas que no interesa mostrar
+        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','hora_salida','fecha_retorno','hora_retorno',''])
+    
+        # Renombra las columnas
+        df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','buque':'Buque','participantes':'Participantes','observaciones':'Observaciones'})
+    
+        # Ajusta el formato de las fechas
+        for idato in range(df_salidas_radiales.shape[0]):
+            df_salidas_radiales['Fecha salida'][idato]  =  df_salidas_radiales['Fecha salida'][idato].strftime("%Y-%m-%d")
+
+          
+        # Muestra una tabla con las salidas realizadas
+        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_salidas_radiales)
+        gridOptions = gb.build()
+        st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+
