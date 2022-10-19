@@ -1290,8 +1290,8 @@ def entrada_salidas_mar():
         # Recupera la tabla con el personal disponible, como un dataframe
         conn                       = init_connection()
         df_personal                = psql.read_sql('SELECT * FROM personal_salidas', conn)
-        df_personal_comisionado    = df_personal[df_personal['personal_salidas']==True]
-        df_personal_no_comisionado = df_personal[df_personal['personal_salidas']==False]
+        df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
+        df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
         conn.close()
         
         # Recupera la tabla con las salidas disponibles, como un dataframe
