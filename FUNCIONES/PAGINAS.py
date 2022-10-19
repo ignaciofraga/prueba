@@ -1300,7 +1300,7 @@ def entrada_salidas_mar():
         # Despliega un formulario para seleccionar las fechas de inicio y final
         with st.form("Formulario seleccion"):
                    
-            col1, col2= st.columns(2,gap="small")
+            col1, col2,col3= st.columns(3,gap="small")
             
             with col1:
                 nombre_salida        = st.text_input('Nombre de la salida', value="")
