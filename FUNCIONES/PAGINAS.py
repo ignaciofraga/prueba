@@ -1527,10 +1527,13 @@ def entrada_estado_mar():
     
     fecha_salida = st.selectbox('Fecha de salida ',(df_salidas_radiales['fecha_salida']))
     id_salida    = int(df_salidas_radiales['id_salida'][df_salidas_radiales['fecha_salida']==fecha_salida].values[0])               
+    estaciones_bd = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida] 
 
-    st.text(id_salida)
-    st.text(df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida])
-    listado_estaciones = json.loads(df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida])
+    if estaciones_bd is not None:
+        listado_estaciones = estaciones_bd.iloc[0]
+    else:
+        listado_estaciones = [None]
+    
 
     st.text(listado_estaciones)
     # # Despliega un formulario para seleccionar las fechas de inicio y final
