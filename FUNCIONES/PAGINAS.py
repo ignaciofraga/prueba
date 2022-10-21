@@ -1565,6 +1565,8 @@ def entrada_estado_mar():
             max_clorofila_defecto           = df_condicion_introducida['max_clorofila'][0]
             humedad_relativa_defecto        = df_condicion_introducida['humedad_relativa'][0]
             
+            io_previo                       = 1
+            
         else:
             hora_llegada_defecto            = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
             profundidad_defecto             = 0
@@ -1581,6 +1583,8 @@ def entrada_estado_mar():
             prof_secchi_defecto             = 0
             max_clorofila_defecto           = 0
             humedad_relativa_defecto        = 50
+            
+            io_previo                       = 0
                        
          
         with st.form("Formulario seleccion"): 
@@ -1642,7 +1646,11 @@ def entrada_estado_mar():
                 cursor.close()
                 conn.close()
 
-                texto_exito = 'Datos de las estación ' + estacion_elegida + ',durante la salida del '  + fecha_salida.strftime('%d-%b-%Y')  + ' añadidos correctamente'
+                if io_previo == 0:
+                    texto_exito = 'Datos de las estación ' + estacion_elegida + ', durante la salida del '  + fecha_salida.strftime('%d-%b-%Y')  + ',añadidos correctamente'
+                if io_previo == 1:
+                    texto_exito = 'Datos de las estación ' + estacion_elegida + ', durante la salida del '  + fecha_salida.strftime('%d-%b-%Y')  + ',actualizados correctamente'
+                    
                 st.success(texto_exito)                
                 
 
