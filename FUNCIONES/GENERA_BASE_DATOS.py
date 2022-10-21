@@ -943,6 +943,7 @@ conn.commit()
 listado_variables = ('(id_condicion SERIAL PRIMARY KEY,'
 ' salida int NOT NULL,'
 ' estacion int NOT NULL,'
+' hora_llegada time,'
 ' profundidad int NOT NULL,'
 ' nubosidad int,'
 ' lluvia boolean,'

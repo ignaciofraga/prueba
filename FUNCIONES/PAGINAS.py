@@ -1537,6 +1537,7 @@ def entrada_estado_mar():
         estacion_elegida    = st.selectbox('Estacion',(listado_estaciones))
         id_estacion_elegida = int(df_estaciones_radiales['id_estacion'][df_estaciones_radiales['nombre_estacion']==estacion_elegida].values[0])
     
+    
             
         with st.form("Formulario seleccion"): 
                
@@ -1546,6 +1547,7 @@ def entrada_estado_mar():
             col1, col2,col3,col4= st.columns(4,gap="small")
 
             with col1:
+                hora_llegada  = st.time_input('Hora de llegada (UTC)')
                 profundidad   = st.number_input('Profundidad(m):',format='%i',value=round(0),min_value=0)
                 nubosidad     = st.number_input('Nubosidad(%) :',format='%i',value=round(0),min_value=0)
                 lluvia_sel    = st.selectbox('LLuvia:',(seleccion_SN))
@@ -1586,12 +1588,12 @@ def entrada_estado_mar():
 
             if submit is True:
                 
-                instruccion_sql = '''INSERT INTO condiciones_ambientales_muestreos (salida,estacion,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_douglas,mar_fondo,mar_direccion,temp_aire,marea,prof_secchi,max_clorofila)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_condicion) DO UPDATE SET (salida,estacion,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_douglas,mar_fondo,mar_direccion,temp_aire,marea,prof_secchi,max_clorofila) = ROW(EXCLUDED.salida,EXCLUDED.estacion,EXCLUDED.profundidad,EXCLUDED.nubosidad,EXCLUDED.lluvia,EXCLUDED.velocidad_viento,EXCLUDED.direccion_viento,EXCLUDED.pres_atmosferica,EXCLUDED.viento_beaufort,EXCLUDED.altura_ola,EXCLUDED.mar_douglas,EXCLUDED.mar_fondo,EXCLUDED.mar_direccion,EXCLUDED.temp_aire,EXCLUDED.marea,EXCLUDED.prof_secchi,EXCLUDED.max_clorofila);''' 
+                instruccion_sql = '''INSERT INTO condiciones_ambientales_muestreos (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_douglas,mar_fondo,mar_direccion,temp_aire,marea,prof_secchi,max_clorofila)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_condicion) DO UPDATE SET (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_douglas,mar_fondo,mar_direccion,temp_aire,marea,prof_secchi,max_clorofila) = ROW(EXCLUDED.salida,EXCLUDED.estacion,EXCLUDED.hora_llegada,EXCLUDED.profundidad,EXCLUDED.nubosidad,EXCLUDED.lluvia,EXCLUDED.velocidad_viento,EXCLUDED.direccion_viento,EXCLUDED.pres_atmosferica,EXCLUDED.viento_beaufort,EXCLUDED.altura_ola,EXCLUDED.mar_douglas,EXCLUDED.mar_fondo,EXCLUDED.mar_direccion,EXCLUDED.temp_aire,EXCLUDED.marea,EXCLUDED.prof_secchi,EXCLUDED.max_clorofila);''' 
                         
                 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                 cursor = conn.cursor()
-                cursor.execute(instruccion_sql, (id_salida,id_estacion_elegida,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_douglas,mar_fondo,mar_direccion,temp_aire,marea,prof_secchi,max_clorofila))
+                cursor.execute(instruccion_sql, (id_salida,id_estacion_elegida,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_douglas,mar_fondo,mar_direccion,temp_aire,marea,prof_secchi,max_clorofila))
                 conn.commit()
                 cursor.close()
                 conn.close()
