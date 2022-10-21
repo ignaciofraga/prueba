@@ -126,169 +126,169 @@ direccion_host = '193.146.155.99'
 
 
 
-#########################################################
-## TABLA CON LOS ESTADOS DEL PROCESADO DE LAS CAMPAÑAS ##
-#########################################################
+# #########################################################
+# ## TABLA CON LOS ESTADOS DEL PROCESADO DE LAS CAMPAÑAS ##
+# #########################################################
 
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-nombre_tabla = 'estado_procesos'
+# nombre_tabla = 'estado_procesos'
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-# Crea la tabla de nuevo
-listado_variables = ('(id_proceso SERIAL PRIMARY KEY,'
-' programa int NOT NULL,'
-' nombre_programa text NOT NULL,'
-' año int NOT NULL,'
-' fecha_final_muestreo date,'
-' fecha_analisis_laboratorio date,'
-' fecha_post_procesado date,'
-' contacto_muestreo text,'
-' contacto_post_procesado text,'
-) 
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_proceso SERIAL PRIMARY KEY,'
+# ' programa int NOT NULL,'
+# ' nombre_programa text NOT NULL,'
+# ' año int NOT NULL,'
+# ' fecha_final_muestreo date,'
+# ' fecha_analisis_laboratorio date,'
+# ' fecha_post_procesado date,'
+# ' contacto_muestreo text,'
+# ' contacto_post_procesado text,'
+# ) 
 
-listado_dependencias = ('FOREIGN KEY (programa)'
-  'REFERENCES programas (id_programa)'
-  ' ON UPDATE CASCADE '
-  'ON DELETE CASCADE')
+# listado_dependencias = ('FOREIGN KEY (programa)'
+#   'REFERENCES programas (id_programa)'
+#   ' ON UPDATE CASCADE '
+#   'ON DELETE CASCADE')
 
-listado_unicidades = (', UNIQUE (programa,año))')
+# listado_unicidades = (', UNIQUE (programa,año))')
 
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
-
-
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
 
 
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
 
 
 
 
-##################################################
-## TABLA CON LAS CONFIGURACIONES DEL PERFILADOR ##
-##################################################
-
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
-
-nombre_tabla = 'configuracion_perfilador'
-
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
-
-# Crea la tabla de nuevo
-listado_variables = ('(id_config_perfil int PRIMARY KEY,'
-' buque int NOT NULL,'
-' centro_asociado int,'
-' fecha_inicio date,'
-' sensor_ctd text,'
-' num_serie_ctd text,'
-' propietario_ctd text,'
-' fecha_calibracion_ctd date,'
-' ruta_configuracion_ctd text,'
-' sensor_par text,'
-' num_serie_par text,'
-' fecha_calibracion_par date,'
-' sensor_oxigeno text,'
-' num_serie_oxigeno text,'
-' fecha_calibracion_oxigeno date,'
-' sensor_fluorescencia text,'
-' num_serie_fluorescencia text,'
-' fecha_calibracion_fluorescencia date,'
-' adcp text,'
-' num_serie_adcp text,'
-' fecha_calibracion_adcp date,'
-) 
-
-listado_dependencias = ('FOREIGN KEY (centro_asociado)'
-  'REFERENCES centros_oceanograficos (id_centro)'
-  ' ON UPDATE CASCADE '
-  'ON DELETE CASCADE,'
-  'FOREIGN KEY (buque)'
-  'REFERENCES buques (id_buque)'
-  'ON UPDATE CASCADE ON DELETE CASCADE'
-  )
-
-listado_unicidades = (', UNIQUE (buque,centro_asociado,fecha_inicio,sensor_ctd,num_serie_ctd,sensor_par,num_serie_par,sensor_oxigeno,num_serie_oxigeno,sensor_fluorescencia,num_serie_fluorescencia,adcp,num_serie_adcp))')
-
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
 
 
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# ##################################################
+# ## TABLA CON LAS CONFIGURACIONES DEL PERFILADOR ##
+# ##################################################
+
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
+
+# nombre_tabla = 'configuracion_perfilador'
+
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
+
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_config_perfil int PRIMARY KEY,'
+# ' buque int NOT NULL,'
+# ' centro_asociado int,'
+# ' fecha_inicio date,'
+# ' sensor_ctd text,'
+# ' num_serie_ctd text,'
+# ' propietario_ctd text,'
+# ' fecha_calibracion_ctd date,'
+# ' ruta_configuracion_ctd text,'
+# ' sensor_par text,'
+# ' num_serie_par text,'
+# ' fecha_calibracion_par date,'
+# ' sensor_oxigeno text,'
+# ' num_serie_oxigeno text,'
+# ' fecha_calibracion_oxigeno date,'
+# ' sensor_fluorescencia text,'
+# ' num_serie_fluorescencia text,'
+# ' fecha_calibracion_fluorescencia date,'
+# ' adcp text,'
+# ' num_serie_adcp text,'
+# ' fecha_calibracion_adcp date,'
+# ) 
+
+# listado_dependencias = ('FOREIGN KEY (centro_asociado)'
+#   'REFERENCES centros_oceanograficos (id_centro)'
+#   ' ON UPDATE CASCADE '
+#   'ON DELETE CASCADE,'
+#   'FOREIGN KEY (buque)'
+#   'REFERENCES buques (id_buque)'
+#   'ON UPDATE CASCADE ON DELETE CASCADE'
+#   )
+
+# listado_unicidades = (', UNIQUE (buque,centro_asociado,fecha_inicio,sensor_ctd,num_serie_ctd,sensor_par,num_serie_par,sensor_oxigeno,num_serie_oxigeno,sensor_fluorescencia,num_serie_fluorescencia,adcp,num_serie_adcp))')
+
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
 
 
-##############################################################
-## TABLA CON LAS CONFIGURACIONES DEL MUESTREO EN SUPERFICIE ##
-##############################################################
-
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
-
-nombre_tabla = 'configuracion_superficie'
-
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
-
-# Crea la tabla de nuevo
-listado_variables = ('(id_config_superficie int PRIMARY KEY,'
-' buque int NOT NULL,'
-' centro_asociado int,'
-' fecha_inicio date,'
-' sensor_tsg text,'
-' num_serie_tsg text,'
-' propietario_tsg text,'
-' fecha_calibracion_tsg date,'
-' ruta_configuracion_tsg text,'
-' sensor_ph text,'
-' num_serie_ph text,'
-' fecha_calibracion_ph date,'
-' sensor_oxigeno text,'
-' num_serie_oxigeno text,'
-' fecha_calibracion_oxigeno date,'
-' sensor_fluorescencia text,'
-' num_serie_fluorescencia text,'
-' fecha_calibracion_fluorescencia date,'
-' sensor_pco2 text,'
-' num_serie_pco2 text,'
-' fecha_calibracion_pco2 date,'
-) 
-
-listado_dependencias = ('FOREIGN KEY (centro_asociado)'
-  'REFERENCES centros_oceanograficos (id_centro)'
-  ' ON UPDATE CASCADE '
-  'ON DELETE CASCADE,'
-  'FOREIGN KEY (buque)'
-  'REFERENCES buques (id_buque)'
-  'ON UPDATE CASCADE ON DELETE CASCADE'
-  )
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
-listado_unicidades = (', UNIQUE (buque,centro_asociado,fecha_inicio,sensor_tsg,num_serie_tsg,sensor_ph,num_serie_ph,sensor_oxigeno,num_serie_oxigeno,sensor_fluorescencia,num_serie_fluorescencia,sensor_pco2,num_serie_pco2))')
+# ##############################################################
+# ## TABLA CON LAS CONFIGURACIONES DEL MUESTREO EN SUPERFICIE ##
+# ##############################################################
 
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
+
+# nombre_tabla = 'configuracion_superficie'
+
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
+
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_config_superficie int PRIMARY KEY,'
+# ' buque int NOT NULL,'
+# ' centro_asociado int,'
+# ' fecha_inicio date,'
+# ' sensor_tsg text,'
+# ' num_serie_tsg text,'
+# ' propietario_tsg text,'
+# ' fecha_calibracion_tsg date,'
+# ' ruta_configuracion_tsg text,'
+# ' sensor_ph text,'
+# ' num_serie_ph text,'
+# ' fecha_calibracion_ph date,'
+# ' sensor_oxigeno text,'
+# ' num_serie_oxigeno text,'
+# ' fecha_calibracion_oxigeno date,'
+# ' sensor_fluorescencia text,'
+# ' num_serie_fluorescencia text,'
+# ' fecha_calibracion_fluorescencia date,'
+# ' sensor_pco2 text,'
+# ' num_serie_pco2 text,'
+# ' fecha_calibracion_pco2 date,'
+# ) 
+
+# listado_dependencias = ('FOREIGN KEY (centro_asociado)'
+#   'REFERENCES centros_oceanograficos (id_centro)'
+#   ' ON UPDATE CASCADE '
+#   'ON DELETE CASCADE,'
+#   'FOREIGN KEY (buque)'
+#   'REFERENCES buques (id_buque)'
+#   'ON UPDATE CASCADE ON DELETE CASCADE'
+#   )
 
 
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# listado_unicidades = (', UNIQUE (buque,centro_asociado,fecha_inicio,sensor_tsg,num_serie_tsg,sensor_ph,num_serie_ph,sensor_oxigeno,num_serie_oxigeno,sensor_fluorescencia,num_serie_fluorescencia,sensor_pco2,num_serie_pco2))')
+
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+
+
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
 ##########################################
@@ -326,86 +326,86 @@ conn.close()
 
 
 
-########################################################
-## TABLA CON LOS TRANSECTOS EN SUPERFICIE MUESTREADOS ##
-########################################################
+# ########################################################
+# ## TABLA CON LOS TRANSECTOS EN SUPERFICIE MUESTREADOS ##
+# ########################################################
 
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-nombre_tabla = 'transectos_superficie'
+# nombre_tabla = 'transectos_superficie'
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-listado_variables = ('(id_transecto SERIAL PRIMARY KEY,'
-' nombre_transecto text,'
-' estacion_inicio int NOT NULL,'
-' estacion_final int NOT NULL,'
-' fecha_inicio timestamptz NOT NULL,'
-' fecha_final timestamptz,'
-' configuracion_muestreo_superficie int NOT NULL,'
-) 
+# listado_variables = ('(id_transecto SERIAL PRIMARY KEY,'
+# ' nombre_transecto text,'
+# ' estacion_inicio int NOT NULL,'
+# ' estacion_final int NOT NULL,'
+# ' fecha_inicio timestamptz NOT NULL,'
+# ' fecha_final timestamptz,'
+# ' configuracion_muestreo_superficie int NOT NULL,'
+# ) 
 
-listado_dependencias = ('FOREIGN KEY (estacion_inicio)'
-'REFERENCES estaciones (id_estacion)'
-'ON UPDATE CASCADE ON DELETE CASCADE,'
-'FOREIGN KEY (estacion_final)'
-'REFERENCES estaciones (id_estacion)'
-'ON UPDATE CASCADE ON DELETE CASCADE,'
-'FOREIGN KEY (configuracion_muestreo_superficie)'
-'REFERENCES configuracion_superficie (id_config_superficie)'
-'ON UPDATE CASCADE ON DELETE CASCADE'
-)
+# listado_dependencias = ('FOREIGN KEY (estacion_inicio)'
+# 'REFERENCES estaciones (id_estacion)'
+# 'ON UPDATE CASCADE ON DELETE CASCADE,'
+# 'FOREIGN KEY (estacion_final)'
+# 'REFERENCES estaciones (id_estacion)'
+# 'ON UPDATE CASCADE ON DELETE CASCADE,'
+# 'FOREIGN KEY (configuracion_muestreo_superficie)'
+# 'REFERENCES configuracion_superficie (id_config_superficie)'
+# 'ON UPDATE CASCADE ON DELETE CASCADE'
+# )
 
-listado_unicidades = (', UNIQUE (estacion_inicio,estacion_final,fecha_inicio,configuracion_muestreo_superficie))')
+# listado_unicidades = (', UNIQUE (estacion_inicio,estacion_final,fecha_inicio,configuracion_muestreo_superficie))')
 
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
 
-####################################################
-## TABLA CON LOS PERFILES EN VERTICAL MUESTREADOS ##
-####################################################
+# ####################################################
+# ## TABLA CON LOS PERFILES EN VERTICAL MUESTREADOS ##
+# ####################################################
 
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-nombre_tabla = 'perfiles_verticales'
+# nombre_tabla = 'perfiles_verticales'
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-listado_variables = ('(id_perfil SERIAL PRIMARY KEY,'
-' nombre_perfil text,'
-' estacion int NOT NULL,'
-' feha_perfil timestamptz NOT NULL,'
-' configuracion_perfilador int NOT NULL,'
-) 
+# listado_variables = ('(id_perfil SERIAL PRIMARY KEY,'
+# ' nombre_perfil text,'
+# ' estacion int NOT NULL,'
+# ' feha_perfil timestamptz NOT NULL,'
+# ' configuracion_perfilador int NOT NULL,'
+# ) 
 
-listado_dependencias = ('FOREIGN KEY (estacion)'
-'REFERENCES estaciones (id_estacion)'
-'ON UPDATE CASCADE ON DELETE CASCADE,'
-'FOREIGN KEY (configuracion_perfilador)'
-'REFERENCES configuracion_perfilador (id_config_perfil)'
-'ON UPDATE CASCADE ON DELETE CASCADE'
-)
+# listado_dependencias = ('FOREIGN KEY (estacion)'
+# 'REFERENCES estaciones (id_estacion)'
+# 'ON UPDATE CASCADE ON DELETE CASCADE,'
+# 'FOREIGN KEY (configuracion_perfilador)'
+# 'REFERENCES configuracion_perfilador (id_config_perfil)'
+# 'ON UPDATE CASCADE ON DELETE CASCADE'
+# )
 
-listado_unicidades = (', UNIQUE (estacion,feha_perfil,configuracion_perfilador))')
+# listado_unicidades = (', UNIQUE (estacion,feha_perfil,configuracion_perfilador))')
 
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
 
@@ -589,148 +589,148 @@ cursor.close()
 conn.close()
 
 
-#####################################################################
-## TABLA CON DATOS FISICOS PROCEDENTES DE TRANSECTOS SUPERFICIALES ##
-#####################################################################
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
+# #####################################################################
+# ## TABLA CON DATOS FISICOS PROCEDENTES DE TRANSECTOS SUPERFICIALES ##
+# #####################################################################
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-nombre_tabla = 'datos_superficie_fisica'
+# nombre_tabla = 'datos_superficie_fisica'
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-# Crea la tabla de nuevo
-listado_variables = ('(id_sup_fisica SERIAL PRIMARY KEY,'
-' transecto int NOT NULL,'
-' temperatura_sup json,'
-' salinidad_sup json,'
-' turbidez_sup json,'
-) 
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_sup_fisica SERIAL PRIMARY KEY,'
+# ' transecto int NOT NULL,'
+# ' temperatura_sup json,'
+# ' salinidad_sup json,'
+# ' turbidez_sup json,'
+# ) 
 
-listado_dependencias = ('FOREIGN KEY (transecto)'
-'REFERENCES transectos_superficie (id_transecto)'
-'ON UPDATE CASCADE ON DELETE CASCADE'
-)
+# listado_dependencias = ('FOREIGN KEY (transecto)'
+# 'REFERENCES transectos_superficie (id_transecto)'
+# 'ON UPDATE CASCADE ON DELETE CASCADE'
+# )
 
-listado_unicidades = (', UNIQUE (transecto))')
+# listado_unicidades = (', UNIQUE (transecto))')
 
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
-
-
-############################################################################
-## TABLA CON DATOS BIOGEOQUIMICOS PROCEDENTES DE TRANSECTOS SUPERFICIALES ##
-############################################################################
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
-
-nombre_tabla = 'datos_superficie_biogeoquimica'
-
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
-
-# Crea la tabla de nuevo
-listado_variables = ('(id_sup_biogeoquim SERIAL PRIMARY KEY,'
-' transecto int NOT NULL,'
-' ph_sup json,'
-' pco2_sup json,'
-' fluorescencia_sup json,'
-' oxigeno_sup json,'
-) 
-
-listado_dependencias = ('FOREIGN KEY (transecto)'
-'REFERENCES transectos_superficie (id_transecto)'
-'ON UPDATE CASCADE ON DELETE CASCADE'
-)
-
-listado_unicidades = (', UNIQUE (transecto))')
-
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
+# ############################################################################
+# ## TABLA CON DATOS BIOGEOQUIMICOS PROCEDENTES DE TRANSECTOS SUPERFICIALES ##
+# ############################################################################
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-################################################################
-## TABLA CON DATOS FISICOS PROCEDENTES DE PERFILES VERTICALES ##
-################################################################
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
+# nombre_tabla = 'datos_superficie_biogeoquimica'
 
-nombre_tabla = 'datos_perfil_fisica'
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_sup_biogeoquim SERIAL PRIMARY KEY,'
+# ' transecto int NOT NULL,'
+# ' ph_sup json,'
+# ' pco2_sup json,'
+# ' fluorescencia_sup json,'
+# ' oxigeno_sup json,'
+# ) 
 
-# Crea la tabla de nuevo
-listado_variables = ('(id_perfil_fisica SERIAL PRIMARY KEY,'
-' perfil int NOT NULL,'
-' temperatura_perfil json,'
-' salinidad_perfil json,'
-' par_perfil json,'
-' veloc_x json,'
-' veloc_y json,'
-' veloc_z json,'
-) 
+# listado_dependencias = ('FOREIGN KEY (transecto)'
+# 'REFERENCES transectos_superficie (id_transecto)'
+# 'ON UPDATE CASCADE ON DELETE CASCADE'
+# )
 
-listado_dependencias = ('FOREIGN KEY (perfil)'
-'REFERENCES perfiles_verticales (id_perfil)'
-'ON UPDATE CASCADE ON DELETE CASCADE'
-)
+# listado_unicidades = (', UNIQUE (transecto))')
 
-listado_unicidades = (', UNIQUE (perfil))')
-
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
-#######################################################################
-## TABLA CON DATOS BIOGEOQUIMICOS PROCEDENTES DE PERFILES VERTICALES ##
-#######################################################################
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
 
-nombre_tabla = 'datos_perfil_biogeoquimica'
+# ################################################################
+# ## TABLA CON DATOS FISICOS PROCEDENTES DE PERFILES VERTICALES ##
+# ################################################################
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# nombre_tabla = 'datos_perfil_fisica'
 
-# Crea la tabla de nuevo
-listado_variables = ('(id_perfil_biogeoquim SERIAL PRIMARY KEY,'
-' perfil int NOT NULL,'
-' oxigeno_perfil json,'
-' fluorescencia_perfil json,'
-) 
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-listado_dependencias = ('FOREIGN KEY (perfil)'
-'REFERENCES perfiles_verticales (id_perfil)'
-'ON UPDATE CASCADE ON DELETE CASCADE'
-)
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_perfil_fisica SERIAL PRIMARY KEY,'
+# ' perfil int NOT NULL,'
+# ' temperatura_perfil json,'
+# ' salinidad_perfil json,'
+# ' par_perfil json,'
+# ' veloc_x json,'
+# ' veloc_y json,'
+# ' veloc_z json,'
+# ) 
 
-listado_unicidades = (', UNIQUE (perfil))')
+# listado_dependencias = ('FOREIGN KEY (perfil)'
+# 'REFERENCES perfiles_verticales (id_perfil)'
+# 'ON UPDATE CASCADE ON DELETE CASCADE'
+# )
 
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# listado_unicidades = (', UNIQUE (perfil))')
+
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
+
+
+# #######################################################################
+# ## TABLA CON DATOS BIOGEOQUIMICOS PROCEDENTES DE PERFILES VERTICALES ##
+# #######################################################################
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
+
+# nombre_tabla = 'datos_perfil_biogeoquimica'
+
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
+
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_perfil_biogeoquim SERIAL PRIMARY KEY,'
+# ' perfil int NOT NULL,'
+# ' oxigeno_perfil json,'
+# ' fluorescencia_perfil json,'
+# ) 
+
+# listado_dependencias = ('FOREIGN KEY (perfil)'
+# 'REFERENCES perfiles_verticales (id_perfil)'
+# 'ON UPDATE CASCADE ON DELETE CASCADE'
+# )
+
+# listado_unicidades = (', UNIQUE (perfil))')
+
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
 
@@ -871,56 +871,56 @@ conn.close()
 
 
 
-####################################################################
-## TABLA CON LAS SALIDAS REALIZADAS (ENFOCADO AL PROGRAMA RADIAL) ##
-####################################################################
+# ####################################################################
+# ## TABLA CON LAS SALIDAS REALIZADAS (ENFOCADO AL PROGRAMA RADIAL) ##
+# ####################################################################
 
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-nombre_tabla = 'salidas_muestreos'
+# nombre_tabla = 'salidas_muestreos'
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-# Crea la tabla de nuevo
-listado_variables = ('(id_salida SERIAL PRIMARY KEY,'
-' nombre_salida text NOT NULL,'
-' programa int NOT NULL,'
-' nombre_programa text NOT NULL,'
-' tipo_salida text,'
-' fecha_salida date NOT NULL,'
-' hora_salida time,'
-' fecha_retorno date NOT NULL,'
-' hora_retorno time,'
-' buque int,'
-' estaciones json,'
-' participantes_comisionados json,'
-' participantes_no_comisionados json,'
-' observaciones text,'
-) 
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_salida SERIAL PRIMARY KEY,'
+# ' nombre_salida text NOT NULL,'
+# ' programa int NOT NULL,'
+# ' nombre_programa text NOT NULL,'
+# ' tipo_salida text,'
+# ' fecha_salida date NOT NULL,'
+# ' hora_salida time,'
+# ' fecha_retorno date NOT NULL,'
+# ' hora_retorno time,'
+# ' buque int,'
+# ' estaciones json,'
+# ' participantes_comisionados json,'
+# ' participantes_no_comisionados json,'
+# ' observaciones text,'
+# ) 
 
-listado_dependencias = ('FOREIGN KEY (programa)'
-  'REFERENCES programas (id_programa)'
-  ' ON UPDATE CASCADE '
-  'ON DELETE CASCADE,'
-  'FOREIGN KEY (buque)'
-  'REFERENCES buques (id_buque)'
-  'ON UPDATE CASCADE ON DELETE CASCADE'
-  )
-
-
-listado_unicidades = (', UNIQUE (programa,fecha_salida))')
-
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+# listado_dependencias = ('FOREIGN KEY (programa)'
+#   'REFERENCES programas (id_programa)'
+#   ' ON UPDATE CASCADE '
+#   'ON DELETE CASCADE,'
+#   'FOREIGN KEY (buque)'
+#   'REFERENCES buques (id_buque)'
+#   'ON UPDATE CASCADE ON DELETE CASCADE'
+#   )
 
 
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# listado_unicidades = (', UNIQUE (programa,fecha_salida))')
+
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+
+
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
 
@@ -983,34 +983,34 @@ conn.close()
 
 
 
-#######################################################
-## TABLA CON EL PERSONAL PARTICIPANTE EN LAS SALIDAS ##
-#######################################################
+# #######################################################
+# ## TABLA CON EL PERSONAL PARTICIPANTE EN LAS SALIDAS ##
+# #######################################################
 
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-nombre_tabla = 'personal_salidas'
+# nombre_tabla = 'personal_salidas'
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-# Crea la tabla de nuevo
-listado_variables = ('(id_personal SERIAL PRIMARY KEY,'
-' nombre_apellidos text NOT NULL,'
-' correo text NOT NULL,'
-' comisionado bool NOT NULL'
-) 
-
-
-listado_unicidades = (', UNIQUE (nombre_apellidos))')
-
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_personal SERIAL PRIMARY KEY,'
+# ' nombre_apellidos text NOT NULL,'
+# ' correo text NOT NULL,'
+# ' comisionado bool NOT NULL'
+# ) 
 
 
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# listado_unicidades = (', UNIQUE (nombre_apellidos))')
+
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
+
+
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()

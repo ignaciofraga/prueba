@@ -206,7 +206,7 @@ instruccion_sql = '''INSERT INTO estaciones (nombre_estacion,programa,latitud,lo
 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
 cursor = conn.cursor()
 for idato in range(len(nombre_estacion)):
-    cursor.execute(instruccion_sql, (nombre_estacion[idato],int(2),latitud[idato],longitud[idato]))
+    cursor.execute(instruccion_sql, (nombre_estacion[idato],int(3),latitud[idato],longitud[idato]))
     conn.commit()
 cursor.close()
 conn.close()

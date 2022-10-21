@@ -1386,7 +1386,7 @@ def entrada_salidas_mar():
                                 
                         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                         cursor = conn.cursor()
-                        cursor.execute(instruccion_sql, (nombre_salida,2,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_comisionados,json_no_comisionados,observaciones,json_estaciones))
+                        cursor.execute(instruccion_sql, (nombre_salida,3,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_comisionados,json_no_comisionados,observaciones,json_estaciones))
                         conn.commit()
                         cursor.close()
                         conn.close()
@@ -1540,7 +1540,7 @@ def entrada_estado_mar():
             
         with st.form("Formulario seleccion"): 
                
-            texto_estacion  = 'Estacion ' + str(listado_estaciones[id_estacion_elegida])
+            texto_estacion  = 'Estacion ' + str(df_estaciones_radiales['nombre_estacion'][id_estacion_elegida])
             st.write(texto_estacion)
             
             col1, col2,col3,col4= st.columns(4,gap="small")
