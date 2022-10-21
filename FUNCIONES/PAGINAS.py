@@ -1563,6 +1563,7 @@ def entrada_estado_mar():
             indice_marea_defecto            = mareas.index(df_condicion_introducida['marea'][0])
             prof_secchi_defecto             = df_condicion_introducida['prof_secchi'][0]
             max_clorofila_defecto           = df_condicion_introducida['max_clorofila'][0]
+            humedad_relativa_defecto        = df_condicion_introducida['humedad_relativa'][0]
             
         else:
             hora_llegada_defecto            = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
@@ -1579,6 +1580,7 @@ def entrada_estado_mar():
             indice_marea_defecto            = 0
             prof_secchi_defecto             = 0
             max_clorofila_defecto           = 0
+            humedad_relativa_defecto        = 50
             
             
         with st.form("Formulario seleccion"): 
@@ -1621,7 +1623,7 @@ def entrada_estado_mar():
             with col4:
                  temp_aire        = st.number_input('Temperatura del aire(ºC):',value=float(temp_aire_defecto),min_value=float(0),step=0.1)
                  marea            = st.selectbox('Marea:',(mareas),index = indice_marea_defecto)
-                 humedad_relativa = st.number_input('Humedad relativa(%):',value=float(prof_secchi_defecto),min_value=float(0),step=0.5)
+                 humedad_relativa = st.number_input('Humedad relativa(%):',value=humedad_relativa_defecto,min_value=0)
                  max_clorofila    = st.number_input('Max.Clorofila(m):',value=float(max_clorofila_defecto),min_value=float(0),step=0.5)
                  
             submit = st.form_submit_button("Enviar")                    
