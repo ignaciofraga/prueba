@@ -1540,7 +1540,7 @@ def entrada_estado_mar():
             
         with st.form("Formulario seleccion"): 
                
-            texto_estacion  = 'Estacion ' + str(df_estaciones_radiales['nombre_estacion'][id_estacion_elegida])
+            texto_estacion  = 'Estacion ' + estacion_elegida
             st.write(texto_estacion)
             
             col1, col2,col3,col4= st.columns(4,gap="small")
