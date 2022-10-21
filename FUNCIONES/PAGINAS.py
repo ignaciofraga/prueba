@@ -1616,30 +1616,30 @@ def entrada_estado_mar():
                      mar_direccion[iestacion]  = st.number_input('Presion atm.(mmHg):',format='%i',value=round(0),min_value=0)                   
                     
                     
-                    if lluvia_sel == seleccion_SN[0]:
-                        lluvia[iestacion] = True
-                    else:
-                        lluvia[iestacion] = False                        
+    #                 if lluvia_sel == seleccion_SN[0]:
+    #                     lluvia[iestacion] = True
+    #                 else:
+    #                     lluvia[iestacion] = False                        
                     
-                    profundidad[iestacion]  = st.text_input('Nombre y apellidos del nuevo personal', value="")
+    #                 profundidad[iestacion]  = st.text_input('Nombre y apellidos del nuevo personal', value="")
 
-                    correo_participante  = st.text_input('Correo del nuevo personal', value="")
+    #                 correo_participante  = st.text_input('Correo del nuevo personal', value="")
             
-                    comision             = st.checkbox('Comisionado')
-            
-            
+    #                 comision             = st.checkbox('Comisionado')
             
             
-            submit = st.form_submit_button("Añadir participante")
+            
+            
+    #         submit = st.form_submit_button("Añadir participante")
 
-            if submit == True:
+    #         if submit == True:
         
         
-    else:
-        listado_estaciones = [None]
+    # else:
+    #     listado_estaciones = [None]
     
 
-    st.text(listado_estaciones)
+    # st.text(listado_estaciones)
     # # Despliega un formulario para seleccionar las fechas de inicio y final
     # with st.form("Formulario seleccion"):
                
