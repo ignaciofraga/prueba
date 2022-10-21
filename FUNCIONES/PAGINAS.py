@@ -1218,13 +1218,26 @@ def consulta_procesos():
                                   
                 # Muestra sendos dataframes
                 
+                st.subheader('Listado de procesos en curso')
+                if df_muestreos_curso.shape[0] > 0:
+                        
+                    # Muestra una tabla con los análisis en curso
+                    altura_tabla = 150
+                    gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
+                    gridOptions = gb.build()
+                    st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+            
+                else:
+                    
+                    texto_error = 'No hay ninguna muestra en proceso durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
+                    st.warning(texto_error, icon="⚠️") 
 
                 st.subheader('Listado de procesos terminados')
 
                 if df_muestreos_terminados.shape[0] > 0:
                         
                     # Muestra una tabla con los análisis en curso
-                    altura_tabla = 150
+                    altura_tabla = 300
                     gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_terminados)
                     gridOptions = gb.build()
                     st_aggrid.AgGrid(df_muestreos_terminados,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
@@ -1235,20 +1248,9 @@ def consulta_procesos():
                     st.warning(texto_error, icon="⚠️")  
                 
                     
-                st.subheader('Listado de procesos en curso')
+
         
-                if df_muestreos_curso.shape[0] > 0:
-                        
-                    # Muestra una tabla con los análisis en curso
-                    altura_tabla = 300
-                    gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
-                    gridOptions = gb.build()
-                    st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
-            
-                else:
-                    
-                    texto_error = 'No hay ninguna muestra en proceso durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
-                    st.warning(texto_error, icon="⚠️")  
+ 
                             
                 # # Muestra sendos dataframes
                 # col1, col2= st.columns(2,gap="small")
