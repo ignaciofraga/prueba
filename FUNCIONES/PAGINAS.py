@@ -1596,6 +1596,7 @@ def entrada_estado_mar():
 
                    
             with col2:
+                st.text(velocidad_viento_defecto)
                 velocidad_viento  = st.number_input('Vel.Viento(m/s):',value=float(velocidad_viento_defecto),min_value=0)
                 direccion_viento  = st.selectbox('Dir.Viento:',(direcciones),index = indice_direccion_viento_defecto)
                 pres_atmosferica  = st.number_input('Presion atm.(mmHg):',format='%i',value=pres_atmosferica_defecto,min_value=0)
