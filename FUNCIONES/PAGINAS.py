@@ -1575,21 +1575,31 @@ def entrada_estado_mar():
         velocidad_viento = numpy.zeros(len(listado_estaciones),dtype=int)
         direccion_viento = [None] * len(listado_estaciones)
         pres_atmosferica = numpy.zeros(len(listado_estaciones),dtype=int)
+        viento_beaufort  = [None] * len(listado_estaciones)
         
-        mar_viento       = [None] * len(listado_estaciones)
+        altura_ola       = numpy.zeros(len(listado_estaciones))
+        mar_douglas      = [None] * len(listado_estaciones)
         mar_fondo        = [None] * len(listado_estaciones)  
         mar_direccion    = [None] * len(listado_estaciones) 
         
         temp_aire        = numpy.zeros(len(listado_estaciones))
         marea            = [None] * len(listado_estaciones) 
-        prof_secchi      = numpy.zeros(len(listado_estaciones))
-        
+        prof_secchi      = numpy.zeros(len(listado_estaciones))       
         max_clorofila    = numpy.zeros(len(listado_estaciones))
-        altura_ola       = numpy.zeros(len(listado_estaciones))
+
         
         seleccion_SN = ['Si','No']
         direcciones  = ['N','NW','W','SW','S','SE','E','NE'] 
-        beaufort     = ['Calma','Rizada','Marejada','Marejadilla']
+
+        doglas_nombre  = ['Calma (0)','Rizada (1)','Marejadilla (2)','Marejada (3)','Fuerte marejada (4)','Gruesa (5)','Muy Gruesa (6)','Arbolada (7)','Montañosa (8)','Enorme (9)']
+        douglas_hmin   = [0,0,0.1,0.5,1.25,2.5,4,6,9,14]
+        douglas_hmax   = [0,0.1,0.5,1.25,2.5,4,6,9,14,100]
+
+        beaufort_nombre = ['Calma (0)','Ventolina (1)','Brisa muy débil (2)','Brisa Ligera (3)','Brisa moderada (4)','Brisa fresca (5)','Brisa fuerte (6)','Viento fuerte (7)','Viento duro (8)','Muy duro (9)','Temporal (10)','Borrasca (11)','Huracán (12)']
+        beaufort_vmin   = [0,2,6,12,20,29,39,50,62,75,89,103,118]
+        beaufort_vmax   = [2,6,12,20,29,39,50,62,75,89,103,118,500]
+
+        mareas          = ['Bajamar','Media','Pleamar']
 
         
         with st.form("Formulario seleccion"):
@@ -1611,12 +1621,32 @@ def entrada_estado_mar():
                     velocidad_viento[iestacion]  = st.number_input('Vel.Viento(m/s):',format='%i',value=round(0),min_value=0)
                     direccion_viento[iestacion]  = st.selectbox('Dir.Viento:',(direcciones))
                     pres_atmosferica[iestacion]  = st.number_input('Presion atm.(mmHg):',format='%i',value=round(0),min_value=0)
+                    for idato_beaufort in range(len(beaufort_nombre)):
+                        if velocidad_viento[iestacion] >= beaufort_vmin[idato_beaufort] and velocidad_viento[iestacion] < beaufort_vmax[idato_beaufort]:
+                            indice_prop = idato_beaufort
+                    viento_beaufort[iestacion]  = st.selectbox('Viento Beaufort:',(beaufort_nombre),index=indice_prop)
                     
                 with col3:
-                     mar_viento[iestacion]  = st.number_input('Vel.Viento(m/s):',format='%i',value=round(0),min_value=0)
-                     mar_fondo[iestacion]  = st.selectbox('Dir.Viento:',(direcciones))
-                     mar_direccion[iestacion]  = st.number_input('Presion atm.(mmHg):',format='%i',value=round(0),min_value=0)                   
-                    
+                     altura_ola[iestacion]  = st.number_input('Altura de ola(m):',value=round(0),min_value=0)
+                     for idato_douglas in range(len(doglas_nombre)):
+                         if altura_ola[iestacion] >= douglas_hmin[idato_beaufort] and altura_ola[iestacion] < douglas_hmax[idato_beaufort]:
+                             indice_prop = idato_douglas
+                     mar_douglas[iestacion] = st.selectbox('Mar Douglas:',(doglas_nombre),index=indice_prop)
+                     mar_fondo_sel          = st.selectbox('Mar de fondo:',(seleccion_SN))
+                     if mar_fondo_sel == seleccion_SN[0]:
+                         mar_fondo[iestacion] = True
+                     else:
+                         mar_fondo[iestacion] = False
+                     mar_direccion[iestacion] = st.selectbox('Dir.Oleaje:',(direcciones))
+ 
+                with col4:
+                     temp_aire[iestacion]     = st.number_input('Temperatura del aire(ºC):',value=round(0),min_value=0)
+                     marea[iestacion]         = st.selectbox('Marea:',(mareas))
+                     prof_secchi[iestacion]   = st.number_input('Prof.Sechi(m):',value=round(0),min_value=0)
+                     max_clorofila[iestacion] = st.number_input('Max.Clorofila(m):',value=round(0),min_value=0)
+                     
+                     
+
                     
     #                 if lluvia_sel == seleccion_SN[0]:
     #                     lluvia[iestacion] = True
