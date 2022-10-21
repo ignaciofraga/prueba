@@ -1606,17 +1606,24 @@ def entrada_estado_mar():
                    
             for iestacion in range(len(listado_estaciones)):
                 
-                col1, col2,col3,col4= st.columns(4,gap="small")
                 texto_estacion  = 'Estacion ' + str(listado_estaciones[iestacion])
                 st.text(texto_estacion)
+                
+                col1, col2,col3,col4= st.columns(4,gap="small")
+
                 with col1:
-                    profundidad[iestacion]   = st.number_input('Profundidad(m):',format='%i',value=round(0),min_value=0)
-                    nubosidad[iestacion]     = st.number_input('Nubosidad(%) :',format='%i',value=round(0),min_value=0)
+                    prof_temp   = st.number_input('Profundidad(m):',format='%i',value=round(0),min_value=0)
+                    nubosidad_temp     = st.number_input('Nubosidad(%) :',format='%i',value=round(0),min_value=0)
                     lluvia_sel               = st.selectbox('LLuvia:',(seleccion_SN))
                     if lluvia_sel == seleccion_SN[0]:
-                        lluvia[iestacion] = True
+                        lluvia_temp = True
                     else:
-                        lluvia[iestacion] = False
+                        lluvia_temp = False
+                        
+                    profundidad[iestacion] = prof_temp
+                    nubosidad[iestacion]   = nubosidad_temp
+                    lluvia[iestacion]      = lluvia_temp
+                    del(prof_temp,nubosidad_temp,lluvia_temp)
 
                 with col2:
                     velocidad_viento[iestacion]  = st.number_input('Vel.Viento(m/s):',format='%i',value=round(0),min_value=0)
