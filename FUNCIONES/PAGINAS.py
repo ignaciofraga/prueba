@@ -1605,7 +1605,7 @@ def entrada_estado_mar():
                 viento_beaufort  = st.selectbox('Viento Beaufort:',(beaufort_nombre),index=indice_prop)
                 
             with col3:
-                 altura_ola  = st.number_input('Altura de ola(m):',value=altura_ola_defecto,min_value=0)
+                 altura_ola  = st.number_input('Altura de ola(m):',value=round(altura_ola_defecto),min_value=0)
                  for idato_douglas in range(len(doglas_nombre)):
                      if altura_ola == 0:
                          indice_prop = 0
