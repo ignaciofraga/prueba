@@ -1606,8 +1606,9 @@ def entrada_estado_mar():
                    
             for iestacion in range(len(listado_estaciones)):
                 
-                col1, col2,col3,col4,col5= st.columns(5,gap="small")
-                
+                col1, col2,col3,col4= st.columns(4,gap="small")
+                texto_estacion  = 'Estacion ' + str(listado_estaciones[iestacion])
+                st.text(texto_estacion)
                 with col1:
                     profundidad[iestacion]   = st.number_input('Profundidad(m):',format='%i',value=round(0),min_value=0)
                     nubosidad[iestacion]     = st.number_input('Nubosidad(%) :',format='%i',value=round(0),min_value=0)
