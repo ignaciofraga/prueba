@@ -1652,7 +1652,7 @@ def entrada_estado_mar():
                      prof_secchi[iestacion]   = st.number_input('Prof.Sechi(m):',value=round(0),min_value=0)
                      max_clorofila[iestacion] = st.number_input('Max.Clorofila(m):',value=round(0),min_value=0)
                      
-            submit = st.form_submit_button("Enviar")                    
+            st.form_submit_button("Enviar")                    
 
                     
     #                 if lluvia_sel == seleccion_SN[0]:
