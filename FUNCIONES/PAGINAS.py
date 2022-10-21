@@ -1568,8 +1568,11 @@ def entrada_estado_mar():
             with col3:
                  altura_ola  = st.number_input('Altura de ola(m):',value=round(0),min_value=0)
                  for idato_douglas in range(len(doglas_nombre)):
-                     if altura_ola > douglas_hmin[idato_douglas] and altura_ola <= douglas_hmax[idato_douglas]:
-                         indice_prop = idato_douglas
+                     if altura_ola == 0:
+                         indice_prop = 0
+                     else:
+                         if altura_ola > douglas_hmin[idato_douglas] and altura_ola <= douglas_hmax[idato_douglas]:
+                             indice_prop = idato_douglas
                  mar_douglas = st.selectbox('Mar Douglas:',(doglas_nombre),index=indice_prop)
                  mar_fondo_sel          = st.selectbox('Mar de fondo:',(seleccion_SN))
                  if mar_fondo_sel == seleccion_SN[0]:
