@@ -1606,7 +1606,7 @@ def entrada_estado_mar():
                     st.text(beaufort_vmax[idato_beaufort])
                     if velocidad_viento*3.6 >= beaufort_vmin[idato_beaufort] and velocidad_viento*3.6 < beaufort_vmax[idato_beaufort]:
                         indice_prop = idato_beaufort
-                        st.text(indice_prop)
+                        
                 viento_beaufort  = st.selectbox('Viento Beaufort:',(beaufort_nombre),index=indice_prop)
                 
             with col3:
