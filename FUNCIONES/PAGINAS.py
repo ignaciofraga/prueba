@@ -1601,11 +1601,10 @@ def entrada_estado_mar():
 
         mareas          = ['Bajamar','Media','Pleamar']
 
+        for iestacion in range(len(listado_estaciones)):
         
-        with st.form("Formulario seleccion"):
+            with st.form("Formulario seleccion"):
                    
-            for iestacion in range(len(listado_estaciones)):
-                
                 texto_estacion  = 'Estacion ' + str(listado_estaciones[iestacion])
                 st.text(texto_estacion)
                 
@@ -1653,7 +1652,7 @@ def entrada_estado_mar():
                      prof_secchi[iestacion]   = st.number_input('Prof.Sechi(m):',value=round(0),min_value=0)
                      max_clorofila[iestacion] = st.number_input('Max.Clorofila(m):',value=round(0),min_value=0)
                      
-        submit = st.form_submit_button("Enviar")                    
+            submit = st.form_submit_button("Enviar")                    
 
                     
     #                 if lluvia_sel == seleccion_SN[0]:
