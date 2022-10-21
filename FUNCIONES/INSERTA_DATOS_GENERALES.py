@@ -66,9 +66,9 @@ conn.close()
 
 ### Información de los programas ###
 
-programas       = ['PELACUS','RADIAL VIGO','RADIAL CORUÑA','RADIAL SANTANDER','RADPROF']
-centro_asociado = ['CORUNA','VIGO','CORUNA','SANTANDER','CORUNA']
-abreviatura     = ['PEL','RVG','RCOR','RSAN','RPROF']
+programas       = ['PELACUS','RADIAL VIGO','RADIAL CORUÑA','RADIAL SANTANDER','RADPROF','OTROS']
+centro_asociado = ['CORUNA','VIGO','CORUNA','SANTANDER','CORUNA','CORUNA']
+abreviatura     = ['PEL','RVG','RCOR','RSAN','RPROF','OTROS']
 
 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
 cursor = conn.cursor()
@@ -201,7 +201,7 @@ longitud        = [-8.436667,-8.416667,-8.4,-8.383333,-8.37]
 
 
 instruccion_sql = '''INSERT INTO estaciones (nombre_estacion,programa,latitud,longitud)
-    VALUES (%s,%s,%s,%s) ON CONFLICT (id_estacion) DO UPDATE SET (nombre_estacion,programa,latitud,longitud) = ROW(EXCLUDED.nombre_estacion,EXCLUDED.programa,EXCLUDED.latitud,EXCLUDED.longitud);''' 
+    VALUES (%s,%s,%s,%s) ON CONFLICT (programa,latitud,longitud) DO NOTHING;''' 
         
 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
 cursor = conn.cursor()

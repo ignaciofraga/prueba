@@ -1057,7 +1057,7 @@ def actualiza_procesos():
         conn = init_connection()
         df_programas = psql.read_sql('SELECT * FROM programas', conn)
         conn.close()
-        
+       
         # Despliega un formulario para introducir los datos de las muestras que se están analizando
         with st.form("Formulario seleccion"):
         
@@ -1216,44 +1216,77 @@ def consulta_procesos():
                     df_muestreos_curso['Inicio'][idato]         =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
                     df_muestreos_curso['Final estimado'][idato] =  df_muestreos_curso['Final estimado'][idato].strftime("%Y-%m-%d")
                                   
-                
                 # Muestra sendos dataframes
-                col1, col2= st.columns(2,gap="small")
                 
-                with col1:
 
-                    st.subheader('Listado de procesos terminados')
+                st.subheader('Listado de procesos terminados')
 
-                    if df_muestreos_terminados.shape[0] > 0:
-                            
-                        # Muestra una tabla con los análisis en curso
-                        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_terminados)
-                        gridOptions = gb.build()
-                        st_aggrid.AgGrid(df_muestreos_terminados,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
-                
-                    else:
+                if df_muestreos_terminados.shape[0] > 0:
                         
-                        texto_error = 'No se terminó ningún análisis durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
-                        st.warning(texto_error, icon="⚠️")  
-                
-                with col2:
+                    # Muestra una tabla con los análisis en curso
+                    altura_tabla = 150
+                    gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_terminados)
+                    gridOptions = gb.build()
+                    st_aggrid.AgGrid(df_muestreos_terminados,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+            
+                else:
                     
-                    st.subheader('Listado de procesos en curso')
-            
-                    if df_muestreos_curso.shape[0] > 0:
-                            
-                        # Muestra una tabla con los análisis en curso
-                        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
-                        gridOptions = gb.build()
-                        st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+                    texto_error = 'No se terminó ningún análisis durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
+                    st.warning(texto_error, icon="⚠️")  
                 
-                    else:
+                    
+                st.subheader('Listado de procesos en curso')
+        
+                if df_muestreos_curso.shape[0] > 0:
                         
-                        texto_error = 'No hay ninguna muestra en proceso durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
-                        st.warning(texto_error, icon="⚠️")  
+                    # Muestra una tabla con los análisis en curso
+                    altura_tabla = 300
+                    gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
+                    gridOptions = gb.build()
+                    st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+            
+                else:
+                    
+                    texto_error = 'No hay ninguna muestra en proceso durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
+                    st.warning(texto_error, icon="⚠️")  
+                            
+                # # Muestra sendos dataframes
+                # col1, col2= st.columns(2,gap="small")
+                
+                # with col1:
+
+                #     st.subheader('Listado de procesos terminados')
+
+                #     if df_muestreos_terminados.shape[0] > 0:
+                            
+                #         # Muestra una tabla con los análisis en curso
+                #         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_terminados)
+                #         gridOptions = gb.build()
+                #         st_aggrid.AgGrid(df_muestreos_terminados,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+                
+                #     else:
+                        
+                #         texto_error = 'No se terminó ningún análisis durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
+                #         st.warning(texto_error, icon="⚠️")  
+                
+                # with col2:
+                    
+                #     st.subheader('Listado de procesos en curso')
+            
+                #     if df_muestreos_curso.shape[0] > 0:
+                            
+                #         # Muestra una tabla con los análisis en curso
+                #         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
+                #         gridOptions = gb.build()
+                #         st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+                
+                #     else:
+                        
+                #         texto_error = 'No hay ninguna muestra en proceso durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
+                #         st.warning(texto_error, icon="⚠️")  
             
 
-
+#                    st.experimental_rerun()
 
 
 
@@ -1530,7 +1563,78 @@ def entrada_estado_mar():
     estaciones_bd = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida] 
 
     if estaciones_bd is not None:
+        
         listado_estaciones = estaciones_bd.iloc[0]
+        
+        profundidad      = numpy.zeros(len(listado_estaciones),dtype=int)
+        nubosidad        = numpy.zeros(len(listado_estaciones),dtype=int)
+        lluvia           = [None] * len(listado_estaciones)
+        
+        velocidad_viento = numpy.zeros(len(listado_estaciones),dtype=int)
+        direccion_viento = [None] * len(listado_estaciones)
+        pres_atmosferica = numpy.zeros(len(listado_estaciones),dtype=int)
+        
+        mar_viento       = [None] * len(listado_estaciones)
+        mar_fondo        = [None] * len(listado_estaciones)  
+        mar_direccion    = [None] * len(listado_estaciones) 
+        
+        temp_aire        = numpy.zeros(len(listado_estaciones))
+        marea            = [None] * len(listado_estaciones) 
+        prof_secchi      = numpy.zeros(len(listado_estaciones))
+        
+        max_clorofila    = numpy.zeros(len(listado_estaciones))
+        altura_ola       = numpy.zeros(len(listado_estaciones))
+        
+        seleccion_SN = ['Si','No']
+        direcciones  = ['N','NW','W','SW','S','SE','E','NE'] 
+        beaufort     = ['Calma','Rizada','Marejada','Marejadilla']
+
+        
+        with st.form("Formulario seleccion"):
+                   
+            for iestacion in range(len(listado_estaciones)):
+                
+                col1, col2,col3,col4,col5= st.columns(5,gap="small")
+                
+                with col1:
+                    profundidad[iestacion]   = st.number_input('Profundidad(m):',format='%i',value=round(0),min_value=0)
+                    nubosidad[iestacion]     = st.number_input('Nubosidad(%) :',format='%i',value=round(0),min_value=0)
+                    lluvia_sel               = st.selectbox('LLuvia:',(seleccion_SN))
+                    if lluvia_sel == seleccion_SN[0]:
+                        lluvia[iestacion] = True
+                    else:
+                        lluvia[iestacion] = False
+
+                with col2:
+                    velocidad_viento[iestacion]  = st.number_input('Vel.Viento(m/s):',format='%i',value=round(0),min_value=0)
+                    direccion_viento[iestacion]  = st.selectbox('Dir.Viento:',(direcciones))
+                    pres_atmosferica[iestacion]  = st.number_input('Presion atm.(mmHg):',format='%i',value=round(0),min_value=0)
+                    
+                with col3:
+                     mar_viento[iestacion]  = st.number_input('Vel.Viento(m/s):',format='%i',value=round(0),min_value=0)
+                     mar_fondo[iestacion]  = st.selectbox('Dir.Viento:',(direcciones))
+                     mar_direccion[iestacion]  = st.number_input('Presion atm.(mmHg):',format='%i',value=round(0),min_value=0)                   
+                    
+                    
+                    if lluvia_sel == seleccion_SN[0]:
+                        lluvia[iestacion] = True
+                    else:
+                        lluvia[iestacion] = False                        
+                    
+                    profundidad[iestacion]  = st.text_input('Nombre y apellidos del nuevo personal', value="")
+
+                    correo_participante  = st.text_input('Correo del nuevo personal', value="")
+            
+                    comision             = st.checkbox('Comisionado')
+            
+            
+            
+            
+            submit = st.form_submit_button("Añadir participante")
+
+            if submit == True:
+        
+        
     else:
         listado_estaciones = [None]
     
