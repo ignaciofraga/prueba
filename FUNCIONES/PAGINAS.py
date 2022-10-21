@@ -1596,7 +1596,7 @@ def entrada_estado_mar():
 
                    
             with col2:
-                velocidad_viento  = st.number_input('Vel.Viento(m/s):',format='%i',value=velocidad_viento_defecto,min_value=0)
+                velocidad_viento  = st.number_input('Vel.Viento(m/s):',value=float(velocidad_viento_defecto),min_value=0)
                 direccion_viento  = st.selectbox('Dir.Viento:',(direcciones),index = indice_direccion_viento_defecto)
                 pres_atmosferica  = st.number_input('Presion atm.(mmHg):',format='%i',value=pres_atmosferica_defecto,min_value=0)
                 for idato_beaufort in range(len(beaufort_nombre)):
@@ -1605,7 +1605,7 @@ def entrada_estado_mar():
                 viento_beaufort  = st.selectbox('Viento Beaufort:',(beaufort_nombre),index=indice_prop)
                 
             with col3:
-                 altura_ola  = st.number_input('Altura de ola(m):',value=altura_ola_defecto,min_value=0)
+                 altura_ola  = st.number_input('Altura de ola(m):',value=float(altura_ola_defecto),min_value=0)
                  for idato_douglas in range(len(doglas_nombre)):
                      if altura_ola == 0:
                          indice_prop = 0
