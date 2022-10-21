@@ -1523,9 +1523,9 @@ def entrada_estado_mar():
         seleccion_SN = ['Si','No']
         direcciones  = ['N','NW','W','SW','S','SE','E','NE'] 
 
-        doglas_nombre  = ['Calma (0)','Rizada (1)','Marejadilla (2)','Marejada (3)','Fuerte marejada (4)','Gruesa (5)','Muy Gruesa (6)','Arbolada (7)','Montañosa (8)','Enorme (9)']
-        douglas_hmin   = [0,0,0.1,0.5,1.25,2.5,4,6,9,14]
-        douglas_hmax   = [0,0.1,0.5,1.25,2.5,4,6,9,14,100]
+        # doglas_nombre  = ['Calma (0)','Rizada (1)','Marejadilla (2)','Marejada (3)','Fuerte marejada (4)','Gruesa (5)','Muy Gruesa (6)','Arbolada (7)','Montañosa (8)','Enorme (9)']
+        # douglas_hmin   = [0,0,0.1,0.5,1.25,2.5,4,6,9,14]
+        # douglas_hmax   = [0,0.1,0.5,1.25,2.5,4,6,9,14,100]
 
         beaufort_nombre = ['Calma (0)','Ventolina (1)','Brisa muy débil (2)','Brisa Ligera (3)','Brisa moderada (4)','Brisa fresca (5)','Brisa fuerte (6)','Viento fuerte (7)','Viento duro (8)','Muy duro (9)','Temporal (10)','Borrasca (11)','Huracán (12)']
         beaufort_vmin   = [0,2,6,12,20,29,39,50,62,75,89,103,118]
@@ -1596,7 +1596,7 @@ def entrada_estado_mar():
 
                    
             with col2:
-                velocidad_viento  = st.number_input('Vel.Viento(m/s):',value=float(velocidad_viento_defecto),min_value=float(0))
+                velocidad_viento  = st.number_input('Vel.Viento(m/s):',value=float(velocidad_viento_defecto),min_value=float(0),step =0.5)
                 direccion_viento  = st.selectbox('Dir.Viento:',(direcciones),index = indice_direccion_viento_defecto)
                 pres_atmosferica  = st.number_input('Presion atm.(mmHg):',format='%i',value=pres_atmosferica_defecto,min_value=0)
                 for idato_beaufort in range(len(beaufort_nombre)):
@@ -1605,33 +1605,35 @@ def entrada_estado_mar():
                 viento_beaufort  = st.selectbox('Viento Beaufort:',(beaufort_nombre),index=indice_prop)
                 
             with col3:
-                 altura_ola  = st.number_input('Altura de ola(m):',value=float(altura_ola_defecto),min_value=float(0))
-                 for idato_douglas in range(len(doglas_nombre)):
-                     if altura_ola == 0:
-                         indice_prop = 0
-                     else:
-                         if altura_ola > douglas_hmin[idato_douglas] and altura_ola <= douglas_hmax[idato_douglas]:
-                             indice_prop = idato_douglas
-                 mar_douglas = st.selectbox('Mar Douglas:',(doglas_nombre),index=indice_prop)
+                 altura_ola  = st.number_input('Altura de ola(m):',value=float(altura_ola_defecto),min_value=float(0),step =0.5)
+                 # for idato_douglas in range(len(doglas_nombre)):
+                 #     if altura_ola == 0:
+                 #         indice_prop = 0
+                 #     else:
+                 #         if altura_ola > douglas_hmin[idato_douglas] and altura_ola <= douglas_hmax[idato_douglas]:
+                 #             indice_prop = idato_douglas
+                 # mar_douglas = st.selectbox('Mar Douglas:',(doglas_nombre),index=indice_prop)
                  mar_fondo   = st.selectbox('Mar de fondo:',(seleccion_SN),index = indice_mar_fondo_defecto)
                  mar_direccion = st.selectbox('Dir.Oleaje:',(direcciones),index = indice_mar_direccion_defecto)
- 
+                 prof_secchi   = st.number_input('Prof.Sechi(m):',value=float(prof_secchi_defecto),min_value=float(0),step=0.5)
+
+    
             with col4:
-                 temp_aire     = st.number_input('Temperatura del aire(ºC):',value=float(temp_aire_defecto),min_value=float(0))
-                 marea         = st.selectbox('Marea:',(mareas),index = indice_marea_defecto)
-                 prof_secchi   = st.number_input('Prof.Sechi(m):',value=prof_secchi_defecto,min_value=0)
-                 max_clorofila = st.number_input('Max.Clorofila(m):',value=max_clorofila_defecto,min_value=0)
+                 temp_aire        = st.number_input('Temperatura del aire(ºC):',value=float(temp_aire_defecto),min_value=float(0),step=0.1)
+                 marea            = st.selectbox('Marea:',(mareas),index = indice_marea_defecto)
+                 humedad_relativa = st.number_input('Humedad relativa(%):',value=float(prof_secchi_defecto),min_value=float(0),step=0.5)
+                 max_clorofila    = st.number_input('Max.Clorofila(m):',value=float(max_clorofila_defecto),min_value=float(0),step=0.5)
                  
             submit = st.form_submit_button("Enviar")                    
 
             if submit is True:
                 
-                instruccion_sql = '''INSERT INTO condiciones_ambientales_muestreos (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_douglas,mar_fondo,mar_direccion,temp_aire,marea,prof_secchi,max_clorofila)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_condicion) DO UPDATE SET (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_douglas,mar_fondo,mar_direccion,temp_aire,marea,prof_secchi,max_clorofila) = ROW(EXCLUDED.salida,EXCLUDED.estacion,EXCLUDED.hora_llegada,EXCLUDED.profundidad,EXCLUDED.nubosidad,EXCLUDED.lluvia,EXCLUDED.velocidad_viento,EXCLUDED.direccion_viento,EXCLUDED.pres_atmosferica,EXCLUDED.viento_beaufort,EXCLUDED.altura_ola,EXCLUDED.mar_douglas,EXCLUDED.mar_fondo,EXCLUDED.mar_direccion,EXCLUDED.temp_aire,EXCLUDED.marea,EXCLUDED.prof_secchi,EXCLUDED.max_clorofila);''' 
+                instruccion_sql = '''INSERT INTO condiciones_ambientales_muestreos (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_condicion) DO UPDATE SET (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila) = ROW(EXCLUDED.salida,EXCLUDED.estacion,EXCLUDED.hora_llegada,EXCLUDED.profundidad,EXCLUDED.nubosidad,EXCLUDED.lluvia,EXCLUDED.velocidad_viento,EXCLUDED.direccion_viento,EXCLUDED.pres_atmosferica,EXCLUDED.viento_beaufort,EXCLUDED.altura_ola,EXCLUDED.mar_fondo,EXCLUDED.mar_direccion,EXCLUDED.humedad_relativa,EXCLUDED.temp_aire,EXCLUDED.marea,EXCLUDED.prof_secchi,EXCLUDED.max_clorofila);''' 
                         
                 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                 cursor = conn.cursor()
-                cursor.execute(instruccion_sql, (id_salida,id_estacion_elegida,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_douglas,mar_fondo,mar_direccion,temp_aire,marea,prof_secchi,max_clorofila))
+                cursor.execute(instruccion_sql, (id_salida,id_estacion_elegida,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila))
                 conn.commit()
                 cursor.close()
                 conn.close()

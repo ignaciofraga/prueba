@@ -959,6 +959,7 @@ listado_variables = ('(id_condicion SERIAL PRIMARY KEY,'
 ' marea text,'
 ' prof_secchi NUMERIC (4, 1),'
 ' max_clorofila NUMERIC (4, 1),'
+' humedad_relativa int,'
 
 ) 
 
