@@ -1575,10 +1575,10 @@ def entrada_estado_mar():
             altura_ola_defecto              = 0
             indice_mar_fondo_defecto        = 0
             indice_mar_direccion_defecto    = 0
-            temp_aire_defecto               = 15.0
+            temp_aire_defecto               = 15
             indice_marea_defecto            = 0
-            prof_secchi_defecto             = 0.
-            max_clorofila_defecto           = 0.
+            prof_secchi_defecto             = 0
+            max_clorofila_defecto           = 0
             
             
         with st.form("Formulario seleccion"): 
