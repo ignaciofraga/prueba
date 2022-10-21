@@ -1582,7 +1582,14 @@ def entrada_estado_mar():
             max_clorofila_defecto           = 0
             humedad_relativa_defecto        = 50
             
+        def beaufort(beaufort_nombre,beaufort_vmin,beaufort_vmax,velocidad_viento):
+            for idato_beaufort in range(len(beaufort_nombre)):
+                if velocidad_viento*3.6 >= beaufort_vmin[idato_beaufort] and velocidad_viento*3.6 < beaufort_vmax[idato_beaufort]:
+                    indice_prop = idato_beaufort
             
+            return indice_prop
+            
+         
         with st.form("Formulario seleccion"): 
                
             texto_estacion  = 'Estacion ' + estacion_elegida
@@ -1598,17 +1605,17 @@ def entrada_estado_mar():
 
                    
             with col2:
-                velocidad_viento  = st.number_input('Vel.Viento(m/s):',value=float(velocidad_viento_defecto),min_value=float(0),step =0.5,on_change=callback)
+                velocidad_viento  = st.number_input('Vel.Viento(m/s):',value=float(velocidad_viento_defecto),min_value=float(0),step =0.5,on_change=beaufort)
                 direccion_viento  = st.selectbox('Dir.Viento:',(direcciones),index = indice_direccion_viento_defecto)
                 pres_atmosferica  = st.number_input('Presion atm.(mmHg):',format='%i',value=pres_atmosferica_defecto,min_value=0)
-                st.text(velocidad_viento)
+                # st.text(velocidad_viento)
                 for idato_beaufort in range(len(beaufort_nombre)):
                     # st.text(beaufort_vmin[idato_beaufort])
                     # st.text(beaufort_vmax[idato_beaufort])
                     if velocidad_viento*3.6 >= beaufort_vmin[idato_beaufort] and velocidad_viento*3.6 < beaufort_vmax[idato_beaufort]:
                         indice_prop = idato_beaufort
                         
-                st.text(indice_prop)
+                # st.text(indice_prop)
                 viento_beaufort  = st.selectbox('Viento Beaufort:',(beaufort_nombre),index=indice_prop)
                 
             with col3:
