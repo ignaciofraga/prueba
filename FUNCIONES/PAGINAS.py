@@ -1537,7 +1537,49 @@ def entrada_estado_mar():
         estacion_elegida    = st.selectbox('Estacion',(listado_estaciones))
         id_estacion_elegida = int(df_estaciones_radiales['id_estacion'][df_estaciones_radiales['nombre_estacion']==estacion_elegida].values[0])
     
-    
+        # recupera los datos disponibles en la base de datos para asignar valores por defecto
+        conn                     = init_connection()
+        df_condiciones           = psql.read_sql('SELECT * FROM condiciones_ambientales_muestreos', conn)
+        df_condicion_introducida = df_condiciones[(df_condiciones['salida']==id_salida) & (df_condiciones['estacion']==id_estacion_elegida)]               
+        conn.close()
+        
+        if df_condicion_introducida.shape[0] == 1:
+            
+            texto_error = 'Ya existen datos correspondientes a la estación y salida seleccionada.'
+            st.warning(texto_error, icon="⚠️") 
+        
+            # Asigna como valores por defecto los que ya estaban en la base de datos
+            hora_llegada_defecto            = df_condicion_introducida['hora_llegada'][0]
+            profundidad_defecto             = df_condicion_introducida['profundidad'][0]
+            nubosidad_defecto               = df_condicion_introducida['nubosidad'][0]
+            indice_lluvia_defecto           = seleccion_SN.index(df_condicion_introducida['lluvia'][0])
+            velocidad_viento_defecto        = df_condicion_introducida['velocidad_viento'][0]
+            indice_direccion_viento_defecto = direcciones.index(df_condicion_introducida['direccion_viento'][0])
+            pres_atmosferica_defecto        = df_condicion_introducida['pres_atmosferica'][0]
+            altura_ola_defecto              = df_condicion_introducida['altura_ola'][0]
+            indice_mar_fondo_defecto        = seleccion_SN.index(df_condicion_introducida['mar_fondo'][0])
+            indice_mar_direccion_defecto    = direcciones.index(df_condicion_introducida['mar_direccion'][0])
+            temp_aire_defecto               = df_condicion_introducida['temp_aire'][0]
+            indice_marea_defecto            = mareas.index(df_condicion_introducida['marea'][0])
+            prof_secchi_defecto             = df_condicion_introducida['prof_secchi'][0]
+            max_clorofila_defecto           = df_condicion_introducida['max_clorofila'][0]
+            
+        else:
+            hora_llegada_defecto            = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
+            profundidad_defecto             = 0
+            nubosidad_defecto               = 0
+            indice_lluvia_defecto           = 0
+            velocidad_viento_defecto        = 0
+            indice_direccion_viento_defecto = 0
+            pres_atmosferica_defecto        = 1022
+            altura_ola_defecto              = 0
+            indice_mar_fondo_defecto        = 0
+            indice_mar_direccion_defecto    = 0
+            temp_aire_defecto               = 15.0
+            indice_marea_defecto            = 0
+            prof_secchi_defecto             = 0.
+            max_clorofila_defecto           = 0.
+            
             
         with st.form("Formulario seleccion"): 
                
@@ -1547,26 +1589,23 @@ def entrada_estado_mar():
             col1, col2,col3,col4= st.columns(4,gap="small")
 
             with col1:
-                hora_llegada  = st.time_input('Hora de llegada (UTC)')
-                profundidad   = st.number_input('Profundidad(m):',format='%i',value=round(0),min_value=0)
-                nubosidad     = st.number_input('Nubosidad(%) :',format='%i',value=round(0),min_value=0)
-                lluvia_sel    = st.selectbox('LLuvia:',(seleccion_SN))
-                if lluvia_sel == seleccion_SN[0]:
-                    lluvia = True
-                else:
-                    lluvia = False
+                hora_llegada  = st.time_input('Hora de llegada (UTC)',value=hora_llegada_defecto)
+                profundidad   = st.number_input('Profundidad(m):',format='%i',value=profundidad_defecto,min_value=0)
+                nubosidad     = st.number_input('Nubosidad(%) :',format='%i',value=nubosidad_defecto,min_value=0)
+                lluvia        = st.selectbox('LLuvia:',(seleccion_SN),index=indice_lluvia_defecto)
+
                    
             with col2:
-                velocidad_viento  = st.number_input('Vel.Viento(m/s):',format='%i',value=round(0),min_value=0)
-                direccion_viento  = st.selectbox('Dir.Viento:',(direcciones))
-                pres_atmosferica  = st.number_input('Presion atm.(mmHg):',format='%i',value=round(0),min_value=0)
+                velocidad_viento  = st.number_input('Vel.Viento(m/s):',format='%i',value=velocidad_viento_defecto,min_value=0)
+                direccion_viento  = st.selectbox('Dir.Viento:',(direcciones),index = indice_direccion_viento_defecto)
+                pres_atmosferica  = st.number_input('Presion atm.(mmHg):',format='%i',value=pres_atmosferica_defecto,min_value=0)
                 for idato_beaufort in range(len(beaufort_nombre)):
                     if velocidad_viento*3.6 >= beaufort_vmin[idato_beaufort] and velocidad_viento*3.6 < beaufort_vmax[idato_beaufort]:
                         indice_prop = idato_beaufort
                 viento_beaufort  = st.selectbox('Viento Beaufort:',(beaufort_nombre),index=indice_prop)
                 
             with col3:
-                 altura_ola  = st.number_input('Altura de ola(m):',value=round(0),min_value=0)
+                 altura_ola  = st.number_input('Altura de ola(m):',value=altura_ola_defecto,min_value=0)
                  for idato_douglas in range(len(doglas_nombre)):
                      if altura_ola == 0:
                          indice_prop = 0
@@ -1574,18 +1613,14 @@ def entrada_estado_mar():
                          if altura_ola > douglas_hmin[idato_douglas] and altura_ola <= douglas_hmax[idato_douglas]:
                              indice_prop = idato_douglas
                  mar_douglas = st.selectbox('Mar Douglas:',(doglas_nombre),index=indice_prop)
-                 mar_fondo_sel          = st.selectbox('Mar de fondo:',(seleccion_SN))
-                 if mar_fondo_sel == seleccion_SN[0]:
-                     mar_fondo = True
-                 else:
-                     mar_fondo = False
-                 mar_direccion = st.selectbox('Dir.Oleaje:',(direcciones))
+                 mar_fondo   = st.selectbox('Mar de fondo:',(seleccion_SN),index = indice_mar_fondo_defecto)
+                 mar_direccion = st.selectbox('Dir.Oleaje:',(direcciones),index = indice_mar_direccion_defecto)
  
             with col4:
-                 temp_aire     = st.number_input('Temperatura del aire(ºC):',value=round(0),min_value=0)
-                 marea         = st.selectbox('Marea:',(mareas))
-                 prof_secchi   = st.number_input('Prof.Sechi(m):',value=round(0),min_value=0)
-                 max_clorofila = st.number_input('Max.Clorofila(m):',value=round(0),min_value=0)
+                 temp_aire     = st.number_input('Temperatura del aire(ºC):',value=temp_aire_defecto,min_value=0)
+                 marea         = st.selectbox('Marea:',(mareas),index = indice_marea_defecto)
+                 prof_secchi   = st.number_input('Prof.Sechi(m):',value=prof_secchi_defecto,min_value=0)
+                 max_clorofila = st.number_input('Max.Clorofila(m):',value=max_clorofila_defecto,min_value=0)
                  
             submit = st.form_submit_button("Enviar")                    
 
