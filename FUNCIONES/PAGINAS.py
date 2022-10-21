@@ -1561,9 +1561,6 @@ def entrada_estado_mar():
                 direccion_viento  = st.selectbox('Dir.Viento:',(direcciones))
                 pres_atmosferica  = st.number_input('Presion atm.(mmHg):',format='%i',value=round(0),min_value=0)
                 for idato_beaufort in range(len(beaufort_nombre)):
-                    st.text(velocidad_viento)
-                    st.text(beaufort_vmin[idato_beaufort])
-                    st.text(beaufort_vmax[idato_beaufort])
                     if velocidad_viento*3.6 >= beaufort_vmin[idato_beaufort] and velocidad_viento*3.6 < beaufort_vmax[idato_beaufort]:
                         indice_prop = idato_beaufort
                 viento_beaufort  = st.selectbox('Viento Beaufort:',(beaufort_nombre),index=indice_prop)
