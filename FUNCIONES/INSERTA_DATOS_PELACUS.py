@@ -24,7 +24,6 @@ id_config_per     = 1
 
 # Rutas de los archivos a importar  
 archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx' 
-archivo_variables_base_datos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VARIABLES.xlsx'  
 
 # Tipo de información a introducir
 itipo_informacion = 1 # 1-dato nuevo (analisis laboratorio)  2-dato re-analizado (control calidad)   
@@ -49,33 +48,18 @@ id_programa = FUNCIONES_INSERCION.recupera_id_programa(programa_muestreo,direcci
 print('Identificando la estación correspondiente a cada medida')
 datos_pelacus_corregido = FUNCIONES_INSERCION.evalua_estaciones(datos_pelacus_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
+# Asigna el identificador de salida al mar correspondiente
+tipo_salida = 'ANUAL'
+datos_pelacus_corregido = FUNCIONES_INSERCION.evalua_salidas(datos_pelacus_corregido,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+
 # Encuentra el identificador asociado a cada registro
 print('Identificando el registro correspondiente a cada medida')
 datos_pelacus_corregido = FUNCIONES_INSERCION.evalua_registros(datos_pelacus_corregido,programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# # # # Introduce los datos en la base de datos
+# Introduce los datos en la base de datos
 print('Introduciendo los datos en la base de datos')
-
 FUNCIONES_INSERCION.inserta_datos_fisica(datos_pelacus_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
-
 FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_pelacus_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
-
-
-
-# # Realiza un control de calidad primario a los datos importados   
-# print('Realizando control de calidad')
-# datos_pelacus_corregido = FUNCIONES_INSERCION.control_calidad(datos_pelacus,archivo_variables_base_datos)  
- 
-# # Recupera el identificador del programa de muestreo
-# id_programa = FUNCIONES_INSERCION.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
-
-# # Introduce los datos en la base de datos
-# print('Introduciendo los datos en la base de datos')
-# FUNCIONES_INSERCION.inserta_datos(datos_pelacus_corregido,min_dist,programa_muestreo,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-      
-# # Actualiza estado
-# print('Actualizando el estado de los procesos')
-# FUNCIONES_INSERCION.actualiza_estado(datos_pelacus_corregido,fecha_actualizacion,id_programa,programa_muestreo,itipo_informacion,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
 
 print('Procesado terminado')
 

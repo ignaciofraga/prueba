@@ -63,6 +63,11 @@ for iarchivo in range(len(listado_archivos)):
     # Encuentra la estación asociada a cada registro
     print('Asignando la estación correspondiente a cada medida')
     datos_radprof_corregido = FUNCIONES_INSERCION.evalua_estaciones(datos_radprof_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    # Asigna el identificador de salida al mar correspondiente
+    tipo_salida = 'ANUAL'
+    datos_radprof_corregido = FUNCIONES_INSERCION.evalua_salidas(datos_radprof_corregido,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+
 
     # Encuentra el identificador asociado a cada registro
     print('Asignando el registro correspondiente a cada medida')

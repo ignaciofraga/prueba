@@ -13,6 +13,7 @@ import math
 import psycopg2
 import pandas.io.sql as psql
 from sqlalchemy import create_engine
+import json
 
 
 pandas.options.mode.chained_assignment = None
@@ -165,14 +166,19 @@ def lectura_datos_pelacus(nombre_archivo):
     datos_pelacus['configuracion_perfilador'] = numpy.ones(datos_pelacus.shape[0],dtype=int)
     
     # Genera una columna con la profundidad. Usar el valor real (si existe) o la teórica en caso contrario
-    datos_pelacus['presion_ctd'] = numpy.zeros(datos_pelacus.shape[0])
+    datos_pelacus['presion_ctd'] = datos_pelacus['Prof_teor.']
     for idato in range(datos_pelacus.shape[0]):
-        if datos_pelacus['Prof_real'][idato] is not None:
+        if numpy.isnan(datos_pelacus['Prof_real'][idato]) is False:
             datos_pelacus['presion_ctd'][idato] = datos_pelacus['Prof_real'][idato]
-        if datos_pelacus['Prof_real'][idato] is None and datos_pelacus['Prof_teor.'][idato] is not None:
-            datos_pelacus['presion_ctd'][idato] = datos_pelacus['Prof_teor.'][idato]        
-        if datos_pelacus['Prof_real'][idato] is None and datos_pelacus['Prof_teor.'][idato] is None:
-            datos_pelacus['presion_ctd'][idato] = -999   
+
+    # datos_pelacus['presion_ctd'] = numpy.zeros(datos_pelacus.shape[0])
+    # for idato in range(datos_pelacus.shape[0]):
+    #     if datos_pelacus['Prof_real'][idato] is not None:
+    #         datos_pelacus['presion_ctd'][idato] = datos_pelacus['Prof_real'][idato]
+    #     if datos_pelacus['Prof_real'][idato] is None and datos_pelacus['Prof_teor.'][idato] is not None:
+    #         datos_pelacus['presion_ctd'][idato] = datos_pelacus['Prof_teor.'][idato]        
+    #     if datos_pelacus['Prof_real'][idato] is None and datos_pelacus['Prof_teor.'][idato] is None:
+    #         datos_pelacus['presion_ctd'][idato] = -999   
             
     # Asigna la profundidad teórica como la de referencia
     datos_pelacus['prof_referencia'] = datos_pelacus['Prof_teor.']
@@ -521,6 +527,159 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
 
 
 
+
+###############################################################################
+###### FUNCION PARA ENCONTRAR LA SALIDA AL MAR ASOCIADA A CADA REGISTRO  ######
+###############################################################################
+
+def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto):
+
+    # Recupera la tabla con los registros de muestreos físicos
+    con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    conn_psql        = create_engine(con_engine)
+    tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
+    
+
+    datos['id_salida']  = numpy.zeros(datos.shape[0],dtype=int)
+ 
+    # PELACUS
+    if id_programa == 1:        
+
+        datos['año_salida']  = numpy.zeros(datos.shape[0],dtype=int)
+
+        for idato in range(datos.shape[0]):
+            datos['año_salida'][idato] = datos['fecha_muestreo'][idato].year
+            
+        anhos_salidas_mar = datos['año_salida'].unique()
+        fecha_salida      = [None]*len(anhos_salidas_mar)
+        fecha_llegada     = [None]*len(anhos_salidas_mar)
+        for ianho in range(len(anhos_salidas_mar)):
+            
+            subset         = datos[datos['año_salida']==anhos_salidas_mar[ianho]]
+            fechas_anuales = subset['fecha_muestreo'].unique()
+            fecha_salida[ianho] = min(fechas_anuales)
+            fecha_llegada[ianho] = max(fechas_anuales)
+            
+            identificador_estaciones_muestreadas = list(subset['id_estacion_temp'].unique())
+            estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
+            for iestacion in range(len(estaciones_muestreadas)):
+                estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
+            json_estaciones        = json.dumps(estaciones_muestreadas)
+        
+
+
+            instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
+            VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.estaciones);''' 
+                
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()
+
+            nombre_salida = nombre_programa + ' ' + str(anhos_salidas_mar[ianho]) 
+          
+            cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,fecha_salida[ianho],fecha_llegada[ianho],json_estaciones))
+            conn.commit()
+            
+            # Recupera el identificador de la salida al mar
+            instruccion_sql = "SELECT id_salida FROM salidas_muestreos WHERE nombre_salida = '" + nombre_salida + "';"
+            cursor.execute(instruccion_sql)
+            id_salida =cursor.fetchone()[0]
+            conn.commit()
+
+            datos['id_salida'][datos['año_salida']==anhos_salidas_mar[ianho]] = id_salida
+            
+            cursor.close()
+            conn.close()
+
+        datos = datos.drop(columns=['año_salida']) 
+
+    # RADIALES
+    if id_programa == 3:
+    
+        # Encuentra las fechas de muestreo únicas
+        fechas_salidas_mar = datos['fecha_muestreo'].unique()
+        
+        # Asigna nombre a la salida
+        meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']
+           
+        # Listado con los identificadores de buque en función de la configuración del perfilador
+        id_buque              = [1,2,3,2]
+        
+        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,buque,estaciones)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,buque,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.buque,EXCLUDED.estaciones);''' 
+                
+        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        cursor = conn.cursor()
+        for isalida in range(len(fechas_salidas_mar)):
+            
+            # Encuentra las estaciones muestreadas
+            subset_salida                        = datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]
+            identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
+            estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
+            for iestacion in range(len(estaciones_muestreadas)):
+                estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
+            json_estaciones        = json.dumps(estaciones_muestreadas)
+            
+            id_configuracion_perfilador = list(subset_salida['configuracion_perfilador'].unique())[0]
+            buque                       = id_buque[id_configuracion_perfilador-1]
+          
+            nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_salidas_mar[isalida].month-1]) + ' ' +  str(fechas_salidas_mar[isalida].year)
+          
+            cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_salidas_mar[isalida],fechas_salidas_mar[isalida],int(buque),json_estaciones))
+            conn.commit()
+            
+            # Recupera el identificador de la salida al mar
+            instruccion_sql_recupera = "SELECT id_salida FROM salidas_muestreos WHERE nombre_salida = '" + nombre_salida + "';"
+            cursor.execute(instruccion_sql_recupera)
+            id_salida =cursor.fetchone()[0]
+            conn.commit()
+    
+            datos['id_salida'][datos['fecha_muestreo']==fechas_salidas_mar[isalida]] = id_salida
+            
+        cursor.close()
+        conn.close()
+        
+    # RADPROF
+    if id_programa == 5:
+        
+        fecha_salida  = min(datos['fecha_muestreo'])
+        fecha_llegada = max(datos['fecha_muestreo'])
+        
+        identificador_estaciones_muestreadas = list(datos['id_estacion_temp'].unique())
+        estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
+        for iestacion in range(len(estaciones_muestreadas)):
+            estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
+        json_estaciones        = json.dumps(estaciones_muestreadas)
+    
+    
+        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
+        VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.estaciones);''' 
+    
+        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        cursor = conn.cursor()
+    
+        nombre_salida = nombre_programa + ' ' + str(fecha_salida.year) 
+      
+        cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,fecha_salida,fecha_llegada,json_estaciones))
+        conn.commit()
+        
+        # Recupera el identificador de la salida al mar
+        instruccion_sql = "SELECT id_salida FROM salidas_muestreos WHERE nombre_salida = '" + nombre_salida + "';"
+        cursor.execute(instruccion_sql)
+        id_salida =cursor.fetchone()[0]
+        conn.commit()
+    
+        datos['id_salida'] = id_salida
+        
+        cursor.close()
+        conn.close()
+                
+    
+
+    return datos
+
+
+
+
 ###########################################################################
 ######## FUNCION PARA ENCONTRAR EL IDENTIFICADOR DE CADA REGISTRO  ########
 ###########################################################################
@@ -539,12 +698,12 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
     if tabla_muestreos.shape[0] == 0:
     
         # genera un dataframe con las variables que interesa introducir en la base de datos
-        exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','hora_muestreo','presion_ctd','prof_referencia','botella','num_cast','configuracion_perfilador','configuracion_superficie']]
+        exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','configuracion_perfilador','configuracion_superficie']]
         # añade el indice de cada registro
         indices_registros                    = numpy.arange(1,(exporta_registros.shape[0]+1))    
         exporta_registros['id_muestreo']     = indices_registros
         # renombra la columna con información de la estación muestreada
-        exporta_registros                    = exporta_registros.rename(columns={"id_estacion_temp":"estacion"})
+        exporta_registros                    = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar'})
         # # añade el nombre del muestreo
         exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
         for idato in range(exporta_registros.shape[0]):    
@@ -582,29 +741,17 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
                 # Asigna el identificador (siguiente al máximo disponible)
                 ultimo_registro_bd                = ultimo_registro_bd + 1
                 datos['id_muestreo_temp'][idato]  = ultimo_registro_bd  
-
-        # for idato in range(datos.shape[0]):
-        #     df_temporal = tabla_muestreos.loc[(tabla_muestreos['estacion'] == datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo'] == datos['fecha_muestreo'][idato])  & (tabla_muestreos['hora_muestreo'] == datos['hora_muestreo'][idato]) & (tabla_muestreos['presion_ctd'] == datos['presion_ctd'][idato]) & (tabla_muestreos['configuracion_perfilador'] == datos['configuracion_perfilador'][idato])  & (tabla_muestreos['configuracion_superficie'] == datos['configuracion_superficie'][idato])]
-        #     # Registro ya incluido, recuperar el identificador
-        #     if df_temporal.shape[0] >0:
-        #         datos['id_muestreo_temp'] [idato] =  df_temporal.iloc[0]['id_muestreo']
-        #     # Nuevo registro
-        #     else:
-        #         # Asigna el identificador (siguiente al máximo disponible)
-        #         ultimo_registro_bd                = ultimo_registro_bd + 1
-        #         datos['id_muestreo_temp'][idato]  = ultimo_registro_bd               
-        #         datos['io_nuevo_muestreo'][idato] = 1 
-                
+               
         
         if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
         
             # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
             nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
             # Mantén sólo las columnas que interesan
-            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','hora_muestreo','presion_ctd','prof_referencia','botella','num_cast','configuracion_perfilador','configuracion_superficie']]
+            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','configuracion_perfilador','configuracion_superficie']]
                         
             # Cambia el nombre de la columna de estaciones
-            exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion","id_muestreo_temp":"id_muestreo"})
+            exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion","id_muestreo_temp":"id_muestreo",'id_salida':'salida_mar'})
             # Indice temporal
             exporta_registros['indice_temporal'] = numpy.arange(0,exporta_registros.shape[0])
             exporta_registros.set_index('indice_temporal',drop=True,append=False,inplace=True)
@@ -628,6 +775,12 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
 
 
 
+
+
+
+
+
+
 ################################################################################
 ######## FUNCION PARA INSERTAR LOS DATOS DE FISICA EN LA BASE DE DATOS  ########
 ################################################################################
@@ -636,7 +789,7 @@ def inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puer
   
     # Recupera la tabla con los registros de muestreos físicos
     con_engine                = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    conn_psql                      = create_engine(con_engine)
+    conn_psql                 = create_engine(con_engine)
     tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
     
     # Genera un dataframe solo con las variales fisicas de los datos a importar 

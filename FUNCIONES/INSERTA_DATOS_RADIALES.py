@@ -63,11 +63,17 @@ for iarchivo in range(len(listado_archivos)):
     id_programa = FUNCIONES_INSERCION.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
     
     # Encuentra la estación asociada a cada registro
+    print('Asignando la estación correspondiente a cada medida')
     datos_radiales_corregido = FUNCIONES_INSERCION.evalua_estaciones(datos_radiales_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-    # Encuentra el identificador asociado a cada registro
-    datos_radiales_corregido = FUNCIONES_INSERCION.evalua_registros(datos_radiales_corregido,programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+    # Encuentra las salidas al mar correspondientes
+    tipo_salida = 'MENSUAL'   
+    datos_radiales_corregido = FUNCIONES_INSERCION.evalua_salidas(datos_radiales_corregido,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
     
+    # Encuentra el identificador asociado a cada registro
+    print('Asignando el registro correspondiente a cada medida')
+    datos_radiales_corregido = FUNCIONES_INSERCION.evalua_registros(datos_radiales_corregido,programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+   
     # # # # Introduce los datos en la base de datos
     print('Introduciendo los datos en la base de datos')
     

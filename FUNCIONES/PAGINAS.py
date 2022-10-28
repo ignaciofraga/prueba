@@ -1296,7 +1296,7 @@ def entrada_salidas_mar():
         df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
         # Estaciones de muestreo (radiales)
         df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_estaciones_radiales = df_estaciones[df_estaciones['programa']==2]
+        df_estaciones_radiales = df_estaciones[df_estaciones['programa']==3]
         
         conn.close()
         
@@ -1493,7 +1493,7 @@ def entrada_salidas_mar():
 ################# PÁGINA DE ENTRADA DE DATOS DEL ESTADO DEL  MAR ##############
 ###############################################################################    
 
-def entrada_estado_mar():
+def entrada_condiciones_ambientales():
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host = st.secrets["postgres"].host
@@ -1656,65 +1656,30 @@ def entrada_estado_mar():
 
 
 
-        #      
-    #                 if lluvia_sel == seleccion_SN[0]:
-    #                     lluvia[iestacion] = True
-    #                 else:
-    #                     lluvia[iestacion] = False                        
-                    
-    #                 profundidad[iestacion]  = st.text_input('Nombre y apellidos del nuevo personal', value="")
 
-    #                 correo_participante  = st.text_input('Correo del nuevo personal', value="")
-            
-    #                 comision             = st.checkbox('Comisionado')
-            
-            
-            
-            
-    #         submit = st.form_submit_button("Añadir participante")
 
-    #         if submit == True:
-        
-        
-    # else:
-    #     listado_estaciones = [None]
+
+
+###############################################################################
+##################### PÁGINA DE ENTRADA DE DATOS DE BOTELLAS ##################
+###############################################################################    
+
+def entrada_botellas():
+    
+    # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    direccion_host = st.secrets["postgres"].host
+    base_datos     = st.secrets["postgres"].dbname
+    usuario        = st.secrets["postgres"].user
+    contrasena     = st.secrets["postgres"].password
+    puerto         = st.secrets["postgres"].port
+    
+    # Recupera la tabla de las salidas realizadas 
+    conn       = init_connection()
+    df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA'] 
+    df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+    df_estaciones_radiales = df_estaciones[df_estaciones['programa']==3]
+    conn.close()
     
 
-    # st.text(listado_estaciones)
-    # # Despliega un formulario para seleccionar las fechas de inicio y final
-    # with st.form("Formulario seleccion"):
-               
-    #     nombre_participante  = st.text_input('Nombre y apellidos del nuevo personal', value="")
-
-    #     correo_participante  = st.text_input('Correo del nuevo personal', value="")
-        
-    #     comision             = st.checkbox('Comisionado')
-        
-    #     submit = st.form_submit_button("Añadir participante")
-
-    #     if submit == True:
-
-    #         io_incluido = 0
-    #         for ipersonal in range(df_personal.shape[0]):
-    #             if df_personal['nombre_apellidos'][ipersonal] == nombre_participante:
-    #                 io_incluido = 1
-            
-    #         if io_incluido == 0:
-
-    #             instruccion_sql = '''INSERT INTO personal_salidas (nombre_apellidos,correo,comisionado)
-    #                 VALUES (%s,%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,correo,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.correo,EXCLUDED.comisionado);''' 
-                        
-    #             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    #             cursor = conn.cursor()
-    #             cursor.execute(instruccion_sql, (nombre_participante,correo_participante,comision))
-    #             conn.commit()
-    #             cursor.close()
-    #             conn.close()
-
-    #             texto_exito = 'Participante añadido correctamente'
-    #             st.success(texto_exito)
-    
-    #         else:
-    #             texto_error = 'El participante introducido ya se encuentra en la base de datos '
-    #             st.warning(texto_error, icon="⚠️")
        

@@ -22,6 +22,7 @@ import psycopg2
 import numpy
 import pandas
 import datetime
+import json
 
 
 #### TABLAS CON INFORMACIÓN DE LAS CONDICIONES DE MUESTREO (EQUIV. METADATOS) ####
@@ -199,19 +200,81 @@ nombre_estacion = ['E2CO','E3ACO','E3CCO','E3BCO','E4CO']
 latitud         = [43.421667,43.406667,43.393333,43.388333,43.363333]
 longitud        = [-8.436667,-8.416667,-8.4,-8.383333,-8.37]
 
+profs_referencia_e2 = [0,5,10,20,30,40,70]
+profs_referencia_e4 = [0,4,8,12,18]
+profs_referencia_e3c = [0,5,10,20,30,35,40]
 
-instruccion_sql = '''INSERT INTO estaciones (nombre_estacion,programa,latitud,longitud)
-    VALUES (%s,%s,%s,%s) ON CONFLICT (programa,latitud,longitud) DO NOTHING;''' 
+instruccion_sql = '''INSERT INTO estaciones (nombre_estacion,programa,latitud,longitud,profundidades_referencia)
+    VALUES (%s,%s,%s,%s,%s) ON CONFLICT (programa,latitud,longitud) DO NOTHING;''' 
         
 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
 cursor = conn.cursor()
 for idato in range(len(nombre_estacion)):
-    cursor.execute(instruccion_sql, (nombre_estacion[idato],int(3),latitud[idato],longitud[idato]))
+    profs_ref = None
+    if idato == 0: # ESTACION 2
+        profs_ref = json.dumps(profs_referencia_e2)
+    if idato == 2: # ESTACION 3C
+        profs_ref = json.dumps(profs_referencia_e3c)
+    if idato == 4: # ESTACION 3C
+        profs_ref = json.dumps(profs_referencia_e4)
+    
+    cursor.execute(instruccion_sql, (nombre_estacion[idato],int(3),latitud[idato],longitud[idato],profs_ref))
     conn.commit()
 cursor.close()
 conn.close()
 
 
+
+### Informacion de las salidas al mar de las campañas PELACUS  ###
+
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_salida SERIAL PRIMARY KEY,'
+# ' nombre_salida text NOT NULL,'
+# ' programa int NOT NULL,'
+# ' nombre_programa text NOT NULL,'
+# ' tipo_salida text,'
+# ' fecha_salida date NOT NULL,'
+# ' hora_salida time,'
+# ' fecha_retorno date NOT NULL,'
+# ' hora_retorno time,'
+# ' buque int,'
+# ' estaciones json,'
+# ' participantes_comisionados json,'
+# ' participantes_no_comisionados json,'
+# ' observaciones text,'
+# ) 
+
+# nombre_salida = ['PELACUS 2000','PELACUS 2001','PELACUS 2003','PELACUS 2004','PELACUS 2005','PELACUS 2006','PELACUS 2007']
+# fecha_salida  = [datetime.date(2000,3,19),datetime.date(2001,3,31),datetime.date(2003,3,19),datetime.date(2004,3,30),datetime.date(2005,4,5),datetime.date(2006,4,4),datetime.date(2000,3,19)]
+# fecha_retorno = [datetime.date(2000,4,12),datetime.date(2000,4,22),datetime.date(2003,3,31),datetime.date(2004,4,22),datetime.date(2005,4,27),datetime.date(2006,4,26),datetime.date(2000,3,19)]
+
+
+# nombre_estacion = ['E2CO','E3ACO','E3CCO','E3BCO','E4CO']
+# latitud         = [43.421667,43.406667,43.393333,43.388333,43.363333]
+# longitud        = [-8.436667,-8.416667,-8.4,-8.383333,-8.37]
+
+# profs_referencia_e2 = [0,5,10,20,30,40,70]
+# profs_referencia_e4 = [0,4,8,12,18]
+# profs_referencia_e3c = [0,5,10,20,30,35,40]
+
+# instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_estacion,programa,latitud,longitud,profundidades_referencia)
+#     VALUES (%s,%s,%s,%s,%s) ON CONFLICT (programa,latitud,longitud) DO NOTHING;''' 
+        
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
+# for idato in range(len(nombre_estacion)):
+#     profs_ref = None
+#     if idato == 0: # ESTACION 2
+#         profs_ref = json.dumps(profs_referencia_e2)
+#     if idato == 2: # ESTACION 3C
+#         profs_ref = json.dumps(profs_referencia_e3c)
+#     if idato == 4: # ESTACION 3C
+#         profs_ref = json.dumps(profs_referencia_e4)
+    
+#     cursor.execute(instruccion_sql, (nombre_estacion[idato],int(3),latitud[idato],longitud[idato],profs_ref))
+#     conn.commit()
+# cursor.close()
+# conn.close()
 
 
 
