@@ -1703,6 +1703,7 @@ def entrada_botellas():
         df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
         df_seleccion                = df_seleccion[df_seleccion['tipo_salida'] == tipo_salida_seleccionada ]
 
+
         fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
         
         submit = st.form_submit_button("Seleccionar salida") 
