@@ -1725,7 +1725,7 @@ def entrada_botellas():
     if submit_2 is True:
         
         # Recupera el identificador de la salida
-        id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida]
+        id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida].iloc[0]
 
         # Recupera las estaciones muestreadas
         estaciones               = df_seleccion['estaciones'][df_seleccion['id_salida']==id_salida].iloc[0]
