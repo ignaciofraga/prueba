@@ -1730,6 +1730,8 @@ def entrada_botellas():
             # Recupera las estaciones muestreadas
             estaciones               = df_seleccion['estaciones'][df_seleccion['fecha_salida']==fecha_salida]
 
+            st.text(estaciones)
+
             with st.form("Formulario seleccion estacion"):
        
                  fecha_salida                 = st.selectbox('Estación',(estaciones))
