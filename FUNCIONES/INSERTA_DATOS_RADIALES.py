@@ -69,7 +69,8 @@ for iarchivo in range(len(listado_archivos)):
     # Encuentra las salidas al mar correspondientes
     tipo_salida = 'MENSUAL'   
     datos_radiales_corregido = FUNCIONES_INSERCION.evalua_salidas(datos_radiales_corregido,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
-    
+        
+
     # Encuentra el identificador asociado a cada registro
     print('Asignando el registro correspondiente a cada medida')
     datos_radiales_corregido = FUNCIONES_INSERCION.evalua_registros(datos_radiales_corregido,programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
@@ -86,7 +87,7 @@ for iarchivo in range(len(listado_archivos)):
     # print('Actualizando el estado de los procesos')
     # FUNCIONES_INSERCION.actualiza_estado(datos_radiales_corregido,fecha_actualizacion,id_programa,programa_muestreo,itipo_informacion,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
 
-    # print('Procesado del año ', nombre_archivo[-9:-5], ' terminado')
+    print('Procesado del año ', nombre_archivo[-9:-5], ' terminado')
     
 print('Fin del procesado de todos los datos disponibles')
   

@@ -22,6 +22,8 @@ import pandas.io.sql as psql
 from sqlalchemy import create_engine
 import psycopg2
 import os
+from glob import glob
+import json
 
 # Parámetros de la base de datos
 base_datos     = 'COAC'
@@ -31,18 +33,199 @@ puerto         = '5432'
 direccion_host = '193.146.155.99'
 
 # Parámetros
-programa_muestreo = 'RADIAL CORUÑA'
+nombre_programa = 'RADIAL CORUÑA'
 
-anho = 2020
+anho = 2022
 ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
+tipo_salida   = 'MENSUAL' 
 
-ruta_datos = ruta_archivos + '/' + str(anho)
+# Recupera el identificador del programa
+id_programa = FUNCIONES_INSERCION.recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            
+# recupera la información de las estaciones incluidas en la base de datos
+con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+conn_psql        = create_engine(con_engine)
+tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
+conn_psql.dispose()
 
-listado_salidas = os.listdir(ruta_datos)
+ruta_datos = ruta_archivos + '/' + str(anho) + '/*/'
 
-from glob import glob
-test = ruta_datos + '/*/'
-listado_salidas = glob(test, recursive = True)
+# Recupera el nombre de los directorios
+listado_salidas = glob(ruta_datos, recursive = True)
+
+# Mantén sólo la parte de fechas
+for idato in range(len(listado_salidas)):
+
+    fecha_salida_texto = listado_salidas[idato][-14:-6]
+
+    fecha_salida       = datetime.datetime.strptime(fecha_salida_texto, '%y_%m_%d').date()
+    
+    # Encuentra los parámetros muestreados
+    parametros = 'btl+PAR'
+    
+    for archivo in os.listdir(listado_salidas[idato]):
+        if 'flscufa' in archivo:
+            parametros = parametros + '+flscufa'
+
+        if 'O2' in archivo:
+            parametros = parametros + '+O2'
+            
+            
+    
+    # Encuentra las estaciones muestreadas a partir de los archivos .btl
+    ruta_salida   = listado_salidas[idato] + '/' + parametros + '/'
+    
+    listado_estaciones_muestreadas = []
+    for archivo in os.listdir(ruta_salida):
+        if archivo.endswith(".btl"):
+            posicion_separador = archivo.index('+')
+            nombre_estacion    = archivo[8:posicion_separador].upper() + 'CO'
+            
+            listado_estaciones_muestreadas.append(nombre_estacion)
+    
+    # Añade una salida al mar con esas estaciones
+            
+    json_estaciones        = json.dumps(listado_estaciones_muestreadas)
+
+    instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
+    VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.estaciones);''' 
+        
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor()
+
+    if tipo_salida == 'MENSUAL':
+        # Asigna nombre a la salida
+        meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']
+
+        nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' + meses[fecha_salida.month-1] + ' ' + str(fecha_salida.year) 
+  
+    cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,fecha_salida,fecha_salida,json_estaciones))
+    conn.commit()
+    
+    # Recupera el identificador de la salida al mar
+    instruccion_sql = "SELECT id_salida FROM salidas_muestreos WHERE nombre_salida = '" + nombre_salida + "';"
+    cursor.execute(instruccion_sql)
+    id_salida =cursor.fetchone()[0]
+    conn.commit()
+    
+    cursor.close()
+    conn.close()
+    
+    
+    
+    
+    
+    
+
+    for archivo in os.listdir(ruta_salida):
+        if archivo.endswith(".btl"):
+            posicion_separador = archivo.index('+')
+            nombre_estacion    = archivo[8:posicion_separador].upper() + 'CO'
+            
+            id_estacion              = tabla_estaciones['id_estacion'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
+            profundidades_referencia = tabla_estaciones['profundidades_referencia'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
+            lat_estacion             = tabla_estaciones['latitud'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
+            lon_estacion             = tabla_estaciones['longitud'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
+            
+            
+            ruta_archivo             = ruta_salida + archivo
+            archivo_temporal         = ruta_salida + 'TEMPORAL.txt'
+            
+            if 'flscufa' in archivo:
+                io_fluor = 1
+            else:
+                io_fluor = 0
+                
+            if 'O2' in archivo:
+                io_o2 = 1
+            else:
+                io_o2 = 0
+                            
+            # Funcion
+            # Lee el archivo .btl y escribe la información de las botellas en un archivo temporal
+            cast_muestreo = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
+            with open(ruta_archivo, "r") as file_input:
+                with open(archivo_temporal, "w") as output:
+                    for line in file_input:
+                        if line[0:8] == '** Time:': # Línea con hora del cast
+                            hora_muestreo = datetime.datetime.strptime(line[8:-1],'%H:%M').time()            
+                        if line[0:8] == '** Cast:': # Línea con el número de cast
+                            cast_muestreo = int(line[8:-1])
+                        if line[-6:-1] == '(avg)': # Línea con datos de botella, escribir en el archivo temporal
+                            output.write(line)
+            
+            file_input.close()
+            output.close()
+            
+            # Lee el archivo temporal como  un dataframe
+            datos_botellas = pandas.read_csv(archivo_temporal, sep='\s+',header=None)
+
+                       
+            # Elimina las columnas que no interesan
+            if io_fluor == 0: 
+                datos_botellas = datos_botellas.drop(columns=[1,2,3,5,8,10])  
+            if io_fluor == 1:
+                datos_botellas = datos_botellas.drop(columns=[1,2,3,7,8,11]) 
+                
+            # Cambia el nombre de las columnas
+            if io_fluor == 0:
+                datos_botellas = datos_botellas.rename(columns={0: 'botella', 4: 'salinidad_ctd',6:'presion_ctd',7:'temperatura_ctd',9:'par_ctd'})
+            if io_fluor == 1:
+                datos_botellas = datos_botellas.rename(columns={0: 'botella', 4: 'salinidad_ctd',5:'presion_ctd',6:'temperatura_ctd',9:'par_ctd',10:'fluorescencia_ctd'})
+                
+            
+            # Elimina el archivo temporal
+            os.remove(archivo_temporal)            
+            
+
+            test = ruta_salida + archivo + '_TEMPORAL.csv'
+            datos_botellas.to_csv(test)
+            # os.remove(test)
+
+            # Añade una columna con la profundidad de referencia
+            if profundidades_referencia is not None:
+                datos_botellas['prof_referencia'] = numpy.zeros(datos_botellas.shape[0],dtype=int)
+                for idato in range(datos_botellas.shape[0]):
+                        # Encuentra la profundidad de referencia más cercana a cada dato
+                        idx = (numpy.abs(profundidades_referencia - datos_botellas['presion_ctd'][idato])).argmin()
+                        datos_botellas['prof_referencia'][idato] =  profundidades_referencia[idx]
+            else:
+                datos_botellas['prof_referencia'] = [None]*datos_botellas.shape[0]
+            
+            # Redondea la precisión de los datos de profundidad
+            datos_botellas['presion_ctd'] = round(datos_botellas['presion_ctd'],2)
+                
+
+            # Añade informacion de lat/lon para que no elimine el registro durante el control de calidad
+            datos_botellas['latitud']                  = lat_estacion  
+            datos_botellas['longitud']                 = lon_estacion
+            datos_botellas,textos_aviso                = FUNCIONES_INSERCION.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
+
+            # Añade columnas con datos del muestreo 
+            datos_botellas['id_estacion_temp']         = numpy.zeros(datos_botellas.shape[0],dtype=int)
+            datos_botellas['id_estacion_temp']         = id_estacion
+            datos_botellas['fecha_muestreo']           = fecha_salida
+            datos_botellas['hora_muestreo']            = hora_muestreo
+            datos_botellas['num_cast']                 = cast_muestreo
+            datos_botellas['configuracion_perfilador'] = 1
+            datos_botellas['configuracion_superficie'] = 1
+
+            # Asigna el identificador de la salida al mar
+            datos_botellas = FUNCIONES_INSERCION.evalua_salidas(datos_botellas,id_programa,nombre_programa,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+            
+            # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+            datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+
+            # Inserta en la base de datos las variables físicas disponibles 
+            FUNCIONES_INSERCION.inserta_datos_fisica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
+            
+            # Inserta en la base de datos las variables biogeoquímicas disponibles 
+            FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
+            
+            
+    #print(fecha_salida,listado_estaciones_muestreadas)            
+
+            #print(nombre_estacion,id_estacion)
 
 
 

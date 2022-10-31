@@ -1673,7 +1673,7 @@ def entrada_botellas():
     contrasena     = st.secrets["postgres"].password
     puerto         = st.secrets["postgres"].port
     
-    # Recupera la tabla de las salidas realizadas 
+    # Recupera tablas con informacion utilizada en el procesado
     conn       = init_connection()
     df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
     df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA'] 
@@ -1681,5 +1681,31 @@ def entrada_botellas():
     df_estaciones_radiales = df_estaciones[df_estaciones['programa']==3]
     conn.close()
     
+    # Define los años con salidas asociadas
+    df_salidas_radiales['año'] = numpy.zeros(df_salidas_radiales.shape[0],dtype=int)
+    for idato in range(df_salidas_radiales.shape[0]):
+        df_salidas_radiales['año'] = df_salidas_radiales['fecha_salida'].year 
+    listado_anhos = df_salidas_radiales['año'].unique
+    
+    # Despliega un menú de selección de la salida a introducir
+    with st.form("Formulario seleccion"):
+               
+        tipo_salida_seleccionada    = st.selectbox('Tipo de salida',(['ANUAL','MENSUAL']))
 
+        anho_seleccionado           = st.selectbox('Año',(listado_anhos))
+
+        df_seleccion                = df_estaciones_radiales[df_estaciones_radiales['año']==anho_seleccionado]
+        df_seleccion                = df_seleccion[df_seleccion['tipo_salida'] == tipo_salida_seleccionada ]
+
+        fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
+        
+        submit = st.form_submit_button("Seleccionar salida") 
+    
+    # # Selecciona la salida de la que se quiere introducir datos
+    # fecha_salida = st.selectbox('Fecha de salida ',(df_salidas_radiales['fecha_salida']))
+    # id_salida    = int(df_salidas_radiales['id_salida'][df_salidas_radiales['fecha_salida']==fecha_salida].values[0])               
+ 
+    # # Extrae las estaciones visitadas en la salida seleccionada
+    # listado_estaciones = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida].iloc[0] 
+    
        
