@@ -1752,7 +1752,7 @@ def entrada_botellas():
             
 
             bytes_data = archivo_subido.read()          
-            with open(os.path.join("DATOS",archivo_subido),"w") as f:
+            with open(os.path.join("DATOS",archivo_subido),"wb") as f:
                  f.write(bytes_data)
             #with open(os.path.join("DATOS",archivo_subido.name),"wb") as f:
             #    f.write(archivo_subido.getbuffer())
