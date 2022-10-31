@@ -1752,7 +1752,7 @@ def entrada_botellas():
             
 
             bytes_data = archivo_subido.read()          
-            with open(os.path.join("DATOS",'BTL_TEMPORAL.btl'),"w") as f:
+            with open(os.path.join("DATOS",'BTL_TEMPORAL.btl'),"wb") as f:
                  f.write(bytes_data)
                  
             archivo_temporal = 'DATOS/BTL_TEMPORAL.btl'
