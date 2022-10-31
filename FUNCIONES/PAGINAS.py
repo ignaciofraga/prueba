@@ -1721,9 +1721,9 @@ def entrada_botellas():
             df_seleccion                = df_seleccion[df_seleccion['tipo_salida']==tipo_salida_seleccionada]
     
             fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
-    
+            io_prev_1 = 1
             submit_2  = st.form_submit_button("Seleccionar salida")
-            io_prev_1 = 1    
+                
 
         if submit_2 is True or io_prev_2 == 1:
             
