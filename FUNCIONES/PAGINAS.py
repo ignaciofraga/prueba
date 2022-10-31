@@ -1695,7 +1695,7 @@ def entrada_botellas():
     listado_salidas = df_salidas_radiales['tipo_salida'].unique()
     
     
-    # Despliega un menú de selección de la salida a introducir
+    # Despliega un menú de selección del año y tipo de salida
     with st.form("Formulario seleccion año"):
                
         col1, col2= st.columns(2,gap="small")
@@ -1712,6 +1712,7 @@ def entrada_botellas():
         
     if submit_1 is True:
 
+        # Despliega un menú para elegir la fecha entre la salidas realizadas
         with st.form("Formulario seleccion fecha"):
     
             df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
@@ -1719,13 +1720,62 @@ def entrada_botellas():
     
             fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
 
-            id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida]
-
-            st.text(id_salida)            
-
             submit_2 = st.form_submit_button("Seleccionar salida") 
 
+        if submit_2 is True:
+            
+            # Recupera el identificador de la salida
+            id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida]
 
+            # Recupera las estaciones muestreadas
+            estaciones               = df_seleccion['estaciones'][df_seleccion['fecha_salida']==fecha_salida]
+
+            with st.form("Formulario seleccion estacion"):
+       
+                 fecha_salida                 = st.selectbox('Estación',(estaciones))
+    
+                 submit_2 = st.form_submit_button("Seleccionar salida")
+
+
+
+
+
+    #         # Despliega un recordatorio de mantener el nombre del archivo            
+    #         texto_error = 'IMPORTANTE. Los datos a subir deben ajustarse a la plantilla facilitada' 
+    #         st.warning(texto_error, icon="⚠️")
+
+
+
+
+
+
+    # #    st.download_button('DESCARGAR PLANTILLA E INSTRUCCIONES', archivo_instrucciones, file_name='PLANTILLA.zip')        
+
+    #     with open(archivo_instrucciones, "rb") as fp:
+    #         st.download_button(
+    #             label="DESCARGAR PLANTILLA E INSTRUCCIONES",
+    #             data=fp,
+    #             file_name="PLANTILLA.zip",
+    #             mime="application/zip"
+    #         )
+            
+        
+    # fecha_actualizacion = datetime.date.today()    
+        
+    # ### Subida de archivos
+
+    # # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    # direccion_host = st.secrets["postgres"].host
+    # base_datos     = st.secrets["postgres"].dbname
+    # usuario        = st.secrets["postgres"].user
+    # contrasena     = st.secrets["postgres"].password
+    # puerto         = st.secrets["postgres"].port
+
+    # col1 = st.columns(1)
+
+    # # Boton para subir los archivos de datos
+    # listado_archivos_subidos = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)
+  
 
     
     # # Selecciona la salida de la que se quiere introducir datos
