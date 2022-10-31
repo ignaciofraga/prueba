@@ -1696,7 +1696,7 @@ def entrada_botellas():
     
     
     # Despliega un menú de selección de la salida a introducir
-    with st.form("Formulario seleccion"):
+    with st.form("Formulario seleccion año"):
                
         col1, col2= st.columns(2,gap="small")
         
@@ -1704,18 +1704,22 @@ def entrada_botellas():
         
             tipo_salida_seleccionada    = st.selectbox('Tipo de salida',(listado_salidas))
 
+        with col2:
+            
             anho_seleccionado           = st.selectbox('Año',(listado_anhos))
 
         submit = st.form_submit_button("Ver salidas realizadas") 
-
-    with st.form("Formulario seleccion"):
-
-        df_seleccion                = df_seleccion[df_seleccion['año']==anho_seleccionado]
-        df_seleccion                = df_seleccion[df_seleccion['tipo_salida']==tipo_salida_seleccionada]
-
-        fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
         
-        submit = st.form_submit_button("Seleccionar salida") 
+        if submit is True:
+
+            with st.form("Formulario seleccion fecha"):
+        
+                df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
+                df_seleccion                = df_seleccion[df_seleccion['tipo_salida']==tipo_salida_seleccionada]
+        
+                fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
+                
+                submit = st.form_submit_button("Seleccionar salida") 
 
 
 
