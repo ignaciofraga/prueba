@@ -1752,7 +1752,7 @@ def entrada_botellas():
             import os
             archivo_temporal = 'DATOS/TEMPORAL_botella.btl'
             
-            with open(os.path.join("tempDir",archivo_subido.name),"wb") as f:
+            with open(os.path.join("DATOS",archivo_subido.name),"wb") as f:
                 f.write(archivo_subido.getbuffer())
 
             # Nombre del archivo (para evitar conflictos por ser leido como objeto)
