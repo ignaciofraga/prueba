@@ -17,6 +17,7 @@ from PIL import Image
 from dateutil.relativedelta import relativedelta
 import matplotlib.dates as mdates
 import json
+import os
 
 #import FUNCIONES_INSERCION
 from FUNCIONES import FUNCIONES_INSERCION
@@ -1670,7 +1671,7 @@ def entrada_botellas():
     
     # Archivo temporal para escritura de resultados intermedios
     archivo_temporal = 'DATOS/TEMPORAL_botella.btl'
-    archivo_subido   = 'DATOS/Archivo_botella.btl'
+    archivo_subido   = 'Archivo_botella.btl'
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host   = st.secrets["postgres"].host
@@ -1749,16 +1750,9 @@ def entrada_botellas():
         texto_estado = 'Procesando el archivo ' + archivo_subido.name
         with st.spinner(texto_estado):
             
-            import os
-            archivo_temporal = 'DATOS/TEMPORAL_botella.btl'
-            
-
-            
-            
-            
 
             bytes_data = archivo_subido.read()          
-            with open(os.path.join("DATOS",'BTL_TEMPORAL.btl'),"wb") as f:
+            with open(os.path.join("DATOS",archivo_subido),"w") as f:
                  f.write(bytes_data)
             #with open(os.path.join("DATOS",archivo_subido.name),"wb") as f:
             #    f.write(archivo_subido.getbuffer())
