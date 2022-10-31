@@ -1038,8 +1038,7 @@ def lectura_btl(nombre_archivo,archivo,archivo_temporal,nombre_programa,direccio
         io_fluor = 1
     if 'O2' in archivo:
         io_o2 = 1
-         
-    
+             
     id_estacion              = tabla_estaciones['id_estacion'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
     profundidades_referencia = tabla_estaciones['profundidades_referencia'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
     lat_estacion             = tabla_estaciones['latitud'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]

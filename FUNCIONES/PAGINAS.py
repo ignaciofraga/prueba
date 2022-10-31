@@ -1671,7 +1671,7 @@ def entrada_botellas():
     
     # Archivo temporal para escritura de resultados intermedios
     archivo_temporal = 'DATOS/TEMPORAL_botella.btl'
-    archivo_subido   = 'Archivo_botella.btl'
+
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host   = st.secrets["postgres"].host
@@ -1752,18 +1752,16 @@ def entrada_botellas():
             
 
             bytes_data = archivo_subido.read()          
-            with open(os.path.join("DATOS",archivo_subido),"wb") as f:
+            with open(os.path.join("DATOS",'BTL_TEMPORAL.btl'),"w") as f:
                  f.write(bytes_data)
-            #with open(os.path.join("DATOS",archivo_subido.name),"wb") as f:
-            #    f.write(archivo_subido.getbuffer())
-
-#archivo_subido
+                 
+            archivo_temporal = 'DATOS/BTL_TEMPORAL.btl'
 
             # Nombre del archivo (para evitar conflictos por ser leido como objeto)
             nombre_archivo_subido         = archivo_subido.name
         
             # Lee el archivo subido
-            datos_botellas                 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo_subido,archivo_subido,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            datos_botellas                 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo_subido,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
             # Asigna la salida al mar correspondiente
             datos_botellas['salida_mar']   = id_salida
