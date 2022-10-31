@@ -1744,7 +1744,8 @@ def entrada_botellas():
     listado_archivos_subidos = st.file_uploader("Arrastra los archivos .btl", accept_multiple_files=True)
   
     for archivo_subido in listado_archivos_subidos:
-
+        st.text(listado_archivos_subidos)
+        st.text(archivo_subido)
         texto_estado = 'Procesando el archivo ' + archivo_subido
         with st.spinner(texto_estado):
 
