@@ -1666,20 +1666,29 @@ def entrada_condiciones_ambientales():
 
 def entrada_botellas():
     
+    nombre_programa = 'RADIAL CORUÑA'
+    
+    # Archivo temporal para escritura de resultados intermedios
+    archivo_temporal = 'DATOS/TEMPORAL_botella.btl'
+    
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
-    direccion_host = st.secrets["postgres"].host
-    base_datos     = st.secrets["postgres"].dbname
-    usuario        = st.secrets["postgres"].user
-    contrasena     = st.secrets["postgres"].password
-    puerto         = st.secrets["postgres"].port
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port
     
     # Recupera tablas con informacion utilizada en el procesado
-    conn       = init_connection()
-    df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-    df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA'] 
-    df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
-    df_estaciones_radiales = df_estaciones[df_estaciones['programa']==3]
-    conn.close()
+    conn          = init_connection()
+    df_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    # df_programas  = psql.read_sql('SELECT * FROM programas', conn)
+    # df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+    df_salidas_radiales = df_salidas[df_salidas['nombre_programa']==nombre_programa] 
+    conn.close()    
+    
+#    id_programa_elegido = df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].iloc[0]
+    #df_estaciones_radiales = df_estaciones[df_estaciones['programa']==id_programa_elegido]
+
     
     # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
     indices_dataframe              = numpy.arange(0,df_salidas_radiales.shape[0],1,dtype=int)    
@@ -1694,20 +1703,16 @@ def entrada_botellas():
     listado_anhos   = numpy.sort(listado_anhos)
     listado_salidas = df_salidas_radiales['tipo_salida'].unique()
     
-    # io_prev_1 = 0
-    # io_prev_2 = 0
-    
+
     # Despliega un menú de selección del año y tipo de salida
     with st.form("Formulario seleccion año"):
                
         col1, col2= st.columns(2,gap="small")
         
         with col1:
-        
             tipo_salida_seleccionada    = st.selectbox('Tipo de salida',(listado_salidas))
 
         with col2:
-            
             anho_seleccionado           = st.selectbox('Año',(listado_anhos))
 
         st.form_submit_button("Ver salidas realizadas") 
@@ -1728,11 +1733,35 @@ def entrada_botellas():
             # Recupera el identificador de la salida
             id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida].iloc[0]
     
-            # Recupera las estaciones muestreadas
-            estaciones_muestreadas   = df_seleccion['estaciones'][df_seleccion['id_salida']==id_salida].iloc[0]
+            # # Recupera las estaciones muestreadas y selecciona la que se va a introducir
+            # estaciones_muestreadas   = df_seleccion['estaciones'][df_seleccion['id_salida']==id_salida].iloc[0]
     
-            estacion_seleccionada    = st.selectbox('Estación',(estaciones_muestreadas))
+#            estacion_seleccionada    = st.selectbox('Estación',(estaciones_muestreadas))
+            
+            texto_error = 'IMPORTANTE. El nombre de los archivos deben de mantener el formato FechaEstacion+Variables.btl' 
+            st.warning(texto_error, icon="⚠️")
     
+            listado_archivos_subidos = st.file_uploader("Arrastra los archivos .btl", accept_multiple_files=True)
+  
+            for archivo_subido in listado_archivos_subidos:
+
+                # Lee el archivo subido
+                datos_botellas                 = FUNCIONES_INSERCION.lectura_btl(archivo_subido,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+                 
+                # Asigna la salida al mar correspondiente
+                datos_botellas['salida_mar']   = id_salida
+                
+                # Sube los datos a la base de datos
+                # Asigna el registro correspondiente 
+                datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+
+                # Inserta en la base de datos las variables físicas disponibles 
+                FUNCIONES_INSERCION.inserta_datos_fisica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
+                
+                # Inserta en la base de datos las variables biogeoquímicas disponibles 
+                FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
+                
+
             # with st.form("Formulario seleccion estacion"):
        
             #      fecha_salida                 = st.selectbox('Estación',(estaciones))
