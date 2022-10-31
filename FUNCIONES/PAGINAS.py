@@ -1722,7 +1722,7 @@ def entrada_botellas():
 
             submit_2 = st.form_submit_button("Seleccionar salida") 
 
-        if submit_2 is True:
+        if submit_2 is True and submit_1 is True:
             
             # Recupera el identificador de la salida
             id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida]
