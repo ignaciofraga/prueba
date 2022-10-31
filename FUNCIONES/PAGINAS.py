@@ -1708,9 +1708,9 @@ def entrada_botellas():
             
             anho_seleccionado           = st.selectbox('Año',(listado_anhos))
 
-        submit = st.form_submit_button("Ver salidas realizadas") 
+        submit_1 = st.form_submit_button("Ver salidas realizadas") 
         
-    if submit is True:
+    if submit_1 is True:
 
         with st.form("Formulario seleccion fecha"):
     
@@ -1718,8 +1718,12 @@ def entrada_botellas():
             df_seleccion                = df_seleccion[df_seleccion['tipo_salida']==tipo_salida_seleccionada]
     
             fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
-            
-            submit = st.form_submit_button("Seleccionar salida") 
+
+            id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida]
+
+            st.text(id_salida)            
+
+            submit_2 = st.form_submit_button("Seleccionar salida") 
 
 
 
