@@ -1684,7 +1684,7 @@ def entrada_botellas():
     # Define los años con salidas asociadas
     df_salidas_radiales['año'] = numpy.zeros(df_salidas_radiales.shape[0],dtype=int)
     for idato in range(df_salidas_radiales.shape[0]):
-        df_salidas_radiales['año'] = df_salidas_radiales['fecha_salida'].year 
+        df_salidas_radiales['año'][idato] = df_salidas_radiales['fecha_salida'][idato].year 
     listado_anhos = df_salidas_radiales['año'].unique
     
     # Despliega un menú de selección de la salida a introducir
