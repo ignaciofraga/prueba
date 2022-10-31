@@ -1746,7 +1746,7 @@ def entrada_botellas():
     for archivo_subido in listado_archivos_subidos:
         st.text(listado_archivos_subidos)
         st.text(archivo_subido)
-        texto_estado = 'Procesando el archivo ' + archivo_subido
+        texto_estado = 'Procesando el archivo ' #+ archivo_subido
         with st.spinner(texto_estado):
 
             # Lee el archivo subido
