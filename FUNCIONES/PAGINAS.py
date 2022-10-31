@@ -1753,7 +1753,7 @@ def entrada_botellas():
             archivo_temporal = 'DATOS/BTL_TEMPORAL2.btl'
             
             data = archivo_subido.getvalue().decode('utf-8')
-            
+            st.text(data)
             archivo_destino = open(archivo_temporal,'w')
             archivo_destino.write(data)
             archivo_destino.close()
