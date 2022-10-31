@@ -1728,46 +1728,46 @@ def entrada_botellas():
         submit_2  = st.form_submit_button("Seleccionar salida")
                 
 
-        if submit_2 is True:
-            
-            # Recupera el identificador de la salida
-            id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida].iloc[0]
-    
-            # # Recupera las estaciones muestreadas y selecciona la que se va a introducir
-            # estaciones_muestreadas   = df_seleccion['estaciones'][df_seleccion['id_salida']==id_salida].iloc[0]
-    
+    if submit_2 is True:
+        
+        # Recupera el identificador de la salida
+        id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida].iloc[0]
+
+        # # Recupera las estaciones muestreadas y selecciona la que se va a introducir
+        # estaciones_muestreadas   = df_seleccion['estaciones'][df_seleccion['id_salida']==id_salida].iloc[0]
+
 #            estacion_seleccionada    = st.selectbox('Estación',(estaciones_muestreadas))
-            
-            texto_error = 'IMPORTANTE. El nombre de los archivos deben de mantener el formato FechaEstacion+Variables.btl' 
-            st.warning(texto_error, icon="⚠️")
-    
-            listado_archivos_subidos = st.file_uploader("Arrastra los archivos .btl", accept_multiple_files=True)
+        
+        texto_error = 'IMPORTANTE. El nombre de los archivos deben de mantener el formato FechaEstacion+Variables.btl' 
+        st.warning(texto_error, icon="⚠️")
+
+        listado_archivos_subidos = st.file_uploader("Arrastra los archivos .btl", accept_multiple_files=True)
   
-            for archivo_subido in listado_archivos_subidos:
+        for archivo_subido in listado_archivos_subidos:
 
-                texto_estado = 'Procesando el archivo ' + archivo_subido
-                with st.spinner(texto_estado):
+            texto_estado = 'Procesando el archivo ' + archivo_subido
+            with st.spinner(texto_estado):
 
-                    # Lee el archivo subido
-                    datos_botellas                 = FUNCIONES_INSERCION.lectura_btl(archivo_subido,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-                     
-                    # Asigna la salida al mar correspondiente
-                    datos_botellas['salida_mar']   = id_salida
-                    
-                    # Sube los datos a la base de datos
-                    # Asigna el registro correspondiente 
-                    datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-    
-                    # Inserta en la base de datos las variables físicas disponibles 
-                    FUNCIONES_INSERCION.inserta_datos_fisica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
-                    
-                    # Inserta en la base de datos las variables biogeoquímicas disponibles 
-                    FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
-                    
-                texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
-                st.success(texto_exito)
+                # Lee el archivo subido
+                datos_botellas                 = FUNCIONES_INSERCION.lectura_btl(archivo_subido,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+                 
+                # Asigna la salida al mar correspondiente
+                datos_botellas['salida_mar']   = id_salida
+                
+                # Sube los datos a la base de datos
+                # Asigna el registro correspondiente 
+                datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-            st.form_submit_button("Seleccionar salida")
+                # Inserta en la base de datos las variables físicas disponibles 
+                FUNCIONES_INSERCION.inserta_datos_fisica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
+                
+                # Inserta en la base de datos las variables biogeoquímicas disponibles 
+                FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
+                
+            texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
+            st.success(texto_exito)
+
+
        
             #      fecha_salida                 = st.selectbox('Estación',(estaciones))
     
