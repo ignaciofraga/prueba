@@ -1690,13 +1690,15 @@ def entrada_botellas():
     df_salidas_radiales['año'] = numpy.zeros(df_salidas_radiales.shape[0],dtype=int)
     for idato in range(df_salidas_radiales.shape[0]):
         df_salidas_radiales['año'][idato] = df_salidas_radiales['fecha_salida'][idato].year 
-    listado_anhos = df_salidas_radiales['año'].unique()
-    listado_anhos = numpy.sort(listado_anhos)
+    listado_anhos   = df_salidas_radiales['año'].unique()
+    listado_anhos   = numpy.sort(listado_anhos)
+    listado_salidas = df_salidas_radiales['tipo_salida'].unique()
+    
     
     # Despliega un menú de selección de la salida a introducir
     with st.form("Formulario seleccion"):
                
-        tipo_salida_seleccionada    = st.selectbox('Tipo de salida',(['MENSUAL','SEMANAL']))
+        tipo_salida_seleccionada    = st.selectbox('Tipo de salida',(listado_salidas))
 
         anho_seleccionado           = st.selectbox('Año',(listado_anhos))
 
