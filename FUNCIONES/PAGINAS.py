@@ -1761,6 +1761,8 @@ def entrada_botellas():
                 # Inserta en la base de datos las variables biogeoquímicas disponibles 
                 FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
                 
+                texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
+                st.success(texto_exito)
 
             # with st.form("Formulario seleccion estacion"):
        
