@@ -1728,9 +1728,7 @@ def entrada_botellas():
         id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida]
 
         # Recupera las estaciones muestreadas
-        estaciones               = json.loads(df_seleccion['estaciones'][df_seleccion['fecha_salida']==fecha_salida])
-
-        st.text(estaciones)
+        estaciones               = df_seleccion['estaciones'][df_seleccion['id_salida']==id_salida].iloc[0]
 
         with st.form("Formulario seleccion estacion"):
    
