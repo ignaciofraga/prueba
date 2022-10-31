@@ -1670,6 +1670,7 @@ def entrada_botellas():
     
     # Archivo temporal para escritura de resultados intermedios
     archivo_temporal = 'DATOS/TEMPORAL_botella.btl'
+    archivo_subido   = 'DATOS/Archivo_botella.btl'
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host   = st.secrets["postgres"].host
@@ -1747,6 +1748,12 @@ def entrada_botellas():
         
         texto_estado = 'Procesando el archivo ' + archivo_subido.name
         with st.spinner(texto_estado):
+            
+            import os
+            archivo_temporal = 'DATOS/TEMPORAL_botella.btl'
+            
+            with open(os.path.join("tempDir",archivo_subido.name),"wb") as f:
+                f.write(archivo_subido.getbuffer())
 
             # Nombre del archivo (para evitar conflictos por ser leido como objeto)
             nombre_archivo_subido         = archivo_subido.name
