@@ -1752,8 +1752,13 @@ def entrada_botellas():
             import os
             archivo_temporal = 'DATOS/TEMPORAL_botella.btl'
             
+            bytes_data = archivo_subido.read()          
             with open(os.path.join("DATOS",archivo_subido.name),"wb") as f:
-                f.write(archivo_subido.getbuffer())
+                 f.write(bytes_data)
+            #with open(os.path.join("DATOS",archivo_subido.name),"wb") as f:
+            #    f.write(archivo_subido.getbuffer())
+
+#archivo_subido
 
             # Nombre del archivo (para evitar conflictos por ser leido como objeto)
             nombre_archivo_subido         = archivo_subido.name
