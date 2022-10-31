@@ -1699,11 +1699,10 @@ def entrada_botellas():
     with st.form("Formulario seleccion"):
                
         tipo_salida_seleccionada    = st.selectbox('Tipo de salida',(listado_salidas))
+        df_seleccion                = df_salidas_radiales[df_salidas_radiales['tipo_salida'] == tipo_salida_seleccionada]
 
         anho_seleccionado           = st.selectbox('Año',(listado_anhos))
-
-        df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
-        df_seleccion                = df_seleccion[df_seleccion['tipo_salida'] == tipo_salida_seleccionada ]
+        df_seleccion                = df_seleccion[df_seleccion['año']==anho_seleccionado]
 
 
         fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
