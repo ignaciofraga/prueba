@@ -1767,7 +1767,7 @@ def entrada_botellas():
                 texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
                 st.success(texto_exito)
 
-            # with st.form("Formulario seleccion estacion"):
+            st.form_submit_button("Seleccionar salida")
        
             #      fecha_salida                 = st.selectbox('Estación',(estaciones))
     
