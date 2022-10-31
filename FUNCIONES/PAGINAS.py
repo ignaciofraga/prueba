@@ -1745,22 +1745,25 @@ def entrada_botellas():
   
             for archivo_subido in listado_archivos_subidos:
 
-                # Lee el archivo subido
-                datos_botellas                 = FUNCIONES_INSERCION.lectura_btl(archivo_subido,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-                 
-                # Asigna la salida al mar correspondiente
-                datos_botellas['salida_mar']   = id_salida
-                
-                # Sube los datos a la base de datos
-                # Asigna el registro correspondiente 
-                datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+                texto_estado = 'Procesando el archivo ' + archivo_subido
+                with st.spinner(texto_estado):
 
-                # Inserta en la base de datos las variables físicas disponibles 
-                FUNCIONES_INSERCION.inserta_datos_fisica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
-                
-                # Inserta en la base de datos las variables biogeoquímicas disponibles 
-                FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
-                
+                    # Lee el archivo subido
+                    datos_botellas                 = FUNCIONES_INSERCION.lectura_btl(archivo_subido,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+                     
+                    # Asigna la salida al mar correspondiente
+                    datos_botellas['salida_mar']   = id_salida
+                    
+                    # Sube los datos a la base de datos
+                    # Asigna el registro correspondiente 
+                    datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+                    # Inserta en la base de datos las variables físicas disponibles 
+                    FUNCIONES_INSERCION.inserta_datos_fisica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
+                    
+                    # Inserta en la base de datos las variables biogeoquímicas disponibles 
+                    FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
+                    
                 texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
                 st.success(texto_exito)
 
