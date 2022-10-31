@@ -1681,6 +1681,11 @@ def entrada_botellas():
     df_estaciones_radiales = df_estaciones[df_estaciones['programa']==3]
     conn.close()
     
+    # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
+    indices_dataframe              = numpy.arange(0,df_salidas_radiales.shape[0],1,dtype=int)    
+    df_salidas_radiales['id_temp'] = indices_dataframe
+    df_salidas_radiales.set_index('id_temp',drop=False,append=False,inplace=True)
+    
     # Define los años con salidas asociadas
     df_salidas_radiales['año'] = numpy.zeros(df_salidas_radiales.shape[0],dtype=int)
     for idato in range(df_salidas_radiales.shape[0]):
