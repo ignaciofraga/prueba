@@ -1710,33 +1710,33 @@ def entrada_botellas():
 
         submit_1 = st.form_submit_button("Ver salidas realizadas") 
         
-    if submit_1 is True:
+#    if submit_1 is True:
 
-        # Despliega un menú para elegir la fecha entre la salidas realizadas
-        with st.form("Formulario seleccion fecha"):
-    
-            df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
-            df_seleccion                = df_seleccion[df_seleccion['tipo_salida']==tipo_salida_seleccionada]
-    
-            fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
+    # Despliega un menú para elegir la fecha entre la salidas realizadas
+    with st.form("Formulario seleccion fecha"):
 
-            submit_2 = st.form_submit_button("Seleccionar salida") 
+        df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
+        df_seleccion                = df_seleccion[df_seleccion['tipo_salida']==tipo_salida_seleccionada]
 
-        if submit_2 is True and submit_1 is True:
-            
-            # Recupera el identificador de la salida
-            id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida]
+        fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
 
-            # Recupera las estaciones muestreadas
-            estaciones               = df_seleccion['estaciones'][df_seleccion['fecha_salida']==fecha_salida]
+        submit_2 = st.form_submit_button("Seleccionar salida") 
 
-            st.text(estaciones)
+    if submit_2 is True:
+        
+        # Recupera el identificador de la salida
+        id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida]
 
-            with st.form("Formulario seleccion estacion"):
-       
-                 fecha_salida                 = st.selectbox('Estación',(estaciones))
-    
-                 submit_2 = st.form_submit_button("Seleccionar salida")
+        # Recupera las estaciones muestreadas
+        estaciones               = df_seleccion['estaciones'][df_seleccion['fecha_salida']==fecha_salida]
+
+        st.text(estaciones)
+
+        with st.form("Formulario seleccion estacion"):
+   
+             fecha_salida                 = st.selectbox('Estación',(estaciones))
+
+             submit_2 = st.form_submit_button("Seleccionar salida")
 
 
 
