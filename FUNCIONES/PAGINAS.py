@@ -1696,7 +1696,7 @@ def entrada_botellas():
     # Despliega un menú de selección de la salida a introducir
     with st.form("Formulario seleccion"):
                
-        tipo_salida_seleccionada    = st.selectbox('Tipo de salida',(['ANUAL','MENSUAL']))
+        tipo_salida_seleccionada    = st.selectbox('Tipo de salida',(['MENSUAL','SEMANAL']))
 
         anho_seleccionado           = st.selectbox('Año',(listado_anhos))
 
