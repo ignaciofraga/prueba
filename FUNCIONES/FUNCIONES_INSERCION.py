@@ -1003,7 +1003,7 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 ######################################################################
 ######## FUNCION PARA LEER DATOS DE BOTELLAs (ARCHIVOS .BTL)  ########
 ######################################################################
-def lectura_btl(archivo,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto):
+def lectura_btl(nombre_archivo,archivo,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto):
  
     # recupera la información de las estaciones incluidas en la base de datos
     con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
@@ -1019,12 +1019,12 @@ def lectura_btl(archivo,archivo_temporal,nombre_programa,direccion_host,base_dat
     
     
     # Identifica la estación a la que corresponde el archivo
-    posicion_separador = archivo.index('+')
-    nombre_estacion    = archivo[8:posicion_separador].upper() + 'CO'                
+    posicion_separador = nombre_archivo.index('+')
+    nombre_estacion    = nombre_archivo[8:posicion_separador].upper() + 'CO'                
     id_estacion        = df_estaciones_radiales['id_estacion'][df_estaciones_radiales['nombre_estacion']==nombre_estacion].iloc[0] 
     
     # Identifica la fecha del muestreo
-    fecha_salida_texto = archivo[0:8]
+    fecha_salida_texto = nombre_archivo[0:8]
     fecha_salida       = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
     
     # Encuentra las variables muestreadas
@@ -1039,10 +1039,6 @@ def lectura_btl(archivo,archivo_temporal,nombre_programa,direccion_host,base_dat
     if 'O2' in archivo:
         io_o2 = 1
          
-         
-    
-    posicion_separador = archivo.index('+')
-    nombre_estacion    = archivo[8:posicion_separador].upper() + 'CO'
     
     id_estacion              = tabla_estaciones['id_estacion'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
     profundidades_referencia = tabla_estaciones['profundidades_referencia'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]

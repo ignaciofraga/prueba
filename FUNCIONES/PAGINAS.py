@@ -1744,13 +1744,15 @@ def entrada_botellas():
     listado_archivos_subidos = st.file_uploader("Arrastra los archivos .btl", accept_multiple_files=True)
   
     for archivo_subido in listado_archivos_subidos:
-        st.text(listado_archivos_subidos)
-        st.text(archivo_subido.name)
-        texto_estado = 'Procesando el archivo ' #+ archivo_subido
+        
+        texto_estado = 'Procesando el archivo ' + archivo_subido.name
         with st.spinner(texto_estado):
 
+            # Nombre del archivo (para evitar conflictos por ser leido como objeto)
+            nombre_archivo_subido         = archivo_subido.name
+        
             # Lee el archivo subido
-            datos_botellas                 = FUNCIONES_INSERCION.lectura_btl(archivo_subido,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            datos_botellas                 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo_subido,archivo_subido,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
             # Asigna la salida al mar correspondiente
             datos_botellas['salida_mar']   = id_salida
