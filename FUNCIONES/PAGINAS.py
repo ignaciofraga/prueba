@@ -1691,6 +1691,7 @@ def entrada_botellas():
     for idato in range(df_salidas_radiales.shape[0]):
         df_salidas_radiales['año'][idato] = df_salidas_radiales['fecha_salida'][idato].year 
     listado_anhos = df_salidas_radiales['año'].unique()
+    listado_anhos = numpy.sort(listado_anhos)
     
     # Despliega un menú de selección de la salida a introducir
     with st.form("Formulario seleccion"):
@@ -1699,7 +1700,7 @@ def entrada_botellas():
 
         anho_seleccionado           = st.selectbox('Año',(listado_anhos))
 
-        df_seleccion                = df_estaciones_radiales[df_estaciones_radiales['año']==anho_seleccionado]
+        df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
         df_seleccion                = df_seleccion[df_seleccion['tipo_salida'] == tipo_salida_seleccionada ]
 
         fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
