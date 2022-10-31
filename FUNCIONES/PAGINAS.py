@@ -1694,6 +1694,8 @@ def entrada_botellas():
     listado_anhos   = numpy.sort(listado_anhos)
     listado_salidas = df_salidas_radiales['tipo_salida'].unique()
     
+    io_prev_1 = 0
+    io_prev_2 = 0
     
     # Despliega un menú de selección del año y tipo de salida
     with st.form("Formulario seleccion año"):
@@ -1710,32 +1712,34 @@ def entrada_botellas():
 
         submit_1 = st.form_submit_button("Ver salidas realizadas") 
         
-#    if submit_1 is True:
+    if submit_1 is True or io_prev_1 == 1:
 
-    # Despliega un menú para elegir la fecha entre la salidas realizadas
-    with st.form("Formulario seleccion fecha"):
+        # Despliega un menú para elegir la fecha entre la salidas realizadas
+        with st.form("Formulario seleccion fecha"):
+    
+            df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
+            df_seleccion                = df_seleccion[df_seleccion['tipo_salida']==tipo_salida_seleccionada]
+    
+            fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
+    
+            submit_2  = st.form_submit_button("Seleccionar salida")
+            io_prev_1 = 1    
 
-        df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
-        df_seleccion                = df_seleccion[df_seleccion['tipo_salida']==tipo_salida_seleccionada]
-
-        fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
-
-        submit_2 = st.form_submit_button("Seleccionar salida") 
-
-    if submit_2 is True:
-        
-        # Recupera el identificador de la salida
-        id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida].iloc[0]
-
-        # Recupera las estaciones muestreadas
-        estaciones               = df_seleccion['estaciones'][df_seleccion['id_salida']==id_salida].iloc[0]
-
-        with st.form("Formulario seleccion estacion"):
-   
-             fecha_salida                 = st.selectbox('Estación',(estaciones))
-
-             submit_2 = st.form_submit_button("Seleccionar salida")
-
+        if submit_2 is True or io_prev_2 == 1:
+            
+            # Recupera el identificador de la salida
+            id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida].iloc[0]
+    
+            # Recupera las estaciones muestreadas
+            estaciones               = df_seleccion['estaciones'][df_seleccion['id_salida']==id_salida].iloc[0]
+    
+            with st.form("Formulario seleccion estacion"):
+       
+                 fecha_salida                 = st.selectbox('Estación',(estaciones))
+    
+                 submit_3 = st.form_submit_button("Seleccionar salida")
+                 io_prev_2 = 1
+    
 
 
 
