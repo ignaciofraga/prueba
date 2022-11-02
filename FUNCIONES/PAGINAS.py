@@ -1723,13 +1723,14 @@ def entrada_botellas():
         df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
         for idato in range(df_salidas_seleccion.shape[0]):
             df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+        df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
     
     with col3:
-        anho_seleccionado           = st.selectbox('Año',(df_salidas_seleccion['año'].unique()),index=len(df_salidas_seleccion['año'].unique())-1)
+        anho_seleccionado           = st.selectbox('Año',(df_salidas_seleccion['año'].unique()),index=df_salidas_seleccion.shape[0]-1)
         df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
 
     with col4:
-        fecha_salida                = st.selectbox('Fecha salida',(df_salidas_seleccion['fecha_salida']),index=df_salidas_seleccion.shape[0])
+        fecha_salida                = st.selectbox('Fecha salida',(df_salidas_seleccion['fecha_salida']),index=df_salidas_seleccion.shape[0]-1)
 
         # Recupera el identificador de la salida seleccionada
         id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_salida].iloc[0]
