@@ -1754,10 +1754,11 @@ def entrada_botellas():
             archivo        = archivo_subido
             
             #lectura_archivo = open(archivo, "r") 
-            data = archivo_subido.getvalue().decode('utf-8')
+            bytes_data = archivo_subido.getvalue()
+            data = archivo_subido.getvalue().decode('utf-8').splitlines()
             
-            test = data.readlines()
-            st.text(test[-1])
+            #test = data.readlines()
+            st.text(data[-1])
             
             #mensaje_error,datos_botellas = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,archivo,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
