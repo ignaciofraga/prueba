@@ -1719,10 +1719,6 @@ def entrada_botellas():
         # Recupera el identificador de la salida seleccionada
         id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_salida].iloc[0]
 
-
-    # seleccion = st.button('Seleccionar salida')
-    
-    # if seleccion == True:
  
     # Despliega la extensión para subir archivos
     listado_archivos_subidos = st.file_uploader("Arrastra o selecciona los archivos .btl", accept_multiple_files=True)
@@ -1803,6 +1799,12 @@ def entrada_botellas():
 
     cursor.close()
     conn.close()         
+
+    recarga    = st.button('Añadir datos de nueva salida')
+    
+    if recarga == True:    
+
+        st.experimental_rerun()    
  
     
  
