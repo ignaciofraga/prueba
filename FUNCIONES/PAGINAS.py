@@ -5,6 +5,7 @@ Created on Wed Sep 21 08:05:55 2022
 @author: ifraga
 """
 import streamlit as st
+from .session_state import get_session_state
 import pandas.io.sql as psql
 import datetime
 import pandas 
@@ -18,6 +19,7 @@ from dateutil.relativedelta import relativedelta
 import matplotlib.dates as mdates
 import json
 import os
+from random import randint
 
 #import FUNCIONES_INSERCION
 from FUNCIONES import FUNCIONES_INSERCION
@@ -1721,7 +1723,11 @@ def entrada_botellas():
 
  
     # Despliega la extensión para subir archivos
-    listado_archivos_subidos = st.file_uploader("Arrastra o selecciona los archivos .btl", accept_multiple_files=True)
+    state = get_session_state()
+    if not state.widget_key:
+        state.widget_key = str(randint(1000, 100000000))
+        
+    listado_archivos_subidos = st.file_uploader("Arrastra o selecciona los archivos .btl", accept_multiple_files=True,key=state.widget_key)
   
     # Conecta con la base de datos
     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -1800,11 +1806,21 @@ def entrada_botellas():
     cursor.close()
     conn.close()         
 
-    recarga    = st.button('Añadir datos de nueva salida')
+    # Botón para recargar los archivos subidos    
+    if st.button('Limpiar archivos subidos'):    
+        state.widget_key = str(randint(1000, 100000000))    
+    state.sync()
     
-    if recarga == True:    
 
-        st.experimental_rerun()    
- 
+
+    
+    # if not state.widget_key:
+    #     state.widget_key = str(randint(1000, 100000000))
+    # uploaded_file = st.file_uploader(
+    # "Choose a file", accept_multiple_files=True, key=state.widget_key)
+    # if st.button('clear uploaded_file'):
+    #     state.widget_key = str(randint(1000, 100000000))
+    # state.sync()
+    
     
  
