@@ -1666,7 +1666,8 @@ def entrada_condiciones_ambientales():
 ###############################################################################    
 
 def entrada_botellas():
-        
+    
+    st.subheader('Entrada de datos procedentes de botellas')    
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host   = st.secrets["postgres"].host
@@ -1681,28 +1682,9 @@ def entrada_botellas():
     df_programas        = psql.read_sql('SELECT * FROM programas', conn)
     conn.close()    
     
-    #id_radiales   = [df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
     id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
     
-    #id_radiales   = df_programas.loc[df_programas['nombre_programa'] == 'RADIAL CORUÑA']
-    # tipos_salidas = df_salidas['tipo_salida'].unique()
-    
-    # # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
-    # indices_dataframe              = numpy.arange(0,df_salidas_radiales.shape[0],1,dtype=int)    
-    # df_salidas_radiales['id_temp'] = indices_dataframe
-    # df_salidas_radiales.set_index('id_temp',drop=False,append=False,inplace=True)
-    
-    # # Define los años con salidas asociadas
-    # df_salidas_radiales['año'] = numpy.zeros(df_salidas_radiales.shape[0],dtype=int)
-    # for idato in range(df_salidas_radiales.shape[0]):
-    #     df_salidas_radiales['año'][idato] = df_salidas_radiales['fecha_salida'][idato].year 
-    # listado_anhos   = df_salidas_radiales['año'].unique()
-    # listado_anhos   = numpy.sort(listado_anhos)
-    
-  
-    # Despliega menús de selección del año y fecha
-
-               
+    # Despliega menús de selección del programa, tipo de salida, año y fecha               
     col1, col2, col3, col4= st.columns(4,gap="small")
  
     with col1: 
@@ -1755,221 +1737,59 @@ def entrada_botellas():
             texto_estado = 'Procesando el archivo ' + archivo_subido.name
             with st.spinner(texto_estado):
                 
-                # Lee los datos de cada archivo de botella
-                nombre_archivo = archivo_subido.name
-                datos_archivo = archivo_subido.getvalue().decode('utf-8').splitlines()            
-                mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
-    
-                # Asigna el identificador de la salida al mar
-                datos_botellas ['id_salida'] =  id_salida
-    
-                # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-                datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
-    
-    
-                # Inserta datos físicos
-                for idato in range(datos_botellas.shape[0]):
-                    if io_par == 1:
-                        instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf)
-                              VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf,EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
-                        
-                        cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato]),datos_botellas['par_ctd'][idato],int(datos_botellas['par_ctd_qf'][idato])))
-                        conn.commit()
-                        
-                    if io_par == 0:   
-                        instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
-                              VALUES (%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf);''' 
-                                
-                        cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato])))
-                        conn.commit()
-                        
-                    # Inserta datos biogeoquímicos
-                    if io_fluor == 1:                
-                        instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,fluorescencia_ctd,fluorescencia_ctd_qf)
-                              VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (fluorescencia_ctd,fluorescencia_ctd_qf) = ROW(EXCLUDED.fluorescencia_ctd,EXCLUDED.fluorescencia_ctd_qf);''' 
-                                
-                        cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['fluorescencia_ctd'][idato],int(datos_botellas['fluorescencia_ctd'][idato])))
-                        conn.commit()           
-         
-                    if io_O2 == 1:                
-                        instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,oxigeno_ctd,oxigeno_ctd_qf)
-                              VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (oxigeno_ctd,oxigeno_ctd_qf) = ROW(EXCLUDED.oxigeno_ctd,EXCLUDED.oxigeno_ctd_qf);''' 
-                                
-                        cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['oxigeno_ctd'][idato],int(datos_botellas['oxigeno_ctd_qf'][idato])))
-                        conn.commit()     
-    
-            texto_exito = 'Archivo ' + archivo_subido.name + ' procesado correctamente'
-            st.success(texto_exito)  
-            
+                try:
+                
+                    # Lee los datos de cada archivo de botella
+                    nombre_archivo = archivo_subido.name
+                    datos_archivo = archivo_subido.getvalue().decode('utf-8').splitlines()            
+                    mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+        
+                    # Asigna el identificador de la salida al mar
+                    datos_botellas ['id_salida'] =  id_salida
+        
+                    # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+                    datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+        
+        
+                    # Inserta datos físicos
+                    for idato in range(datos_botellas.shape[0]):
+                        if io_par == 1:
+                            instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf)
+                                  VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf,EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
+                            
+                            cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato]),datos_botellas['par_ctd'][idato],int(datos_botellas['par_ctd_qf'][idato])))
+                            conn.commit()
+                            
+                        if io_par == 0:   
+                            instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
+                                  VALUES (%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf);''' 
+                                    
+                            cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato])))
+                            conn.commit()
+                            
+                        # Inserta datos biogeoquímicos
+                        if io_fluor == 1:                
+                            instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,fluorescencia_ctd,fluorescencia_ctd_qf)
+                                  VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (fluorescencia_ctd,fluorescencia_ctd_qf) = ROW(EXCLUDED.fluorescencia_ctd,EXCLUDED.fluorescencia_ctd_qf);''' 
+                                    
+                            cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['fluorescencia_ctd'][idato],int(datos_botellas['fluorescencia_ctd'][idato])))
+                            conn.commit()           
+             
+                        if io_O2 == 1:                
+                            instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,oxigeno_ctd,oxigeno_ctd_qf)
+                                  VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (oxigeno_ctd,oxigeno_ctd_qf) = ROW(EXCLUDED.oxigeno_ctd,EXCLUDED.oxigeno_ctd_qf);''' 
+                                    
+                            cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['oxigeno_ctd'][idato],int(datos_botellas['oxigeno_ctd_qf'][idato])))
+                            conn.commit()     
+        
+                    texto_exito = 'Archivo ' + archivo_subido.name + ' procesado correctamente'
+                    st.success(texto_exito) 
+                
+                except:
+                    texto_error = 'Error en el procesado del archivo ' + archivo_subido.name
+                    st.warning(texto_error, icon="⚠️")
             
         cursor.close()
         conn.close()  
     
-        texto_exito = 'Procesado de la información realizado correctamente'
-        st.success(texto_exito)               
-  
-  
-
-    # # Despliega un menú de selección del año y tipo de salida
-    # with st.form("Formulario seleccion año"):
-               
-    #     col1, col2= st.columns(2,gap="small")
-        
-    #     with col1:
-    #         anho_seleccionado           = st.selectbox('Año',(listado_anhos))
-    #         df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
-
-    #         # Get dataframe where continent is the continent_sidebar.
-    #         df1 = df.loc[df.continent == continent_sidebar]
-            
-    #         # Get the country column from df1.
-    #         df2 = df1.country
-
-
-    #     with col2:
-    #         fecha_salida              = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
-
-    #     submit = st.form_submit_button("Ver salidas realizadas") 
-
-#     # Despliega un menú para elegir la fecha entre la salidas realizadas
-#     with st.form("Formulario seleccion fecha"):
-
-#         df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
-#         df_seleccion                = df_seleccion[df_seleccion['tipo_salida']==tipo_salida_seleccionada]
-
-#         fecha_salida                 = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
-        
-#         submit_2  = st.form_submit_button("Seleccionar salida")
-                
-
-#     #if submit_2 is True:
-        
-#     # Recupera el identificador de la salida
-#     id_salida                = df_seleccion['id_salida'][df_seleccion['fecha_salida']==fecha_salida].iloc[0]
-
-#     # # Recupera las estaciones muestreadas y selecciona la que se va a introducir
-#     # estaciones_muestreadas   = df_seleccion['estaciones'][df_seleccion['id_salida']==id_salida].iloc[0]
-
-# #            estacion_seleccionada    = st.selectbox('Estación',(estaciones_muestreadas))
-    
-#     texto_error = 'IMPORTANTE. El nombre de los archivos deben de mantener el formato FechaEstacion+Variables.btl' 
-#     st.warning(texto_error, icon="⚠️")
-
-#     listado_archivos_subidos = st.file_uploader("Arrastra los archivos .btl", accept_multiple_files=True)
-  
-#     for archivo_subido in listado_archivos_subidos:
-        
-#         texto_estado = 'Procesando el archivo ' + archivo_subido.name
-#         with st.spinner(texto_estado):
-            
-#             # Conecta con la base de datos
-#             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-#             cursor = conn.cursor() 
-            
-#             # Lee los datos de cada archivo de botella
-#             nombre_archivo = archivo_subido.name
-#             datos_archivo = archivo_subido.getvalue().decode('utf-8').splitlines()            
-#             mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-
-#             # Asigna el identificador de la salida al mar
-#             datos_botellas ['id_salida'] =  id_salida
-
-#             # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-#             datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-
-
-#             # Inserta datos físicos
-#             for idato in range(datos_botellas.shape[0]):
-#                 if io_par == 1:
-#                     instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf)
-#                          VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf,EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
-                    
-#                     cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato]),datos_botellas['par_ctd'][idato],int(datos_botellas['par_ctd_qf'][idato])))
-#                     conn.commit()
-                    
-#                 if io_par == 0:   
-#                     instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
-#                          VALUES (%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf);''' 
-                            
-#                     cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato])))
-#                     conn.commit()
-                    
-#                 # Inserta datos biogeoquímicos
-#                 if io_fluor == 1:                
-#                     instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,fluorescencia_ctd,fluorescencia_ctd_qf)
-#                          VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (fluorescencia_ctd,fluorescencia_ctd_qf) = ROW(EXCLUDED.fluorescencia_ctd,EXCLUDED.fluorescencia_ctd_qf);''' 
-                            
-#                     cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['fluorescencia_ctd'][idato],int(datos_botellas['fluorescencia_ctd'][idato])))
-#                     conn.commit()           
-     
-#                 if io_O2 == 1:                
-#                     instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,oxigeno_ctd,oxigeno_ctd_qf)
-#                          VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (oxigeno_ctd,oxigeno_ctd_qf) = ROW(EXCLUDED.oxigeno_ctd,EXCLUDED.oxigeno_ctd_qf);''' 
-                            
-#                     cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['oxigeno_ctd'][idato],int(datos_botellas['oxigeno_ctd_qf'][idato])))
-#                     conn.commit()     
-
-#             cursor.close()
-#             conn.close()  
-
-           
-#         texto_exito = 'Archivo ' + archivo_subido.name + ' procesado correctamente'
-#         st.success(texto_exito)
-
-
-       
-            #      fecha_salida                 = st.selectbox('Estación',(estaciones))
-    
-            #      submit_3 = st.form_submit_button("Seleccionar salida")
-            #      io_prev_2 = 1
-    
-
-
-
-
-    #         # Despliega un recordatorio de mantener el nombre del archivo            
-    #         texto_error = 'IMPORTANTE. Los datos a subir deben ajustarse a la plantilla facilitada' 
-    #         st.warning(texto_error, icon="⚠️")
-
-
-
-
-
-
-    # #    st.download_button('DESCARGAR PLANTILLA E INSTRUCCIONES', archivo_instrucciones, file_name='PLANTILLA.zip')        
-
-    #     with open(archivo_instrucciones, "rb") as fp:
-    #         st.download_button(
-    #             label="DESCARGAR PLANTILLA E INSTRUCCIONES",
-    #             data=fp,
-    #             file_name="PLANTILLA.zip",
-    #             mime="application/zip"
-    #         )
-            
-        
-    # fecha_actualizacion = datetime.date.today()    
-        
-    # ### Subida de archivos
-
-    # # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
-    # direccion_host = st.secrets["postgres"].host
-    # base_datos     = st.secrets["postgres"].dbname
-    # usuario        = st.secrets["postgres"].user
-    # contrasena     = st.secrets["postgres"].password
-    # puerto         = st.secrets["postgres"].port
-
-    # col1 = st.columns(1)
-
-    # # Boton para subir los archivos de datos
-    # listado_archivos_subidos = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)
-  
-
-    
-    # # Selecciona la salida de la que se quiere introducir datos
-    # fecha_salida = st.selectbox('Fecha de salida ',(df_salidas_radiales['fecha_salida']))
-    # id_salida    = int(df_salidas_radiales['id_salida'][df_salidas_radiales['fecha_salida']==fecha_salida].values[0])               
  
-    # # Extrae las estaciones visitadas en la salida seleccionada
-    # listado_estaciones = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida].iloc[0] 
-    
-       
