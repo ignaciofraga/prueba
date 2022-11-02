@@ -1666,12 +1666,7 @@ def entrada_condiciones_ambientales():
 ###############################################################################    
 
 def entrada_botellas():
-    
-    nombre_programa = 'RADIAL CORUÑA'
-    
-    # Archivo temporal para escritura de resultados intermedios
-    archivo_temporal = 'DATOS/TEMPORAL_botella.btl'
-
+        
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host   = st.secrets["postgres"].host
@@ -1681,51 +1676,132 @@ def entrada_botellas():
     puerto           = st.secrets["postgres"].port
     
     # Recupera tablas con informacion utilizada en el procesado
-    conn          = init_connection()
-    df_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-    df_programas  = psql.read_sql('SELECT * FROM programas', conn)
-    # df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
-    df_salidas_radiales = df_salidas[df_salidas['nombre_programa']==nombre_programa] 
+    conn                = init_connection()
+    df_salidas          = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    df_programas        = psql.read_sql('SELECT * FROM programas', conn)
     conn.close()    
     
-    id_programa_elegido = df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].iloc[0]
-    #df_estaciones_radiales = df_estaciones[df_estaciones['programa']==id_programa_elegido]
-
+    id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
+    # tipos_salidas = df_salidas['tipo_salida'].unique()
     
-    # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
-    indices_dataframe              = numpy.arange(0,df_salidas_radiales.shape[0],1,dtype=int)    
-    df_salidas_radiales['id_temp'] = indices_dataframe
-    df_salidas_radiales.set_index('id_temp',drop=False,append=False,inplace=True)
+    # # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
+    # indices_dataframe              = numpy.arange(0,df_salidas_radiales.shape[0],1,dtype=int)    
+    # df_salidas_radiales['id_temp'] = indices_dataframe
+    # df_salidas_radiales.set_index('id_temp',drop=False,append=False,inplace=True)
     
-    # Define los años con salidas asociadas
-    df_salidas_radiales['año'] = numpy.zeros(df_salidas_radiales.shape[0],dtype=int)
-    for idato in range(df_salidas_radiales.shape[0]):
-        df_salidas_radiales['año'][idato] = df_salidas_radiales['fecha_salida'][idato].year 
-    listado_anhos   = df_salidas_radiales['año'].unique()
-    listado_anhos   = numpy.sort(listado_anhos)
+    # # Define los años con salidas asociadas
+    # df_salidas_radiales['año'] = numpy.zeros(df_salidas_radiales.shape[0],dtype=int)
+    # for idato in range(df_salidas_radiales.shape[0]):
+    #     df_salidas_radiales['año'][idato] = df_salidas_radiales['fecha_salida'][idato].year 
+    # listado_anhos   = df_salidas_radiales['año'].unique()
+    # listado_anhos   = numpy.sort(listado_anhos)
     
   
-    # Despliega un menú de selección del año y tipo de salida
+    # Despliega menús de selección del año y fecha
 
                
-    col1, col2= st.columns(2,gap="small")
+    col1, col2, col3, col4= st.columns(4,gap="small")
+ 
+    with col1: 
+        programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
+        df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
+        
     
-    with col1:
-        anho_seleccionado           = st.selectbox('Año',(listado_anhos))
-        df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
-
-
     with col2:
-        fecha_salida              = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
+        tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
+        df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+    
+        # Añade la variable año al dataframe
+        indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+        df_salidas_seleccion['id_temp'] = indices_dataframe
+        df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
+        
+        # Define los años con salidas asociadas
+        df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
+        for idato in range(df_salidas_seleccion.shape[0]):
+            df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+    
+    with col3:
+        anho_seleccionado           = st.selectbox('Año',(df_salidas_seleccion['año'].unique()),index=-1)
+        df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+
+    with col4:
+        fecha_salida                = st.selectbox('Fecha salida',(df_salidas_seleccion['fecha_salida']),index=-1)
+
+        # Recupera el identificador de la salida seleccionada
+        id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_salida].iloc[0]
 
 
     seleccion = st.button('Seleccionar salida')
     
     if seleccion == True:
+
+ 
+        # Despliega la extensión para subir archivos
+        listado_archivos_subidos = st.file_uploader("Arrastra o selecciona los archivos .btl", accept_multiple_files=True)
+  
+        # Conecta con la base de datos
+        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        cursor = conn.cursor() 
         
-        listado_archivos_subidos = st.file_uploader("Arrastra los archivos .btl", accept_multiple_files=True)
-          
+        for archivo_subido in listado_archivos_subidos:
+            
+            texto_estado = 'Procesando el archivo ' + archivo_subido.name
+            with st.spinner(texto_estado):
+                
+                # Lee los datos de cada archivo de botella
+                nombre_archivo = archivo_subido.name
+                datos_archivo = archivo_subido.getvalue().decode('utf-8').splitlines()            
+                mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
     
+                # Asigna el identificador de la salida al mar
+                datos_botellas ['id_salida'] =  id_salida
+    
+                # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+                datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    
+                # Inserta datos físicos
+                for idato in range(datos_botellas.shape[0]):
+                    if io_par == 1:
+                        instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf)
+                              VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf,EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
+                        
+                        cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato]),datos_botellas['par_ctd'][idato],int(datos_botellas['par_ctd_qf'][idato])))
+                        conn.commit()
+                        
+                    if io_par == 0:   
+                        instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
+                              VALUES (%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf);''' 
+                                
+                        cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato])))
+                        conn.commit()
+                        
+                    # Inserta datos biogeoquímicos
+                    if io_fluor == 1:                
+                        instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,fluorescencia_ctd,fluorescencia_ctd_qf)
+                              VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (fluorescencia_ctd,fluorescencia_ctd_qf) = ROW(EXCLUDED.fluorescencia_ctd,EXCLUDED.fluorescencia_ctd_qf);''' 
+                                
+                        cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['fluorescencia_ctd'][idato],int(datos_botellas['fluorescencia_ctd'][idato])))
+                        conn.commit()           
+         
+                    if io_O2 == 1:                
+                        instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,oxigeno_ctd,oxigeno_ctd_qf)
+                              VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (oxigeno_ctd,oxigeno_ctd_qf) = ROW(EXCLUDED.oxigeno_ctd,EXCLUDED.oxigeno_ctd_qf);''' 
+                                
+                        cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['oxigeno_ctd'][idato],int(datos_botellas['oxigeno_ctd_qf'][idato])))
+                        conn.commit()     
+    
+            texto_exito = 'Archivo ' + archivo_subido.name + ' procesado correctamente'
+            st.success(texto_exito)  
+            
+            
+        cursor.close()
+        conn.close()  
+    
+        texto_exito = 'Procesado de la información realizado correctamente'
+        st.success(texto_exito)               
+  
   
 
     # # Despliega un menú de selección del año y tipo de salida
