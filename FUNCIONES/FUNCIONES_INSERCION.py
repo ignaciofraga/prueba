@@ -1180,7 +1180,7 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
         datos_botellas['latitud']                  = lat_estacion  
         datos_botellas['longitud']                 = lon_estacion
         datos_botellas['fecha_muestreo']           = fecha_salida
-        datos_botellas,textos_aviso                = FUNCIONES_INSERCION.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
+        datos_botellas,textos_aviso                = control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
         
         # Añade columnas con datos del muestreo 
         datos_botellas['id_estacion_temp']         = numpy.zeros(datos_botellas.shape[0],dtype=int)
