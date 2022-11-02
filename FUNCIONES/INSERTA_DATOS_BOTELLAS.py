@@ -112,103 +112,19 @@ for idato in range(len(listado_salidas)):
     conn.close()
     
     
-    
+    os.chdir(ruta_salida)
     
     
     
 
     for archivo in os.listdir(ruta_salida):
         if archivo.endswith(".btl"):
-            posicion_separador = archivo.index('+')
-            nombre_estacion    = archivo[8:posicion_separador].upper() + 'CO'
-            
-            id_estacion              = tabla_estaciones['id_estacion'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
-            profundidades_referencia = tabla_estaciones['profundidades_referencia'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
-            lat_estacion             = tabla_estaciones['latitud'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
-            lon_estacion             = tabla_estaciones['longitud'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
-            
-            
-            ruta_archivo             = ruta_salida + archivo
-            archivo_temporal         = ruta_salida + 'TEMPORAL.txt'
-            
-            if 'flscufa' in archivo:
-                io_fluor = 1
-            else:
-                io_fluor = 0
-                
-            if 'O2' in archivo:
-                io_o2 = 1
-            else:
-                io_o2 = 0
-                            
-            # Funcion
-            # Lee el archivo .btl y escribe la información de las botellas en un archivo temporal
-            cast_muestreo = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
-            with open(ruta_archivo, "r") as file_input:
-                with open(archivo_temporal, "w") as output:
-                    for line in file_input:
-                        if line[0:8] == '** Time:': # Línea con hora del cast
-                            hora_muestreo = datetime.datetime.strptime(line[8:-1],'%H:%M').time()            
-                        if line[0:8] == '** Cast:': # Línea con el número de cast
-                            cast_muestreo = int(line[8:-1])
-                        if line[-6:-1] == '(avg)': # Línea con datos de botella, escribir en el archivo temporal
-                            output.write(line)
-            
-            file_input.close()
-            output.close()
-            
-            # Lee el archivo temporal como  un dataframe
-            datos_botellas = pandas.read_csv(archivo_temporal, sep='\s+',header=None)
 
-                       
-            # Elimina las columnas que no interesan
-            if io_fluor == 0: 
-                datos_botellas = datos_botellas.drop(columns=[1,2,3,5,8,10])  
-            if io_fluor == 1:
-                datos_botellas = datos_botellas.drop(columns=[1,2,3,7,8,11]) 
-                
-            # Cambia el nombre de las columnas
-            if io_fluor == 0:
-                datos_botellas = datos_botellas.rename(columns={0: 'botella', 4: 'salinidad_ctd',6:'presion_ctd',7:'temperatura_ctd',9:'par_ctd'})
-            if io_fluor == 1:
-                datos_botellas = datos_botellas.rename(columns={0: 'botella', 4: 'salinidad_ctd',5:'presion_ctd',6:'temperatura_ctd',9:'par_ctd',10:'fluorescencia_ctd'})
-                
+            nombre_archivo = archivo
+            lectura_archivo = open(archivo, "r")  
+            datos_archivo = lectura_archivo.readlines()
             
-            # Elimina el archivo temporal
-            os.remove(archivo_temporal)            
-            
-
-            test = ruta_salida + archivo + '_TEMPORAL.csv'
-            datos_botellas.to_csv(test)
-            # os.remove(test)
-
-            # Añade una columna con la profundidad de referencia
-            if profundidades_referencia is not None:
-                datos_botellas['prof_referencia'] = numpy.zeros(datos_botellas.shape[0],dtype=int)
-                for idato in range(datos_botellas.shape[0]):
-                        # Encuentra la profundidad de referencia más cercana a cada dato
-                        idx = (numpy.abs(profundidades_referencia - datos_botellas['presion_ctd'][idato])).argmin()
-                        datos_botellas['prof_referencia'][idato] =  profundidades_referencia[idx]
-            else:
-                datos_botellas['prof_referencia'] = [None]*datos_botellas.shape[0]
-            
-            # Redondea la precisión de los datos de profundidad
-            datos_botellas['presion_ctd'] = round(datos_botellas['presion_ctd'],2)
-                
-
-            # Añade informacion de lat/lon para que no elimine el registro durante el control de calidad
-            datos_botellas['latitud']                  = lat_estacion  
-            datos_botellas['longitud']                 = lon_estacion
-            datos_botellas,textos_aviso                = FUNCIONES_INSERCION.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
-
-            # Añade columnas con datos del muestreo 
-            datos_botellas['id_estacion_temp']         = numpy.zeros(datos_botellas.shape[0],dtype=int)
-            datos_botellas['id_estacion_temp']         = id_estacion
-            datos_botellas['fecha_muestreo']           = fecha_salida
-            datos_botellas['hora_muestreo']            = hora_muestreo
-            datos_botellas['num_cast']                 = cast_muestreo
-            datos_botellas['configuracion_perfilador'] = 1
-            datos_botellas['configuracion_superficie'] = 1
+            mensaje_error,datos_botellas = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
             # Asigna el identificador de la salida al mar
             datos_botellas = FUNCIONES_INSERCION.evalua_salidas(datos_botellas,id_programa,nombre_programa,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)

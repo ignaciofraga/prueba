@@ -32,7 +32,7 @@ archivo = '20220712e2+PAR+flscufa.btl'
 
 
 ruta    = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados/2022/rad_men_2022_10_04_0485/btl+PAR+flscufa+O2/'
-archivo = '20221004e2+TEST.btl'
+archivo = '20221004e2+PAR+flscufa+O2.btl'
 
 archivo_temporal = 'TEMPORAL.btl'
 programa_elegido = 'RADIAL CORUÑA'

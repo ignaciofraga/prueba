@@ -1755,7 +1755,9 @@ def entrada_botellas():
             
             mensaje_error,datos_botellas = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-            st.text(mensaje_error)
+            
+
+st.text(mensaje_error)
             
             # base_datos     = 'COAC'
             # usuario        = 'postgres'
