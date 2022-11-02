@@ -1806,7 +1806,7 @@ def entrada_botellas():
                 texto_linea = datos_archivo[ilinea]
                 
                 pos_final = texto_linea.rfind('\n')
-                st.text(pos_final)
+                st.text(len(texto_linea))
                 
                 if texto_linea[0:1] == '#' or texto_linea[0:1] == '*':
                     st.text(texto_linea)
