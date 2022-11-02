@@ -1704,21 +1704,50 @@ def entrada_botellas():
     listado_anhos   = df_salidas_radiales['año'].unique()
     listado_anhos   = numpy.sort(listado_anhos)
     
-    
-
+  
     # Despliega un menú de selección del año y tipo de salida
-    with st.form("Formulario seleccion año"):
+
                
-        col1, col2= st.columns(2,gap="small")
+    col1, col2= st.columns(2,gap="small")
+    
+    with col1:
+        anho_seleccionado           = st.selectbox('Año',(listado_anhos))
+        df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
+
+
+    with col2:
+        fecha_salida              = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
+
+
+    seleccion = st.button('Seleccionar salida')
+    
+    if seleccion == True:
         
-        with col1:
-            anho_seleccionado           = st.selectbox('Año',(listado_anhos))
-            df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
+        listado_archivos_subidos = st.file_uploader("Arrastra los archivos .btl", accept_multiple_files=True)
+          
+    
+  
 
-        with col2:
-            fecha_salida              = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
+    # # Despliega un menú de selección del año y tipo de salida
+    # with st.form("Formulario seleccion año"):
+               
+    #     col1, col2= st.columns(2,gap="small")
+        
+    #     with col1:
+    #         anho_seleccionado           = st.selectbox('Año',(listado_anhos))
+    #         df_seleccion                = df_salidas_radiales[df_salidas_radiales['año']==anho_seleccionado]
 
-        submit = st.form_submit_button("Ver salidas realizadas") 
+    #         # Get dataframe where continent is the continent_sidebar.
+    #         df1 = df.loc[df.continent == continent_sidebar]
+            
+    #         # Get the country column from df1.
+    #         df2 = df1.country
+
+
+    #     with col2:
+    #         fecha_salida              = st.selectbox('Fecha salida',(df_seleccion['fecha_salida']))
+
+    #     submit = st.form_submit_button("Ver salidas realizadas") 
 
 #     # Despliega un menú para elegir la fecha entre la salidas realizadas
 #     with st.form("Formulario seleccion fecha"):
