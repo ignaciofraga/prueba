@@ -1725,11 +1725,11 @@ def entrada_botellas():
             df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
     
     with col3:
-        anho_seleccionado           = st.selectbox('Año',(df_salidas_seleccion['año'].unique()))
+        anho_seleccionado           = st.selectbox('Año',(df_salidas_seleccion['año'].unique()),index=len(df_salidas_seleccion['año'].unique()))
         df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
 
     with col4:
-        fecha_salida                = st.selectbox('Fecha salida',(df_salidas_seleccion['fecha_salida']),index=-1)
+        fecha_salida                = st.selectbox('Fecha salida',(df_salidas_seleccion['fecha_salida']),index=df_salidas_seleccion.shape[0])
 
         # Recupera el identificador de la salida seleccionada
         id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_salida].iloc[0]
