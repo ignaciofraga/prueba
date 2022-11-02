@@ -1724,9 +1724,11 @@ def entrada_botellas():
         for idato in range(df_salidas_seleccion.shape[0]):
             df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
         df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
+        
+        listado_anhos              = df_salidas_seleccion['año'].unique()
     
     with col3:
-        anho_seleccionado           = st.selectbox('Año',(df_salidas_seleccion['año'].unique()),index=df_salidas_seleccion.shape[0]-1)
+        anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
         df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
 
     with col4:
