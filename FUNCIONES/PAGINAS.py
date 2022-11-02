@@ -1707,8 +1707,6 @@ def entrada_botellas():
  
     with col1: 
         programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
-        st.text(id_radiales)        
-        programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']))   
         df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
         
     
@@ -1727,7 +1725,7 @@ def entrada_botellas():
             df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
     
     with col3:
-        anho_seleccionado           = st.selectbox('Año',(df_salidas_seleccion['año'].unique()),index=-1)
+        anho_seleccionado           = st.selectbox('Año',(df_salidas_seleccion['año'].unique()))
         df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
 
     with col4:
