@@ -1806,16 +1806,16 @@ def entrada_botellas():
                 texto_linea = datos_archivo[ilinea]
                 
                 pos_final = texto_linea.rfind('\n')
-                st.text(len(texto_linea))
+                #st.text(len(texto_linea))
                 
                 if texto_linea[0:1] == '#' or texto_linea[0:1] == '*':
                     st.text(texto_linea)
                     if texto_linea[0:8] == '** Time:': # Línea con hora del cast
                         hora_muestreo = datetime.datetime.strptime(texto_linea[8:-1],'%H:%M').time()            
                     if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
-                        cast_muestreo = int(texto_linea[8:9])
+                        cast_muestreo = int(texto_linea[8:len(texto_linea)])
                     if texto_linea[0:8] == '** Date:': # Línea con la fecha
-                        fecha_muestreo_archivo = texto_linea[8:-1]
+                        fecha_muestreo_archivo = texto_linea[8:len(texto_linea)]
                         if fecha_muestreo_archivo is not None:
                             fecha_muestreo_archivo = datetime.datetime.strptime(fecha_muestreo_archivo, '%d/%m/%y').date()
             
