@@ -1051,11 +1051,14 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
         texto_linea = datos_archivo[ilinea]
         if texto_linea[0:1] == '#' or texto_linea[0:1] == '*':
             if texto_linea[0:8] == '** Time:': # Línea con hora del cast
-                hora_muestreo = datetime.datetime.strptime(texto_linea[8:len(texto_linea)],'%H:%M').time()            
+#                hora_muestreo = datetime.datetime.strptime(texto_linea[8:len(texto_linea)],'%H:%M').time()            
+                hora_muestreo = datetime.datetime.strptime(texto_linea[8:13],'%H:%M').time()            
             if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
-                cast_muestreo = int(texto_linea[8:len(texto_linea)])
+#                cast_muestreo = int(texto_linea[8:len(texto_linea)])
+                cast_muestreo = int(texto_linea[8:12])
             if texto_linea[0:8] == '** Date:': # Línea con la fecha
-                fecha_muestreo_archivo = texto_linea[8:len(texto_linea)]
+#                fecha_muestreo_archivo = texto_linea[8:len(texto_linea)]
+                fecha_muestreo_archivo = texto_linea[8:16]
                 try: 
                     fecha_muestreo_archivo = datetime.datetime.strptime(fecha_muestreo_archivo, '%d/%m/%y').date()
                 except:
@@ -1145,6 +1148,9 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
     
         mensaje_error  = 'La fecha indicada en el nombre del archivo no coincide con la que figura en dentro del mismo'
         datos_botellas = None
+        io_par         = 0
+        io_fluor       = 0
+        io_O2          = 0
     
     else:
         
@@ -1195,9 +1201,9 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
         datos_botellas['configuracion_superficie'] = 1
         datos_botellas['programa']                 = id_programa_elegido
         
-        mensaje_error = 'lerele'
+        mensaje_error = []
         
-    return mensaje_error,datos_botellas
+    return mensaje_error,datos_botellas,io_par,io_fluor,io_O2
 
 
 

@@ -114,17 +114,34 @@ for idato in range(len(listado_salidas)):
     
     os.chdir(ruta_salida)
     
+
+
+# instruccion_sql = '''INSERT INTO datos_discretos_fisica (id_centro,nombre_centro)
+#     VALUES (%s,%s) ON CONFLICT (id_centro) DO UPDATE SET (nombre_centro) = ROW(EXCLUDED.nombre_centro);''' 
+        
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
+# for idato in range(len(centros)):
+#     cursor.execute(instruccion_sql, (identificador[idato],centros[idato]))
+#     conn.commit()
+# cursor.close()
+# conn.close()
+
     
-    
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor()   
 
     for archivo in os.listdir(ruta_salida):
         if archivo.endswith(".btl"):
+
+            print(ruta_salida)   
+            print(archivo)    
 
             nombre_archivo = archivo
             lectura_archivo = open(archivo, "r")  
             datos_archivo = lectura_archivo.readlines()
             
-            mensaje_error,datos_botellas = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
             # Asigna el identificador de la salida al mar
             datos_botellas = FUNCIONES_INSERCION.evalua_salidas(datos_botellas,id_programa,nombre_programa,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
@@ -132,11 +149,65 @@ for idato in range(len(listado_salidas)):
             # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
             datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-            # Inserta en la base de datos las variables físicas disponibles 
-            FUNCIONES_INSERCION.inserta_datos_fisica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
+
+            # Inserta datos físicos
+            for idato in range(datos_botellas.shape[0]):
+                if io_par == 1:
+                    instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf)
+                         VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf,EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
+                    
+               
+                    cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato]),datos_botellas['par_ctd'][idato],int(datos_botellas['par_ctd_qf'][idato])))
+                    conn.commit()
+                    
+                if io_par == 0:   
+                    instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
+                         VALUES (%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf);''' 
+                            
+                    cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato])))
+                    conn.commit()
+                    
+                # Inserta datos biogeoquímicos
+                if io_fluor == 1:                
+                    instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,fluorescencia_ctd,fluorescencia_ctd_qf)
+                         VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (fluorescencia_ctd,fluorescencia_ctd_qf) = ROW(EXCLUDED.fluorescencia_ctd,EXCLUDED.fluorescencia_ctd_qf);''' 
+                            
+                    cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['fluorescencia_ctd'][idato],int(datos_botellas['fluorescencia_ctd'][idato])))
+                    conn.commit()           
+     
+                if io_O2 == 1:                
+                    instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,oxigeno_ctd,oxigeno_ctd_qf)
+                         VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (oxigeno_ctd,oxigeno_ctd_qf) = ROW(EXCLUDED.oxigeno_ctd,EXCLUDED.oxigeno_ctd_qf);''' 
+                            
+                    cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['oxigeno_ctd'][idato],int(datos_botellas['oxigeno_ctd_qf'][idato])))
+                    conn.commit()                 
+                  
+    cursor.close()
+    conn.close()           
+    
+    
+    
+                
+#             io_par         = 0
+#             io_fluor       = 0
+#             io_O2          = 0
+
+
+# ' muestreo int NOT NULL,'
+# ' temperatura_ctd NUMERIC (4, 2),'
+# ' temperatura_ctd_qf int DEFAULT 9,'
+# ' salinidad_ctd NUMERIC (5, 3),'
+# ' salinidad_ctd_qf int DEFAULT 9,'
+# ' par_ctd NUMERIC (8, 3),'
+# ' par_ctd_qf int DEFAULT 9,'
+# ' turbidez_ctd NUMERIC (6, 3),'
+# ' turbidez_ctd_qf int DEFAULT 9,'
+
+            # # Inserta en la base de datos las variables físicas disponibles 
+            # FUNCIONES_INSERCION.inserta_datos_fisica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
             
-            # Inserta en la base de datos las variables biogeoquímicas disponibles 
-            FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
+            # # Inserta en la base de datos las variables biogeoquímicas disponibles 
+            # FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
             
             
     #print(fecha_salida,listado_estaciones_muestreadas)            
