@@ -1720,28 +1720,34 @@ def entrada_botellas():
         id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_salida].iloc[0]
 
 
-    seleccion = st.button('Seleccionar salida')
+    # seleccion = st.button('Seleccionar salida')
     
-    if seleccion == True:
-
+    # if seleccion == True:
  
-        # Despliega la extensión para subir archivos
-        listado_archivos_subidos = st.file_uploader("Arrastra o selecciona los archivos .btl", accept_multiple_files=True)
+    # Despliega la extensión para subir archivos
+    listado_archivos_subidos = st.file_uploader("Arrastra o selecciona los archivos .btl", accept_multiple_files=True)
   
-        # Conecta con la base de datos
-        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        cursor = conn.cursor() 
+    # Conecta con la base de datos
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor() 
+    
+    for archivo_subido in listado_archivos_subidos:
         
-        for archivo_subido in listado_archivos_subidos:
+        texto_estado = 'Procesando el archivo ' + archivo_subido.name
+        with st.spinner(texto_estado):
             
-            texto_estado = 'Procesando el archivo ' + archivo_subido.name
-            with st.spinner(texto_estado):
+            try:
+            
+                # Lee los datos de cada archivo de botella
+                nombre_archivo = archivo_subido.name
+                datos_archivo = archivo_subido.getvalue().decode('utf-8').splitlines()            
                 
-                try:
+                # Comprueba que la fecha del archivo y de la salida coinciden
+                fecha_salida_texto    = nombre_archivo[0:8]
+                fecha_salida_archivo  = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
                 
-                    # Lee los datos de cada archivo de botella
-                    nombre_archivo = archivo_subido.name
-                    datos_archivo = archivo_subido.getvalue().decode('utf-8').splitlines()            
+                if fecha_salida == fecha_salida:
+                
                     mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
         
                     # Asigna el identificador de la salida al mar
@@ -1784,12 +1790,19 @@ def entrada_botellas():
         
                     texto_exito = 'Archivo ' + archivo_subido.name + ' procesado correctamente'
                     st.success(texto_exito) 
+                    
+                else:
                 
-                except:
-                    texto_error = 'Error en el procesado del archivo ' + archivo_subido.name
-                    st.warning(texto_error, icon="⚠️")
+                    texto_error = 'La fecha del archivo ' + archivo_subido.name + ' no coindice con la fecha seleccionada '
+                    st.warning(texto_error, icon="⚠️")                    
+                    
             
-        cursor.close()
-        conn.close()  
+            except:
+                texto_error = 'Error en el procesado del archivo ' + archivo_subido.name
+                st.warning(texto_error, icon="⚠️")
+
+    cursor.close()
+    conn.close()         
+ 
     
  
