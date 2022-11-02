@@ -1051,14 +1051,15 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
         texto_linea = datos_archivo[ilinea]
         if texto_linea[0:1] == '#' or texto_linea[0:1] == '*':
             if texto_linea[0:8] == '** Time:': # Línea con hora del cast
-                hora_muestreo = datetime.datetime.strptime(texto_linea[8:(len(texto_linea)-1)],'%H:%M').time()            
+                hora_muestreo = datetime.datetime.strptime(texto_linea[8:len(texto_linea)],'%H:%M').time()            
             if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
-                cast_muestreo = int(texto_linea[8:(len(texto_linea)-1)])
+                cast_muestreo = int(texto_linea[8:len(texto_linea)])
             if texto_linea[0:8] == '** Date:': # Línea con la fecha
-                fecha_muestreo_archivo = texto_linea[8:(len(texto_linea)-1)]
-                #fecha_muestreo_archivo = texto_linea[8:16]
-                if fecha_muestreo_archivo is not None:
+                fecha_muestreo_archivo = texto_linea[8:len(texto_linea)]
+                try: 
                     fecha_muestreo_archivo = datetime.datetime.strptime(fecha_muestreo_archivo, '%d/%m/%y').date()
+                except:
+                    pass
     
         else:
     
