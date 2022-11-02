@@ -1809,7 +1809,7 @@ def entrada_botellas():
                     if texto_linea[0:8] == '** Time:': # Línea con hora del cast
                         hora_muestreo = datetime.datetime.strptime(texto_linea[8:-1],'%H:%M').time()            
                     if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
-                        cast_muestreo = int(texto_linea[8:-1])
+                        cast_muestreo = int(texto_linea[8:9])
                     if texto_linea[0:8] == '** Date:': # Línea con la fecha
                         fecha_muestreo_archivo = texto_linea[8:-1]
                         if fecha_muestreo_archivo is not None:
