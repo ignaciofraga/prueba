@@ -1003,7 +1003,7 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 ######################################################################
 ######## FUNCION PARA LEER DATOS DE BOTELLAs (ARCHIVOS .BTL)  ########
 ######################################################################
-def lectura_btl(nombre_archivo,archivo,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto):
+def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto):
  
     
     # recupera la información de las estaciones incluidas en la base de datos
@@ -1046,95 +1046,96 @@ def lectura_btl(nombre_archivo,archivo,archivo_temporal,nombre_programa,direccio
     
     # Lee el archivo .btl y escribe la información de las botellas en un archivo temporal
     cast_muestreo = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
-    with open(archivo, "r") as file_input:
-        for line in file_input:
-            if line[0:1] == '#' or line[0:1] == '*':
-                if line[0:8] == '** Time:': # Línea con hora del cast
-                    hora_muestreo = datetime.datetime.strptime(line[8:-1],'%H:%M').time()            
-                if line[0:8] == '** Cast:': # Línea con el número de cast
-                    cast_muestreo = int(line[8:-1])
-                if line[0:8] == '** Date:': # Línea con la fecha
-                    fecha_muestreo_archivo = line[8:-1]
-                    if fecha_muestreo_archivo is not None:
-                        fecha_muestreo_archivo = datetime.datetime.strptime(fecha_muestreo_archivo, '%d/%m/%y').date()
     
-            else:
+    for ilinea in range(len(datos_archivo)):
+        texto_linea = datos_archivo[ilinea]
+        if texto_linea[0:1] == '#' or texto_linea[0:1] == '*':
+            if texto_linea[0:8] == '** Time:': # Línea con hora del cast
+                hora_muestreo = datetime.datetime.strptime(texto_linea[8:-1],'%H:%M').time()            
+            if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
+                cast_muestreo = int(texto_linea[8:-1])
+            if texto_linea[0:8] == '** Date:': # Línea con la fecha
+                fecha_muestreo_archivo = texto_linea[8:-1]
+                if fecha_muestreo_archivo is not None:
+                    fecha_muestreo_archivo = datetime.datetime.strptime(fecha_muestreo_archivo, '%d/%m/%y').date()
     
-                # Separa las cabeceras de las medidas de oxigeno si existen y están juntas 
-                if 'Sbeox0VSbeox0Mm/Kg' in line: 
-                    line = line.replace('Sbeox0VSbeox0Mm/Kg', 'Sbeox0V Sbeox0Mm/Kg')
-                   
-                datos_linea = line.split()
+        else:
+    
+            # Separa las cabeceras de las medidas de oxigeno si existen y están juntas 
+            if 'Sbeox0VSbeox0Mm/Kg' in texto_linea: 
+                texto_linea = texto_linea.replace('Sbeox0VSbeox0Mm/Kg', 'Sbeox0V Sbeox0Mm/Kg')
+               
+            datos_linea = texto_linea.split()
+                
+            if datos_linea[0] == 'Bottle': # Primera línea con las cabeceras
+    
+                # Encuentra los indices (posiciones) de cada variable, si ésta está incluida
+                indice_botellas  = datos_linea.index("Bottle")
+    
+                try:
+                    indice_salinidad = datos_linea.index("Sal00")            
+                except:
+                    indice_salinidad = None
+               
+                try: 
+                   indice_presion   = datos_linea.index("PrSM")
+                except:
+                    indice_presion  = None      
+                
+                try:
+                    indice_temp     = datos_linea.index("T090C")
+                except:
+                    indice_temp     = None
                     
-                if datos_linea[0] == 'Bottle': # Primera línea con las cabeceras
+                try:
+                    indice_par      = datos_linea.index("Par")
+                    io_par          = 1
+                except:
+                    indice_par      = None
+                    io_par          = 0
+                  
+                try:
+                    indice_fluor    = datos_linea.index("FlScufa")  
+                    io_fluor        = 1
+                except:
+                    indice_fluor    =  None 
+                    io_fluor        = 0                    
+                
+                try:
+                    indice_O2       = datos_linea.index("Sbeox0Mm/Kg")
+                    io_O2           = 1                   
+                except:
+                    indice_O2       =  None  
+                    io_O2           = 0     
     
-                    # Encuentra los indices (posiciones) de cada variable, si ésta está incluida
-                    indice_botellas  = datos_linea.index("Bottle")
     
-                    try:
-                        indice_salinidad = datos_linea.index("Sal00")            
-                    except:
-                        indice_salinidad = None
-                   
-                    try: 
-                       indice_presion   = datos_linea.index("PrSM")
-                    except:
-                        indice_presion  = None      
-                    
-                    try:
-                        indice_temp     = datos_linea.index("T090C")
-                    except:
-                        indice_temp     = None
+            elif datos_linea[0] == 'Position': # Segunda línea con las cabeceras
+                datos_linea = texto_linea.split() 
+                
+            else:  # Líneas con datos
+                
+                datos_linea = texto_linea.split()
+                
+                if datos_linea[-1] == '(avg)': # Línea con los registros de cada variable
                         
-                    try:
-                        indice_par      = datos_linea.index("Par")
-                        io_par          = 1
-                    except:
-                        indice_par      = None
-                        io_par          = 0
-                      
-                    try:
-                        indice_fluor    = datos_linea.index("FlScufa")  
-                        io_fluor        = 1
-                    except:
-                        indice_fluor    =  None 
-                        io_fluor        = 0                    
+                    # Salvo en el caso del identificador de las botellas, sumar dos espacios al índice de cada variable
+                    # porque la fecha la divide en 3 lecturas debido al espacio que contiene
                     
-                    try:
-                        indice_O2       = datos_linea.index("Sbeox0Mm/Kg")
-                        io_O2           = 1                   
-                    except:
-                        indice_O2       =  None  
-                        io_O2           = 0     
+                    datos_botella.append(int(datos_linea[indice_botellas]))
+                    datos_salinidad.append(float(datos_linea[indice_salinidad + 2])) 
+                    datos_temperatura.append(float(datos_linea[indice_temp + 2]))
+                    datos_presion.append(round(float(datos_linea[indice_presion + 2]),2))
+                
     
-    
-                elif datos_linea[0] == 'Position': # Segunda línea con las cabeceras
-                    datos_linea = line.split() 
-                    
-                else:  # Líneas con datos
-                    
-                    datos_linea = line.split()
-                    
-                    if datos_linea[-1] == '(avg)': # Línea con los registros de cada variable
-                            
-                        # Salvo en el caso del identificador de las botellas, sumar dos espacios al índice de cada variable
-                        # porque la fecha la divide en 3 lecturas debido al espacio que contiene
-                        
-                        datos_botella.append(int(datos_linea[indice_botellas]))
-                        datos_salinidad.append(float(datos_linea[indice_salinidad + 2])) 
-                        datos_temperatura.append(float(datos_linea[indice_temp + 2]))
-                        datos_presion.append(round(float(datos_linea[indice_presion + 2]),2))
-                    
-    
-                    
-                        if io_par == 1:
-                            datos_PAR.append(float(datos_linea[indice_par + 2]))
-                        if io_fluor == 1:
-                            datos_fluor.append(float(datos_linea[indice_fluor + 2]))
-                        if io_O2 == 1:
-                            datos_O2.append(float(datos_linea[indice_O2 + 2]))                    
+                
+                    if io_par == 1:
+                        datos_PAR.append(float(datos_linea[indice_par + 2]))
+                    if io_fluor == 1:
+                        datos_fluor.append(float(datos_linea[indice_fluor + 2]))
+                    if io_O2 == 1:
+                        datos_O2.append(float(datos_linea[indice_O2 + 2]))                    
                                     
-    file_input.close()
+    
     
     
     # Comprueba que la fecha contenida en el archivo y la del nombre del archivo son la misma
@@ -1179,7 +1180,7 @@ def lectura_btl(nombre_archivo,archivo,archivo_temporal,nombre_programa,direccio
         datos_botellas['latitud']                  = lat_estacion  
         datos_botellas['longitud']                 = lon_estacion
         datos_botellas['fecha_muestreo']           = fecha_salida
-        datos_botellas,textos_aviso                = control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
+        datos_botellas,textos_aviso                = FUNCIONES_INSERCION.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
         
         # Añade columnas con datos del muestreo 
         datos_botellas['id_estacion_temp']         = numpy.zeros(datos_botellas.shape[0],dtype=int)
@@ -1191,6 +1192,8 @@ def lectura_btl(nombre_archivo,archivo,archivo_temporal,nombre_programa,direccio
         datos_botellas['configuracion_perfilador'] = 1
         datos_botellas['configuracion_superficie'] = 1
         datos_botellas['programa']                 = id_programa_elegido
+        
+        mensaje_error = []
         
         mensaje_error = 'todo bien'
     
