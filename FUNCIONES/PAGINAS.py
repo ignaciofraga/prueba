@@ -1681,7 +1681,8 @@ def entrada_botellas():
     df_programas        = psql.read_sql('SELECT * FROM programas', conn)
     conn.close()    
     
-    id_radiales   = [df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
+    #id_radiales   = [df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
+    id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
     
     #id_radiales   = df_programas.loc[df_programas['nombre_programa'] == 'RADIAL CORUÑA']
     # tipos_salidas = df_salidas['tipo_salida'].unique()
