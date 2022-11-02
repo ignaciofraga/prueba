@@ -1757,7 +1757,7 @@ def entrada_botellas():
 
             
 
-st.text(mensaje_error)
+            st.text(mensaje_error)
             
             # base_datos     = 'COAC'
             # usuario        = 'postgres'
