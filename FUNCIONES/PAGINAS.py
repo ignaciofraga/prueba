@@ -1766,7 +1766,7 @@ def entrada_botellas():
             conn_psql          = init_connection()
             tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
             df_programas = psql.read_sql('SELECT * FROM programas', conn_psql)
-            conn_psql.dispose()
+            conn_psql.close()
             
             id_programa_elegido = df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].iloc[0]
             
