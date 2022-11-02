@@ -1753,9 +1753,15 @@ def entrada_botellas():
             nombre_archivo = archivo_subido.name
             archivo        = archivo_subido
             
-            mensaje_error,datos_botellas = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,archivo,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            #lectura_archivo = open(archivo, "r") 
+            data = archivo_subido.getvalue().decode('utf-8')
+            
+            test = data.readlines()
+            st.text(test[-1])
+            
+            #mensaje_error,datos_botellas = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,archivo,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
-            st.text(mensaje_error)
+            #st.text(mensaje_error)
             # archivo_temporal = 'DATOS/BTL_TEMPORAL2.btl'
             
             # data = archivo_subido.getvalue().decode('utf-8')

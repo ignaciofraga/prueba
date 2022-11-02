@@ -48,7 +48,8 @@ os.chdir(ruta)
   
     
 lectura_archivo = open(archivo, "r") 
-f.close()
+test = lectura_archivo.readlines()
+print(test[-1])
     
 # recupera la información de las estaciones incluidas en la base de datos
 con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
