@@ -1750,40 +1750,46 @@ def entrada_botellas():
         texto_estado = 'Procesando el archivo ' + archivo_subido.name
         with st.spinner(texto_estado):
             
-            archivo_temporal = 'DATOS/BTL_TEMPORAL2.btl'
+            nombre_archivo = archivo_subido.name
+            archivo        = archivo_subido
             
-            data = archivo_subido.getvalue().decode('utf-8')
-            st.text(data)
-            archivo_destino = open(archivo_temporal,'w')
-            archivo_destino.write(data)
-            archivo_destino.close()
-
-            bytes_data = archivo_subido.read() 
-            
-            
-            with open(os.path.join("DATOS",'BTL_TEMPORAL.btl'),"wb") as f:
-                 f.write(bytes_data)
-                 
-            archivo_temporal = 'DATOS/BTL_TEMPORAL.btl'
-
-            # Nombre del archivo (para evitar conflictos por ser leido como objeto)
-            nombre_archivo_subido         = archivo_subido.name
-        
-            # Lee el archivo subido
-            datos_botellas                 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo_subido,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            mensaje_error,datos_botellas = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,archivo,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
-            # Asigna la salida al mar correspondiente
-            datos_botellas['salida_mar']   = id_salida
+            st.text(mensaje_error)
+            # archivo_temporal = 'DATOS/BTL_TEMPORAL2.btl'
             
-            # Sube los datos a la base de datos
-            # Asigna el registro correspondiente 
-            datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            # data = archivo_subido.getvalue().decode('utf-8')
+            # st.text(data)
+            # archivo_destino = open(archivo_temporal,'w')
+            # archivo_destino.write(data)
+            # archivo_destino.close()
 
-            # Inserta en la base de datos las variables físicas disponibles 
-            FUNCIONES_INSERCION.inserta_datos_fisica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
+            # bytes_data = archivo_subido.read() 
             
-            # Inserta en la base de datos las variables biogeoquímicas disponibles 
-            FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
+            
+            # with open(os.path.join("DATOS",'BTL_TEMPORAL.btl'),"wb") as f:
+            #      f.write(bytes_data)
+                 
+            # archivo_temporal = 'DATOS/BTL_TEMPORAL.btl'
+
+            # # Nombre del archivo (para evitar conflictos por ser leido como objeto)
+            # nombre_archivo_subido         = archivo_subido.name
+        
+            # # Lee el archivo subido
+            # datos_botellas                 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo_subido,archivo_temporal,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+             
+            # # Asigna la salida al mar correspondiente
+            # datos_botellas['salida_mar']   = id_salida
+            
+            # # Sube los datos a la base de datos
+            # # Asigna el registro correspondiente 
+            # datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+
+            # # Inserta en la base de datos las variables físicas disponibles 
+            # FUNCIONES_INSERCION.inserta_datos_fisica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
+            
+            # # Inserta en la base de datos las variables biogeoquímicas disponibles 
+            # FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
             
         texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
         st.success(texto_exito)
