@@ -1746,7 +1746,7 @@ def entrada_botellas():
                 fecha_salida_texto    = nombre_archivo[0:8]
                 fecha_salida_archivo  = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
                 
-                if fecha_salida == fecha_salida:
+                if fecha_salida_archivo == fecha_salida:
                 
                     mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
         
