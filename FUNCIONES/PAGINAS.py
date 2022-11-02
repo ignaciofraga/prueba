@@ -1754,146 +1754,145 @@ def entrada_botellas():
             datos_archivo = archivo_subido.getvalue().decode('utf-8').splitlines()
             
             
-            base_datos     = 'COAC'
-            usuario        = 'postgres'
-            contrasena     = 'm0nt34lt0'
-            puerto         = '5432'
-            direccion_host = '193.146.155.99'
+            # base_datos     = 'COAC'
+            # usuario        = 'postgres'
+            # contrasena     = 'm0nt34lt0'
+            # puerto         = '5432'
+            # direccion_host = '193.146.155.99'
             
             
             
-            # recupera la información de las estaciones incluidas en la base de datos
-            conn_psql          = init_connection()
-            tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
-            df_programas = psql.read_sql('SELECT * FROM programas', conn_psql)
-            conn_psql.close()
+            # # recupera la información de las estaciones incluidas en la base de datos
+            # conn_psql          = init_connection()
+            # tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
+            # df_programas = psql.read_sql('SELECT * FROM programas', conn_psql)
+            # conn_psql.close()
             
-            id_programa_elegido = df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].iloc[0]
+            # id_programa_elegido = df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].iloc[0]
             
-            df_estaciones_radiales = tabla_estaciones[tabla_estaciones['programa']==id_programa_elegido]
-            
-            
-            
-            # Identifica la estación a la que corresponde el archivo
-            posicion_separador = nombre_archivo.index('+')
-            nombre_estacion    = nombre_archivo[8:posicion_separador].upper() + 'CO'                
-            id_estacion        = df_estaciones_radiales['id_estacion'][df_estaciones_radiales['nombre_estacion']==nombre_estacion].iloc[0] 
-            
-            # Identifica la fecha del muestreo
-            fecha_salida_texto = nombre_archivo[0:8]
-            fecha_salida       = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
+            # df_estaciones_radiales = tabla_estaciones[tabla_estaciones['programa']==id_programa_elegido]
             
             
-            id_estacion              = tabla_estaciones['id_estacion'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
-            profundidades_referencia = tabla_estaciones['profundidades_referencia'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
-            lat_estacion             = tabla_estaciones['latitud'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
-            lon_estacion             = tabla_estaciones['longitud'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
+            
+            # # Identifica la estación a la que corresponde el archivo
+            # posicion_separador = nombre_archivo.index('+')
+            # nombre_estacion    = nombre_archivo[8:posicion_separador].upper() + 'CO'                
+            # id_estacion        = df_estaciones_radiales['id_estacion'][df_estaciones_radiales['nombre_estacion']==nombre_estacion].iloc[0] 
+            
+            # # Identifica la fecha del muestreo
+            # fecha_salida_texto = nombre_archivo[0:8]
+            # fecha_salida       = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
             
             
-            # Genera las listas en las que se guardarán los datos si éstos existen
-            datos_botella     = []
-            datos_salinidad   = []
-            datos_temperatura = []
-            datos_presion     = []
-            datos_PAR         = []
-            datos_fluor       = []
-            datos_O2          = []
+            # id_estacion              = tabla_estaciones['id_estacion'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
+            # profundidades_referencia = tabla_estaciones['profundidades_referencia'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
+            # lat_estacion             = tabla_estaciones['latitud'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
+            # lon_estacion             = tabla_estaciones['longitud'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
             
-            # Lee el archivo .btl y escribe la información de las botellas en un archivo temporal
-            cast_muestreo = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
             
-            for ilinea in range(len(datos_archivo)):
-                texto_linea = datos_archivo[ilinea]
+            # # Genera las listas en las que se guardarán los datos si éstos existen
+            # datos_botella     = []
+            # datos_salinidad   = []
+            # datos_temperatura = []
+            # datos_presion     = []
+            # datos_PAR         = []
+            # datos_fluor       = []
+            # datos_O2          = []
+            
+            # # Lee el archivo .btl y escribe la información de las botellas en un archivo temporal
+            # cast_muestreo = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
+            
+            # for ilinea in range(len(datos_archivo)):
+            #     texto_linea = datos_archivo[ilinea]
                 
-                pos_final = texto_linea.rfind('\n')
-                #st.text(len(texto_linea))
+            #     #st.text(len(texto_linea))
                 
-                if texto_linea[0:1] == '#' or texto_linea[0:1] == '*':
-                    st.text(texto_linea)
-                    if texto_linea[0:8] == '** Time:': # Línea con hora del cast
-                        hora_muestreo = datetime.datetime.strptime(texto_linea[8:-1],'%H:%M').time()            
-                    if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
-                        cast_muestreo = int(texto_linea[8:len(texto_linea)])
-                    if texto_linea[0:8] == '** Date:': # Línea con la fecha
-                        fecha_muestreo_archivo = texto_linea[8:len(texto_linea)]
-                        if fecha_muestreo_archivo is not None:
-                            fecha_muestreo_archivo = datetime.datetime.strptime(fecha_muestreo_archivo, '%d/%m/%y').date()
+            #     if texto_linea[0:1] == '#' or texto_linea[0:1] == '*':
+            #         st.text(texto_linea)
+            #         if texto_linea[0:8] == '** Time:': # Línea con hora del cast
+            #             hora_muestreo = datetime.datetime.strptime(texto_linea[8:-1],'%H:%M').time()            
+            #         if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
+            #             cast_muestreo = int(texto_linea[8:len(texto_linea)])
+            #         if texto_linea[0:8] == '** Date:': # Línea con la fecha
+            #             fecha_muestreo_archivo = texto_linea[8:len(texto_linea)]
+            #             if fecha_muestreo_archivo is not None:
+            #                 fecha_muestreo_archivo = datetime.datetime.strptime(fecha_muestreo_archivo, '%d/%m/%y').date()
             
-                else:
+            #     else:
             
-                    # Separa las cabeceras de las medidas de oxigeno si existen y están juntas 
-                    if 'Sbeox0VSbeox0Mm/Kg' in texto_linea: 
-                        texto_linea = texto_linea.replace('Sbeox0VSbeox0Mm/Kg', 'Sbeox0V Sbeox0Mm/Kg')
+            #         # Separa las cabeceras de las medidas de oxigeno si existen y están juntas 
+            #         if 'Sbeox0VSbeox0Mm/Kg' in texto_linea: 
+            #             texto_linea = texto_linea.replace('Sbeox0VSbeox0Mm/Kg', 'Sbeox0V Sbeox0Mm/Kg')
                        
-                    datos_linea = texto_linea.split()
+            #         datos_linea = texto_linea.split()
                         
-                    if datos_linea[0] == 'Bottle': # Primera línea con las cabeceras
+            #         if datos_linea[0] == 'Bottle': # Primera línea con las cabeceras
             
-                        # Encuentra los indices (posiciones) de cada variable, si ésta está incluida
-                        indice_botellas  = datos_linea.index("Bottle")
+            #             # Encuentra los indices (posiciones) de cada variable, si ésta está incluida
+            #             indice_botellas  = datos_linea.index("Bottle")
             
-                        try:
-                            indice_salinidad = datos_linea.index("Sal00")            
-                        except:
-                            indice_salinidad = None
+            #             try:
+            #                 indice_salinidad = datos_linea.index("Sal00")            
+            #             except:
+            #                 indice_salinidad = None
                        
-                        try: 
-                           indice_presion   = datos_linea.index("PrSM")
-                        except:
-                            indice_presion  = None      
+            #             try: 
+            #                indice_presion   = datos_linea.index("PrSM")
+            #             except:
+            #                 indice_presion  = None      
                         
-                        try:
-                            indice_temp     = datos_linea.index("T090C")
-                        except:
-                            indice_temp     = None
+            #             try:
+            #                 indice_temp     = datos_linea.index("T090C")
+            #             except:
+            #                 indice_temp     = None
                             
-                        try:
-                            indice_par      = datos_linea.index("Par")
-                            io_par          = 1
-                        except:
-                            indice_par      = None
-                            io_par          = 0
+            #             try:
+            #                 indice_par      = datos_linea.index("Par")
+            #                 io_par          = 1
+            #             except:
+            #                 indice_par      = None
+            #                 io_par          = 0
                           
-                        try:
-                            indice_fluor    = datos_linea.index("FlScufa")  
-                            io_fluor        = 1
-                        except:
-                            indice_fluor    =  None 
-                            io_fluor        = 0                    
+            #             try:
+            #                 indice_fluor    = datos_linea.index("FlScufa")  
+            #                 io_fluor        = 1
+            #             except:
+            #                 indice_fluor    =  None 
+            #                 io_fluor        = 0                    
                         
-                        try:
-                            indice_O2       = datos_linea.index("Sbeox0Mm/Kg")
-                            io_O2           = 1                   
-                        except:
-                            indice_O2       =  None  
-                            io_O2           = 0     
+            #             try:
+            #                 indice_O2       = datos_linea.index("Sbeox0Mm/Kg")
+            #                 io_O2           = 1                   
+            #             except:
+            #                 indice_O2       =  None  
+            #                 io_O2           = 0     
             
             
-                    elif datos_linea[0] == 'Position': # Segunda línea con las cabeceras
-                        datos_linea = texto_linea.split() 
+            #         elif datos_linea[0] == 'Position': # Segunda línea con las cabeceras
+            #             datos_linea = texto_linea.split() 
                         
-                    else:  # Líneas con datos
+            #         else:  # Líneas con datos
                         
-                        datos_linea = texto_linea.split()
+            #             datos_linea = texto_linea.split()
                         
-                        if datos_linea[-1] == '(avg)': # Línea con los registros de cada variable
+            #             if datos_linea[-1] == '(avg)': # Línea con los registros de cada variable
                                 
-                            # Salvo en el caso del identificador de las botellas, sumar dos espacios al índice de cada variable
-                            # porque la fecha la divide en 3 lecturas debido al espacio que contiene
+            #                 # Salvo en el caso del identificador de las botellas, sumar dos espacios al índice de cada variable
+            #                 # porque la fecha la divide en 3 lecturas debido al espacio que contiene
                             
-                            datos_botella.append(int(datos_linea[indice_botellas]))
-                            datos_salinidad.append(float(datos_linea[indice_salinidad + 2])) 
-                            datos_temperatura.append(float(datos_linea[indice_temp + 2]))
-                            datos_presion.append(round(float(datos_linea[indice_presion + 2]),2))
+            #                 datos_botella.append(int(datos_linea[indice_botellas]))
+            #                 datos_salinidad.append(float(datos_linea[indice_salinidad + 2])) 
+            #                 datos_temperatura.append(float(datos_linea[indice_temp + 2]))
+            #                 datos_presion.append(round(float(datos_linea[indice_presion + 2]),2))
                         
             
                         
-                            if io_par == 1:
-                                datos_PAR.append(float(datos_linea[indice_par + 2]))
-                            if io_fluor == 1:
-                                datos_fluor.append(float(datos_linea[indice_fluor + 2]))
-                            if io_O2 == 1:
-                                datos_O2.append(float(datos_linea[indice_O2 + 2]))                    
+            #                 if io_par == 1:
+            #                     datos_PAR.append(float(datos_linea[indice_par + 2]))
+            #                 if io_fluor == 1:
+            #                     datos_fluor.append(float(datos_linea[indice_fluor + 2]))
+            #                 if io_O2 == 1:
+            #                     datos_O2.append(float(datos_linea[indice_O2 + 2]))                    
                                             
             
             
