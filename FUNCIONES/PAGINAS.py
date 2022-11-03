@@ -1875,12 +1875,14 @@ def control_calidad_botellas():
     # Determina las estaciones muestreadas en la salida selecionada
     listado_estaciones         = df_muestreos_salida['estacion'].unique()
     df_estaciones_muestreadas  = df_estaciones[df_estaciones['id_estacion'].isin(listado_estaciones)]
+    nombres_estaciones         = df_estaciones_muestreadas['nombre_estacion']
+    listado_estaciones         = df_estaciones_muestreadas['estacion']
     
     # Despliega menús de selección de la variable y la estación a controlar                
     col1, col2 = st.columns(2,gap="small")
  
     with col1: 
-        estacion_seleccionada = st.selectbox('Estación',(df_estaciones_muestreadas['nombre_estacion']))
+        estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
         indice_estacion       = listado_estaciones.index(estacion_seleccionada)
         df_muestreos_estacion = df_muestreos_salida[df_muestreos_salida['estacion']==indice_estacion]
         listado_muestreos     = df_muestreos_estacion['id_muestreo']
