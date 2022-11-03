@@ -949,7 +949,7 @@ def actualiza_estado(datos,fecha_actualizacion,id_programa,nombre_programa,itipo
         # Si la base de datos ya contiene registros del programa y año a insertar, actualizar las fechas correspondientes
         else:
             if itipo_informacion == 1:
-                instruccion_sql = "UPDATE estado_procesos SET fecha_analisis_laboratorio = %s,contacto_analisis_laboratorio = %s WHERE programa = %s AND año = %s;"   
+                instruccion_sql = "UPDATE estado_procesos SET fecha_analisis_laboratorio = %s,contacto_post_procesado = %s WHERE programa = %s AND año = %s;"   
                 cursor.execute(instruccion_sql, (fecha_actualizacion,email_contacto,int(id_programa),int(anho_procesado)))
                 conn.commit()                
 
@@ -959,7 +959,7 @@ def actualiza_estado(datos,fecha_actualizacion,id_programa,nombre_programa,itipo
                 conn.commit()  
                 
             if itipo_informacion == 3:
-                instruccion_sql = "UPDATE estado_procesos SET fecha_entrada_datos = %s,contacto_entrada_datos = %s WHERE programa = %s AND año = %s;"   
+                instruccion_sql = "UPDATE estado_procesos SET fecha_entrada_datos = %s,contacto_post_procesado = %s WHERE programa = %s AND año = %s;"   
                 cursor.execute(instruccion_sql, (fecha_actualizacion,email_contacto,int(id_programa),int(anho_procesado)))
                 conn.commit() 
     
