@@ -932,17 +932,17 @@ def actualiza_estado(datos,fecha_actualizacion,id_programa,nombre_programa,itipo
                 
             # Genera el vector con los datos a insertar. diferente según sea análisis o post-procesado
             if itipo_informacion == 1: # La información a insertar es un nuevo registro de análisis de laboratorio
-                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,None,fecha_actualizacion,None,None,None,email_contacto,None]
+                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,fecha_actualizacion,None,None,email_contacto]
             
             if itipo_informacion == 2: # La información a insertar es un registro de post-procesado 
-                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,None,None,fecha_actualizacion,None,None,None,email_contacto]
+                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,None,fecha_actualizacion,None,email_contacto]
             
             if itipo_informacion == 3: # La información a insertar es un registro de entrada de datos 
-                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,fecha_actualizacion,None,None,None,email_contacto,None,None]
+                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,None,None,email_contacto,None]
             
             
             # Inserta la información en la base de datos
-            instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_entrada_datos,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_entrada_datos,contacto_analisis_laboratorio,contacto_post_procesado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_entrada_datos,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_entrada_datos,contacto_analisis_laboratorio,contacto_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_entrada_datos,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado,EXCLUDED.contacto_muestreo,EXCLUDED.contacto_entrada_datos,EXCLUDED.contacto_analisis_laboratorio,EXCLUDED.contacto_post_procesado);"   
+            instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado,EXCLUDED.contacto_muestreo,EXCLUDED.contacto_post_procesado);"   
             cursor.execute(instruccion_sql, (datos_insercion))
             conn.commit()
 
