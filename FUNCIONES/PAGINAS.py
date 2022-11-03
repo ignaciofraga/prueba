@@ -1930,7 +1930,8 @@ def control_calidad_botellas():
 
             with col2:
                 
-                enunciado          = 'QF del muestreo'
+                #enunciado          = 'QF del muestreo'
+                enunciado          = ''
                 valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato)
                 qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
         
