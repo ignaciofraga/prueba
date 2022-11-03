@@ -1900,11 +1900,12 @@ def control_calidad_botellas():
     else:
         df_temp        = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos)]        
     
-    datos_variable = df_temp[listado_variables[indice_variable]]
+    datos_variable    = df_temp[listado_variables[indice_variable]]
+
 
     # Representa un gráfico con la variable seleccionada
     fig, ax = plt.subplots()
-    ax.plot(datos_variable,df_muestreos_salida['presion_ctd'],'.k' )
+    ax.plot(datos_variable,df_muestreos_estacion['presion_ctd'],'.k' )
     texto_eje = nombre_variables[indice_variable] + '(' + uds_variables[indice_variable] + ')'
     ax.set(xlabel=texto_eje)
     ax.set(ylabel='Presion (db)')
