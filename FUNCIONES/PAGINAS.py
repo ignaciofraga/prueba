@@ -1912,7 +1912,7 @@ def control_calidad_botellas():
     ax.invert_yaxis()
     # Añade el nombre de cada punto
     for ipunto in range(len(datos_variable)):
-        texto = 'BTL' + df_muestreos_estacion['botella'].iloc[ipunto]
+        texto = 'BTL' + str(df_muestreos_estacion['botella'].iloc[ipunto])
         ax.annotate(texto, (datos_variable.iloc[ipunto], df_muestreos_estacion['presion_ctd'].iloc[ipunto]))
     
     st.pyplot(fig)
