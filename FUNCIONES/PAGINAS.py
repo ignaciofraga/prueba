@@ -1912,29 +1912,38 @@ def control_calidad_botellas():
     ax.invert_yaxis()
     st.pyplot(fig)
 
-
-    # Definir si los datos están bien o no 
-    col1, col2 = st.columns(2,gap="small")
+    #
+    with st.form("my-form", clear_on_submit=True):
+        
+        indice_validacion = [2,3,6]
+        texto_indice      = ['Validado','Dudoso','Malo']
+        
+        for idato in range(len(datos_variable)):
+            
+            enunciado    = 'QF del muestreo de profundidad ' + str(df_muestreos_estacion['presion_ctd'].iloc[idato])
+            st.radio(enunciado,texto_indice,horizontal=True)
+        
+        st.form_submit_button("Procesar los archivos seleccionados")  
  
-    with col1: 
-        io_valida_si = st.button('Validar todos los datos')
+    # with col1: 
+    #     io_valida_si = st.button('Validar todos los datos')
         
-    with col2: 
-        io_valida_no = st.button('Validar individualmente')
+    # with col2: 
+    #     io_valida_no = st.button('Validar individualmente')
     
-    if io_valida_si is True:
-        st.text('QF asignado a los datos mostrados')
+    # if io_valida_si is True:
+    #     st.text('QF asignado a los datos mostrados')
         
-    if io_valida_no is True:
-        listado_puntos       = df_muestreos_estacion['botella']
-        botella_seleccionada = st.selectbox('Punto (botella)',(listado_puntos))
+    # if io_valida_no is True:
+    #     listado_puntos       = df_muestreos_estacion['botella']
+    #     botella_seleccionada = st.selectbox('Punto (botella)',(listado_puntos))
 
-        fig, ax = plt.subplots()
-        ax.plot(datos_variable,df_muestreos_estacion['presion_ctd'],'.r' )
-        texto_eje = nombre_variables[indice_variable] + '(' + uds_variables[indice_variable] + ')'
-        ax.set(xlabel=texto_eje)
-        ax.set(ylabel='Presion (db)')
-        ax.invert_yaxis()        
+    #     fig, ax = plt.subplots()
+    #     ax.plot(datos_variable,df_muestreos_estacion['presion_ctd'],'.r' )
+    #     texto_eje = nombre_variables[indice_variable] + '(' + uds_variables[indice_variable] + ')'
+    #     ax.set(xlabel=texto_eje)
+    #     ax.set(ylabel='Presion (db)')
+    #     ax.invert_yaxis()        
         
         
         
