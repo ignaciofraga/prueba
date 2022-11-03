@@ -1803,8 +1803,12 @@ def entrada_botellas():
         cursor.close()
         conn.close()   
         
+        if st.button('Clear Uploaded File(s)') and 'key' in st.session_state.keys():
+            st.session_state.pop('key')
+            st.experimental_rerun()
         
-        st.form_submit_button("Borrar archivos subidos")
+        
+        #st.form_submit_button("Borrar archivos subidos")
 
   
     # if not state.widget_key:
