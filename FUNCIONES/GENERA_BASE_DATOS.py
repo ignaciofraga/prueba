@@ -869,6 +869,34 @@ conn.close()
 
 
 
+# ###############################################
+# ## TABLA CON LAS BANDERAS DE CALIDAD USADAS  ##
+# ###############################################
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
+
+# nombre_tabla = 'indices_calidad'
+
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
+
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_indice SERIAL PRIMARY KEY,'
+# ' indice int NOT NULL,'
+# ' descripcion text)'
+# ) 
+
+
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables 
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
+
+
+
 
 
 

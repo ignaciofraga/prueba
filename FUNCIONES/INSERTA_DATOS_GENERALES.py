@@ -225,6 +225,26 @@ conn.close()
 
 
 
+
+### Informacion de los indices de calidad utilizados ###
+
+
+indice       = [1,2,3,4,6,9]
+descripcion  = ['No evaluado','Bueno','Dudoso','Malo','Media de datos','No disponible']
+
+instruccion_sql = '''INSERT INTO indices_calidad (indice,descripcion)
+    VALUES (%s,%s) ON CONFLICT (id_indice) DO NOTHING;''' 
+        
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()
+for idato in range(len(nombre_estacion)):
+    
+    cursor.execute(instruccion_sql, (int(indice[idato]),descripcion[idato]))
+    conn.commit()
+cursor.close()
+conn.close()
+
+
 ### Informacion de las salidas al mar de las campañas PELACUS  ###
 
 # # Crea la tabla de nuevo

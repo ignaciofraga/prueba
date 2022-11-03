@@ -1829,6 +1829,7 @@ def control_calidad_botellas():
     df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
     df_programas            = psql.read_sql('SELECT * FROM programas', conn)
     df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
+    df_indices_calidad      = psql.read_sql('SELECT * FROM indices_calidad', conn)
     conn.close()    
     
     id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
@@ -1929,8 +1930,8 @@ def control_calidad_botellas():
         #
         with st.form("my-form", clear_on_submit=True):
             
-            indice_validacion = [2,3,6]
-            texto_indice      = ['Validado','Dudoso','Malo']
+            indice_validacion = df_indices_calidad['indice'].tolist()
+            texto_indice      = df_indices_calidad['descripcion'].tolist()
             qf_asignado       = numpy.zeros(len(datos_variable))
             
             for idato in range(len(datos_variable)):
@@ -1952,7 +1953,11 @@ def control_calidad_botellas():
             
             st.form_submit_button("Asignar los índices seleccionados")  
      
-        st.text(qf_asignado)
+     # Introducir los valores en la base de datos
+     
+     
+        
+    st.text(qf_asignado)
     # with col1: 
     #     io_valida_si = st.button('Validar todos los datos')
         
