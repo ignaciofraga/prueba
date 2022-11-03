@@ -1871,79 +1871,88 @@ def control_calidad_botellas():
     # Recupera los muestreos de la salida seleccionada
     df_muestreos_salida = df_muestreos[df_muestreos['salida_mar']==id_salida]  
     
-    
-    # Determina las estaciones muestreadas en la salida selecionada
-    listado_estaciones         = df_muestreos_salida['estacion'].unique()
-    df_estaciones_muestreadas  = df_estaciones[df_estaciones['id_estacion'].isin(listado_estaciones)]
-    nombres_estaciones         = df_estaciones_muestreadas['nombre_estacion'].tolist()
-    listado_estaciones         = df_estaciones_muestreadas['id_estacion'].tolist()
-    
-    # Despliega menús de selección de la variable y la estación a controlar                
-    col1, col2 = st.columns(2,gap="small")
- 
-    with col1: 
-        estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
-        indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
-        df_muestreos_estacion = df_muestreos_salida[df_muestreos_salida['estacion']==indice_estacion]
-        listado_muestreos     = df_muestreos_estacion['id_muestreo']
-    
-    with col2:
-        listado_variables     = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
-        nombre_variables      = ['Temperatura','Salinidad','PAR','Fluorescencia','O2']
-        uds_variables         = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
-        variable_seleccionada = st.selectbox('Variable',(nombre_variables))
-    
-        indice_variable = nombre_variables.index(variable_seleccionada)
-    
-    if indice_variable <=2:
-        df_temp        = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos)]
+    if df_muestreos_salida.shape[0] == 0:
+        
+        texto_error = 'No hay datos disponibles para la salida seleccionada '
+        st.warning(texto_error, icon="⚠️")        
+        
     else:
-        df_temp        = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos)]        
     
-    datos_variable    = df_temp[listado_variables[indice_variable]]
-
-
-    # Representa un gráfico con la variable seleccionada
-    fig, ax = plt.subplots()
-    ax.plot(datos_variable,df_muestreos_estacion['presion_ctd'],'.k' )
-    texto_eje = nombre_variables[indice_variable] + '(' + uds_variables[indice_variable] + ')'
-    ax.set(xlabel=texto_eje)
-    ax.set(ylabel='Presion (db)')
-    ax.invert_yaxis()
-    # Añade el nombre de cada punto
-    for ipunto in range(len(datos_variable)):
-        texto = 'BTL' + str(df_muestreos_estacion['botella'].iloc[ipunto])
-        ax.annotate(texto, (datos_variable.iloc[ipunto], df_muestreos_estacion['presion_ctd'].iloc[ipunto]))
+        # Determina las estaciones muestreadas en la salida selecionada
+        listado_estaciones         = df_muestreos_salida['estacion'].unique()
+        df_estaciones_muestreadas  = df_estaciones[df_estaciones['id_estacion'].isin(listado_estaciones)]
+        nombres_estaciones         = df_estaciones_muestreadas['nombre_estacion'].tolist()
+        listado_estaciones         = df_estaciones_muestreadas['id_estacion'].tolist()
+        
+        # Despliega menús de selección de la variable y la estación a controlar                
+        col1, col2 = st.columns(2,gap="small")
+     
+        with col1: 
+            estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
+            indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
+            df_muestreos_estacion = df_muestreos_salida[df_muestreos_salida['estacion']==indice_estacion]
+            listado_muestreos     = df_muestreos_estacion['id_muestreo']
+        
+        with col2:
+            listado_variables     = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
+            nombre_variables      = ['Temperatura','Salinidad','PAR','Fluorescencia','O2']
+            uds_variables         = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
+            variable_seleccionada = st.selectbox('Variable',(nombre_variables))
+        
+            indice_variable = nombre_variables.index(variable_seleccionada)
+        
+        if indice_variable <=2:
+            df_temp        = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos)]
+        else:
+            df_temp        = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos)]        
+        
+        datos_variable    = df_temp[listado_variables[indice_variable]]
     
-    st.pyplot(fig)
-
-    #
-    with st.form("my-form", clear_on_submit=True):
+    
+        # Representa un gráfico con la variable seleccionada
+        fig, ax = plt.subplots()
+        ax.plot(datos_variable,df_muestreos_estacion['presion_ctd'],'.k' )
+        texto_eje = nombre_variables[indice_variable] + '(' + uds_variables[indice_variable] + ')'
+        ax.set(xlabel=texto_eje)
+        ax.set(ylabel='Presion (db)')
+        ax.invert_yaxis()
+        # Añade el nombre de cada punto
+        for ipunto in range(len(datos_variable)):
+            if df_muestreos_estacion['botella'].iloc[ipunto] is None:
+                texto = 'Prof.' + str(df_muestreos_estacion['presion_ctd'].iloc[ipunto])
+            else:
+                texto = 'Bot.' + str(df_muestreos_estacion['botella'].iloc[ipunto])
+            ax.annotate(texto, (datos_variable.iloc[ipunto], df_muestreos_estacion['presion_ctd'].iloc[ipunto]))
         
-        indice_validacion = [2,3,6]
-        texto_indice      = ['Validado','Dudoso','Malo']
-        qf_asignado       = numpy.zeros(len(datos_variable))
-        
-        for idato in range(len(datos_variable)):
+        st.pyplot(fig)
+    
+        #
+        with st.form("my-form", clear_on_submit=True):
             
-            col1, col2 = st.columns(2,gap="small")
+            indice_validacion = [2,3,6]
+            texto_indice      = ['Validado','Dudoso','Malo']
+            qf_asignado       = numpy.zeros(len(datos_variable))
             
-            with col1:
+            for idato in range(len(datos_variable)):
                 
-                st.text('')
-                texto_indicador = 'QF asignado a botella '  + str(df_muestreos_estacion['botella'].iloc[idato]) + ' (Profundidad ' + str(df_muestreos_estacion['presion_ctd'].iloc[idato]) + ' m)'
-                st.markdown(texto_indicador)
-
-            with col2:
+                col1, col2 = st.columns(2,gap="small")
                 
-                #enunciado          = 'QF del muestreo'
-                enunciado          = ''
-                valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato)
-                qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
-        
-        st.form_submit_button("Asignar los índices seleccionados")  
- 
-    st.text(qf_asignado)
+                with col1:
+                    
+                    st.text('')
+                    texto_indicador = 'QF asignado a botella '  + str(df_muestreos_estacion['botella'].iloc[idato]) + ' (Profundidad ' + str(df_muestreos_estacion['presion_ctd'].iloc[idato]) + ' m)'
+                    st.markdown(texto_indicador)
+    
+                with col2:
+                    
+                    #enunciado          = 'QF del muestreo'
+                    enunciado          = ''
+                    valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato)
+                    qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
+            
+            st.form_submit_button("Asignar los índices seleccionados")  
+     
+        st.text(qf_asignado)
     # with col1: 
     #     io_valida_si = st.button('Validar todos los datos')
         
