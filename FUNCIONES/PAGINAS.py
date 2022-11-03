@@ -1803,7 +1803,7 @@ def entrada_botellas():
         cursor.close()
         conn.close()   
     
-        submitted = st.form_submit_button("submit") 
+        st.form_submit_button("Procesar los archivos subidos") 
     
     # if st.button('Clear Uploaded File(s)') and 'key' in st.session_state.keys():
     #     st.session_state.pop('key')
