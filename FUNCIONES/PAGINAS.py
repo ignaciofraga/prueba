@@ -1931,7 +1931,7 @@ def control_calidad_botellas():
             with col2:
                 
                 enunciado          = 'QF del muestreo'
-                valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True)
+                valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato)
                 qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
         
         st.form_submit_button("Asignar los índices seleccionados")  
