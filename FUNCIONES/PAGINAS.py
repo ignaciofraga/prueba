@@ -1925,6 +1925,7 @@ def control_calidad_botellas():
             
             with col1:
                 
+                st.text('')
                 texto_indicador = 'QF asignado a botella '  + str(df_muestreos_estacion['botella'].iloc[idato]) + ' (Profundidad ' + str(df_muestreos_estacion['presion_ctd'].iloc[idato]) + ' m)'
                 st.markdown(texto_indicador)
 
