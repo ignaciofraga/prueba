@@ -454,12 +454,12 @@ def consulta_estado():
                     if pandas.isnull(estado_procesos_programa['fecha_analisis_laboratorio'][ianho]) is False:
                         if tiempo_consulta >= (estado_procesos_programa['fecha_analisis_laboratorio'][ianho]):  # estado_procesos_programa['fecha_analisis_laboratorio'][ianho] is not None:     
                             estado_procesos_programa['id_estado'][ianho] = 2
-                            estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_analisis_laboratorio'][ianho] 
+                            estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho] 
                             estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_analisis_laboratorio'][ianho].strftime("%m/%d/%Y")
                         else:
                             if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
                                 estado_procesos_programa['id_estado'][ianho] = 1 
-                                estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_entrada_datos'][ianho]
+                                estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho]
                                 estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_entrada_datos'][ianho].strftime("%m/%d/%Y")
                                                     
                     
@@ -468,7 +468,7 @@ def consulta_estado():
                         if pandas.isnull(estado_procesos_programa['fecha_entrada_datos'][ianho]) is False:
                             if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
                                 estado_procesos_programa['id_estado'][ianho] = 1 
-                                estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_entrada_datos'][ianho]
+                                estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho]
                                 estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_entrada_datos'][ianho].strftime("%m/%d/%Y")
                                 
             
