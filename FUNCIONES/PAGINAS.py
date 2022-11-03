@@ -1828,6 +1828,7 @@ def control_calidad_botellas():
     df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
     df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
     df_programas            = psql.read_sql('SELECT * FROM programas', conn)
+    df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
     conn.close()    
     
     id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
@@ -1869,15 +1870,28 @@ def control_calidad_botellas():
 
     # Recupera los muestreos de la salida seleccionada
     df_muestreos_salida = df_muestreos[df_muestreos['salida_mar']==id_salida]  
-    listado_muestreos   = df_muestreos_salida['id_muestreo']
     
-    # Selecciona la variable de la que se quiere evaluar los datos
-    listado_variables     = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
-    nombre_variables      = ['Temperatura','Salinidad','PAR','Fluorescencia','O2']
-    uds_variables         = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
-    variable_seleccionada = st.selectbox('Variable',(nombre_variables))
     
-    indice_variable = nombre_variables.index(variable_seleccionada)
+    # Determina las estaciones muestreadas en la salida selecionada
+    listado_estaciones         = df_muestreos_salida['estacion'].unique()
+    df_estaciones_muestreadas  = df_estaciones[df_estaciones['id_estacion'].isin(listado_estaciones)]
+    
+    # Despliega menús de selección de la variable y la estación a controlar                
+    col1, col2 = st.columns(2,gap="small")
+ 
+    with col1: 
+        estacion_seleccionada = st.selectbox('Estación',(df_estaciones_muestreadas['nombre_estacion']))
+        indice_estacion       = listado_estaciones.index(estacion_seleccionada)
+        df_muestreos_estacion = df_muestreos_salida[df_muestreos_salida['estacion']==indice_estacion]
+        listado_muestreos     = df_muestreos_estacion['id_muestreo']
+    
+    with col2:
+        listado_variables     = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
+        nombre_variables      = ['Temperatura','Salinidad','PAR','Fluorescencia','O2']
+        uds_variables         = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
+        variable_seleccionada = st.selectbox('Variable',(nombre_variables))
+    
+        indice_variable = nombre_variables.index(variable_seleccionada)
     
     if indice_variable <=2:
         df_temp        = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos)]
