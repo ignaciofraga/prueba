@@ -1883,7 +1883,7 @@ def control_calidad_botellas():
  
     with col1: 
         estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
-        indice_estacion       = listado_estaciones.index(estacion_seleccionada)
+        indice_estacion       = nombres_estaciones.index(estacion_seleccionada)
         df_muestreos_estacion = df_muestreos_salida[df_muestreos_salida['estacion']==indice_estacion]
         listado_muestreos     = df_muestreos_estacion['id_muestreo']
     
