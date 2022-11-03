@@ -1875,7 +1875,7 @@ def control_calidad_botellas():
     listado_variables     = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
     nombre_variables      = ['Temperatura','Salinidad','PAR','Fluorescencia','O2']
     uds_variables         = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
-    variable_seleccionada = st.selectbox('Variable',(listado_variables))
+    variable_seleccionada = st.selectbox('Variable',(nombre_variables))
     
     indice_variable = nombre_variables.index(variable_seleccionada)
     
