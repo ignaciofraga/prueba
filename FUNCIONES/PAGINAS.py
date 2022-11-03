@@ -1917,14 +1917,26 @@ def control_calidad_botellas():
         
         indice_validacion = [2,3,6]
         texto_indice      = ['Validado','Dudoso','Malo']
+        qf_asignado       = numpy.zeros(len(datos_variable))
         
         for idato in range(len(datos_variable)):
             
-            enunciado    = 'QF del muestreo de profundidad ' + str(df_muestreos_estacion['presion_ctd'].iloc[idato])
-            st.radio(enunciado,texto_indice,horizontal=True)
+            col1, col2 = st.columns(2,gap="small")
+            
+            with col1:
+                
+                texto_indicador = 'QF asignado a botella '  + str(df_muestreos_estacion['botella'].iloc[idato]) + ' (Profundidad ' + str(df_muestreos_estacion['presion_ctd'].iloc[idato]) + ' m)'
+                st.markdown(texto_indicador)
+
+            with col2:
+                
+                enunciado          = 'QF del muestreo'
+                valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,label_visibility='hidden')
+                qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
         
-        st.form_submit_button("Procesar los archivos seleccionados")  
+        st.form_submit_button("Asignar los índices seleccionados")  
  
+    st.text(qf_asignado)
     # with col1: 
     #     io_valida_si = st.button('Validar todos los datos')
         
