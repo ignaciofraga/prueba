@@ -1883,10 +1883,14 @@ def control_calidad_botellas():
  
     with col1: 
         estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
-        for iestacion in range(len(nombres_estaciones)):
-            if nombres_estaciones[iestacion] == estacion_seleccionada:
-                indice_estacion  = listado_estaciones[iestacion]
-        #indice_estacion       = nombres_estaciones.index(estacion_seleccionada)
+        # for iestacion in range(len(nombres_estaciones)):
+        #     if nombres_estaciones[iestacion] == estacion_seleccionada:
+        #         indice_estacion  = listado_estaciones[iestacion]
+        st.text(estacion_seleccionada)
+        st.text(nombres_estaciones)
+        st.text(listado_estaciones)
+        indice_estacion       = nombres_estaciones.index(estacion_seleccionada)
+        st.text(indice_estacion)
         df_muestreos_estacion = df_muestreos_salida[df_muestreos_salida['estacion']==indice_estacion]
         listado_muestreos     = df_muestreos_estacion['id_muestreo']
     
