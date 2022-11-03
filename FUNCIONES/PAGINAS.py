@@ -1803,8 +1803,102 @@ def entrada_botellas():
         cursor.close()
         conn.close()   
     
-        st.form_submit_button("Procesar los archivos subidos") 
+        st.form_submit_button("Procesar los archivos seleccionados") 
+        
+        
+
+
+
+
+def control_calidad_botellas():
     
+    st.subheader('Control de calidad de datos procedentes de botellas')    
+    
+    # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port
+    
+    # Recupera tablas con informacion utilizada en el procesado
+    conn                    = init_connection()
+    df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+    df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+    df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+    df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    df_programas            = psql.read_sql('SELECT * FROM programas', conn)
+    conn.close()    
+    
+    id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+
+    # Despliega menús de selección del programa, tipo de salida, año y fecha               
+    col1, col2, col3, col4= st.columns(4,gap="small")
+ 
+    with col1: 
+        programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
+        df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
+        
+    
+    with col2:
+        tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
+        df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+    
+        # Añade la variable año al dataframe
+        indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+        df_salidas_seleccion['id_temp'] = indices_dataframe
+        df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
+        
+        # Define los años con salidas asociadas
+        df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
+        for idato in range(df_salidas_seleccion.shape[0]):
+            df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+        df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
+        
+        listado_anhos              = df_salidas_seleccion['año'].unique()
+    
+    with col3:
+        anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
+        df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+
+    with col4:
+        fecha_salida                = st.selectbox('Fecha salida',(df_salidas_seleccion['fecha_salida']),index=df_salidas_seleccion.shape[0]-1)
+
+        # Recupera el identificador de la salida seleccionada
+        id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_salida].iloc[0]
+
+    # Recupera los muestreos de la salida seleccionada
+    df_muestreos_salida = df_muestreos[df_muestreos['salida_mar']==id_salida]  
+    listado_muestreos   = df_muestreos_salida['id_muestreo']
+    
+    # Selecciona la variable de la que se quiere evaluar los datos
+    listado_variables     = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
+    nombre_variables      = ['Temperatura','Salinidad','PAR','Fluorescencia','O2']
+    uds_variables         = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
+    variable_seleccionada = st.selectbox('Variable',(listado_variables))
+    
+    indice_variable = nombre_variables.index(variable_seleccionada)
+    
+    if indice_variable <=2:
+        df_temp        = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos)]
+    else:
+        df_temp        = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos)]        
+    
+    datos_variable = df_temp[listado_variables[indice_variable]]
+
+    # Representa un gráfico con la variable seleccionada
+    fig, ax = plt.subplots()
+    ax.plot(datos_variable,df_muestreos_salida['presion_ctd'],'.k' )
+    texto_eje = nombre_variables[indice_variable] + '(' + uds_variables[indice_variable] + ')'
+    ax.set(xlabel=texto_eje)
+    ax.set(ylabel='Presion (db)')
+    ax.invert_yaxis()
+    st.pyplot(fig)
+
+
+    # df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+    # df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+
     # if st.button('Clear Uploaded File(s)') and 'key' in st.session_state.keys():
     #     st.session_state.pop('key')
     #     st.experimental_rerun()
