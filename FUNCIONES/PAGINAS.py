@@ -1908,7 +1908,7 @@ def control_calidad_botellas():
             df_temp        = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos)]        
         
         datos_variable    = df_temp[listado_variables[indice_variable]]
-    
+          
     
         # Representa un gráfico con la variable seleccionada
         fig, ax = plt.subplots()
@@ -1918,12 +1918,13 @@ def control_calidad_botellas():
         ax.set(ylabel='Presion (db)')
         ax.invert_yaxis()
         # Añade el nombre de cada punto
+        nombre_muestreos = [None]*len(datos_variable)
         for ipunto in range(len(datos_variable)):
             if df_muestreos_estacion['botella'].iloc[ipunto] is None:
-                texto = 'Prof.' + str(df_muestreos_estacion['presion_ctd'].iloc[ipunto])
+                nombre_muestreos[ipunto] = 'Prof.' + str(df_muestreos_estacion['presion_ctd'].iloc[ipunto])
             else:
-                texto = 'Bot.' + str(df_muestreos_estacion['botella'].iloc[ipunto])
-            ax.annotate(texto, (datos_variable.iloc[ipunto], df_muestreos_estacion['presion_ctd'].iloc[ipunto]))
+                nombre_muestreos[ipunto] = 'Bot.' + str(df_muestreos_estacion['botella'].iloc[ipunto])
+            ax.annotate(nombre_muestreos[ipunto], (datos_variable.iloc[ipunto], df_muestreos_estacion['presion_ctd'].iloc[ipunto]))
         
         st.pyplot(fig)
     
@@ -1936,20 +1937,20 @@ def control_calidad_botellas():
             
             for idato in range(len(datos_variable)):
                 
-                col1, col2 = st.columns(2,gap="small")
+                # col1, col2 = st.columns(2,gap="small")
                 
-                with col1:
+                # with col1:
                     
-                    st.text('')
-                    texto_indicador = 'QF asignado a botella '  + str(df_muestreos_estacion['botella'].iloc[idato]) + ' (Profundidad ' + str(df_muestreos_estacion['presion_ctd'].iloc[idato]) + ' m)'
-                    st.markdown(texto_indicador)
+                #     st.text('')
+                #     texto_indicador = 'QF asignado a botella '  + str(df_muestreos_estacion['botella'].iloc[idato]) + ' (Profundidad ' + str(df_muestreos_estacion['presion_ctd'].iloc[idato]) + ' m)'
+                #     st.markdown(texto_indicador)
     
-                with col2:
+                # with col2:
                     
-                    #enunciado          = 'QF del muestreo'
-                    enunciado          = ''
-                    valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato)
-                    qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
+                #enunciado          = 'QF del muestreo'
+                enunciado          = 'QF del muestreo ' + nombre_muestreos[idato]
+                valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato)
+                qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
             
             st.form_submit_button("Asignar los índices seleccionados")  
      
