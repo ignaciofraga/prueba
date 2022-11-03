@@ -1721,92 +1721,92 @@ def entrada_botellas():
         id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_salida].iloc[0]
 
 
-    with st.form("my-form", clear_on_submit=True):
+
  
-        # Despliega la extensión para subir archivos       
-        listado_archivos_subidos = st.file_uploader("Arrastra o selecciona los archivos .btl", accept_multiple_files=True)
-      
-        # Conecta con la base de datos
-        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        cursor = conn.cursor() 
-        
-        for archivo_subido in listado_archivos_subidos:
-            
-            texto_estado = 'Procesando el archivo ' + archivo_subido.name
-            with st.spinner(texto_estado):
-                
-                try:
-                
-                    # Lee los datos de cada archivo de botella
-                    nombre_archivo = archivo_subido.name
-                    datos_archivo = archivo_subido.getvalue().decode('utf-8').splitlines()            
-                    
-                    # Comprueba que la fecha del archivo y de la salida coinciden
-                    fecha_salida_texto    = nombre_archivo[0:8]
-                    fecha_salida_archivo  = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
-                    
-                    if fecha_salida_archivo == fecha_salida:
-                    
-                        mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
-            
-                        # Asigna el identificador de la salida al mar
-                        datos_botellas ['id_salida'] =  id_salida
-            
-                        # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-                        datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
-            
-            
-                        # Inserta datos físicos
-                        for idato in range(datos_botellas.shape[0]):
-                            if io_par == 1:
-                                instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf)
-                                      VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf,EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
-                                
-                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato]),datos_botellas['par_ctd'][idato],int(datos_botellas['par_ctd_qf'][idato])))
-                                conn.commit()
-                                
-                            if io_par == 0:   
-                                instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
-                                      VALUES (%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf);''' 
-                                        
-                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato])))
-                                conn.commit()
-                                
-                            # Inserta datos biogeoquímicos
-                            if io_fluor == 1:                
-                                instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,fluorescencia_ctd,fluorescencia_ctd_qf)
-                                      VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (fluorescencia_ctd,fluorescencia_ctd_qf) = ROW(EXCLUDED.fluorescencia_ctd,EXCLUDED.fluorescencia_ctd_qf);''' 
-                                        
-                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['fluorescencia_ctd'][idato],int(datos_botellas['fluorescencia_ctd'][idato])))
-                                conn.commit()           
-                 
-                            if io_O2 == 1:                
-                                instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,oxigeno_ctd,oxigeno_ctd_qf)
-                                      VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (oxigeno_ctd,oxigeno_ctd_qf) = ROW(EXCLUDED.oxigeno_ctd,EXCLUDED.oxigeno_ctd_qf);''' 
-                                        
-                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['oxigeno_ctd'][idato],int(datos_botellas['oxigeno_ctd_qf'][idato])))
-                                conn.commit()     
-            
-                        texto_exito = 'Archivo ' + archivo_subido.name + ' procesado correctamente'
-                        st.success(texto_exito) 
-                        
-                    else:
-                    
-                        texto_error = 'La fecha del archivo ' + archivo_subido.name + ' no coindice con la fecha seleccionada '
-                        st.warning(texto_error, icon="⚠️")                    
-                        
-                
-                except:
-                    texto_error = 'Error en el procesado del archivo ' + archivo_subido.name
-                    st.warning(texto_error, icon="⚠️")
+    # Despliega la extensión para subir archivos       
+    listado_archivos_subidos = st.file_uploader("Arrastra o selecciona los archivos .btl", accept_multiple_files=True)
+  
+    # Conecta con la base de datos
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor() 
     
-        cursor.close()
-        conn.close()   
+    for archivo_subido in listado_archivos_subidos:
         
-        if st.button('Clear Uploaded File(s)') and 'key' in st.session_state.keys():
-            st.session_state.pop('key')
-            st.experimental_rerun()
+        texto_estado = 'Procesando el archivo ' + archivo_subido.name
+        with st.spinner(texto_estado):
+            
+            try:
+            
+                # Lee los datos de cada archivo de botella
+                nombre_archivo = archivo_subido.name
+                datos_archivo = archivo_subido.getvalue().decode('utf-8').splitlines()            
+                
+                # Comprueba que la fecha del archivo y de la salida coinciden
+                fecha_salida_texto    = nombre_archivo[0:8]
+                fecha_salida_archivo  = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
+                
+                if fecha_salida_archivo == fecha_salida:
+                
+                    mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
         
+                    # Asigna el identificador de la salida al mar
+                    datos_botellas ['id_salida'] =  id_salida
+        
+                    # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+                    datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+        
+        
+                    # Inserta datos físicos
+                    for idato in range(datos_botellas.shape[0]):
+                        if io_par == 1:
+                            instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf)
+                                  VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf,EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
+                            
+                            cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato]),datos_botellas['par_ctd'][idato],int(datos_botellas['par_ctd_qf'][idato])))
+                            conn.commit()
+                            
+                        if io_par == 0:   
+                            instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
+                                  VALUES (%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf);''' 
+                                    
+                            cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato])))
+                            conn.commit()
+                            
+                        # Inserta datos biogeoquímicos
+                        if io_fluor == 1:                
+                            instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,fluorescencia_ctd,fluorescencia_ctd_qf)
+                                  VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (fluorescencia_ctd,fluorescencia_ctd_qf) = ROW(EXCLUDED.fluorescencia_ctd,EXCLUDED.fluorescencia_ctd_qf);''' 
+                                    
+                            cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['fluorescencia_ctd'][idato],int(datos_botellas['fluorescencia_ctd'][idato])))
+                            conn.commit()           
+             
+                        if io_O2 == 1:                
+                            instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,oxigeno_ctd,oxigeno_ctd_qf)
+                                  VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (oxigeno_ctd,oxigeno_ctd_qf) = ROW(EXCLUDED.oxigeno_ctd,EXCLUDED.oxigeno_ctd_qf);''' 
+                                    
+                            cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['oxigeno_ctd'][idato],int(datos_botellas['oxigeno_ctd_qf'][idato])))
+                            conn.commit()     
+        
+                    texto_exito = 'Archivo ' + archivo_subido.name + ' procesado correctamente'
+                    st.success(texto_exito) 
+                    
+                else:
+                
+                    texto_error = 'La fecha del archivo ' + archivo_subido.name + ' no coindice con la fecha seleccionada '
+                    st.warning(texto_error, icon="⚠️")                    
+                    
+            
+            except:
+                texto_error = 'Error en el procesado del archivo ' + archivo_subido.name
+                st.warning(texto_error, icon="⚠️")
+
+    cursor.close()
+    conn.close()   
+    
+    if st.button('Clear Uploaded File(s)') and 'key' in st.session_state.keys():
+        st.session_state.pop('key')
+        st.experimental_rerun()
+    
         
         #st.form_submit_button("Borrar archivos subidos")
 
