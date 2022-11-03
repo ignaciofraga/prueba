@@ -1901,12 +1901,16 @@ def control_calidad_botellas():
             variable_seleccionada = st.selectbox('Variable',(nombre_variables))
         
             indice_variable = nombre_variables.index(variable_seleccionada)
-        
-        if indice_variable <=2:
-            df_temp        = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos)]
-        else:
-            df_temp        = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos)]        
-        
+
+        if indice_variable <=2: # Datos fisicos
+            df_temp         = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos)]
+            tabla_actualiza = 'datos_discretos_fisica'
+            identificador   = 'id_disc_fisica'
+        else:                    # Datos biogeoquimicos
+            df_temp         = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos)]        
+            tabla_actualiza = 'datos_discretos_biogeoquimica'
+            identificador   = 'id_disc_biogeoquim'
+            
         datos_variable    = df_temp[listado_variables[indice_variable]]
           
     
@@ -1929,34 +1933,40 @@ def control_calidad_botellas():
         st.pyplot(fig)
     
         #
-        with st.form("my-form", clear_on_submit=True):
-            
+        with st.form("Formulario", clear_on_submit=True):
+                       
             indice_validacion = df_indices_calidad['indice'].tolist()
             texto_indice      = df_indices_calidad['descripcion'].tolist()
             qf_asignado       = numpy.zeros(len(datos_variable))
             
             for idato in range(len(datos_variable)):
                 
-                # col1, col2 = st.columns(2,gap="small")
-                
-                # with col1:
-                    
-                #     st.text('')
-                #     texto_indicador = 'QF asignado a botella '  + str(df_muestreos_estacion['botella'].iloc[idato]) + ' (Profundidad ' + str(df_muestreos_estacion['presion_ctd'].iloc[idato]) + ' m)'
-                #     st.markdown(texto_indicador)
-    
-                # with col2:
-                    
-                #enunciado          = 'QF del muestreo'
                 enunciado          = 'QF del muestreo ' + nombre_muestreos[idato]
                 valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
                 qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
             
-            st.form_submit_button("Asignar los índices seleccionados")  
+            io_envio = st.form_submit_button("Asignar los índices seleccionados")  
      
-     # Introducir los valores en la base de datos
+        if io_envio:
+            
+            texto_estado = 'Actualizando los índices de la base de datos'
+            with st.spinner(texto_estado):
+            
+                # Introducir los valores en la base de datos
+                conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()  
+        
+                for idato in range(len(datos_variable)):
      
+                    instruccion_sql = "UPDATE " + tabla_actualiza + " SET " + listado_variables[indice_variable] + '_qf = %s WHERE ' + identificador + '= %s;'
+                    cursor.execute(instruccion_sql, (int(qf_asignado[idato],int(df_temp[identificador].iloc[idato]))))
+                    conn.commit() 
+
+                cursor.close()
+                conn.close()   
      
+            texto_exito = 'QF de la variable  ' + variable_seleccionada + ' asignados correctamente'
+            st.success(texto_exito)
         
     st.text(qf_asignado)
     # with col1: 
