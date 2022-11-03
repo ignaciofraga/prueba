@@ -30,11 +30,11 @@ if FUNCIONES_AUXILIARES.log_in() is True:
         
             paginas = {"INICIO": PAGINAS.principal,
                         "ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
-                        "INFORMACIÓN DISPONIBLE": PAGINAS.consulta_estado,
-                        "DATOS DE MUESTREOS": PAGINAS.consulta_estadillos,
-                        "GRÁFICO DE EVOLUCIÓN": PAGINAS.evolucion_analisis,
-                        "ENTRADA PROCESOS": PAGINAS.entrada_procesos_actuales,
-                        "ESTADO DEL PROCESADO DE MUESTRAS": PAGINAS.consulta_procesos
+                        "INFORMACIÓN DISPONIBLE": PAGINAS.consulta_estado
+                        # "DATOS DE MUESTREOS": PAGINAS.consulta_estadillos,
+                        # "GRÁFICO DE EVOLUCIÓN": PAGINAS.evolucion_analisis,
+                        # "ENTRADA PROCESOS": PAGINAS.entrada_procesos_actuales,
+                        # "ESTADO DEL PROCESADO DE MUESTRAS": PAGINAS.consulta_procesos
                         }
             
             
