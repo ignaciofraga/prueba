@@ -1913,6 +1913,33 @@ def control_calidad_botellas():
     st.pyplot(fig)
 
 
+    # Definir si los datos están bien o no 
+    col1, col2 = st.columns(2,gap="small")
+ 
+    with col1: 
+        io_valida_si = st.button('Validar todos los datos')
+        
+    with col2: 
+        io_valida_no = st.button('Validar individualmente')
+    
+    if io_valida_si is True:
+        st.text('QF asignado a los datos mostrados')
+        
+    if io_valida_no is True:
+        listado_puntos       = df_muestreos_estacion['botella']
+        botella_seleccionada = st.selectbox('Punto (botella)',(listado_puntos))
+
+        fig, ax = plt.subplots()
+        ax.plot(datos_variable,df_muestreos_estacion['presion_ctd'],'.r' )
+        texto_eje = nombre_variables[indice_variable] + '(' + uds_variables[indice_variable] + ')'
+        ax.set(xlabel=texto_eje)
+        ax.set(ylabel='Presion (db)')
+        ax.invert_yaxis()        
+        
+        
+        
+    
+
     # df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
     # df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
 
