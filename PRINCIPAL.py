@@ -44,6 +44,7 @@ if FUNCIONES_AUXILIARES.log_in() is True:
                         "ACTUALIZA PROCESOS EN CURSO": PAGINAS.actualiza_procesos, 
                         "DESCARGA DATOS DE MUESTREOS": PAGINAS.consulta_estadillos,
                         "INTRODUCE DATOS NUTRIENTES": PAGINAS.entrada_datos,
+                        "CONSULTA DATOS BOTELLAS":PAGINAS.consulta_botellas
                         }
 
             

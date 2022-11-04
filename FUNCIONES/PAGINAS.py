@@ -1987,6 +1987,67 @@ def entrada_botellas():
 # ##################### PÁGINA DE CONSULTA DE DATOS DE BOTELLAS #################
 # ###############################################################################    
 
+
+def consulta_botellas():
+    
+    # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port
+    
+
+    
+    st.subheader('Entrada de datos procedentes de botellas') 
+
+    # Recupera tablas con informacion utilizada en el procesado
+    conn                = init_connection()
+    df_salidas          = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    df_programas        = psql.read_sql('SELECT * FROM programas', conn)
+    conn.close()    
+    
+    id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+    
+    # Despliega menús de selección del programa, tipo de salida, año y fecha               
+    col1, col2, col3= st.columns(3,gap="small")
+ 
+    with col1: 
+        programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
+        df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
+        
+    
+    with col2:
+        tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
+        df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+    
+        # Añade la variable año al dataframe
+        indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+        df_salidas_seleccion['id_temp'] = indices_dataframe
+        df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
+        
+        # Define los años con salidas asociadas
+        df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
+        for idato in range(df_salidas_seleccion.shape[0]):
+            df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+        df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
+        
+        listado_anhos              = df_salidas_seleccion['año'].unique()
+    
+    with col3:
+        anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
+        df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+
+    listado_salidas                 = st.multiselect('Muestreo',(df_salidas_seleccion['nombre_salida']))   
+
+
+
+
+
+
+
+
+
 # def consulta_botellas():
     
 #     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
