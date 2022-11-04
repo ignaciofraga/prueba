@@ -90,6 +90,10 @@ else:
         
     datos_variable    = df_temp[listado_variables[indice_variable]]
       
+    # Une los dataframes con los datos del muestreo y de las variables, para tener los datos de profundidad, botella....
+    df_muestreos_estacion['muestreo'] = df_muestreos_estacion['id_muestreo'] # Para igualar los nombres de columnas
+
+    test = pandas.merge(df_temp, df_muestreos_estacion, on="muestreo")
 
     # Representa un gráfico con la variable seleccionada
     fig, ax = plt.subplots()

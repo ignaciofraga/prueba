@@ -1929,11 +1929,11 @@ def control_calidad_botellas():
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*len(datos_variable)
         for ipunto in range(len(datos_variable)):
-            if df_muestreos_estacion['botella'].iloc[ipunto] is None:
+            if df_temp['botella'].iloc[ipunto] is None:
                 nombre_muestreos[ipunto] = 'Prof.' + str(df_temp['presion_ctd'].iloc[ipunto])
             else:
                 nombre_muestreos[ipunto] = 'Bot.' + str(df_temp['botella'].iloc[ipunto])
-            ax.annotate(nombre_muestreos[ipunto], (datos_variable.iloc[ipunto], df_muestreos_estacion['presion_ctd'].iloc[ipunto]))
+            ax.annotate(nombre_muestreos[ipunto], (datos_variable.iloc[ipunto], df_temp['presion_ctd'].iloc[ipunto]))
         
         st.pyplot(fig)
     
