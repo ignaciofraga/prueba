@@ -2043,7 +2043,9 @@ def consulta_botellas():
     identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
     for idato in range(len(listado_salidas)):
         identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
-       #id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+       
+    st.text(identificadores_salidas)
+        #id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
 
 
 
