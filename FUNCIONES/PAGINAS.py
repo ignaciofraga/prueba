@@ -1968,7 +1968,8 @@ def control_calidad_botellas():
                 for idato in range(len(datos_variable)):
      
                     instruccion_sql = "UPDATE " + tabla_actualiza + " SET " + listado_variables[indice_variable] + '_qf = %s WHERE ' + identificador + '= %s;'
-                    cursor.execute(instruccion_sql, (int(qf_asignado[idato],int(df_temp[identificador].iloc[idato]))))
+                    st.text(instruccion_sql)
+                    cursor.execute(instruccion_sql, (int(qf_asignado[idato]),int(df_temp[identificador].iloc[idato])))
                     conn.commit() 
 
                 cursor.close()
