@@ -1694,7 +1694,7 @@ def entrada_botellas():
         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
         
         # Despliega menús de selección del programa, tipo de salida, año y fecha               
-        col1, col2, col3, col4= st.columns(4,gap="small")
+        col1, col2, col3= st.columns(3,gap="small")
      
         with col1: 
             programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
@@ -1722,11 +1722,12 @@ def entrada_botellas():
             anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
             df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
     
-        with col4:
-            fecha_salida                = st.selectbox('Fecha salida',(df_salidas_seleccion['fecha_salida']),index=df_salidas_seleccion.shape[0]-1)
+        salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
     
-            # Recupera el identificador de la salida seleccionada
-            id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_salida].iloc[0]
+        # Recupera el identificador de la salida seleccionada
+        id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+    
+        fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
     
     
         with st.form("my-form", clear_on_submit=True):
@@ -1863,7 +1864,6 @@ def entrada_botellas():
             df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
                 
         salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
-        #fecha_salida               = st.selectbox('Fecha salida',(df_salidas_seleccion['fecha_salida']),index=df_salidas_seleccion.shape[0]-1)
     
         # Recupera el identificador de la salida seleccionada
         id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
