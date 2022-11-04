@@ -1834,7 +1834,7 @@ def entrada_botellas():
         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
     
         # Despliega menús de selección del programa, tipo de salida, año y fecha               
-        col1, col2, col3, col4= st.columns(4,gap="small")
+        col1, col2, col3= st.columns(3,gap="small")
      
         with col1: 
             programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
@@ -1861,12 +1861,12 @@ def entrada_botellas():
         with col3:
             anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
             df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+                
+        salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
+        #fecha_salida               = st.selectbox('Fecha salida',(df_salidas_seleccion['fecha_salida']),index=df_salidas_seleccion.shape[0]-1)
     
-        with col4:
-            fecha_salida                = st.selectbox('Fecha salida',(df_salidas_seleccion['fecha_salida']),index=df_salidas_seleccion.shape[0]-1)
-    
-            # Recupera el identificador de la salida seleccionada
-            id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_salida].iloc[0]
+        # Recupera el identificador de la salida seleccionada
+        id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
     
         # Recupera los muestreos de la salida seleccionada
         df_muestreos_salida = df_muestreos[df_muestreos['salida_mar']==id_salida]  
@@ -1983,7 +1983,175 @@ def entrada_botellas():
 
 
 
+# ###############################################################################
+# ##################### PÁGINA DE CONSULTA DE DATOS DE BOTELLAS #################
+# ###############################################################################    
 
+# def consulta_botellas():
+    
+#     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+#     direccion_host   = st.secrets["postgres"].host
+#     base_datos       = st.secrets["postgres"].dbname
+#     usuario          = st.secrets["postgres"].user
+#     contrasena       = st.secrets["postgres"].password
+#     puerto           = st.secrets["postgres"].port
+    
+#     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
+#     acciones     = ['Añadir datos de botellas', 'Realizar control de calidad de datos de botellas']
+#     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
+    
+
+#     # Añade datos de botellas
+#     if tipo_accion == acciones[0]: 
+        
+#         st.subheader('Entrada de datos procedentes de botellas') 
+    
+#         # Recupera tablas con informacion utilizada en el procesado
+#         conn                = init_connection()
+#         df_salidas          = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+#         df_programas        = psql.read_sql('SELECT * FROM programas', conn)
+#         conn.close()    
+        
+#         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+        
+#         # Despliega menús de selección del programa, tipo de salida, año y fecha               
+#         col1, col2, col3, col4= st.columns(4,gap="small")
+     
+#         with col1: 
+#             programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
+#             df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
+            
+        
+#         with col2:
+#             tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
+#             df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+        
+#             # Añade la variable año al dataframe
+#             indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+#             df_salidas_seleccion['id_temp'] = indices_dataframe
+#             df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
+            
+#             # Define los años con salidas asociadas
+#             df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
+#             for idato in range(df_salidas_seleccion.shape[0]):
+#                 df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+#             df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
+            
+#             listado_anhos              = df_salidas_seleccion['año'].unique()
+        
+#         with col3:
+#             anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
+#             df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+    
+#         with col4:
+#             fecha_salida                = st.multiselect('salida',(df_salidas_seleccion['fecha_salida']),index=df_salidas_seleccion.shape[0]-1)
+    
+#             # Recupera el identificador de la salida seleccionada
+#             id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_salida].iloc[0]
+    
+
+
+#     # Recupera las tablas de los programas y estaciones disponibles como  dataframes
+#     conn = init_connection()
+#     df_programas  = psql.read_sql('SELECT * FROM programas', conn)
+#     df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+#     conn.close()
+    
+    
+#     # Selecciona el programa del que se quieren buscar estadillos
+#     nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere recuperar el estadillo',(df_programas['nombre_programa']))
+    
+#     id_programa      = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
+    
+    
+#     # Determina las fechas de las que hay información de datos de nutrientes
+#     estaciones_programa = df_estaciones[df_estaciones['programa'] == id_programa]
+    
+#     indices_dataframe   = numpy.arange(0,estaciones_programa.shape[0],1,dtype=int) 
+    
+#     # # Primero recupera los registros correspondientes al periodo evaluado y al año consultado
+#     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    
+#     cursor = conn.cursor()
+#     instruccion_sql = "SELECT id_muestreo,nombre_muestreo,fecha_muestreo,hora_muestreo,estacion,botella,presion_ctd,id_tubo_nutrientes FROM muestreos_discretos INNER JOIN estaciones ON muestreos_discretos.estacion = estaciones.id_estacion WHERE estaciones.programa = %s;"
+#     cursor.execute(instruccion_sql,(str(id_programa)))
+#     registros_consulta = cursor.fetchall()
+#     conn.commit()
+#     cursor.close()
+#     conn.close()
+    
+    
+#     dataframe_registros = pandas.DataFrame(registros_consulta, columns=['id_muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','botella','presion_ctd','id_tubo_nutrientes'])
+    
+#     # Mantén sólo los registros con datos de id_nutrientes
+#     dataframe_registros = dataframe_registros[dataframe_registros['id_tubo_nutrientes'].notna()]
+    
+#     # Busca las fechas disponibles 
+#     dataframe_temporal = dataframe_registros.drop_duplicates('fecha_muestreo')
+#     listado_fechas     = dataframe_temporal['fecha_muestreo']
+    
+#     if len(listado_fechas) > 0:
+    
+#         # Seleccionas una fecha
+#         fecha_seleccionada = st.selectbox('Selecciona la fecha de la que se quiere recuperar el estadillo',(listado_fechas))
+        
+#         # Recupera los registros correspondientes a esa fecha
+#         dataframe_fecha = dataframe_registros[dataframe_registros['fecha_muestreo']==fecha_seleccionada]
+        
+#         # Ajusta el numero de los indices
+#         indices_dataframe          = numpy.arange(0,dataframe_fecha.shape[0],1,dtype=int)    
+#         dataframe_fecha['id_temp'] = indices_dataframe
+#         dataframe_fecha.set_index('id_temp',drop=True,append=False,inplace=True)
+        
+#         # Recupera las coordenadas a partir de la estación asignada
+#         dataframe_fecha['latitud'] = numpy.zeros(dataframe_fecha.shape[0])
+#         dataframe_fecha['longitud'] = numpy.zeros(dataframe_fecha.shape[0])
+#         for idato in range(dataframe_fecha.shape[0]):
+#             dataframe_fecha['latitud'][idato]  = estaciones_programa['latitud'][estaciones_programa['id_estacion']==dataframe_fecha['estacion'][idato]]
+#             dataframe_fecha['longitud'][idato] = estaciones_programa['longitud'][estaciones_programa['id_estacion']==dataframe_fecha['estacion'][idato]]
+        
+#         # Recupera las propiedades físicas del registro (temperatura, salinidad....)
+#         conn = init_connection()
+#         tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+#         conn.close()
+#         dataframe_fecha['temperatura_ctd'] = numpy.zeros(dataframe_fecha.shape[0])
+#         dataframe_fecha['salinidad_ctd'] = numpy.zeros(dataframe_fecha.shape[0])
+#         for idato in range(dataframe_fecha.shape[0]):
+#             dataframe_fecha['temperatura_ctd'][idato]  = tabla_registros_fisica['temperatura_ctd'][tabla_registros_fisica['muestreo']==dataframe_fecha['id_muestreo'][idato]]
+#             dataframe_fecha['salinidad_ctd'][idato]    = tabla_registros_fisica['salinidad_ctd'][tabla_registros_fisica['muestreo']==dataframe_fecha['id_muestreo'][idato]]
+        
+#         # Quita la columna de estación
+#         dataframe_fecha = dataframe_fecha.drop(columns=['estacion','id_muestreo'])
+        
+#         # Ajusta el orden de las columnas
+#         dataframe_fecha = dataframe_fecha[['nombre_muestreo','fecha_muestreo','hora_muestreo','latitud','longitud','botella','id_tubo_nutrientes','presion_ctd','temperatura_ctd','salinidad_ctd']]
+        
+#         # Ordena en función del número de tubo
+#         dataframe_fecha = dataframe_fecha.sort_values(by=['id_tubo_nutrientes'])
+       
+#         ## Botón para exportar los resultados
+#         nombre_archivo =  'ESTADILLO_' + nombre_programa + '_' + fecha_seleccionada.strftime("%m/%d/%Y") + '.xlsx'
+    
+#         output = BytesIO()
+#         writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+#         dataframe_fecha.to_excel(writer, index=False, sheet_name='DATOS')
+#         workbook = writer.book
+#         worksheet = writer.sheets['DATOS']
+#         writer.save()
+#         datos_exporta = output.getvalue()
+    
+#         st.download_button(
+#             label="DESCARGA LOS DATOS SELECCIONADOS",
+#             data=datos_exporta,
+#             file_name=nombre_archivo,
+#             help= 'Descarga un archivo .csv con el estadillo solicitado',
+#             mime="application/vnd.ms-excel"
+#         )
+        
+#     else:
+        
+#         texto_error = 'No hay estadillos de entrada correspondientes al programa ' + nombre_programa
+#         st.warning(texto_error, icon="⚠️")
 
 
 
