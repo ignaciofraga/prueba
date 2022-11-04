@@ -1910,13 +1910,18 @@ def control_calidad_botellas():
             df_temp         = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos)]        
             tabla_actualiza = 'datos_discretos_biogeoquimica'
             identificador   = 'id_disc_biogeoquim'
+
+        # Une los dataframes con los datos del muestreo y de las variables, para tener los datos de profundidad, botella....
+        df_muestreos_estacion = df_muestreos_estacion.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
+        df_temp               = pandas.merge(df_temp, df_muestreos_estacion, on="muestreo")
             
         datos_variable    = df_temp[listado_variables[indice_variable]]
-          
+ 
+         
     
         # Representa un gráfico con la variable seleccionada
         fig, ax = plt.subplots()
-        ax.plot(datos_variable,df_muestreos_estacion['presion_ctd'],'.k' )
+        ax.plot(datos_variable,df_temp['presion_ctd'],'.k' )
         texto_eje = nombre_variables[indice_variable] + '(' + uds_variables[indice_variable] + ')'
         ax.set(xlabel=texto_eje)
         ax.set(ylabel='Presion (db)')
@@ -1925,9 +1930,9 @@ def control_calidad_botellas():
         nombre_muestreos = [None]*len(datos_variable)
         for ipunto in range(len(datos_variable)):
             if df_muestreos_estacion['botella'].iloc[ipunto] is None:
-                nombre_muestreos[ipunto] = 'Prof.' + str(df_muestreos_estacion['presion_ctd'].iloc[ipunto])
+                nombre_muestreos[ipunto] = 'Prof.' + str(df_temp['presion_ctd'].iloc[ipunto])
             else:
-                nombre_muestreos[ipunto] = 'Bot.' + str(df_muestreos_estacion['botella'].iloc[ipunto])
+                nombre_muestreos[ipunto] = 'Bot.' + str(df_temp['botella'].iloc[ipunto])
             ax.annotate(nombre_muestreos[ipunto], (datos_variable.iloc[ipunto], df_muestreos_estacion['presion_ctd'].iloc[ipunto]))
         
         st.pyplot(fig)
@@ -1947,26 +1952,26 @@ def control_calidad_botellas():
             
             io_envio = st.form_submit_button("Asignar los índices seleccionados")  
      
-        if io_envio:
+        # if io_envio:
             
-            texto_estado = 'Actualizando los índices de la base de datos'
-            with st.spinner(texto_estado):
+        #     texto_estado = 'Actualizando los índices de la base de datos'
+        #     with st.spinner(texto_estado):
             
-                # Introducir los valores en la base de datos
-                conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                cursor = conn.cursor()  
+        #         # Introducir los valores en la base de datos
+        #         conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        #         cursor = conn.cursor()  
         
-                for idato in range(len(datos_variable)):
+        #         for idato in range(len(datos_variable)):
      
-                    instruccion_sql = "UPDATE " + tabla_actualiza + " SET " + listado_variables[indice_variable] + '_qf = %s WHERE ' + identificador + '= %s;'
-                    cursor.execute(instruccion_sql, (int(qf_asignado[idato],int(df_temp[identificador].iloc[idato]))))
-                    conn.commit() 
+        #             instruccion_sql = "UPDATE " + tabla_actualiza + " SET " + listado_variables[indice_variable] + '_qf = %s WHERE ' + identificador + '= %s;'
+        #             cursor.execute(instruccion_sql, (int(qf_asignado[idato],int(df_temp[identificador].iloc[idato]))))
+        #             conn.commit() 
 
-                cursor.close()
-                conn.close()   
+        #         cursor.close()
+        #         conn.close()   
      
-            texto_exito = 'QF de la variable  ' + variable_seleccionada + ' asignados correctamente'
-            st.success(texto_exito)
+        #     texto_exito = 'QF de la variable  ' + variable_seleccionada + ' asignados correctamente'
+        #     st.success(texto_exito)
         
     st.text(qf_asignado)
     # with col1: 
