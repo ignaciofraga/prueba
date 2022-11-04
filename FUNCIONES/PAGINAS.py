@@ -1915,6 +1915,10 @@ def control_calidad_botellas():
         df_muestreos_estacion = df_muestreos_estacion.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
         df_temp               = pandas.merge(df_temp, df_muestreos_estacion, on="muestreo")
             
+        # Ordena los registros del dataframe por profundidades
+        df_temp = df_temp.sort_values('presion_ctd')
+        
+        
         datos_variable    = df_temp[listado_variables[indice_variable]]
  
          
