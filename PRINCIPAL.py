@@ -65,8 +65,7 @@ if FUNCIONES_AUXILIARES.log_in() is True:
             paginas = {"INICIO": PAGINAS.principal,
                         "SALIDAS AL MAR": PAGINAS.entrada_salidas_mar,
                         "CONDICIONES AMBIENTALES":PAGINAS.entrada_condiciones_ambientales,
-                        "DATOS BOTELLAS":PAGINAS.entrada_botellas,
-                        "CONTROL":PAGINAS.control_calidad_botellas}
+                        "DATOS BOTELLAS":PAGINAS.entrada_botellas}
         
         seleccion = st.sidebar.selectbox("Elige la página a mostrar: ",tuple(paginas.keys()))
         
