@@ -1455,6 +1455,8 @@ def entrada_salidas_mar():
 
     # Consulta las salidas realizadas
     if tipo_entrada == entradas[2]: 
+        
+        st.subheader('Salidas al mar realizadas')
 
         # Recupera la tabla con las salidas disponibles, como un dataframe
         conn = init_connection()
