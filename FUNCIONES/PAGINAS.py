@@ -1526,6 +1526,10 @@ def entrada_condiciones_ambientales():
     df_salidas_radiales    = df_salidas[df_salidas['programa']==id_radiales] 
     df_estaciones_radiales = df_estaciones[df_estaciones['programa']==id_radiales]
     
+    # Ajusta el formato de las fechas
+    for idato in range(df_salidas_radiales.shape[0]):
+        df_salidas_radiales['fecha_salida'].iloc[idato]  =  df_salidas_radiales['fecha_salida'].iloc[idato].strftime("%Y-%m-%d")
+   
     # Selecciona la salida de la que se quiere introducir datos
     df_salidas_radiales    = df_salidas_radiales.sort_values('fecha_salida')
     st.text(df_salidas_radiales)
