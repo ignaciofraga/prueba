@@ -1474,9 +1474,9 @@ def entrada_salidas_mar():
         # Renombra las columnas
         df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','participantes':'Participantes','observaciones':'Observaciones'})
     
-        # # Ajusta el formato de las fechas
-        # for idato in range(df_salidas_radiales.shape[0]):
-        #     df_salidas_radiales['Fecha salida'][idato]  =  df_salidas_radiales['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
+        # Ajusta el formato de las fechas
+        for idato in range(df_salidas_radiales.shape[0]):
+            df_salidas_radiales['Fecha salida'].iloc[idato]  =  df_salidas_radiales['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
 
         # Ordena los valores por fechas
         #df_salidas_radiales = df_salidas_radiales.sort_values('Fecha salida')
