@@ -1479,7 +1479,7 @@ def entrada_salidas_mar():
             df_salidas_radiales['Fecha salida'].iloc[idato]  =  df_salidas_radiales['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
 
         # Ordena los valores por fechas
-        #df_salidas_radiales = df_salidas_radiales.sort_values('Fecha salida')
+        df_salidas_radiales = df_salidas_radiales.sort_values('Fecha salida')
 
         # Mueve os identificadores de muestreo al final del dataframe
         listado_cols = df_salidas_radiales.columns.tolist()
