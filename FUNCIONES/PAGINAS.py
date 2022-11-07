@@ -1478,6 +1478,14 @@ def entrada_salidas_mar():
         for idato in range(df_salidas_radiales.shape[0]):
             df_salidas_radiales['Fecha salida'][idato]  =  df_salidas_radiales['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
 
+        # Ordena los valores por fechas
+        df_salidas_radiales = df_salidas_radiales.sort_values('Fecha salida')
+
+        # Mueve os identificadores de muestreo al final del dataframe
+        listado_cols = df_salidas_radiales.columns.tolist()
+        listado_cols.append(listado_cols.pop(listado_cols.index('Observaciones')))
+        #listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud')))    
+        df_salidas_radiales = df_salidas_radiales[listado_cols]
           
         # Muestra una tabla con las salidas realizadas
         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_salidas_radiales)
