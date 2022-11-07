@@ -1523,7 +1523,7 @@ def entrada_condiciones_ambientales():
     
     #id_radiales            = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
 
-    id_radiales            = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'][0]
+    id_radiales            = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA']
     st.text(id_radiales)
 
     df_salidas_radiales    = df_salidas[df_salidas['programa']==id_radiales] 
