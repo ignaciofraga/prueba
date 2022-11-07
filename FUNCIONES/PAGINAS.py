@@ -1528,7 +1528,7 @@ def entrada_condiciones_ambientales():
     
     # Selecciona la salida de la que se quiere introducir datos
     df_salidas_radiales    = df_salidas_radiales.sort_values('fecha_salida')
-    salida                 = st.selectbox('Salida',(df_salidas_radiales['nombre_salida']),index=df_salidas_radiales.shape[0]-1)   
+    salida                 = st.selectbox('Salida',(df_salidas_radiales['nombre_salida']))   
  
     id_salida              = df_salidas_radiales['id_salida'][df_salidas_radiales['nombre_salida']==salida].iloc[0]
 
