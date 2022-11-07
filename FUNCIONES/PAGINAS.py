@@ -1521,10 +1521,7 @@ def entrada_condiciones_ambientales():
     df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
     conn.close()
     
-    #id_radiales            = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
-
     id_radiales            = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
-    st.text(id_radiales)
 
     df_salidas_radiales    = df_salidas[df_salidas['programa']==id_radiales] 
     df_estaciones_radiales = df_estaciones[df_estaciones['programa']==id_radiales]
@@ -1534,13 +1531,10 @@ def entrada_condiciones_ambientales():
         df_salidas_radiales['fecha_salida'].iloc[idato]  =  df_salidas_radiales['fecha_salida'].iloc[idato].strftime("%Y-%m-%d")
    
     # Selecciona la salida de la que se quiere introducir datos
-    df_salidas_radiales    = df_salidas_radiales.sort_values('fecha_salida')
-    st.text(df_salidas_radiales)
+    df_salidas_radiales    = df_salidas_radiales.sort_values('fecha_salida',ascending=False)
     salida                 = st.selectbox('Salida',(df_salidas_radiales['nombre_salida']))   
- 
     id_salida              = df_salidas_radiales['id_salida'][df_salidas_radiales['nombre_salida']==salida].iloc[0]
 
-     
     # Extrae las estaciones visitadas en la salida seleccionada
     listado_estaciones = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida].iloc[0] 
 
@@ -1716,7 +1710,9 @@ def entrada_botellas():
         df_programas        = psql.read_sql('SELECT * FROM programas', conn)
         conn.close()    
         
-        id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+        #id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+        id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
+
         
         # Despliega menús de selección del programa, tipo de salida, año y fecha               
         col1, col2, col3= st.columns(3,gap="small")
