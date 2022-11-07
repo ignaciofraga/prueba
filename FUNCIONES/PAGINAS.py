@@ -2050,6 +2050,8 @@ def consulta_botellas():
     # conserva los datos de las salidas seleccionadas
     df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
 
+    st.text(df_salidas_seleccion) 
+
     # Recupera los muestreos correspondientes a las salidas seleccionadas
     df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
     df_muestreos_seleccionados  = pandas.merge(df_salidas_seleccion, df_muestreos, on="id_salida")
