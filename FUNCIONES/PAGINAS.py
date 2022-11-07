@@ -2067,7 +2067,7 @@ def consulta_botellas():
     listado_cols = df_exporta.columns.tolist()
     listado_cols.append(listado_cols.pop(listado_cols.index('id_muestreo')))
     listado_cols.append(listado_cols.pop(listado_cols.index('id_disc_fisica')))
-    listado_cols.append(listado_cols.pop(listado_cols.index('id_disc_biogeoquimica')))
+    listado_cols.append(listado_cols.pop(listado_cols.index('id_disc_biogeoquim')))
     df_exporta = df_exporta[listado_cols]
 
  
