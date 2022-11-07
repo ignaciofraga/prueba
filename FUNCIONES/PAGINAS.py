@@ -2047,6 +2047,9 @@ def consulta_botellas():
     df_muestreos                = df_muestreos.drop(columns=['configuracion_perfilador','configuracion_superficie'])
     df_datos_biogeoquimicos     = df_datos_biogeoquimicos.drop(columns=['r_clor','r_clor_qf','r_per','r_per_qf','co3_temp'])
 
+    # conserva los datos de las salidas seleccionadas
+    df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
+
     # Recupera los muestreos correspondientes a las salidas seleccionadas
     df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
     df_muestreos_seleccionados  = pandas.merge(df_salidas_seleccion, df_muestreos, on="id_salida")
