@@ -2051,6 +2051,7 @@ def consulta_botellas():
     df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
 
     st.text(df_salidas_seleccion['id_salida'].iloc[0]) 
+    st.text(df_muestreos)
 
     # Recupera los muestreos correspondientes a las salidas seleccionadas
     df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
