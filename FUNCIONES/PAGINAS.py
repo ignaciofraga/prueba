@@ -2050,15 +2050,12 @@ def consulta_botellas():
     # conserva los datos de las salidas seleccionadas
     df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
 
-    st.text(df_salidas_seleccion['id_salida'].iloc[0]) 
-    st.text(df_muestreos)
+    st.text(df_salidas_seleccion)
 
     # Recupera los muestreos correspondientes a las salidas seleccionadas
     df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
     df_muestreos_seleccionados  = pandas.merge(df_salidas_seleccion, df_muestreos, on="id_salida")
-                  
-    st.text(df_muestreos_seleccionados)
-        
+                          
     # Asocia las coordenadas y nombre de estación de cada muestreo
     df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
     df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
@@ -2079,9 +2076,14 @@ def consulta_botellas():
     listado_cols.append(listado_cols.pop(listado_cols.index('id_muestreo')))
     listado_cols.append(listado_cols.pop(listado_cols.index('id_disc_fisica')))
     listado_cols.append(listado_cols.pop(listado_cols.index('id_disc_biogeoquim')))
+    listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud')))    
+    listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud')))
+    listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
+    listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
     df_exporta = df_exporta[listado_cols]
 
- 
+    # Ordena los valores por fechas
+    df_exporta.sort_values('fecha_muestreo',axis=1)
 
     ## Botón para exportar los resultados
     nombre_archivo =  'DATOS_BOTELLAS.xlsx'
