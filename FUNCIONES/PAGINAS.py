@@ -1891,6 +1891,8 @@ def entrada_botellas():
         # Recupera el identificador de la salida seleccionada
         id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
     
+        st.text(id_salida)
+    
         # Recupera los muestreos de la salida seleccionada
         df_muestreos_salida = df_muestreos[df_muestreos['salida_mar']==id_salida]  
         
