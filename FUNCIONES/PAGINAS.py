@@ -1507,6 +1507,8 @@ def entrada_salidas_mar():
 
 def entrada_condiciones_ambientales():
     
+    st.subheader('Condiciones ambientales')
+    
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host = st.secrets["postgres"].host
     base_datos     = st.secrets["postgres"].dbname
@@ -1668,9 +1670,9 @@ def entrada_condiciones_ambientales():
                 conn.close()
 
                 if io_previo == 0:
-                    texto_exito = 'Datos de las estación ' + estacion_elegida + ', durante la salida del '  + fecha_salida.strftime('%d-%b-%Y')  + ',añadidos correctamente'
+                    texto_exito = 'Datos de las estación ' + estacion_elegida + ' durante la salida '  + salida  + ' añadidos correctamente'
                 if io_previo == 1:
-                    texto_exito = 'Datos de las estación ' + estacion_elegida + ', durante la salida del '  + fecha_salida.strftime('%d-%b-%Y')  + ',actualizados correctamente'
+                    texto_exito = 'Datos de las estación ' + estacion_elegida + ' durante la salida '  + salida  + ' actualizados correctamente'
                     
                 st.success(texto_exito)                
                 
@@ -1710,8 +1712,8 @@ def entrada_botellas():
         df_programas        = psql.read_sql('SELECT * FROM programas', conn)
         conn.close()    
         
-        #id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
-        id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
+        id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+        #id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
 
         
         # Despliega menús de selección del programa, tipo de salida, año y fecha               
