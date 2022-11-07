@@ -1515,17 +1515,24 @@ def entrada_condiciones_ambientales():
     puerto         = st.secrets["postgres"].port
     
     # Recupera la tabla de las salidas realizadas 
-    conn       = init_connection()
-    df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-    df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA'] 
+    conn          = init_connection()
+    df_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    df_programas  = psql.read_sql('SELECT * FROM programas', conn)
     df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
-    df_estaciones_radiales = df_estaciones[df_estaciones['programa']==3]
     conn.close()
     
+    id_radiales            = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+
+    df_salidas_radiales    = df_salidas[df_salidas['programa']==id_radiales] 
+    df_estaciones_radiales = df_estaciones[df_estaciones['programa']==id_radiales]
+    
     # Selecciona la salida de la que se quiere introducir datos
-    fecha_salida = st.selectbox('Fecha de salida ',(df_salidas_radiales['fecha_salida']))
-    id_salida    = int(df_salidas_radiales['id_salida'][df_salidas_radiales['fecha_salida']==fecha_salida].values[0])               
+    df_salidas_radiales    = df_salidas_radiales.sort_values('fecha_salida')
+    salida                 = st.selectbox('Salida',(df_salidas_radiales['nombre_salida']),index=df_salidas_radiales.shape[0]-1)   
  
+    id_salida              = df_salidas_radiales['id_salida'][df_salidas_radiales['nombre_salida']==salida].iloc[0]
+
+     
     # Extrae las estaciones visitadas en la salida seleccionada
     listado_estaciones = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida].iloc[0] 
 
