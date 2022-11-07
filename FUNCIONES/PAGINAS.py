@@ -2039,15 +2039,19 @@ def consulta_botellas():
     for idato in range(len(listado_salidas)):
         identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
 
+    st.text(identificadores_salidas)
+
     # Elimina las columnas que no interesan en los dataframes a utilizar
-    df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
+    df_salidas_seleccion        = df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
     df_muestreos                = df_muestreos.drop(columns=['configuracion_perfilador','configuracion_superficie'])
     df_datos_biogeoquimicos     = df_datos_biogeoquimicos.drop(columns=['r_clor','r_clor_qf','r_per','r_per_qf','co3_temp'])
 
     # Recupera los muestreos correspondientes a las salidas seleccionadas
     df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
     df_muestreos_seleccionados  = pandas.merge(df_salidas_seleccion, df_muestreos, on="id_salida")
-                       
+                  
+    st.text(df_muestreos_seleccionados.shape[0])
+        
     # Asocia las coordenadas y nombre de estación de cada muestreo
     df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
     df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
