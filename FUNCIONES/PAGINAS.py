@@ -2039,6 +2039,8 @@ def consulta_botellas():
     for idato in range(len(listado_salidas)):
         identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
 
+    st.text(identificadores_salidas)
+
     # Elimina las columnas que no interesan en los dataframes a utilizar
     #df_salidas_seleccion        = df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
     df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
@@ -2049,7 +2051,7 @@ def consulta_botellas():
     df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
     df_muestreos_seleccionados  = pandas.merge(df_salidas_seleccion, df_muestreos, on="id_salida")
                   
-    st.text(df_muestreos_seleccionados['id_salida'])
+    st.text(df_muestreos_seleccionados)
         
     # Asocia las coordenadas y nombre de estación de cada muestreo
     df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
