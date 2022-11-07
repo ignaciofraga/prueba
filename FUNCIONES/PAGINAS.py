@@ -1476,7 +1476,7 @@ def entrada_salidas_mar():
     
         # Ajusta el formato de las fechas
         for idato in range(df_salidas_radiales.shape[0]):
-            df_salidas_radiales['Fecha salida'][idato]  =  df_salidas_radiales['Fecha salida'][idato].strftime("%Y-%m-%d")
+            df_salidas_radiales['Fecha salida'][idato]  =  df_salidas_radiales['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
 
           
         # Muestra una tabla con las salidas realizadas
