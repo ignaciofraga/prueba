@@ -1045,14 +1045,21 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
     datos_O2          = []
     
     # Lee el archivo .btl y escribe la información de las botellas en un archivo temporal
-    cast_muestreo = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
-    
+    cast_muestreo          = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
+    fecha_muestreo_archivo = None
     for ilinea in range(len(datos_archivo)):
         texto_linea = datos_archivo[ilinea]
         if texto_linea[0:1] == '#' or texto_linea[0:1] == '*':
             if texto_linea[0:8] == '** Time:': # Línea con hora del cast
 #                hora_muestreo = datetime.datetime.strptime(texto_linea[8:len(texto_linea)],'%H:%M').time()            
-                hora_muestreo = datetime.datetime.strptime(texto_linea[8:13],'%H:%M').time()            
+                hora_muestreo = datetime.datetime.strptime(texto_linea[8:13],'%H:%M').time() 
+                
+            if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
+#                hora_muestreo = datetime.datetime.strptime(texto_linea[8:len(texto_linea)],'%H:%M').time()            
+                print('loooooo',texto_linea[27:35])                
+                hora_muestreo = datetime.datetime.strptime(texto_linea[27:35],'%H:%M:%S').time() 
+                
+                print(hora_muestreo)
             if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
 #                cast_muestreo = int(texto_linea[8:len(texto_linea)])
                 cast_muestreo = int(texto_linea[8:12])
