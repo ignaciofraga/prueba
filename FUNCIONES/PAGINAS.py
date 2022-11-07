@@ -1521,7 +1521,10 @@ def entrada_condiciones_ambientales():
     df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
     conn.close()
     
-    id_radiales            = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+    #id_radiales            = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+
+    id_radiales            = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'][0]
+    st.text(id_radiales)
 
     df_salidas_radiales    = df_salidas[df_salidas['programa']==id_radiales] 
     df_estaciones_radiales = df_estaciones[df_estaciones['programa']==id_radiales]
