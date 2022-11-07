@@ -2041,8 +2041,8 @@ def consulta_botellas():
 
     # Elimina las columnas que no interesan en los dataframes a utilizar
     df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
-    df_muestreos.drop(df_muestreos.columns.difference(['configuracion_perfilador','configuracion_superficie']), 1, inplace=True)
-    df_datos_biogeoquimicos.drop(df_datos_biogeoquimicos.columns.difference(['r_clor','r_clor_qf','r_per','r_per_qf','co3_temp']), 1, inplace=True)
+    df_muestreos.drop(columns=['configuracion_perfilador','configuracion_superficie'])
+    df_datos_biogeoquimicos.drop(columns=['r_clor','r_clor_qf','r_per','r_per_qf','co3_temp'])
 
     # Recupera los muestreos correspondientes a las salidas seleccionadas
     df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
