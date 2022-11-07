@@ -2018,7 +2018,7 @@ def consulta_botellas():
     
         indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
         df_salidas_seleccion['id_temp'] = indices_dataframe
-        df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
+        df_salidas_seleccion.set_index('id_temp',drop=True,append=False,inplace=True)
         
         # Define los años con salidas asociadas
         df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
@@ -2039,16 +2039,11 @@ def consulta_botellas():
     for idato in range(len(listado_salidas)):
         identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
 
-    st.text(identificadores_salidas)
-
     # Elimina las columnas que no interesan en los dataframes a utilizar
     #df_salidas_seleccion        = df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
-    df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones'])
-    
+    df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
     df_muestreos                = df_muestreos.drop(columns=['configuracion_perfilador','configuracion_superficie'])
     df_datos_biogeoquimicos     = df_datos_biogeoquimicos.drop(columns=['r_clor','r_clor_qf','r_per','r_per_qf','co3_temp'])
-
-    st.text(df_salidas_seleccion) 
 
     # Recupera los muestreos correspondientes a las salidas seleccionadas
     df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
