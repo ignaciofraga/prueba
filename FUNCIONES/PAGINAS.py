@@ -2072,6 +2072,7 @@ def consulta_botellas():
     df_exporta = df_exporta[listado_cols]
 
  
+
     ## Botón para exportar los resultados
     nombre_archivo =  'DATOS_BOTELLAS.xlsx'
 
