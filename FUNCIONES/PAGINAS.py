@@ -1473,14 +1473,15 @@ def entrada_salidas_mar():
             df_salidas_radiales['Buque'][isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]]
         
         # Elimina las columnas que no interesa mostrar
-        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','hora_salida','fecha_retorno','hora_retorno','buque'])
+        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa'])
     
         # Renombra las columnas
-        df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','participantes':'Participantes','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados'})
+        df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','participantes':'Participantes','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','buque':'Buque'})
     
         # Ajusta el formato de las fechas
         for idato in range(df_salidas_radiales.shape[0]):
-            df_salidas_radiales['Fecha salida'].iloc[idato]  =  df_salidas_radiales['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
+            df_salidas_radiales['Fecha salida'].iloc[idato]   =  df_salidas_radiales['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
+            df_salidas_radiales['Fecha retorno'].iloc[idato]  =  df_salidas_radiales['Fecha retorno'].iloc[idato].strftime("%Y-%m-%d")
 
         # Ordena los valores por fechas
         df_salidas_radiales = df_salidas_radiales.sort_values('Fecha salida')
@@ -1622,7 +1623,10 @@ def entrada_salidas_mar():
                 conn.close()
 
 
-
+                texto_exito = 'Salida ' + salida + ' actualizada correctamente'
+                st.success(texto_exito)
+                    
+                st.experimental_rerun()
 
 
 
