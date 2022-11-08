@@ -1494,141 +1494,141 @@ def entrada_salidas_mar():
           
         st.text(df_salidas_radiales)
         
-        # Muestra una tabla con las salidas realizadas
-        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_salidas_radiales)
-        gridOptions = gb.build()
-        st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+        # # Muestra una tabla con las salidas realizadas
+        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_salidas_radiales)
+        # gridOptions = gb.build()
+        # st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
 
 
-        # Modifica una salida
+        # # Modifica una salida
 
-        # Recupera la tabla con los buques disponibles en la base de datos, como un dataframe
-        conn = init_connection()
-        df_buques = psql.read_sql('SELECT * FROM buques', conn)
-        conn.close()
+        # # Recupera la tabla con los buques disponibles en la base de datos, como un dataframe
+        # conn = init_connection()
+        # df_buques = psql.read_sql('SELECT * FROM buques', conn)
+        # conn.close()
           
-        # Recupera tablas con información utilizada
-        conn                       = init_connection()
+        # # Recupera tablas con información utilizada
+        # conn                       = init_connection()
           
-        # Personal disponible
-        df_personal                = psql.read_sql('SELECT * FROM personal_salidas', conn)
-        df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
-        df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
-        # Salidas realizadas 
-        df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
-        # Estaciones de muestreo (radiales)
-        df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_estaciones_radiales = df_estaciones[df_estaciones['programa']==3]
+        # # Personal disponible
+        # df_personal                = psql.read_sql('SELECT * FROM personal_salidas', conn)
+        # df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
+        # df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
+        # # Salidas realizadas 
+        # df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        # df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
+        # # Estaciones de muestreo (radiales)
+        # df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+        # df_estaciones_radiales = df_estaciones[df_estaciones['programa']==3]
         
-        conn.close()
+        # conn.close()
       
-        # Recupera tablas con informacion utilizada en el procesado
-        conn                = init_connection()
-        df_salidas          = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        df_programas        = psql.read_sql('SELECT * FROM programas', conn)
-        conn.close()    
+        # # Recupera tablas con informacion utilizada en el procesado
+        # conn                = init_connection()
+        # df_salidas          = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        # df_programas        = psql.read_sql('SELECT * FROM programas', conn)
+        # conn.close()    
         
-        id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
-        #id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
+        # id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+        # #id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
 
 
-        fecha_actual        = datetime.date.today()
+        # fecha_actual        = datetime.date.today()
         
-        hora_defecto_inicio = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
-        hora_defecto_final  = datetime.time(14,30,0,0,tzinfo = datetime.timezone.utc)
+        # hora_defecto_inicio = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
+        # hora_defecto_final  = datetime.time(14,30,0,0,tzinfo = datetime.timezone.utc)
         
         
-        # Despliega menús de selección del programa, tipo de salida, año y fecha               
-        col1, col2, col3= st.columns(3,gap="small")
+        # # Despliega menús de selección del programa, tipo de salida, año y fecha               
+        # col1, col2, col3= st.columns(3,gap="small")
      
-        with col1: 
-            programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
-            df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
+        # with col1: 
+        #     programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
+        #     df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
             
         
-        with col2:
-            tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
-            df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+        # with col2:
+        #     tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
+        #     df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
         
-            # Añade la variable año al dataframe
-            indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
-            df_salidas_seleccion['id_temp'] = indices_dataframe
-            df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
+        #     # Añade la variable año al dataframe
+        #     indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+        #     df_salidas_seleccion['id_temp'] = indices_dataframe
+        #     df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
             
-            # Define los años con salidas asociadas
-            df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
-            for idato in range(df_salidas_seleccion.shape[0]):
-                df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
-            df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
+        #     # Define los años con salidas asociadas
+        #     df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
+        #     for idato in range(df_salidas_seleccion.shape[0]):
+        #         df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+        #     df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
             
-            listado_anhos              = df_salidas_seleccion['año'].unique()
+        #     listado_anhos              = df_salidas_seleccion['año'].unique()
         
-        with col3:
-            anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
-            df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+        # with col3:
+        #     anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
+        #     df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
     
-        salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
+        # salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
     
-        # Recupera el identificador de la salida seleccionada
-        id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+        # # Recupera el identificador de la salida seleccionada
+        # id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
     
-        fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+        # fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
     
 
-        # Despliega un formulario para modificar los datos de la salida 
-        with st.form("Formulario seleccion"):
+        # # Despliega un formulario para modificar los datos de la salida 
+        # with st.form("Formulario seleccion"):
                    
             
-            col1, col2,col3= st.columns(3,gap="small")
+        #     col1, col2,col3= st.columns(3,gap="small")
             
-            with col1:
+        #     with col1:
                                 
-                buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']))
-                id_buque_elegido = int(df_buques['id_buque'][df_buques['nombre_buque']==buque_elegido].values[0])               
+        #         buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']))
+        #         id_buque_elegido = int(df_buques['id_buque'][df_buques['nombre_buque']==buque_elegido].values[0])               
 
                    
-            with col2:               
-                fecha_salida  = st.date_input('Fecha de salida',max_value=fecha_actual,value=fecha_salida)
+        #     with col2:               
+        #         fecha_salida  = st.date_input('Fecha de salida',max_value=fecha_actual,value=fecha_salida)
 
-                hora_salida   = st.time_input('Hora de salida (UTC)', value=hora_defecto_inicio)
+        #         hora_salida   = st.time_input('Hora de salida (UTC)', value=hora_defecto_inicio)
 
-            with col3:
+        #     with col3:
                 
-                fecha_regreso = st.date_input('Fecha de regreso',max_value=fecha_actual,value=fecha_salida)
+        #         fecha_regreso = st.date_input('Fecha de regreso',max_value=fecha_actual,value=fecha_salida)
 
-                hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto_final)
+        #         hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto_final)
 
 
-            personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])
-            json_comisionados       = json.dumps(personal_comisionado)
+        #     personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])
+        #     json_comisionados       = json.dumps(personal_comisionado)
 
-            personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])
-            json_no_comisionados    = json.dumps(personal_no_comisionado)
+        #     personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])
+        #     json_no_comisionados    = json.dumps(personal_no_comisionado)
             
-            estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
-            json_estaciones         = json.dumps(estaciones_muestreadas)
+        #     estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
+        #     json_estaciones         = json.dumps(estaciones_muestreadas)
 
-            observaciones = st.text_input('Observaciones', value="")
+        #     observaciones = st.text_input('Observaciones', value="")
     
-            submit = st.form_submit_button("Actualizar salida")
+        #     submit = st.form_submit_button("Actualizar salida")
     
-            if submit == True:
+        #     if submit == True:
                            
-                instruccion_sql = '''UPDATE salidas_muestreos SET fecha_salida = %s, hora_salida = %s, fecha_retorno = %s,hora_retorno = %s, buque = %s, participantes_comisionados = %s ,participantes_no_comisionados = %s,observaciones = %s,estaciones = %s WHERE id_salida = %s;''' 
+        #         instruccion_sql = '''UPDATE salidas_muestreos SET fecha_salida = %s, hora_salida = %s, fecha_retorno = %s,hora_retorno = %s, buque = %s, participantes_comisionados = %s ,participantes_no_comisionados = %s,observaciones = %s,estaciones = %s WHERE id_salida = %s;''' 
                         
-                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                cursor = conn.cursor()
-                cursor.execute(instruccion_sql, (fecha_salida,hora_salida,fecha_regreso,hora_regreso,int(id_buque_elegido),json_comisionados,json_no_comisionados,observaciones,json_estaciones,int(id_salida)))
-                conn.commit()
-                cursor.close()
-                conn.close()
+        #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        #         cursor = conn.cursor()
+        #         cursor.execute(instruccion_sql, (fecha_salida,hora_salida,fecha_regreso,hora_regreso,int(id_buque_elegido),json_comisionados,json_no_comisionados,observaciones,json_estaciones,int(id_salida)))
+        #         conn.commit()
+        #         cursor.close()
+        #         conn.close()
 
 
-                texto_exito = 'Salida ' + salida + ' actualizada correctamente'
-                st.success(texto_exito)
+        #         texto_exito = 'Salida ' + salida + ' actualizada correctamente'
+        #         st.success(texto_exito)
                     
-                st.experimental_rerun()
+        #         st.experimental_rerun()
 
 
 
