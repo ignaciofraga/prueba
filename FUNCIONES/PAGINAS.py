@@ -1476,7 +1476,7 @@ def entrada_salidas_mar():
         df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa'])
     
         # Renombra las columnas
-        df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','participantes':'Participantes','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','buque':'Buque'})
+        df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados','buque':'Buque'})
     
         # Ajusta el formato de las fechas
         for idato in range(df_salidas_radiales.shape[0]):
