@@ -17,7 +17,7 @@ from PIL import Image
 from dateutil.relativedelta import relativedelta
 import matplotlib.dates as mdates
 import json
-import os
+import time
 #from random import randint
 
 #import FUNCIONES_INSERCION
@@ -1627,6 +1627,8 @@ def entrada_salidas_mar():
 
                 texto_exito = 'Salida ' + salida + ' actualizada correctamente'
                 st.success(texto_exito)
+                
+                time.sleep(5)
                     
                 st.experimental_rerun()
 
