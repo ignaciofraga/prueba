@@ -1492,7 +1492,6 @@ def entrada_salidas_mar():
         #listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud')))    
         df_salidas_radiales = df_salidas_radiales[listado_cols]
           
-        st.text(listado_cols)
         
         # Muestra una tabla con las salidas realizadas
         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_salidas_radiales)
@@ -1501,7 +1500,8 @@ def entrada_salidas_mar():
 
 
         # Modifica una salida
-
+        st.subheader('Modifica salida al mar')
+        
         # Recupera la tabla con los buques disponibles en la base de datos, como un dataframe
         conn = init_connection()
         df_buques = psql.read_sql('SELECT * FROM buques', conn)
