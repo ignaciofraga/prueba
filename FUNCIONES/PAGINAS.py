@@ -1492,6 +1492,7 @@ def entrada_salidas_mar():
         #listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud')))    
         df_salidas_radiales = df_salidas_radiales[listado_cols]
           
+        st.text(df_salidas_radiales)
         
         # Muestra una tabla con las salidas realizadas
         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_salidas_radiales)
