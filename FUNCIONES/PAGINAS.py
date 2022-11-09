@@ -2424,6 +2424,12 @@ def procesado_nutrientes():
             # Mantén sólo las filas del dataframe con valores no nulos
             datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
 
+            # Muestra una tabla con las salidas realizadas
+            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_muestras)
+            gridOptions = gb.build()
+            st_aggrid.AgGrid(datos_muestras,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+
+
 
             ### CONTROL DE CALIDAD DE LOS DATOS
 
