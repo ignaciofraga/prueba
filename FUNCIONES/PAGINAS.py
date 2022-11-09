@@ -2330,8 +2330,10 @@ def procesado_nutrientes():
                 
                 else:   # Resto de tubos
                     id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
-                    st.text(id_temp)
+                    
                     if len(id_temp) > 0:
+                        st.text(id_temp)
+                        st.text(id_temp[1])
                         datos_AA['muestreo'].iloc[idato]    = id_temp[0]
                         datos_AA['Presion'].iloc[idato]     = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==id_temp[0]][0]
                         datos_AA['Salinidad'].iloc[idato]   = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==id_temp[0]][0]
