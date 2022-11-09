@@ -2480,7 +2480,7 @@ def procesado_nutrientes():
         df_seleccion                 = df_seleccion.sort_values('presion_ctd')
         df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
         for idato in range(df_disponible_bd.shape[0]):
-            delta_t = (df_disponible_bd['fecha_muestreo'].iloc[idato] - (df_seleccion['fecha_muestreo'].iloc[0]).days)
+            delta_t = (df_disponible_bd['fecha_muestreo'].iloc[idato] - df_seleccion['fecha_muestreo'].iloc[0]).days
             st.text(delta_t)     
 
         df_seleccion               = df_seleccion.sort_values('presion_ctd')
