@@ -2428,8 +2428,8 @@ def procesado_nutrientes():
                 file_name=nombre_archivo,
                 help= 'Descarga un archivo .csv con los datos solicitados',
                 mime="application/vnd.ms-excel"
-            )     
-        
+            )
+            
      
         
             # Mantén sólo las filas del dataframe con valores no nulos
