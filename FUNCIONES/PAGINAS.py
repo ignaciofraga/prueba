@@ -2274,6 +2274,7 @@ def procesado_nutrientes():
     
     # Recupera tablas con informacion utilizada en el procesado
     conn                    = init_connection()
+    df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
     df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
     df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
     df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
@@ -2287,13 +2288,16 @@ def procesado_nutrientes():
     # Despliega un formulario para subir los archivos del AA y las referencias
     with st.form("my-form", clear_on_submit=False):
         
-        archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
-          
-        archivo_refs             = st.file_uploader("Arrastra o selecciona los archivos con las referencias", accept_multiple_files=False)
+        col1, col2, col3= st.columns(3,gap="small")
+        
+        with col1:
+            archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
+        with col2:  
+            archivo_refs             = st.file_uploader("Arrastra o selecciona los archivos con las referencias", accept_multiple_files=False)
+        with col3:
+            temperatura_laboratorio = st.number_input('Temperatura laboratorio:',value=20)
 
-        temperatura_laboratorio = st.number_input('Temperatura laboratorio:',value=20)
-
-        envio = st.form_submit_button("Procesar los archivos seleccionados")
+        envio = st.form_submit_button("Procesar el archivo subido")
 
         if envio is True:
     
@@ -2320,6 +2324,7 @@ def procesado_nutrientes():
             datos_corregidos['Alcalinidad'] = [None]*datos_AA.shape[0]
             datos_corregidos['Oxigeno']     = [None]*datos_AA.shape[0]  
             datos_corregidos['id_estacion'] = [None]*datos_AA.shape[0]
+            datos_corregidos['id_salida']   = [None]*datos_AA.shape[0]
     
             # Busca los datos de cada tubo analizada en el AA
             for idato in range(datos_AA.shape[0]):
@@ -2334,11 +2339,13 @@ def procesado_nutrientes():
                     id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
                     
                     if len(id_temp) > 0:
-                        indice                                   = id_temp.iloc[0]
-                        datos_AA['Salinidad'].iloc[idato]        = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
+                        indice                                    = id_temp.iloc[0]
+                        datos_AA['Salinidad'].iloc[idato]         = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
 
-                        datos_corregidos['muestreo'].iloc[idato] = indice
-                        datos_corregidos['Presion'].iloc[idato]  = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
+                        datos_corregidos['muestreo'].iloc[idato]  = indice
+                        datos_corregidos['Presion'].iloc[idato]   = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
+                        datos_corregidos['id_salida'].iloc[idato] = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice]
+                        
                         
                         ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==indice]
                         ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_biogeoquimicos['muestreo']==indice]
@@ -2417,10 +2424,146 @@ def procesado_nutrientes():
             # Mantén sólo las filas del dataframe con valores no nulos
             datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
 
-            # Muestra una tabla con las salidas realizadas
-            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_muestras)
-            gridOptions = gb.build()
-            st_aggrid.AgGrid(datos_muestras,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+
+            ### CONTROL DE CALIDAD DE LOS DATOS
+
+            # Determina las estaciones muestreadas en la salida selecionada
+            listado_estaciones         = datos_muestras['id_estacion'].unique()
+            df_estaciones_muestreadas  = df_estaciones[df_estaciones['id_estacion'].isin(listado_estaciones)]
+            nombres_estaciones         = df_estaciones_muestreadas['nombre_estacion'].tolist()
+            listado_estaciones         = df_estaciones_muestreadas['id_estacion'].tolist()
+           
+            # Determina los muestreos realizados  
+            listado_salidas            = datos_corregidos['id_salida'].unique()
+            df_salidas_muestreadas     = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
+            nombres_salidas            = df_salidas['nombre_salida'].tolist()
+            listado_salidas            = df_salidas['id_salida'].tolist()
+            
+            # Despliega menús de selección de la variable y la estación a controlar                
+            col1, col2, col3 = st.columns(3,gap="small")
+        
+            with col1: 
+                estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
+                indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
+                
+            with col2: 
+                salida_seleccionada   = st.selectbox('Salida',(listado_salidas))
+                indice_salida         = listado_salidas[nombres_salidas.index(salida_seleccionada)]
+           
+            with col3:
+                listado_variables     = ['TON','NITRITO','NITRATO','SILICATO','FOSFATO']
+                variable_seleccionada = st.selectbox('Variable',(listado_variables))
+            
+            # Selecciona los datos correspondientes a la estación y salida seleccionada
+            df_seleccion              = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
+            st.text(df_seleccion)
+
+   
+           # if indice_variable <=2: # Datos fisicos
+           #     df_temp         = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos)]
+           #     tabla_actualiza = 'datos_discretos_fisica'
+           #     identificador   = 'id_disc_fisica'
+           # else:                    # Datos biogeoquimicos
+           #     df_temp         = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos)]        
+           #     tabla_actualiza = 'datos_discretos_biogeoquimica'
+           #     identificador   = 'id_disc_biogeoquim'
+   
+           # # Une los dataframes con los datos del muestreo y de las variables, para tener los datos de profundidad, botella....
+           # df_muestreos_estacion = df_muestreos_estacion.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
+           # df_temp               = pandas.merge(df_temp, df_muestreos_estacion, on="muestreo")
+               
+           # # Ordena los registros del dataframe por profundidades
+           # df_temp = df_temp.sort_values('presion_ctd',ascending=False)
+           
+           
+           # datos_variable    = df_temp[listado_variables[indice_variable]]
+    
+            
+       
+           # # Representa un gráfico con la variable seleccionada
+           # fig, ax = plt.subplots()
+           # ax.plot(datos_variable,df_temp['presion_ctd'],'.k' )
+           # texto_eje = nombre_variables[indice_variable] + '(' + uds_variables[indice_variable] + ')'
+           # ax.set(xlabel=texto_eje)
+           # ax.set(ylabel='Presion (db)')
+           # ax.invert_yaxis()
+           # # Añade el nombre de cada punto
+           # nombre_muestreos = [None]*len(datos_variable)
+           # for ipunto in range(len(datos_variable)):
+           #     if df_temp['botella'].iloc[ipunto] is None:
+           #         nombre_muestreos[ipunto] = 'Prof.' + str(df_temp['presion_ctd'].iloc[ipunto])
+           #     else:
+           #         nombre_muestreos[ipunto] = 'Bot.' + str(df_temp['botella'].iloc[ipunto])
+           #     ax.annotate(nombre_muestreos[ipunto], (datos_variable.iloc[ipunto], df_temp['presion_ctd'].iloc[ipunto]))
+           
+           # st.pyplot(fig)
+       
+           # #
+           # with st.form("Formulario", clear_on_submit=False):
+                          
+           #     indice_validacion = df_indices_calidad['indice'].tolist()
+           #     texto_indice      = df_indices_calidad['descripcion'].tolist()
+           #     qf_asignado       = numpy.zeros(len(datos_variable))
+               
+           #     for idato in range(len(datos_variable)):
+                   
+           #         enunciado          = 'QF del muestreo ' + nombre_muestreos[idato]
+           #         valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
+           #         qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
+               
+           #     io_envio = st.form_submit_button("Asignar los índices seleccionados")  
+        
+           # if io_envio:
+               
+           #     texto_estado = 'Actualizando los índices de la base de datos'
+           #     with st.spinner(texto_estado):
+               
+           #         # Introducir los valores en la base de datos
+           #         conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+           #         cursor = conn.cursor()  
+           
+           #         for idato in range(len(datos_variable)):
+        
+           #             instruccion_sql = "UPDATE " + tabla_actualiza + " SET " + listado_variables[indice_variable] + '_qf = %s WHERE ' + identificador + '= %s;'
+           #             cursor.execute(instruccion_sql, (int(qf_asignado[idato]),int(df_temp[identificador].iloc[idato])))
+           #             conn.commit() 
+   
+           #         cursor.close()
+           #         conn.close()   
+        
+           #     texto_exito = 'QF de la variable  ' + variable_seleccionada + ' asignados correctamente'
+           #     st.success(texto_exito)
+   
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            # # Muestra una tabla con las salidas realizadas
+            # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_muestras)
+            # gridOptions = gb.build()
+            # st_aggrid.AgGrid(datos_muestras,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
 
 
         
