@@ -2332,8 +2332,6 @@ def procesado_nutrientes():
                     id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
                     
                     if len(id_temp) > 0:
-                        st.text(id_temp)
-                        st.text(id_temp.iloc[0])
                         indice                              = id_temp.iloc[0]
                         datos_AA['muestreo'].iloc[idato]    = indice
                         datos_AA['Presion'].iloc[idato]     = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
