@@ -2453,7 +2453,7 @@ def procesado_nutrientes():
                 indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
                 
             with col2: 
-                salida_seleccionada   = st.selectbox('Salida',(listado_salidas))
+                salida_seleccionada   = st.selectbox('Salida',(nombres_salidas))
                 indice_salida         = listado_salidas[nombres_salidas.index(salida_seleccionada)]
            
             with col3:
