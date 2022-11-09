@@ -2431,10 +2431,10 @@ def procesado_nutrientes():
             datos_corregidos[datos_corregidos['NITRATO']<0] = 0           
      
     
-            # # Muestra una tabla con las salidas realizadas
-            # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
-            # gridOptions = gb.build()
-            # st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+            # Muestra una tabla con las salidas realizadas
+            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
+            gridOptions = gb.build()
+            st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
 
 
         
