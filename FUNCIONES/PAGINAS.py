@@ -2366,8 +2366,8 @@ def procesado_nutrientes():
                 # valores_concentraciones = 
                 
                 # Concentraciones de las referencias
-                RMN_CE_variable = df_referencias.iloc[0,variables_run[ivariable]] 
-                RMN_CI_variable = df_referencias.iloc[1,variables_run[ivariable]]     
+                RMN_CE_variable = df_referencias[0,variables_run[ivariable]] 
+                RMN_CI_variable = df_referencias[1,variables_run[ivariable]]     
     
                 # Encuentra las posiciones de los RMNs
                 posicion_RMN_bajos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN Low CE']
