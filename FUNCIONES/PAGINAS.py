@@ -2352,8 +2352,7 @@ def procesado_nutrientes():
                     datos_corregidos['id_salida'].iloc[idato]      = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice]
                     datos_corregidos['id_botella'].iloc[idato]     = df_muestreos['botella'][df_muestreos['id_muestreo']==indice]
                     datos_corregidos['fecha_muestreo'].iloc[idato] = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice]
-                    st.text((datos_corregidos['fecha_muestreo'].iloc[idato]))
-                    
+                                        
                     ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==indice]
                     ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_biogeoquimicos['muestreo']==indice]
                     if ph_unpur is not None:
@@ -2481,8 +2480,8 @@ def procesado_nutrientes():
         df_seleccion                 = df_seleccion.sort_values('presion_ctd')
         df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
         for idato in range(df_disponible_bd.shape[0]):
-            delta_t = (df_disponible_bd['fecha_muestreo'].iloc[idato] - df_seleccion['fecha_muestreo'].iloc[0]).days
-            st.text(delta_t)     
+            #delta_t = (df_disponible_bd['fecha_muestreo'].iloc[idato] - df_seleccion['fecha_muestreo'].iloc[0]).days
+            st.text(df_disponible_bd['fecha_muestreo'].iloc[idato])     
 
         df_seleccion               = df_seleccion.sort_values('presion_ctd')
 
