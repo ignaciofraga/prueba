@@ -2373,6 +2373,9 @@ def procesado_nutrientes():
                 posicion_RMN_bajos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN Low CE']
                 posicion_RMN_altos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN High CG']
     
+                st.text(posicion_RMN_bajos)
+                st.text(posicion_RMN_altos)
+    
                 # Predimensiona las rectas a y b
                 posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0],posicion_RMN_bajos[1])
                 recta_at              = numpy.zeros(datos_AA.shape[0])
