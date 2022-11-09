@@ -692,8 +692,8 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
     conn_psql        = create_engine(con_engine)
     tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
     tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
-    
-    
+    tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn_psql)
+       
     datos['id_muestreo_temp']  = numpy.zeros(datos.shape[0],dtype=int)
     
     # si no hay ningun valor en la tabla de registro, meter directamente todos los datos registrados
@@ -715,7 +715,10 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
             else:
                 str_profundidad = str(round(datos['presion_ctd'][idato]))                
                 
-            exporta_registros['nombre_muestreo'][idato]  = nombre_programa + '_' + datos['fecha_muestreo'][idato].strftime("%Y_%m_%d")  + '_EST_' + str(nombre_estacion) + '_P_' + str_profundidad
+            #exporta_registros['nombre_muestreo'][idato]  = nombre_programa + '_' + datos['fecha_muestreo'][idato].strftime("%Y_%m_%d")  + '_EST_' + str(nombre_estacion) + '_P_' + str_profundidad
+
+            exporta_registros['nombre_muestreo'][idato]  = tabla_salidas['nombre_salida'][tabla_salidas['id_salida']==exporta_registros['salida_mar'][idato]].iloc[0] + ' ' + str(nombre_estacion) + ' P' + str_profundidad            
+            
             datos['id_muestreo_temp'] [idato]            = idato + 1
             
             
@@ -766,7 +769,8 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
                 else:
                     str_profundidad = str(round(datos['presion_ctd'][idato]))                
  
-                exporta_registros['nombre_muestreo'][idato]  = nombre_programa + '_' + datos['fecha_muestreo'][idato].strftime("%Y_%m_%d")  + '_EST_' + str(nombre_estacion) + '_P_' + str_profundidad
+                #exporta_registros['nombre_muestreo'][idato]  = nombre_programa + '_' + datos['fecha_muestreo'][idato].strftime("%Y_%m_%d")  + '_EST_' + str(nombre_estacion) + '_P_' + str_profundidad
+                exporta_registros['nombre_muestreo'][idato]  = tabla_salidas['nombre_salida'][tabla_salidas['id_salida']==exporta_registros['salida_mar'][idato]].iloc[0] + ' ' + str(nombre_estacion) + ' P' + str_profundidad            
 
 
             # # Inserta el dataframe resultante en la base de datos 
