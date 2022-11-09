@@ -2410,12 +2410,32 @@ def procesado_nutrientes():
             datos_corregidos['NITRATO']          = datos_corregidos['TON']-datos_corregidos['NITRITO']
             datos_corregidos[datos_corregidos['NITRATO']<0] = 0           
      
-            st.text(datos_corregidos)   
+            #st.text(datos_corregidos)   
+            ## Botón para exportar los resultados
+            nombre_archivo =  'DATOS.xlsx'
+        
+            output = BytesIO()
+            writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+            datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
+            workbook = writer.book
+            worksheet = writer.sheets['DATOS']
+            writer.save()
+            datos_corregidos = output.getvalue()
+        
+            st.download_button(
+                label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
+                data=datos_corregidos,
+                file_name=nombre_archivo,
+                help= 'Descarga un archivo .csv con los datos solicitados',
+                mime="application/vnd.ms-excel"
+            )     
+        
      
+        
             # Mantén sólo las filas del dataframe con valores no nulos
             datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
             
-            st.text(datos_muestras)
+            #st.text(datos_muestras)
         
         
         # # Recupera las propiedades de cada muestreo
