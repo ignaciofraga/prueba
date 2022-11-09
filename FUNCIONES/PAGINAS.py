@@ -2314,12 +2314,13 @@ def procesado_nutrientes():
         datos_corregidos    = pandas.DataFrame(columns=variables_run)
         # Añade columnas con variables a utilizar en el control de calidad posterior 
         datos_corregidos['muestreo']    = [None]*datos_AA.shape[0]
-        datos_corregidos['Presion']     = [None]*datos_AA.shape[0]
+        datos_corregidos['presion_ctd'] = [None]*datos_AA.shape[0]
         datos_corregidos['pH']          = [None]*datos_AA.shape[0]
         datos_corregidos['Alcalinidad'] = [None]*datos_AA.shape[0]
         datos_corregidos['Oxigeno']     = [None]*datos_AA.shape[0]  
         datos_corregidos['id_estacion'] = numpy.zeros(datos_AA.shape[0],dtype=int)
         datos_corregidos['id_salida']   = numpy.zeros(datos_AA.shape[0],dtype=int)
+        datos_corregidos['id_botella']  = numpy.zeros(datos_AA.shape[0],dtype=int)
     
         # Busca los datos de cada tubo analizada en el AA
         for idato in range(datos_AA.shape[0]):
@@ -2334,13 +2335,13 @@ def procesado_nutrientes():
                 id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
                 
                 if len(id_temp) > 0:
-                    indice                                    = id_temp.iloc[0]
-                    datos_AA['Salinidad'].iloc[idato]         = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
+                    indice                                      = id_temp.iloc[0]
+                    datos_AA['Salinidad'].iloc[idato]           = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
     
-                    datos_corregidos['muestreo'].iloc[idato]  = indice
-                    datos_corregidos['Presion'].iloc[idato]   = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
-                    datos_corregidos['id_salida'].iloc[idato] = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice]
-                    
+                    datos_corregidos['muestreo'].iloc[idato]    = indice
+                    datos_corregidos['presion_ctd'].iloc[idato] = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
+                    datos_corregidos['id_salida'].iloc[idato]   = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice]
+                    datos_corregidos['id_botella'].iloc[idato]  = df_muestreos['botella'][df_muestreos['id_muestreo']==indice]
                     
                     ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==indice]
                     ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_biogeoquimicos['muestreo']==indice]
@@ -2458,23 +2459,23 @@ def procesado_nutrientes():
         df_seleccion              = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
 
 
-           # # Representa un gráfico con la variable seleccionada
-           # fig, ax = plt.subplots()
-           # ax.plot(datos_variable,df_temp['presion_ctd'],'.k' )
-           # texto_eje = nombre_variables[indice_variable] + '(' + uds_variables[indice_variable] + ')'
-           # ax.set(xlabel=texto_eje)
-           # ax.set(ylabel='Presion (db)')
-           # ax.invert_yaxis()
-           # # Añade el nombre de cada punto
-           # nombre_muestreos = [None]*len(datos_variable)
-           # for ipunto in range(len(datos_variable)):
-           #     if df_temp['botella'].iloc[ipunto] is None:
-           #         nombre_muestreos[ipunto] = 'Prof.' + str(df_temp['presion_ctd'].iloc[ipunto])
-           #     else:
-           #         nombre_muestreos[ipunto] = 'Bot.' + str(df_temp['botella'].iloc[ipunto])
-           #     ax.annotate(nombre_muestreos[ipunto], (datos_variable.iloc[ipunto], df_temp['presion_ctd'].iloc[ipunto]))
-           
-           # st.pyplot(fig)
+        # Representa un gráfico con la variable seleccionada
+        fig, ax = plt.subplots()
+        ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.k' )
+        texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
+        ax.set(xlabel=texto_eje)
+        ax.set(ylabel='Presion (db)')
+        ax.invert_yaxis()
+        # Añade el nombre de cada punto
+        nombre_muestreos = [None]*df_seleccion.shape[0]
+        for ipunto in range(df_seleccion.shape[0]):
+            if df_seleccion['id_botella'].iloc[ipunto] is None:
+                nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+            else:
+                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+            ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
+       
+        st.pyplot(fig)
 
    
            # if indice_variable <=2: # Datos fisicos
