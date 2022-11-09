@@ -2313,7 +2313,7 @@ def procesado_nutrientes():
             datos_AA['muestreo']    = [None]*datos_AA.shape[0]
             datos_AA['Presion']     = [None]*datos_AA.shape[0]
             datos_AA['Salinidad']   = [None]*datos_AA.shape[0]
-            datos_AA['Densidad']    = [None]*datos_AA.shape[0]
+            datos_AA['Densidad']    = numpy.ones(datos_AA.shape[0])
             datos_AA['pH']          = [None]*datos_AA.shape[0]
             datos_AA['Alcalinidad'] = [None]*datos_AA.shape[0]
             datos_AA['Oxigeno']     = [None]*datos_AA.shape[0]  
@@ -2360,10 +2360,10 @@ def procesado_nutrientes():
             # Aplica la corrección de drift de cada variable
             for ivariable in range(len(variables_run)):
     
-                valores_brutos = datos_AA.loc[:,variables_run[ivariable]] # Selecciona la variable y convierte a concentraciones
-                densidades     = datos_AA.loc[:,'Densidad']
+                valores_brutos = datos_AA[variables_run[ivariable]] # Selecciona la variable y convierte a concentraciones
+                densidades     = datos_AA['Densidad']
                 
-                # valores_concentraciones = 
+                valores_concentraciones = valores_brutos / densidades
                 
                 # Concentraciones de las referencias
                 RMN_CE_variable = df_referencias[variables_run[ivariable]][0] 
@@ -2381,8 +2381,8 @@ def procesado_nutrientes():
                 recta_at              = numpy.zeros(datos_AA.shape[0])
                 recta_bt              = numpy.zeros(datos_AA.shape[0])
     
-                RMN_altos = valores_brutos[posicion_RMN_altos]
-                RMN_bajos = valores_brutos[posicion_RMN_bajos]
+                RMN_altos = valores_concentraciones[posicion_RMN_altos]
+                RMN_bajos = valores_concentraciones[posicion_RMN_bajos]
     
                 pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos[0]-RMN_bajos[0]) 
                 t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos[0] 
@@ -2392,15 +2392,14 @@ def procesado_nutrientes():
                 # Aplica la corrección basada de dos rectas, descrita en Hassenmueller
                 for idato in range(posiciones_corr_drift[0],posiciones_corr_drift[-1]):
                     
-                    if densidades[idato] is not None:
+                
+                    factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
+                    recta_at[idato] = RMN_bajos[0] +  factor_f*(RMN_bajos[0]-RMN_bajos[-1]) 
+                    recta_bt[idato] = RMN_altos[0] -  factor_f*(RMN_altos[0]-RMN_altos[-1]) 
                     
-                        factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
-                        recta_at[idato] = RMN_bajos[0] +  factor_f*(RMN_bajos[0]-RMN_bajos[-1]) 
-                        recta_bt[idato] = RMN_altos[0] -  factor_f*(RMN_altos[0]-RMN_altos[-1]) 
-                        
-                        val_combinado         = ((valores_brutos[idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos[0]-RMN_bajos[0]) + RMN_bajos[0]
-        
-                        variable_drift[idato] = val_combinado*pte_RMN+t_indep_RMN
+                    val_combinado         = ((valores_concentraciones[idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos[0]-RMN_bajos[0]) + RMN_bajos[0]
+    
+                    variable_drift[idato] = val_combinado*pte_RMN+t_indep_RMN
     
                 variable_drift[variable_drift<0] = 0
     
