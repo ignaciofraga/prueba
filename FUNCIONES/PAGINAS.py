@@ -2521,7 +2521,7 @@ def procesado_nutrientes():
        
                 for idato in range(df_seleccion.shape[0]):
     
-                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables[indice_variable] + '_qf = %s WHERE id_disc_biogeoquim = %s;'
+                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables_bd[indice_variable] + '_qf = %s WHERE id_disc_biogeoquim = %s;'
                     cursor.execute(instruccion_sql, (int(qf_asignado[idato]),int(df_seleccion['muestreo'].iloc[idato])))
                     conn.commit() 
    
