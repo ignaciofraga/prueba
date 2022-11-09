@@ -2241,26 +2241,26 @@ def consulta_botellas():
         # Ordena los valores por fechas
         df_exporta = df_exporta.sort_values('fecha_muestreo')
     
-    ## Botón para exportar los resultados
-    nombre_archivo =  'DATOS_BOTELLAS.xlsx'
-
-    output = BytesIO()
-    writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-    df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
-    workbook = writer.book
-    worksheet = writer.sheets['DATOS']
-    writer.save()
-    datos_exporta = output.getvalue()
-
-    st.download_button(
-        label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
-        data=datos_exporta,
-        file_name=nombre_archivo,
-        help= 'Descarga un archivo .csv con los datos solicitados',
-        mime="application/vnd.ms-excel"
-    )
+        ## Botón para exportar los resultados
+        nombre_archivo =  'DATOS_BOTELLAS.xlsx'
     
+        output = BytesIO()
+        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+        df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
+        workbook = writer.book
+        worksheet = writer.sheets['DATOS']
+        writer.save()
+        datos_exporta = output.getvalue()
     
+        st.download_button(
+            label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
+            data=datos_exporta,
+            file_name=nombre_archivo,
+            help= 'Descarga un archivo .csv con los datos solicitados',
+            mime="application/vnd.ms-excel"
+        )
+        
+        
         
         
 ###############################################################################
@@ -2412,28 +2412,35 @@ def procesado_nutrientes():
      
             #st.text(datos_corregidos)   
             ## Botón para exportar los resultados
-            nombre_archivo =  'DATOS.xlsx'
+        nombre_archivo =  'DATOS.xlsx'
+    
+        output = BytesIO()
+        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+        datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
+        workbook = writer.book
+        worksheet = writer.sheets['DATOS']
+        writer.save()
+        datos_exporta = output.getvalue()
+    
+        st.download_button(
+            label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
+            data=datos_exporta,
+            file_name=nombre_archivo,
+            help= 'Descarga un archivo .csv con los datos solicitados',
+            mime="application/vnd.ms-excel"
+        )
         
-            output = BytesIO()
-            writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-            datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
-            workbook = writer.book
-            worksheet = writer.sheets['DATOS']
-            writer.save()
-            datos_exporta = output.getvalue()
+ 
+        # # Muestra una tabla con las salidas realizadas
+        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_salidas_radiales)
+        # gridOptions = gb.build()
+        # st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+
+
         
-            st.download_button(
-                label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
-                data=datos_exporta,
-                file_name=nombre_archivo,
-                help= 'Descarga un archivo .csv con los datos solicitados',
-                mime="application/vnd.ms-excel"
-            )
-            
-     
         
-            # Mantén sólo las filas del dataframe con valores no nulos
-            datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
+            # # Mantén sólo las filas del dataframe con valores no nulos
+            # datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
             
             #st.text(datos_muestras)
         
