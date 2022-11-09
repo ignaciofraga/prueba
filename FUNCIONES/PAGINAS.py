@@ -2452,16 +2452,26 @@ def procesado_nutrientes():
             indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
        
         with col2:
-            listado_variables     = ['TON','NITRITO','NITRATO','SILICATO','FOSFATO']
-            variable_seleccionada = st.selectbox('Variable',(listado_variables))
+            listado_variables      = ['TON','NITRITO','NITRATO','SILICATO','FOSFATO']
+            listado_variables_bd   = ['tot_n','no3','no2','nh4','po4','sio2']
+            variable_seleccionada  = st.selectbox('Variable',(listado_variables))
+            indice_variable        = listado_variables.index(variable_seleccionada)
         
         # Selecciona los datos correspondientes a la estación y salida seleccionada
-        df_seleccion              = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
+        df_seleccion               = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
 
+        # Recupera los datos disponibles de la misma estación, para la misma variable
+        listado_muestreos_estacion = df_muestreos['id_muestreos'][df_muestreos['estacion']==indice_estacion]
+        df_disponible_bd           = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos_estacion)]
+        
+        df_disponible_bd            = df_disponible_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
+        df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bd, on="id_muestreo")
+    
 
         # Representa un gráfico con la variable seleccionada
         fig, ax = plt.subplots()
         ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.k' )
+        ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.r' )
         texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
         ax.set(xlabel=texto_eje)
         ax.set(ylabel='Presion (db)')
