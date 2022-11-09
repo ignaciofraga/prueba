@@ -2359,6 +2359,7 @@ def procesado_nutrientes():
                        
             # Asigna el identificador de cada registro al dataframe en el que se guardarán los resultados
             datos_corregidos['muestreo'] = datos_AA['muestreo']
+            datos_corregidos['tubo'] = datos_AA['Sample ID']
                       
             # Aplica la corrección de drift de cada variable
             for ivariable in range(len(variables_run)):
