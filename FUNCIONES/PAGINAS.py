@@ -2288,9 +2288,10 @@ def procesado_nutrientes():
     # # Despliega un formulario para subir los archivos del AA y las referencias
     # with st.form("my-form", clear_on_submit=False):
         
-    archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
-    archivo_refs             = st.file_uploader("Arrastra o selecciona los archivos con las referencias", accept_multiple_files=False)
-    temperatura_laboratorio = st.number_input('Temperatura laboratorio:',value=20)
+    with st.sidebar:
+        archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
+        archivo_refs             = st.file_uploader("Arrastra o selecciona los archivos con las referencias", accept_multiple_files=False)
+        temperatura_laboratorio = st.number_input('Temperatura laboratorio:',value=20)
 
     #     envio = st.form_submit_button("Procesar el archivo subido")
 
@@ -2418,10 +2419,10 @@ def procesado_nutrientes():
         # Mantén sólo las filas del dataframe con valores no nulos
         datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
     
-        # Muestra una tabla con las salidas realizadas
-        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_muestras)
-        gridOptions = gb.build()
-        st_aggrid.AgGrid(datos_muestras,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+        # # Muestra una tabla con las salidas realizadas
+        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_muestras)
+        # gridOptions = gb.build()
+        # st_aggrid.AgGrid(datos_muestras,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
     
     
     
@@ -2440,23 +2441,40 @@ def procesado_nutrientes():
         listado_salidas            = df_salidas_muestreadas['id_salida'].tolist()
         
         # Despliega menús de selección de la variable y la estación a controlar                
-        col1, col2, col3 = st.columns(3,gap="small")
-    
+        salida_seleccionada   = st.selectbox('Salida',(nombres_salidas))
+        indice_salida         = listado_salidas[nombres_salidas.index(salida_seleccionada)]
+            
+        col1, col2 = st.columns(2,gap="small")
+
         with col1: 
             estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
             indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
-            
-        with col2: 
-            salida_seleccionada   = st.selectbox('Salida',(nombres_salidas))
-            indice_salida         = listado_salidas[nombres_salidas.index(salida_seleccionada)]
        
-        with col3:
+        with col2:
             listado_variables     = ['TON','NITRITO','NITRATO','SILICATO','FOSFATO']
             variable_seleccionada = st.selectbox('Variable',(listado_variables))
         
         # Selecciona los datos correspondientes a la estación y salida seleccionada
         df_seleccion              = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
-        st.text(df_seleccion)
+
+
+           # # Representa un gráfico con la variable seleccionada
+           # fig, ax = plt.subplots()
+           # ax.plot(datos_variable,df_temp['presion_ctd'],'.k' )
+           # texto_eje = nombre_variables[indice_variable] + '(' + uds_variables[indice_variable] + ')'
+           # ax.set(xlabel=texto_eje)
+           # ax.set(ylabel='Presion (db)')
+           # ax.invert_yaxis()
+           # # Añade el nombre de cada punto
+           # nombre_muestreos = [None]*len(datos_variable)
+           # for ipunto in range(len(datos_variable)):
+           #     if df_temp['botella'].iloc[ipunto] is None:
+           #         nombre_muestreos[ipunto] = 'Prof.' + str(df_temp['presion_ctd'].iloc[ipunto])
+           #     else:
+           #         nombre_muestreos[ipunto] = 'Bot.' + str(df_temp['botella'].iloc[ipunto])
+           #     ax.annotate(nombre_muestreos[ipunto], (datos_variable.iloc[ipunto], df_temp['presion_ctd'].iloc[ipunto]))
+           
+           # st.pyplot(fig)
 
    
            # if indice_variable <=2: # Datos fisicos
