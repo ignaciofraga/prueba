@@ -2442,8 +2442,8 @@ def procesado_nutrientes():
             # Determina los muestreos realizados  
             listado_salidas            = datos_corregidos['id_salida'].unique()
             df_salidas_muestreadas     = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
-            nombres_salidas            = df_salidas['nombre_salida'].tolist()
-            listado_salidas            = df_salidas['id_salida'].tolist()
+            nombres_salidas            = df_salidas_muestreadas['nombre_salida'].tolist()
+            listado_salidas            = df_salidas_muestreadas['id_salida'].tolist()
             
             # Despliega menús de selección de la variable y la estación a controlar                
             col1, col2, col3 = st.columns(3,gap="small")
