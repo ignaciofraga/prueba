@@ -2384,6 +2384,9 @@ def procesado_nutrientes():
                 RMN_altos = valores_concentraciones[posicion_RMN_altos]
                 RMN_bajos = valores_concentraciones[posicion_RMN_bajos]
     
+                st.text(RMN_altos)
+                st.text(RMN_bajos)
+    
                 pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos[0]-RMN_bajos[0]) 
                 t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos[0] 
     
