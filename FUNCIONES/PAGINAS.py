@@ -2293,125 +2293,124 @@ def procesado_nutrientes():
 
         temperatura_laboratorio = st.number_input('Temperatura laboratorio:',value=20)
 
+        envio = st.form_submit_button("Procesar los archivos seleccionados")
 
-    envio = st.form_submit_button("Procesar los archivos seleccionados")
-
-    if envio is True:
-
-        # Lectura del archivo con las referencias
-        df_referencias        = pandas.read_excel(archivo_refs)   
-#        df_referencias        = df_referencias.rename(columns={"Sal":"salinidad","NO3+NO2umol/kg":"TON","NO2 umol/kg":"NITRATO","SiO2 umol/kg":'SILICATO',"PO4 umol/kg":"FOSFATO"})
-
-        # Lectura del archivo con los resultados del AA
-        datos_brutos=pandas.read_excel(archivo_AA,skiprows=15)
-        
-        # Cambia los nombres de cada variable analizada
-        datos_AA      = datos_brutos.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
-
-        # Genera un dataframe en el que se almacenarán los resultados de las correcciones aplicadas. 
-        datos_corregidos    = pandas.DataFrame(columns=variables_run)
-        
-        datos_AA['muestreo']    = [None]*datos_AA.shape[0]
-        datos_AA['Presion']     = [None]*datos_AA.shape[0]
-        datos_AA['Salinidad']   = [None]*datos_AA.shape[0]
-        datos_AA['Densidad']    = [None]*datos_AA.shape[0]
-        datos_AA['pH']          = [None]*datos_AA.shape[0]
-        datos_AA['Alcalinidad'] = [None]*datos_AA.shape[0]
-        datos_AA['Oxigeno']     = [None]*datos_AA.shape[0]  
-        datos_AA['id_estacion'] = [None]*datos_AA.shape[0]
-
-        # Busca los datos de cada tubo analizada en el AA
-        for idato in range(datos_AA.shape[0]):
-            
-            if datos_AA['nombre_muestreo'].iloc[idato] == 'RMN Low CE' : # Tubo correspondiente a referencia (RMN)
-                datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)^2)/128))/1000
-                
-            elif datos_AA['nombre_muestreo'].iloc[idato] == 'RMN High CG': # Tubo correspondiente a referencia (RMN)
-                datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)^2)/128))/1000
-            
-            else:   # Resto de tubos
-                id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['nombre_muestreo'].iloc[idato]]
-                
-                if len(id_temp) > 0:
-                    datos_AA['muestreo'].iloc[idato]    = id_temp[0]
-                    datos_AA['Presion'].iloc[idato]     = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==id_temp[0]][0]
-                    datos_AA['Salinidad'].iloc[idato]   = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['id_muestreo']==id_temp[0]][0]
-                    
-                    ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_fisicos['id_muestreo']==id_temp[0]]
-                    ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_fisicos['id_muestreo']==id_temp[0]]
-                    if ph_unpur is not None:
-                        datos_AA['pH'].iloc[idato]      = ph_unpur
-                    if ph_pur is not None:
-                        datos_AA['pH'].iloc[idato]      = ph_pur                
-                    
-                    datos_AA['Alcalinidad'].iloc[idato] = df_datos_biogeoquimicos['alkali'][df_datos_fisicos['id_muestreo']==id_temp[0]][0]
-                    
-                    oxi_ctd = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_fisicos['id_muestreo']==id_temp[0]]
-                    oxi_wk  = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_fisicos['id_muestreo']==id_temp[0]]
-                    if oxi_ctd is not None:
-                        datos_AA['Oxigeno'].iloc[idato]  = oxi_ctd
-                    if oxi_wk is not None:
-                        datos_AA['Oxigeno'].iloc[idato]  = oxi_wk 
-                        
-                    datos_AA['id_estacion'].iloc[idato] =  df_muestreos['estacion'][df_muestreos['id_muestreo']==id_temp[0]][0]
-                
-                    datos_AA['Densidad'].iloc[idato]    = (999.1+0.77*((datos_AA['Salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)^2)/128))/1000
-                   
-        # Aplica la corrección de drift de cada variable
-        for ivariable in range(len(variables_run)):
-
-            valores_brutos = datos_AA.loc[:,variables_run[ivariable]] # Selecciona la variable y convierte a concentraciones
-            densidades     = datos_AA.loc[:,'Densidad']
-            
-            # valores_concentraciones = 
-            
-            # Concentraciones de las referencias
-            RMN_CE_variable = df_referencias.iloc[0,variables_run[ivariable]] 
-            RMN_CI_variable = df_referencias.iloc[1,variables_run[ivariable]]     
-
-            # Encuentra las posiciones de los RMNs
-            posicion_RMN_bajos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN Low CE']
-            posicion_RMN_altos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN High CG']
-
-            # Predimensiona las rectas a y b
-            posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0],posicion_RMN_bajos[1])
-            recta_at              = numpy.zeros(datos_AA.shape[0])
-            recta_bt              = numpy.zeros(datos_AA.shape[0])
-
-            RMN_altos = valores_brutos[posicion_RMN_altos]
-            RMN_bajos = valores_brutos[posicion_RMN_bajos]
-
-            pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos[0]-RMN_bajos[0]) 
-            t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos[0] 
-
-            variable_drift = numpy.zeros(datos_AA.shape[0])
-
-            # Aplica la corrección basada de dos rectas, descrita en Hassenmueller
-            for idato in range(posiciones_corr_drift[0],posiciones_corr_drift[-1]):
-                
-                if densidades[idato] is not None:
-                
-                    factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
-                    recta_at[idato] = RMN_bajos[0] +  factor_f*(RMN_bajos[0]-RMN_bajos[-1]) 
-                    recta_bt[idato] = RMN_altos[0] -  factor_f*(RMN_altos[0]-RMN_altos[-1]) 
-                    
-                    val_combinado         = ((valores_brutos[idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos[0]-RMN_bajos[0]) + RMN_bajos[0]
+        if envio is True:
     
-                    variable_drift[idato] = val_combinado*pte_RMN+t_indep_RMN
-
-            variable_drift[variable_drift<0] = 0
-
-            # Almacena los resultados en un dataframe    
-            datos_corregidos.iloc[:,ivariable] = variable_drift
- 
-        # Calcula el NO3 como diferencia entre el TON y el NO2
-        datos_corregidos['NITRATO']          = datos_corregidos['TON']-datos_corregidos['NITRITO']
-        datos_corregidos[datos_corregidos['NITRATO']<0] = 0           
- 
-        # Mantén sólo las filas del dataframe con valores no nulos
-        datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
+            # Lectura del archivo con las referencias
+            df_referencias        = pandas.read_excel(archivo_refs)   
+    #        df_referencias        = df_referencias.rename(columns={"Sal":"salinidad","NO3+NO2umol/kg":"TON","NO2 umol/kg":"NITRATO","SiO2 umol/kg":'SILICATO',"PO4 umol/kg":"FOSFATO"})
+    
+            # Lectura del archivo con los resultados del AA
+            datos_brutos=pandas.read_excel(archivo_AA,skiprows=15)
+            
+            # Cambia los nombres de cada variable analizada
+            datos_AA      = datos_brutos.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
+    
+            # Genera un dataframe en el que se almacenarán los resultados de las correcciones aplicadas. 
+            datos_corregidos    = pandas.DataFrame(columns=variables_run)
+            
+            datos_AA['muestreo']    = [None]*datos_AA.shape[0]
+            datos_AA['Presion']     = [None]*datos_AA.shape[0]
+            datos_AA['Salinidad']   = [None]*datos_AA.shape[0]
+            datos_AA['Densidad']    = [None]*datos_AA.shape[0]
+            datos_AA['pH']          = [None]*datos_AA.shape[0]
+            datos_AA['Alcalinidad'] = [None]*datos_AA.shape[0]
+            datos_AA['Oxigeno']     = [None]*datos_AA.shape[0]  
+            datos_AA['id_estacion'] = [None]*datos_AA.shape[0]
+    
+            # Busca los datos de cada tubo analizada en el AA
+            for idato in range(datos_AA.shape[0]):
+                
+                if datos_AA['nombre_muestreo'].iloc[idato] == 'RMN Low CE' : # Tubo correspondiente a referencia (RMN)
+                    datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)^2)/128))/1000
+                    
+                elif datos_AA['nombre_muestreo'].iloc[idato] == 'RMN High CG': # Tubo correspondiente a referencia (RMN)
+                    datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)^2)/128))/1000
+                
+                else:   # Resto de tubos
+                    id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['nombre_muestreo'].iloc[idato]]
+                    
+                    if len(id_temp) > 0:
+                        datos_AA['muestreo'].iloc[idato]    = id_temp[0]
+                        datos_AA['Presion'].iloc[idato]     = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==id_temp[0]][0]
+                        datos_AA['Salinidad'].iloc[idato]   = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['id_muestreo']==id_temp[0]][0]
+                        
+                        ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_fisicos['id_muestreo']==id_temp[0]]
+                        ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_fisicos['id_muestreo']==id_temp[0]]
+                        if ph_unpur is not None:
+                            datos_AA['pH'].iloc[idato]      = ph_unpur
+                        if ph_pur is not None:
+                            datos_AA['pH'].iloc[idato]      = ph_pur                
+                        
+                        datos_AA['Alcalinidad'].iloc[idato] = df_datos_biogeoquimicos['alkali'][df_datos_fisicos['id_muestreo']==id_temp[0]][0]
+                        
+                        oxi_ctd = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_fisicos['id_muestreo']==id_temp[0]]
+                        oxi_wk  = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_fisicos['id_muestreo']==id_temp[0]]
+                        if oxi_ctd is not None:
+                            datos_AA['Oxigeno'].iloc[idato]  = oxi_ctd
+                        if oxi_wk is not None:
+                            datos_AA['Oxigeno'].iloc[idato]  = oxi_wk 
+                            
+                        datos_AA['id_estacion'].iloc[idato] =  df_muestreos['estacion'][df_muestreos['id_muestreo']==id_temp[0]][0]
+                    
+                        datos_AA['Densidad'].iloc[idato]    = (999.1+0.77*((datos_AA['Salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)^2)/128))/1000
+                       
+            # Aplica la corrección de drift de cada variable
+            for ivariable in range(len(variables_run)):
+    
+                valores_brutos = datos_AA.loc[:,variables_run[ivariable]] # Selecciona la variable y convierte a concentraciones
+                densidades     = datos_AA.loc[:,'Densidad']
+                
+                # valores_concentraciones = 
+                
+                # Concentraciones de las referencias
+                RMN_CE_variable = df_referencias.iloc[0,variables_run[ivariable]] 
+                RMN_CI_variable = df_referencias.iloc[1,variables_run[ivariable]]     
+    
+                # Encuentra las posiciones de los RMNs
+                posicion_RMN_bajos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN Low CE']
+                posicion_RMN_altos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN High CG']
+    
+                # Predimensiona las rectas a y b
+                posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0],posicion_RMN_bajos[1])
+                recta_at              = numpy.zeros(datos_AA.shape[0])
+                recta_bt              = numpy.zeros(datos_AA.shape[0])
+    
+                RMN_altos = valores_brutos[posicion_RMN_altos]
+                RMN_bajos = valores_brutos[posicion_RMN_bajos]
+    
+                pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos[0]-RMN_bajos[0]) 
+                t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos[0] 
+    
+                variable_drift = numpy.zeros(datos_AA.shape[0])
+    
+                # Aplica la corrección basada de dos rectas, descrita en Hassenmueller
+                for idato in range(posiciones_corr_drift[0],posiciones_corr_drift[-1]):
+                    
+                    if densidades[idato] is not None:
+                    
+                        factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
+                        recta_at[idato] = RMN_bajos[0] +  factor_f*(RMN_bajos[0]-RMN_bajos[-1]) 
+                        recta_bt[idato] = RMN_altos[0] -  factor_f*(RMN_altos[0]-RMN_altos[-1]) 
+                        
+                        val_combinado         = ((valores_brutos[idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos[0]-RMN_bajos[0]) + RMN_bajos[0]
         
-        st.text(datos_muestras)
+                        variable_drift[idato] = val_combinado*pte_RMN+t_indep_RMN
+    
+                variable_drift[variable_drift<0] = 0
+    
+                # Almacena los resultados en un dataframe    
+                datos_corregidos.iloc[:,ivariable] = variable_drift
+     
+            # Calcula el NO3 como diferencia entre el TON y el NO2
+            datos_corregidos['NITRATO']          = datos_corregidos['TON']-datos_corregidos['NITRITO']
+            datos_corregidos[datos_corregidos['NITRATO']<0] = 0           
+     
+            # Mantén sólo las filas del dataframe con valores no nulos
+            datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
+            
+            st.text(datos_muestras)
         
         
         # # Recupera las propiedades de cada muestreo
