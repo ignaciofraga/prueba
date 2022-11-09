@@ -2272,6 +2272,13 @@ def procesado_nutrientes():
         
     st.subheader('Procesado de datos de nutrientes')
     
+    # Recupera los datos de conexión
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port
+    
     # Recupera tablas con informacion utilizada en el procesado
     conn                    = init_connection()
     df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
@@ -2279,6 +2286,7 @@ def procesado_nutrientes():
     df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
     df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
     df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
+    df_indices_calidad      = psql.read_sql('SELECT * FROM indices_calidad', conn)
     conn.close()     
     
     
@@ -2487,81 +2495,41 @@ def procesado_nutrientes():
        
         st.pyplot(fig)
 
-   
-           # if indice_variable <=2: # Datos fisicos
-           #     df_temp         = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos)]
-           #     tabla_actualiza = 'datos_discretos_fisica'
-           #     identificador   = 'id_disc_fisica'
-           # else:                    # Datos biogeoquimicos
-           #     df_temp         = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos)]        
-           #     tabla_actualiza = 'datos_discretos_biogeoquimica'
-           #     identificador   = 'id_disc_biogeoquim'
-   
-           # # Une los dataframes con los datos del muestreo y de las variables, para tener los datos de profundidad, botella....
-           # df_muestreos_estacion = df_muestreos_estacion.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
-           # df_temp               = pandas.merge(df_temp, df_muestreos_estacion, on="muestreo")
+        # Formulario para asignar banderas de calidad
+        with st.form("Formulario", clear_on_submit=False):
+                      
+            indice_validacion = df_indices_calidad['indice'].tolist()
+            texto_indice      = df_indices_calidad['descripcion'].tolist()
+            qf_asignado       = numpy.zeros(df_seleccion.shape[0])
+           
+            for idato in range(df_seleccion.shape[0]):
                
-           # # Ordena los registros del dataframe por profundidades
-           # df_temp = df_temp.sort_values('presion_ctd',ascending=False)
+                enunciado          = 'QF del muestreo ' + nombre_muestreos[idato]
+                valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
+                qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
            
-           
-           # datos_variable    = df_temp[listado_variables[indice_variable]]
+            io_envio = st.form_submit_button("Asignar los índices seleccionados")  
     
-            
-       
-           # # Representa un gráfico con la variable seleccionada
-           # fig, ax = plt.subplots()
-           # ax.plot(datos_variable,df_temp['presion_ctd'],'.k' )
-           # texto_eje = nombre_variables[indice_variable] + '(' + uds_variables[indice_variable] + ')'
-           # ax.set(xlabel=texto_eje)
-           # ax.set(ylabel='Presion (db)')
-           # ax.invert_yaxis()
-           # # Añade el nombre de cada punto
-           # nombre_muestreos = [None]*len(datos_variable)
-           # for ipunto in range(len(datos_variable)):
-           #     if df_temp['botella'].iloc[ipunto] is None:
-           #         nombre_muestreos[ipunto] = 'Prof.' + str(df_temp['presion_ctd'].iloc[ipunto])
-           #     else:
-           #         nombre_muestreos[ipunto] = 'Bot.' + str(df_temp['botella'].iloc[ipunto])
-           #     ax.annotate(nombre_muestreos[ipunto], (datos_variable.iloc[ipunto], df_temp['presion_ctd'].iloc[ipunto]))
+        if io_envio:
            
-           # st.pyplot(fig)
-       
-           # #
-           # with st.form("Formulario", clear_on_submit=False):
-                          
-           #     indice_validacion = df_indices_calidad['indice'].tolist()
-           #     texto_indice      = df_indices_calidad['descripcion'].tolist()
-           #     qf_asignado       = numpy.zeros(len(datos_variable))
-               
-           #     for idato in range(len(datos_variable)):
-                   
-           #         enunciado          = 'QF del muestreo ' + nombre_muestreos[idato]
-           #         valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
-           #         qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
-               
-           #     io_envio = st.form_submit_button("Asignar los índices seleccionados")  
-        
-           # if io_envio:
-               
-           #     texto_estado = 'Actualizando los índices de la base de datos'
-           #     with st.spinner(texto_estado):
-               
-           #         # Introducir los valores en la base de datos
-           #         conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-           #         cursor = conn.cursor()  
+            texto_estado = 'Actualizando los índices de la base de datos'
+            with st.spinner(texto_estado):
            
-           #         for idato in range(len(datos_variable)):
-        
-           #             instruccion_sql = "UPDATE " + tabla_actualiza + " SET " + listado_variables[indice_variable] + '_qf = %s WHERE ' + identificador + '= %s;'
-           #             cursor.execute(instruccion_sql, (int(qf_asignado[idato]),int(df_temp[identificador].iloc[idato])))
-           #             conn.commit() 
+                # Introducir los valores en la base de datos
+                conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()  
+       
+                for idato in range(df_seleccion.shape[0]):
+    
+                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables[indice_variable] + '_qf = %s WHERE id_disc_biogeoquim = %s;'
+                    cursor.execute(instruccion_sql, (int(qf_asignado[idato]),int(df_seleccion['muestreo'].iloc[idato])))
+                    conn.commit() 
    
-           #         cursor.close()
-           #         conn.close()   
-        
-           #     texto_exito = 'QF de la variable  ' + variable_seleccionada + ' asignados correctamente'
-           #     st.success(texto_exito)
+                cursor.close()
+                conn.close()   
+    
+            texto_exito = 'QF de la variable  ' + variable_seleccionada + ' asignados correctamente'
+            st.success(texto_exito)
    
    
 
