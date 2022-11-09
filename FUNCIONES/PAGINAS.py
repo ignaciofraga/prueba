@@ -2307,6 +2307,13 @@ def procesado_nutrientes():
             # Cambia los nombres de cada variable analizada
             datos_AA      = datos_brutos.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
     
+            # Muestra una tabla con las salidas realizadas
+            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_AA)
+            gridOptions = gb.build()
+            st_aggrid.AgGrid(datos_AA,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+
+
+    
             # Genera un dataframe en el que se almacenarán los resultados de las correcciones aplicadas. 
             datos_corregidos    = pandas.DataFrame(columns=variables_run)
             
@@ -2412,10 +2419,10 @@ def procesado_nutrientes():
             datos_corregidos[datos_corregidos['NITRATO']<0] = 0           
      
     
-            # Muestra una tabla con las salidas realizadas
-            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
-            gridOptions = gb.build()
-            st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+            # # Muestra una tabla con las salidas realizadas
+            # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
+            # gridOptions = gb.build()
+            # st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
 
 
         
