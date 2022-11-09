@@ -2368,6 +2368,18 @@ def procesado_nutrientes():
             datos_corregidos['muestreo'] = datos_AA['muestreo']
             datos_corregidos['tubo'] = datos_AA['Sample ID']
                       
+            # Muestra una tabla con las salidas realizadas
+            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_AA)
+            gridOptions = gb.build()
+            st_aggrid.AgGrid(datos_AA,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+
+            # Muestra una tabla con las salidas realizadas
+            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
+            gridOptions = gb.build()
+            st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+
+
+            
             # Aplica la corrección de drift de cada variable
             for ivariable in range(len(variables_run)):
     
