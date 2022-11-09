@@ -2333,28 +2333,29 @@ def procesado_nutrientes():
                     
                     if len(id_temp) > 0:
                         st.text(id_temp)
-                        st.text(id_temp[0])
-                        datos_AA['muestreo'].iloc[idato]    = id_temp[0]
-                        datos_AA['Presion'].iloc[idato]     = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==id_temp[0]][0]
-                        datos_AA['Salinidad'].iloc[idato]   = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==id_temp[0]][0]
+                        st.text(id_temp.iloc[0])
+                        indice                              = id_temp.iloc[0]
+                        datos_AA['muestreo'].iloc[idato]    = indice
+                        datos_AA['Presion'].iloc[idato]     = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
+                        datos_AA['Salinidad'].iloc[idato]   = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
                         
-                        ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==id_temp[0]]
-                        ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_biogeoquimicos['muestreo']==id_temp[0]]
+                        ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==indice]
+                        ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_biogeoquimicos['muestreo']==indice]
                         if ph_unpur is not None:
                             datos_AA['pH'].iloc[idato]      = ph_unpur
                         if ph_pur is not None:
                             datos_AA['pH'].iloc[idato]      = ph_pur                
                         
-                        datos_AA['Alcalinidad'].iloc[idato] = df_datos_biogeoquimicos['alkali'][df_datos_biogeoquimicos['muestreo']==id_temp[0]][0]
+                        datos_AA['Alcalinidad'].iloc[idato] = df_datos_biogeoquimicos['alkali'][df_datos_biogeoquimicos['muestreo']==indice]
                         
-                        oxi_ctd = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==id_temp[0]]
-                        oxi_wk  = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_biogeoquimicos['muestreo']==id_temp[0]]
+                        oxi_ctd = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==indice]
+                        oxi_wk  = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_biogeoquimicos['muestreo']==indice]
                         if oxi_ctd is not None:
                             datos_AA['Oxigeno'].iloc[idato]  = oxi_ctd
                         if oxi_wk is not None:
                             datos_AA['Oxigeno'].iloc[idato]  = oxi_wk 
                             
-                        datos_AA['id_estacion'].iloc[idato] =  df_muestreos['estacion'][df_muestreos['id_muestreo']==id_temp[0]][0]
+                        datos_AA['id_estacion'].iloc[idato] =  df_muestreos['estacion'][df_muestreos['id_muestreo']==indice]
                     
                         datos_AA['Densidad'].iloc[idato]    = (999.1+0.77*((datos_AA['Salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)^2)/128))/1000
                        
