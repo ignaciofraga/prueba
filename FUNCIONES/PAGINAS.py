@@ -2461,7 +2461,7 @@ def procesado_nutrientes():
         df_seleccion               = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
 
         # Recupera los datos disponibles de la misma estación, para la misma variable
-        listado_muestreos_estacion = df_muestreos['id_muestreos'][df_muestreos['estacion']==indice_estacion]
+        listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
         df_disponible_bd           = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos_estacion)]
         
         df_disponible_bd            = df_disponible_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
