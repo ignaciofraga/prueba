@@ -2352,7 +2352,7 @@ def procesado_nutrientes():
                     datos_corregidos['id_salida'].iloc[idato]      = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice]
                     datos_corregidos['id_botella'].iloc[idato]     = df_muestreos['botella'][df_muestreos['id_muestreo']==indice]
                     datos_corregidos['fecha_muestreo'].iloc[idato] = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice]
-                    st.text((datos_corregidos['fecha_muestreo'].iloc[idato]).month)
+                    st.text((datos_corregidos['fecha_muestreo'].iloc[idato]))
                     
                     ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==indice]
                     ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_biogeoquimicos['muestreo']==indice]
