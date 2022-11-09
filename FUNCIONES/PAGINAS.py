@@ -2334,19 +2334,19 @@ def procesado_nutrientes():
                     if len(id_temp) > 0:
                         datos_AA['muestreo'].iloc[idato]    = id_temp[0]
                         datos_AA['Presion'].iloc[idato]     = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==id_temp[0]][0]
-                        datos_AA['Salinidad'].iloc[idato]   = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['id_muestreo']==id_temp[0]][0]
+                        datos_AA['Salinidad'].iloc[idato]   = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==id_temp[0]][0]
                         
-                        ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_fisicos['id_muestreo']==id_temp[0]]
-                        ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_fisicos['id_muestreo']==id_temp[0]]
+                        ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==id_temp[0]]
+                        ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_biogeoquimicos['muestreo']==id_temp[0]]
                         if ph_unpur is not None:
                             datos_AA['pH'].iloc[idato]      = ph_unpur
                         if ph_pur is not None:
                             datos_AA['pH'].iloc[idato]      = ph_pur                
                         
-                        datos_AA['Alcalinidad'].iloc[idato] = df_datos_biogeoquimicos['alkali'][df_datos_fisicos['id_muestreo']==id_temp[0]][0]
+                        datos_AA['Alcalinidad'].iloc[idato] = df_datos_biogeoquimicos['alkali'][df_datos_biogeoquimicos['muestreo']==id_temp[0]][0]
                         
-                        oxi_ctd = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_fisicos['id_muestreo']==id_temp[0]]
-                        oxi_wk  = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_fisicos['id_muestreo']==id_temp[0]]
+                        oxi_ctd = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==id_temp[0]]
+                        oxi_wk  = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_biogeoquimicos['muestreo']==id_temp[0]]
                         if oxi_ctd is not None:
                             datos_AA['Oxigeno'].iloc[idato]  = oxi_ctd
                         if oxi_wk is not None:
