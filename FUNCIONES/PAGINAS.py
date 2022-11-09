@@ -2452,7 +2452,7 @@ def procesado_nutrientes():
             indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
        
         with col2:
-            listado_variables      = ['TON','NITRITO','NITRATO','SILICATO','FOSFATO']
+            listado_variables      = ['TON','NITRATO','NITRITO','SILICATO','FOSFATO']
             listado_variables_bd   = ['tot_n','no3','no2','nh4','po4','sio2']
             variable_seleccionada  = st.selectbox('Variable',(listado_variables))
             indice_variable        = listado_variables.index(variable_seleccionada)
