@@ -2306,25 +2306,20 @@ def procesado_nutrientes():
             
             # Cambia los nombres de cada variable analizada
             datos_AA      = datos_brutos.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
-    
-            # Muestra una tabla con las salidas realizadas
-            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_AA)
-            gridOptions = gb.build()
-            st_aggrid.AgGrid(datos_AA,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
 
-
-    
+            # Predimensiona columnas en las que guardar información de salinidad y densidad    
+            datos_AA['Densidad']    = numpy.ones(datos_AA.shape[0])
+            datos_AA['Salinidad']   = numpy.ones(datos_AA.shape[0])
+            
             # Genera un dataframe en el que se almacenarán los resultados de las correcciones aplicadas. 
             datos_corregidos    = pandas.DataFrame(columns=variables_run)
-            
-            datos_AA['muestreo']    = [None]*datos_AA.shape[0]
-            datos_AA['Presion']     = [None]*datos_AA.shape[0]
-            datos_AA['Salinidad']   = [None]*datos_AA.shape[0]
-            datos_AA['Densidad']    = numpy.ones(datos_AA.shape[0])
-            datos_AA['pH']          = [None]*datos_AA.shape[0]
-            datos_AA['Alcalinidad'] = [None]*datos_AA.shape[0]
-            datos_AA['Oxigeno']     = [None]*datos_AA.shape[0]  
-            datos_AA['id_estacion'] = [None]*datos_AA.shape[0]
+            # Añade columnas con variables a utilizar en el control de calidad posterior 
+            datos_corregidos['muestreo']    = [None]*datos_AA.shape[0]
+            datos_corregidos['Presion']     = [None]*datos_AA.shape[0]
+            datos_corregidos['pH']          = [None]*datos_AA.shape[0]
+            datos_corregidos['Alcalinidad'] = [None]*datos_AA.shape[0]
+            datos_corregidos['Oxigeno']     = [None]*datos_AA.shape[0]  
+            datos_corregidos['id_estacion'] = [None]*datos_AA.shape[0]
     
             # Busca los datos de cada tubo analizada en el AA
             for idato in range(datos_AA.shape[0]):
@@ -2339,47 +2334,35 @@ def procesado_nutrientes():
                     id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
                     
                     if len(id_temp) > 0:
-                        indice                              = id_temp.iloc[0]
-                        datos_AA['muestreo'].iloc[idato]    = indice
-                        datos_AA['Presion'].iloc[idato]     = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
-                        datos_AA['Salinidad'].iloc[idato]   = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
+                        indice                                   = id_temp.iloc[0]
+                        datos_AA['Salinidad'].iloc[idato]        = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
+
+                        datos_corregidos['muestreo'].iloc[idato] = indice
+                        datos_corregidos['Presion'].iloc[idato]  = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
                         
                         ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==indice]
                         ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_biogeoquimicos['muestreo']==indice]
                         if ph_unpur is not None:
-                            datos_AA['pH'].iloc[idato]      = ph_unpur
+                            datos_corregidos['pH'].iloc[idato]      = ph_unpur
                         if ph_pur is not None:
-                            datos_AA['pH'].iloc[idato]      = ph_pur                
+                            datos_corregidos['pH'].iloc[idato]      = ph_pur                
                         
-                        datos_AA['Alcalinidad'].iloc[idato] = df_datos_biogeoquimicos['alkali'][df_datos_biogeoquimicos['muestreo']==indice]
+                        datos_corregidos['Alcalinidad'].iloc[idato] = df_datos_biogeoquimicos['alkali'][df_datos_biogeoquimicos['muestreo']==indice]
                         
                         oxi_ctd = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==indice]
                         oxi_wk  = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_biogeoquimicos['muestreo']==indice]
                         if oxi_ctd is not None:
-                            datos_AA['Oxigeno'].iloc[idato]  = oxi_ctd
+                            datos_corregidos['Oxigeno'].iloc[idato]  = oxi_ctd
                         if oxi_wk is not None:
-                            datos_AA['Oxigeno'].iloc[idato]  = oxi_wk 
+                            datos_corregidos['Oxigeno'].iloc[idato]  = oxi_wk 
                             
-                        datos_AA['id_estacion'].iloc[idato] =  df_muestreos['estacion'][df_muestreos['id_muestreo']==indice]
+                        datos_corregidos['id_estacion'].iloc[idato] =  df_muestreos['estacion'][df_muestreos['id_muestreo']==indice]
                     
                         datos_AA['Densidad'].iloc[idato]    = (999.1+0.77*((datos_AA['Salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)^2)/128))/1000
                        
             # Asigna el identificador de cada registro al dataframe en el que se guardarán los resultados
-            datos_corregidos['muestreo'] = datos_AA['muestreo']
             datos_corregidos['tubo'] = datos_AA['Sample ID']
-                      
-            # Muestra una tabla con las salidas realizadas
-            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_AA)
-            gridOptions = gb.build()
-            st_aggrid.AgGrid(datos_AA,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
-
-            # Muestra una tabla con las salidas realizadas
-            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
-            gridOptions = gb.build()
-            st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
-
-
-            
+                                 
             # Aplica la corrección de drift de cada variable
             for ivariable in range(len(variables_run)):
     
@@ -2430,18 +2413,14 @@ def procesado_nutrientes():
             datos_corregidos['NITRATO'] = numpy.zeros(datos_corregidos.shape[0])
             for idato in range(datos_corregidos.shape[0]):
                 datos_corregidos['NITRATO'].iloc[idato] = datos_corregidos['TON'].iloc[idato] - datos_corregidos['NITRITO'].iloc[idato]
-            #datos_corregidos['NITRATO'] = datos_corregidos['TON'].sub(datos_corregidos['NITRITO'], axis = 0)
-            #datos_corregidos[datos_corregidos['NITRATO']<0] = 0
-            
-            
-            # datos_corregidos['NITRATO']          = datos_corregidos['TON']-datos_corregidos['NITRITO']
-            # datos_corregidos[datos_corregidos['NITRATO']<0] = 0           
-     
-    
+
+            # Mantén sólo las filas del dataframe con valores no nulos
+            datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
+
             # Muestra una tabla con las salidas realizadas
-            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
+            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_muestras)
             gridOptions = gb.build()
-            st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+            st_aggrid.AgGrid(datos_muestras,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
 
 
         
