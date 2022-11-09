@@ -2322,14 +2322,14 @@ def procesado_nutrientes():
             # Busca los datos de cada tubo analizada en el AA
             for idato in range(datos_AA.shape[0]):
                 
-                if datos_AA['nombre_muestreo'].iloc[idato] == 'RMN Low CE' : # Tubo correspondiente a referencia (RMN)
+                if datos_AA['Sample ID'].iloc[idato] == 'RMN Low CE' : # Tubo correspondiente a referencia (RMN)
                     datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)^2)/128))/1000
                     
-                elif datos_AA['nombre_muestreo'].iloc[idato] == 'RMN High CG': # Tubo correspondiente a referencia (RMN)
+                elif datos_AA['Sample ID'].iloc[idato] == 'RMN High CG': # Tubo correspondiente a referencia (RMN)
                     datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)^2)/128))/1000
                 
                 else:   # Resto de tubos
-                    id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['nombre_muestreo'].iloc[idato]]
+                    id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
                     
                     if len(id_temp) > 0:
                         datos_AA['muestreo'].iloc[idato]    = id_temp[0]
