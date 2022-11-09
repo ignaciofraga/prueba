@@ -2322,10 +2322,10 @@ def procesado_nutrientes():
             # Busca los datos de cada tubo analizada en el AA
             for idato in range(datos_AA.shape[0]):
                 
-                if datos_AA['Sample ID'].iloc[idato] == 'RMN Low CE' : # Tubo correspondiente a referencia (RMN)
+                if datos_AA['Sample ID'].iloc[idato] == 'RMN Low' : # Tubo correspondiente a referencia (RMN)
                     datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)^2)/128))/1000
                     
-                elif datos_AA['Sample ID'].iloc[idato] == 'RMN High CG': # Tubo correspondiente a referencia (RMN)
+                elif datos_AA['Sample ID'].iloc[idato] == 'RMN High': # Tubo correspondiente a referencia (RMN)
                     datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)^2)/128))/1000
                 
                 else:   # Resto de tubos
@@ -2370,8 +2370,8 @@ def procesado_nutrientes():
                 RMN_CI_variable = df_referencias[variables_run[ivariable]][1]     
     
                 # Encuentra las posiciones de los RMNs
-                posicion_RMN_bajos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN Low CE']
-                posicion_RMN_altos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN High CG']
+                posicion_RMN_bajos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN Low']
+                posicion_RMN_altos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN High']
     
                 st.text(posicion_RMN_bajos)
                 st.text(posicion_RMN_altos)
