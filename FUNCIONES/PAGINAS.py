@@ -2467,6 +2467,7 @@ def procesado_nutrientes():
         
         # Selecciona los datos correspondientes a la estación y salida seleccionada
         df_seleccion               = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
+        
 
         # Recupera los datos disponibles de la misma estación, para la misma variable
         listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
@@ -2475,13 +2476,14 @@ def procesado_nutrientes():
         df_disponible_bd            = df_disponible_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
         df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bd, on="id_muestreo")
     
+        # Busca los datos dentro del rango de meses seleccionado
+        df_seleccion                 = df_seleccion.sort_values('presion_ctd')
         df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
         for idato in range(df_disponible_bd.shape[0]):
-            #if abs(df_disponible_bd['fecha_muestreo'].iloc[idato] - max(df_seleccion[fecha_muestreo]).month
-            st.text(df_disponible_bd['fecha_muestreo'].iloc[idato])
-            st.text(max(df_seleccion['fecha_muestreo']))     
-            #,max(df_seleccion['fecha_muestreo']),abs(df_disponible_bd['fecha_muestreo'].iloc[idato] - max(df_seleccion['fecha_muestreo'])).month)
+            delta_t = abs(df_disponible_bd['fecha_muestreo'].iloc[idato] - (df_seleccion['fecha_muestreo'].iloc[0])).month
+            st.text(delta_t)     
 
+        df_seleccion               = df_seleccion.sort_values('presion_ctd')
 
         # Representa un gráfico con la variable seleccionada
         fig, ax = plt.subplots()
