@@ -2470,8 +2470,8 @@ def procesado_nutrientes():
 
         # Representa un gráfico con la variable seleccionada
         fig, ax = plt.subplots()
+        ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],marker ='o',markersize=8,color='#808080')
         ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.k' )
-        ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.r' )
         texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
         ax.set(xlabel=texto_eje)
         ax.set(ylabel='Presion (db)')
