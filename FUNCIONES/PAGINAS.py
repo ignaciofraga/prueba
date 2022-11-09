@@ -2323,8 +2323,8 @@ def procesado_nutrientes():
             datos_corregidos['pH']          = [None]*datos_AA.shape[0]
             datos_corregidos['Alcalinidad'] = [None]*datos_AA.shape[0]
             datos_corregidos['Oxigeno']     = [None]*datos_AA.shape[0]  
-            datos_corregidos['id_estacion'] = [None]*datos_AA.shape[0]
-            datos_corregidos['id_salida']   = [None]*datos_AA.shape[0]
+            datos_corregidos['id_estacion'] = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['id_salida']   = numpy.zeros(datos_AA.shape[0],dtype=int)
     
             # Busca los datos de cada tubo analizada en el AA
             for idato in range(datos_AA.shape[0]):
