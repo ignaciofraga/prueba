@@ -2387,8 +2387,8 @@ def procesado_nutrientes():
                 st.text(RMN_altos)
                 st.text(RMN_bajos)
     
-                pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos[0]-RMN_bajos[0]) 
-                t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos[0] 
+                pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
+                t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos.iloc[0] 
     
                 variable_drift = numpy.zeros(datos_AA.shape[0])
     
