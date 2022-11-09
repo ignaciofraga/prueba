@@ -2285,7 +2285,7 @@ def procesado_nutrientes():
 
 
     # Despliega un formulario para subir los archivos del AA y las referencias
-    with st.form("my-form", clear_on_submit=True):
+    with st.form("my-form", clear_on_submit=False):
         
         archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
           
