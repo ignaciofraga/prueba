@@ -2241,26 +2241,26 @@ def consulta_botellas():
         # Ordena los valores por fechas
         df_exporta = df_exporta.sort_values('fecha_muestreo')
     
-        ## Botón para exportar los resultados
-        nombre_archivo =  'DATOS_BOTELLAS.xlsx'
+    ## Botón para exportar los resultados
+    nombre_archivo =  'DATOS_BOTELLAS.xlsx'
+
+    output = BytesIO()
+    writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+    df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
+    workbook = writer.book
+    worksheet = writer.sheets['DATOS']
+    writer.save()
+    datos_exporta = output.getvalue()
+
+    st.download_button(
+        label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
+        data=datos_exporta,
+        file_name=nombre_archivo,
+        help= 'Descarga un archivo .csv con los datos solicitados',
+        mime="application/vnd.ms-excel"
+    )
     
-        output = BytesIO()
-        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-        df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
-        workbook = writer.book
-        worksheet = writer.sheets['DATOS']
-        writer.save()
-        datos_exporta = output.getvalue()
     
-        st.download_button(
-            label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
-            data=datos_exporta,
-            file_name=nombre_archivo,
-            help= 'Descarga un archivo .csv con los datos solicitados',
-            mime="application/vnd.ms-excel"
-        )
-        
-        
         
         
 ###############################################################################
