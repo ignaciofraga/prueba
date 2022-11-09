@@ -2410,31 +2410,11 @@ def procesado_nutrientes():
             datos_corregidos['NITRATO']          = datos_corregidos['TON']-datos_corregidos['NITRITO']
             datos_corregidos[datos_corregidos['NITRATO']<0] = 0           
      
-            #st.text(datos_corregidos)   
-            ## Botón para exportar los resultados
-        nombre_archivo =  'DATOS.xlsx'
     
-        output = BytesIO()
-        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-        datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
-        workbook = writer.book
-        worksheet = writer.sheets['DATOS']
-        writer.save()
-        datos_exporta = output.getvalue()
-    
-        st.download_button(
-            label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
-            data=datos_exporta,
-            file_name=nombre_archivo,
-            help= 'Descarga un archivo .csv con los datos solicitados',
-            mime="application/vnd.ms-excel"
-        )
-        
- 
-        # # Muestra una tabla con las salidas realizadas
-        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_salidas_radiales)
-        # gridOptions = gb.build()
-        # st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+            # Muestra una tabla con las salidas realizadas
+            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
+            gridOptions = gb.build()
+            st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
 
 
         
