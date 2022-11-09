@@ -2420,11 +2420,11 @@ def procesado_nutrientes():
             workbook = writer.book
             worksheet = writer.sheets['DATOS']
             writer.save()
-            datos_corregidos = output.getvalue()
+            datos_exporta = output.getvalue()
         
             st.download_button(
                 label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
-                data=datos_corregidos,
+                data=datos_exporta,
                 file_name=nombre_archivo,
                 help= 'Descarga un archivo .csv con los datos solicitados',
                 mime="application/vnd.ms-excel"
