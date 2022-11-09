@@ -2294,7 +2294,7 @@ def procesado_nutrientes():
 
     #     envio = st.form_submit_button("Procesar el archivo subido")
 
-    if archivo_AA is True and archivo_refs is True:
+    if archivo_AA is not None and archivo_refs is not None:
 
         # Lectura del archivo con las referencias
         df_referencias        = pandas.read_excel(archivo_refs)   
