@@ -2333,7 +2333,7 @@ def procesado_nutrientes():
                     
                     if len(id_temp) > 0:
                         st.text(id_temp)
-                        st.text(id_temp[1])
+                        st.text(id_temp[0])
                         datos_AA['muestreo'].iloc[idato]    = id_temp[0]
                         datos_AA['Presion'].iloc[idato]     = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==id_temp[0]][0]
                         datos_AA['Salinidad'].iloc[idato]   = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==id_temp[0]][0]
