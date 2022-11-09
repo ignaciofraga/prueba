@@ -2478,7 +2478,9 @@ def procesado_nutrientes():
         df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
         for idato in range(df_disponible_bd.shape[0]):
             #if abs(df_disponible_bd['fecha_muestreo'].iloc[idato] - max(df_seleccion[fecha_muestreo]).month
-            print(df_disponible_bd['fecha_muestreo'].iloc[idato],max(df_seleccion['fecha_muestreo']),abs(df_disponible_bd['fecha_muestreo'].iloc[idato] - max(df_seleccion['fecha_muestreo'])).month)
+            print(df_disponible_bd['fecha_muestreo'].iloc[idato])
+            print(max(df_seleccion['fecha_muestreo']))     
+            #,max(df_seleccion['fecha_muestreo']),abs(df_disponible_bd['fecha_muestreo'].iloc[idato] - max(df_seleccion['fecha_muestreo'])).month)
 
 
         # Representa un gráfico con la variable seleccionada
