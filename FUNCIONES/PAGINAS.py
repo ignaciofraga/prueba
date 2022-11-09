@@ -2410,6 +2410,8 @@ def procesado_nutrientes():
             datos_corregidos['NITRATO']          = datos_corregidos['TON']-datos_corregidos['NITRITO']
             datos_corregidos[datos_corregidos['NITRATO']<0] = 0           
      
+            st.text(datos_corregidos)   
+     
             # Mantén sólo las filas del dataframe con valores no nulos
             datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
             
