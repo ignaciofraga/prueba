@@ -2357,6 +2357,9 @@ def procesado_nutrientes():
                     
                         datos_AA['Densidad'].iloc[idato]    = (999.1+0.77*((datos_AA['Salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)^2)/128))/1000
                        
+            # Asigna el identificador de cada registro al dataframe en el que se guardarán los resultados
+            datos_corregidos['muestreo'] = datos_AA['muestreo']
+                      
             # Aplica la corrección de drift de cada variable
             for ivariable in range(len(variables_run)):
     
@@ -2372,10 +2375,7 @@ def procesado_nutrientes():
                 # Encuentra las posiciones de los RMNs
                 posicion_RMN_bajos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN Low']
                 posicion_RMN_altos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN High']
-    
-                st.text(posicion_RMN_bajos)
-                st.text(posicion_RMN_altos)
-    
+        
                 # Predimensiona las rectas a y b
                 posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0],posicion_RMN_bajos[1])
                 recta_at              = numpy.zeros(datos_AA.shape[0])
@@ -2383,10 +2383,7 @@ def procesado_nutrientes():
     
                 RMN_altos = valores_concentraciones[posicion_RMN_altos]
                 RMN_bajos = valores_concentraciones[posicion_RMN_bajos]
-    
-                st.text(RMN_altos)
-                st.text(RMN_bajos)
-    
+        
                 pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
                 t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos.iloc[0] 
     
