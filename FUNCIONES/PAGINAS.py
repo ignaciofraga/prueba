@@ -2321,14 +2321,15 @@ def procesado_nutrientes():
         # Genera un dataframe en el que se almacenarán los resultados de las correcciones aplicadas. 
         datos_corregidos    = pandas.DataFrame(columns=variables_run)
         # Añade columnas con variables a utilizar en el control de calidad posterior 
-        datos_corregidos['muestreo']    = [None]*datos_AA.shape[0]
-        datos_corregidos['presion_ctd'] = [None]*datos_AA.shape[0]
-        datos_corregidos['pH']          = [None]*datos_AA.shape[0]
-        datos_corregidos['Alcalinidad'] = [None]*datos_AA.shape[0]
-        datos_corregidos['Oxigeno']     = [None]*datos_AA.shape[0]  
-        datos_corregidos['id_estacion'] = numpy.zeros(datos_AA.shape[0],dtype=int)
-        datos_corregidos['id_salida']   = numpy.zeros(datos_AA.shape[0],dtype=int)
-        datos_corregidos['id_botella']  = numpy.zeros(datos_AA.shape[0],dtype=int)
+        datos_corregidos['muestreo']        = [None]*datos_AA.shape[0]
+        datos_corregidos['presion_ctd']     = [None]*datos_AA.shape[0]
+        datos_corregidos['pH']              = [None]*datos_AA.shape[0]
+        datos_corregidos['Alcalinidad']     = [None]*datos_AA.shape[0]
+        datos_corregidos['Oxigeno']         = [None]*datos_AA.shape[0]  
+        datos_corregidos['id_estacion']     = numpy.zeros(datos_AA.shape[0],dtype=int)
+        datos_corregidos['id_salida']       = numpy.zeros(datos_AA.shape[0],dtype=int)
+        datos_corregidos['id_botella']      = numpy.zeros(datos_AA.shape[0],dtype=int)
+        datos_corregidos['fecha_muestreo']  = [None]*datos_AA.shape[0] 
     
         # Busca los datos de cada tubo analizada en el AA
         for idato in range(datos_AA.shape[0]):
@@ -2343,13 +2344,14 @@ def procesado_nutrientes():
                 id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
                 
                 if len(id_temp) > 0:
-                    indice                                      = id_temp.iloc[0]
-                    datos_AA['Salinidad'].iloc[idato]           = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
+                    indice                                         = id_temp.iloc[0]
+                    datos_AA['Salinidad'].iloc[idato]              = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
     
-                    datos_corregidos['muestreo'].iloc[idato]    = indice
-                    datos_corregidos['presion_ctd'].iloc[idato] = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
-                    datos_corregidos['id_salida'].iloc[idato]   = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice]
-                    datos_corregidos['id_botella'].iloc[idato]  = df_muestreos['botella'][df_muestreos['id_muestreo']==indice]
+                    datos_corregidos['muestreo'].iloc[idato]       = indice
+                    datos_corregidos['presion_ctd'].iloc[idato]    = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
+                    datos_corregidos['id_salida'].iloc[idato]      = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice]
+                    datos_corregidos['id_botella'].iloc[idato]     = df_muestreos['botella'][df_muestreos['id_muestreo']==indice]
+                    datos_corregidos['fecha_muestreo'].iloc[idato] = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice]
                     
                     ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==indice]
                     ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_biogeoquimicos['muestreo']==indice]
@@ -2427,13 +2429,7 @@ def procesado_nutrientes():
     
         # Mantén sólo las filas del dataframe con valores no nulos
         datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
-    
-        # # Muestra una tabla con las salidas realizadas
-        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_muestras)
-        # gridOptions = gb.build()
-        # st_aggrid.AgGrid(datos_muestras,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
-    
-    
+        
     
         ### CONTROL DE CALIDAD DE LOS DATOS
     
@@ -2449,21 +2445,25 @@ def procesado_nutrientes():
         nombres_salidas            = df_salidas_muestreadas['nombre_salida'].tolist()
         listado_salidas            = df_salidas_muestreadas['id_salida'].tolist()
         
-        # Despliega menús de selección de la variable y la estación a controlar                
-        salida_seleccionada   = st.selectbox('Salida',(nombres_salidas))
-        indice_salida         = listado_salidas[nombres_salidas.index(salida_seleccionada)]
-            
+        # Despliega menús de selección de la variable, salida y la estación a controlar                
         col1, col2 = st.columns(2,gap="small")
-
         with col1: 
-            estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
-            indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
-       
-        with col2:
+            
+            salida_seleccionada   = st.selectbox('Salida',(nombres_salidas))
+            indice_salida         = listado_salidas[nombres_salidas.index(salida_seleccionada)]
+
             listado_variables      = ['TON','NITRATO','NITRITO','SILICATO','FOSFATO']
             listado_variables_bd   = ['tot_n','no3','no2','nh4','po4','sio2']
             variable_seleccionada  = st.selectbox('Variable',(listado_variables))
             indice_variable        = listado_variables.index(variable_seleccionada)
+            
+
+       
+        with col2:
+            estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
+            indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
+            
+            meses_offset          = st.number_input('Intervalo meses:',value=0)
         
         # Selecciona los datos correspondientes a la estación y salida seleccionada
         df_seleccion               = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
@@ -2475,6 +2475,11 @@ def procesado_nutrientes():
         df_disponible_bd            = df_disponible_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
         df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bd, on="id_muestreo")
     
+        df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
+        for idato in range(df_disponible_bd.shape[0]):
+            #if abs(df_disponible_bd['fecha_muestreo'].iloc[idato] - max(df_seleccion[fecha_muestreo]).month
+            print(df_disponible_bd['fecha_muestreo'].iloc[idato],max(df_seleccion['fecha_muestreo']),abs(df_disponible_bd['fecha_muestreo'].iloc[idato] - max(df_seleccion['fecha_muestreo'])).month)
+
 
         # Representa un gráfico con la variable seleccionada
         fig, ax = plt.subplots()
