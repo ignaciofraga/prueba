@@ -2397,10 +2397,10 @@ def procesado_nutrientes():
                     
                 
                     factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
-                    recta_at[idato] = RMN_bajos[0] +  factor_f*(RMN_bajos[0]-RMN_bajos[-1]) 
-                    recta_bt[idato] = RMN_altos[0] -  factor_f*(RMN_altos[0]-RMN_altos[-1]) 
+                    recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[0]-RMN_bajos.iloc[-1]) 
+                    recta_bt[idato] = RMN_altos.iloc[0] -  factor_f*(RMN_altos.iloc[0]-RMN_altos.iloc[-1]) 
                     
-                    val_combinado         = ((valores_concentraciones[idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos[0]-RMN_bajos[0]) + RMN_bajos[0]
+                    val_combinado         = ((valores_concentraciones[idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
     
                     variable_drift[idato] = val_combinado*pte_RMN+t_indep_RMN
     
