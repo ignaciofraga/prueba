@@ -2427,6 +2427,10 @@ def procesado_nutrientes():
                 datos_corregidos[variables_run[ivariable]] = variable_drift
      
             # # Calcula el NO3 como diferencia entre el TON y el NO2
+            datos_corregidos['NITRATO'] = datos_corregidos['TON'].sub(datos_corregidos['NITRITO'], axis = 0)
+            datos_corregidos[datos_corregidos['NITRATO']<0] = 0
+            
+            
             # datos_corregidos['NITRATO']          = datos_corregidos['TON']-datos_corregidos['NITRITO']
             # datos_corregidos[datos_corregidos['NITRATO']<0] = 0           
      
