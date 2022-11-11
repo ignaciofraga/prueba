@@ -2463,7 +2463,7 @@ def procesado_nutrientes():
             estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
             indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
             
-            meses_offset          = st.number_input('Intervalo meses:',value=0)
+            dias_offset           = st.number_input('Intervalo meses:',value=30)
         
         # Selecciona los datos correspondientes a la estación y salida seleccionada
         df_seleccion               = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
@@ -2475,15 +2475,12 @@ def procesado_nutrientes():
         
         df_disponible_bd            = df_disponible_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
         df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bd, on="id_muestreo")
-    
-        from datetime import date
-        from dateutil.relativedelta import relativedelta
-    
+       
         # # Busca los datos dentro del rango de meses seleccionado
         st.text(df_seleccion['fecha_muestreo'].iloc[0])
         df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
-        fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0] + relativedelta(months=+meses_offset)#- datetime.timedelta(months=meses_offset)
-        fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1] + relativedelta(months=-meses_offset)#+ datetime.timedelta(months=meses_offset)  
+        fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0] - datetime.timedelta(days=dias_offset)
+        fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1] + datetime.timedelta(days=dias_offset)  
         
         st.text(fecha_minima)
         st.text(fecha_maxima)
