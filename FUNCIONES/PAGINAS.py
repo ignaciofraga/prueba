@@ -2524,7 +2524,7 @@ def procesado_nutrientes():
         az.plot(df_seleccion['Oxigeno'],df_seleccion['presion_ctd'],'.',color='#006633')
         az.set(xlabel='Oxigeno (\u03BCmol/kg)')
         az.yaxis.set_visible(False)
-        az.set_xlim(rango_profs)
+        az.set_ylim(rango_profs)
         az.invert_yaxis()
 
         # fig, ax = plt.subplots()
