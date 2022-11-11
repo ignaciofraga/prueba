@@ -2520,7 +2520,7 @@ def procesado_nutrientes():
                 nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
        
-        az.plot(df_disponible_bd['Oxigeno'],df_disponible_bd['presion_ctd'],'.',color='#006633')
+        az.plot(df_seleccion['Oxigeno'],df_seleccion['presion_ctd'],'.',color='#006633')
         az.set(xlabel='Oxigeno ')
         az.invert_yaxis()
 
