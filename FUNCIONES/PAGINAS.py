@@ -2503,8 +2503,8 @@ def procesado_nutrientes():
         for idato in range(df_disponible_bd.shape[0]):
             st.text(df_disponible_bd['fecha_muestreo'].iloc[idato])
             st.text(df_disponible_bd['fecha_muestreo'].iloc[idato].month)
-            if (df_disponible_bd['fecha_muestreo'].iloc[idato][0]).month in listado_meses:
-                st.text(df_disponible_bd['fecha_muestreo'].iloc[idato][0])
+            if (df_disponible_bd['fecha_muestreo'].iloc[idato]).month in listado_meses:
+                st.text(df_disponible_bd['fecha_muestreo'].iloc[idato])
                 df_disponible_bd['io_fecha'].iloc[idato] = 1
            # .tolist()
         #     #delta_t = (df_disponible_bd['fecha_muestreo'].iloc[idato] - df_seleccion['fecha_muestreo'].iloc[0]).days
