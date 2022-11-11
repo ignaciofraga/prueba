@@ -2463,7 +2463,7 @@ def procesado_nutrientes():
             estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
             indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
             
-            dias_offset           = st.number_input('Intervalo meses:',value=30)
+            meses_offset           = st.number_input('Intervalo meses:',value=1)
         
         # Selecciona los datos correspondientes a la estación y salida seleccionada
         df_seleccion               = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
@@ -2476,22 +2476,39 @@ def procesado_nutrientes():
         df_disponible_bd            = df_disponible_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
         df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bd, on="id_muestreo")
        
-        # # Busca los datos dentro del rango de meses seleccionado
+        # Determina los meses que marcan el rango de busqueda
         df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
-        fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0][0] - datetime.timedelta(days=dias_offset)
-        fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1][0] + datetime.timedelta(days=dias_offset)  
+        fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0][0] - datetime.timedelta(days=meses_offset*30)
+        fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1][0] + datetime.timedelta(days=meses_offset*30)  
 
         if fecha_minima.year < fecha_maxima.year:
             listado_meses_1 = numpy.arange(fecha_minima.month,13)
             listado_meses_2 = numpy.arange(1,fecha_maxima.month+1)
             listado_meses   = numpy.concatenate((listado_meses_1,listado_meses_2))
         
+        else:
+            listado_meses   = numpy.arange(fecha_minima.month,fecha_maxima.month+1)
+ 
+        listado_meses = listado_meses.tolist()
+ 
         st.text(fecha_minima)
         st.text(fecha_maxima)       
  
         st.text(listado_meses_1)
         st.text(listado_meses_2)
-        st.text(listado_meses)       
+        st.text(listado_meses)     
+        
+        # Busca los datos de la base de datos dentro del rango de meses seleccionados
+        df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
+        for idato in range(df_disponible_bd.shape[0]):
+            if (df_disponible_bd['fecha_muestreo'].iloc[idato][0]).month in listado_meses:
+                st.text(df_disponible_bd['fecha_muestreo'].iloc[idato][0])
+                df_disponible_bd['io_fecha'].iloc[idato] = 1
+           # .tolist()
+        #     #delta_t = (df_disponible_bd['fecha_muestreo'].iloc[idato] - df_seleccion['fecha_muestreo'].iloc[0]).days
+        #     st.text(df_disponible_bd['fecha_muestreo'].iloc[idato])            
+        
+        
         # df_seleccion                 = df_seleccion.sort_values('presion_ctd')
         # df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
         # for idato in range(df_disponible_bd.shape[0]):
