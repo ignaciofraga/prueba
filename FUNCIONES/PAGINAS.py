@@ -2490,37 +2490,22 @@ def procesado_nutrientes():
             listado_meses   = numpy.arange(fecha_minima.month,fecha_maxima.month+1)
  
         listado_meses = listado_meses.tolist()
- 
-        st.text(fecha_minima)
-        st.text(fecha_maxima)       
- 
-        st.text(listado_meses_1)
-        st.text(listado_meses_2)
-        st.text(listado_meses)     
+   
         
         # Busca los datos de la base de datos dentro del rango de meses seleccionados
         df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
         for idato in range(df_disponible_bd.shape[0]):
             if (df_disponible_bd['fecha_muestreo'].iloc[idato]).month in listado_meses:
-                st.text(df_disponible_bd['fecha_muestreo'].iloc[idato])
                 df_disponible_bd['io_fecha'].iloc[idato] = 1
-           # .tolist()
-        #     #delta_t = (df_disponible_bd['fecha_muestreo'].iloc[idato] - df_seleccion['fecha_muestreo'].iloc[0]).days
-        #     st.text(df_disponible_bd['fecha_muestreo'].iloc[idato])            
-        
-        
-        # df_seleccion                 = df_seleccion.sort_values('presion_ctd')
-        # df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
-        # for idato in range(df_disponible_bd.shape[0]):
-        # #     #delta_t = (df_disponible_bd['fecha_muestreo'].iloc[idato] - df_seleccion['fecha_muestreo'].iloc[0]).days
-        # #     st.text(df_disponible_bd['fecha_muestreo'].iloc[idato])     
+                
+        df_rango_temporal = df_disponible_bd[df_disponible_bd['io_fecha']==1]
 
-        # df_seleccion               = df_seleccion.sort_values('presion_ctd')
 
         # Representa un gráfico con la variable seleccionada
         fig, ax = plt.subplots()
         ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#808080')
-        ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.k' )
+        ax.plot(df_rango_temporal[listado_variables_bd[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#606060')
+        ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r' )
         texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
         ax.set(xlabel=texto_eje)
         ax.set(ylabel='Presion (db)')
