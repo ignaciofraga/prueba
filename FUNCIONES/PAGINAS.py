@@ -2476,10 +2476,13 @@ def procesado_nutrientes():
         df_disponible_bd            = df_disponible_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
         df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bd, on="id_muestreo")
     
+        from datetime import date
+        from dateutil.relativedelta import relativedelta
+    
         # # Busca los datos dentro del rango de meses seleccionado
         df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
-        fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0] - datetime.timedelta(months=meses_offset)
-        fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1] + datetime.timedelta(months=meses_offset)  
+        fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0] - relativedelta(months=+meses_offset)#- datetime.timedelta(months=meses_offset)
+        fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1] + relativedelta(months=+meses_offset)#+ datetime.timedelta(months=meses_offset)  
         
         st.text(fecha_minima)
         st.text(fecha_maxima)
