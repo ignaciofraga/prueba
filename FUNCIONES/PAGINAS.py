@@ -2481,12 +2481,12 @@ def procesado_nutrientes():
         st.text(df_seleccion['fecha_muestreo'].iloc[0])
         df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
         fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0] - datetime.timedelta(days=dias_offset)
-        fecha_minima    = fecha_minima.replace(year=int(anho_referencia))
+        mes_minim       = fecha_minima.month
         fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1] + datetime.timedelta(days=dias_offset)  
-        #fecha_maxima    = fecha_maxima.replace(year=anho_referencia)
+        mes_maximo      = fecha_maxima.month
         
-        st.text(fecha_minima)
-        st.text(fecha_maxima)
+        st.text(mes_minim)
+        st.text(mes_maximo)
         
         #df_seleccion                 = df_seleccion.sort_values('presion_ctd')
         # df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
