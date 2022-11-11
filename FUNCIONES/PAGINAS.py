@@ -2511,6 +2511,7 @@ def procesado_nutrientes():
         ax.set(xlabel=texto_eje)
         ax.set(ylabel='Presion (db)')
         ax.invert_yaxis()
+        rango_profs = ax.get_ylim()
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
         for ipunto in range(df_seleccion.shape[0]):
@@ -2521,8 +2522,9 @@ def procesado_nutrientes():
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
        
         az.plot(df_seleccion['Oxigeno'],df_seleccion['presion_ctd'],'.',color='#006633')
-        az.set(xlabel='Oxigeno ')
+        az.set(xlabel='Oxigeno (\u03BCmol/kg)')
         az.yaxis.set_visible(False)
+        az.set_xlim(rango_profs)
         az.invert_yaxis()
 
         # fig, ax = plt.subplots()
