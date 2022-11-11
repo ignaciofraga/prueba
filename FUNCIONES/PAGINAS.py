@@ -2531,15 +2531,12 @@ def procesado_nutrientes():
         st.pyplot(fig)
         
         # Gráficos particulares para cada variable
-        if variable_seleccionada == 'NITRATO':
-            #☺fig, ax = plt.subplots(1, 1, gridspec_kw = {'wspace':0.05, 'hspace':0}, width_ratios=[1, 1])
-       
+        if variable_seleccionada == 'FOSFATO':
+
             fig, ax = plt.subplots()       
-            #ax.plot(df_disponible_bd[listado_variables_bd[0]],df_disponible_bd[listado_variables_bd[0]],'.',color='#C0C0C0')
             ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
             ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
             ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
-            texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
             ax.set(xlabel='Nitrato (\u03BCmol/kg)')
             ax.set(ylabel='Fosfato (\u03BCmol/kg)')
 
@@ -2554,7 +2551,43 @@ def procesado_nutrientes():
            
             st.pyplot(fig)
         
-        
+        if variable_seleccionada == 'NITRATO':
+
+            fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
+            ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
+            ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
+            ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
+            ax.set(xlabel='Nitrato (\u03BCmol/kg)')
+            ax.set(ylabel='Fosfato (\u03BCmol/kg)')
+
+            # Añade el nombre de cada punto
+            nombre_muestreos = [None]*df_seleccion.shape[0]
+            for ipunto in range(df_seleccion.shape[0]):
+                if df_seleccion['id_botella'].iloc[ipunto] is None:
+                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+                else:
+                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
+
+            az.plot(df_disponible_bd['no3'],df_disponible_bd['phts25p0_unpur'],'.',color='#C0C0C0')
+            az.plot(df_rango_temporal['no3'],df_rango_temporal['phts25p0_unpur'],'.',color='#404040')
+            az.plot(df_disponible_bd['no3'],df_disponible_bd['phts25p0_pur'],'.',color='#C0C0C0')
+            az.plot(df_rango_temporal['no3'],df_rango_temporal['phts25p0_pur'],'.',color='#404040')
+            az.plot(df_seleccion['NITRATO'],df_seleccion['pH'],'.r' )
+            az.set(xlabel='Nitrato (\u03BCmol/kg)')
+            az.set(ylabel='pH')
+
+            # Añade el nombre de cada punto
+            nombre_muestreos = [None]*df_seleccion.shape[0]
+            for ipunto in range(df_seleccion.shape[0]):
+                if df_seleccion['id_botella'].iloc[ipunto] is None:
+                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+                else:
+                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
+     
+
+            st.pyplot(fig)
         
         
         
