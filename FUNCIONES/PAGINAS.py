@@ -2502,7 +2502,7 @@ def procesado_nutrientes():
 
 
         # Representa un gráfico con la variable seleccionada junto a los oxígenos
-        fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0, 'hspace':0}, width_ratios=[3, 1])
+        fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.5, 'hspace':0}, width_ratios=[3, 1])
    
         ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0')
         ax.plot(df_rango_temporal[listado_variables_bd[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040')
