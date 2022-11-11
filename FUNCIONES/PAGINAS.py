@@ -2478,7 +2478,7 @@ def procesado_nutrientes():
        
         # # Busca los datos dentro del rango de meses seleccionado
         anho_referencia = 2000 
-        st.text(df_seleccion['fecha_muestreo'].iloc[0])
+        st.text(df_seleccion['fecha_muestreo'].iloc[0][0])
         df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
         fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0] - datetime.timedelta(days=dias_offset)
         mes_minim       = fecha_minima.month
