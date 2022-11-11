@@ -2358,7 +2358,10 @@ def procesado_nutrientes():
                     if ph_unpur is not None:
                         datos_corregidos['pH'].iloc[idato]      = ph_unpur
                     if ph_pur is not None:
-                        datos_corregidos['pH'].iloc[idato]      = ph_pur                
+                        datos_corregidos['pH'].iloc[idato]      = ph_pur 
+                        
+                    st.text(ph_pur)
+                    st.text(ph_unpur)
                     
                     datos_corregidos['Alcalinidad'].iloc[idato] = df_datos_biogeoquimicos['alkali'][df_datos_biogeoquimicos['muestreo']==indice]
                     
@@ -2586,7 +2589,7 @@ def procesado_nutrientes():
                     nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
                 else:
                     nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
-                az.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
+                az.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['pH'].iloc[ipunto]))
      
 
             st.pyplot(fig)
