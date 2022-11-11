@@ -2532,8 +2532,9 @@ def procesado_nutrientes():
         
         # Gráficos particulares para cada variable
         if variable_seleccionada == 'NITRATO':
-            fig, ax = plt.subplots(1, 1, gridspec_kw = {'wspace':0.05, 'hspace':0}, width_ratios=[1, 1])
+            #☺fig, ax = plt.subplots(1, 1, gridspec_kw = {'wspace':0.05, 'hspace':0}, width_ratios=[1, 1])
        
+            fig, ax = plt.subplots()       
             ax.plot(df_disponible_bd[listado_variables_bd[0]],df_disponible_bd[listado_variables_bd[0]],'.',color='#C0C0C0')
             #ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
             #ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
