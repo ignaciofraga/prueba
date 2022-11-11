@@ -2482,15 +2482,16 @@ def procesado_nutrientes():
         fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1][0] + datetime.timedelta(days=dias_offset)  
 
         if fecha_minima.year < fecha_maxima.year:
-            listado_meses_1 = numpy.arange(fecha_minima.month,12)
-            listado_meses_2 = numpy.arange(1,fecha_maxima.month)
- 
+            listado_meses_1 = numpy.arange(fecha_minima.month,13)
+            listado_meses_2 = numpy.arange(1,fecha_maxima.month+1)
+            listado_meses   = numpy.concatenate((listado_meses_1,listado_meses_2))
+        
         st.text(fecha_minima)
         st.text(fecha_maxima)       
  
         st.text(listado_meses_1)
         st.text(listado_meses_2)
-        
+        st.text(listado_meses)       
         # df_seleccion                 = df_seleccion.sort_values('presion_ctd')
         # df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
         # for idato in range(df_disponible_bd.shape[0]):
