@@ -2359,10 +2359,7 @@ def procesado_nutrientes():
                         datos_corregidos['pH'].iloc[idato]      = ph_unpur
                     if ph_pur is not None:
                         datos_corregidos['pH'].iloc[idato]      = ph_pur 
-                        
-                    st.text(ph_pur)
-                    st.text(ph_unpur)
-                    
+                                            
                     datos_corregidos['Alcalinidad'].iloc[idato] = df_datos_biogeoquimicos['alkali'][df_datos_biogeoquimicos['muestreo']==indice]
                     
                     oxi_ctd = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==indice]
@@ -2554,7 +2551,7 @@ def procesado_nutrientes():
            
             st.pyplot(fig)
         
-        if variable_seleccionada == 'NITRATO':
+        elif variable_seleccionada == 'NITRATO':
 
             fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
             ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
@@ -2593,7 +2590,28 @@ def procesado_nutrientes():
      
 
             st.pyplot(fig)
+  
         
+        # Gráficos particulares para cada variable
+        elif variable_seleccionada == 'SILICATO':
+
+            fig, ax = plt.subplots()       
+            ax.plot(df_disponible_bd['sio2'],df_disponible_bd['alkali'],'.',color='#C0C0C0')
+            ax.plot(df_rango_temporal['sio2'],df_rango_temporal['alkali'],'.',color='#404040')
+            ax.plot(df_seleccion['SILICATO'],df_seleccion['Alcalinidad'],'.r' )
+            ax.set(xlabel='Silicato (\u03BCmol/kg)')
+            ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')
+
+            # Añade el nombre de cada punto
+            nombre_muestreos = [None]*df_seleccion.shape[0]
+            for ipunto in range(df_seleccion.shape[0]):
+                if df_seleccion['id_botella'].iloc[ipunto] is None:
+                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+                else:
+                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['SILICATO'].iloc[ipunto], df_seleccion['Alcalinidad'].iloc[ipunto]))
+           
+            st.pyplot(fig)
         
         
         ################# FORMULARIOS CALIDAD ################        
