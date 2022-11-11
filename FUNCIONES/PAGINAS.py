@@ -2480,9 +2480,10 @@ def procesado_nutrientes():
         from dateutil.relativedelta import relativedelta
     
         # # Busca los datos dentro del rango de meses seleccionado
+        st.text(df_seleccion['fecha_muestreo'].iloc[0])
         df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
-        fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0] - relativedelta(months=+meses_offset)#- datetime.timedelta(months=meses_offset)
-        fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1] + relativedelta(months=+meses_offset)#+ datetime.timedelta(months=meses_offset)  
+        fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0] + relativedelta(months=+meses_offset)#- datetime.timedelta(months=meses_offset)
+        fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1] + relativedelta(months=-meses_offset)#+ datetime.timedelta(months=meses_offset)  
         
         st.text(fecha_minima)
         st.text(fecha_maxima)
