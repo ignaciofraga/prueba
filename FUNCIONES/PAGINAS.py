@@ -2577,6 +2577,7 @@ def procesado_nutrientes():
             az.set(xlabel='Nitrato (\u03BCmol/kg)')
             az.set(ylabel='pH')
             az.yaxis.tick_right()
+            az.yaxis.set_label_position("right")
 
             # Añade el nombre de cada punto
             nombre_muestreos = [None]*df_seleccion.shape[0]
