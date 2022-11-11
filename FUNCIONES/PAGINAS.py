@@ -2576,6 +2576,7 @@ def procesado_nutrientes():
             az.plot(df_seleccion['NITRATO'],df_seleccion['pH'],'.r' )
             az.set(xlabel='Nitrato (\u03BCmol/kg)')
             az.set(ylabel='pH')
+            az.yaxis.tick_right()
 
             # Añade el nombre de cada punto
             nombre_muestreos = [None]*df_seleccion.shape[0]
@@ -2584,7 +2585,7 @@ def procesado_nutrientes():
                     nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
                 else:
                     nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
-                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
+                az.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
      
 
             st.pyplot(fig)
