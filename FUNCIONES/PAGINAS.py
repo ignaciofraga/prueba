@@ -2501,8 +2501,6 @@ def procesado_nutrientes():
         # Busca los datos de la base de datos dentro del rango de meses seleccionados
         df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
         for idato in range(df_disponible_bd.shape[0]):
-            st.text(df_disponible_bd['fecha_muestreo'].iloc[idato])
-            st.text(df_disponible_bd['fecha_muestreo'].iloc[idato].month)
             if (df_disponible_bd['fecha_muestreo'].iloc[idato]).month in listado_meses:
                 st.text(df_disponible_bd['fecha_muestreo'].iloc[idato])
                 df_disponible_bd['io_fecha'].iloc[idato] = 1
