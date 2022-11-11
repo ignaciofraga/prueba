@@ -2329,6 +2329,7 @@ def procesado_nutrientes():
         datos_corregidos['id_estacion']     = numpy.zeros(datos_AA.shape[0],dtype=int)
         datos_corregidos['id_salida']       = numpy.zeros(datos_AA.shape[0],dtype=int)
         datos_corregidos['id_botella']      = numpy.zeros(datos_AA.shape[0],dtype=int)
+        datos_corregidos['id_muestreo_bgq'] = numpy.zeros(datos_AA.shape[0],dtype=int)
         datos_corregidos['fecha_muestreo']  = [None]*datos_AA.shape[0] 
     
         # Busca los datos de cada tubo analizada en el AA
@@ -2353,6 +2354,7 @@ def procesado_nutrientes():
                     datos_corregidos['id_botella'].iloc[idato]     = df_muestreos['botella'][df_muestreos['id_muestreo']==indice]
                     datos_corregidos['fecha_muestreo'].iloc[idato] = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice]
                                         
+                    datos_corregidos['id_muestreo_bgq'].iloc[idato] = df_datos_biogeoquimicos['id_disc_biogeoquim'][df_datos_biogeoquimicos['muestreo']==indice]
                     ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==indice]
                     ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_biogeoquimicos['muestreo']==indice]
                     if ph_unpur is not None:
@@ -2629,12 +2631,11 @@ def procesado_nutrientes():
                 valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
                 qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
            
-            io_envio = st.form_submit_button("Asignar los índices seleccionados")  
+            io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
     
         if io_envio:
-           
-            texto_estado = 'Actualizando los índices de la base de datos'
-            with st.spinner(texto_estado):
+
+            with st.spinner('Actualizando la base de datos'):
            
                 # Introducir los valores en la base de datos
                 conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -2642,14 +2643,14 @@ def procesado_nutrientes():
        
                 for idato in range(df_seleccion.shape[0]):
     
-                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables_bd[indice_variable] + '_qf = %s WHERE id_disc_biogeoquim = %s;'
-                    cursor.execute(instruccion_sql, (int(qf_asignado[idato]),int(df_seleccion['muestreo'].iloc[idato])))
+                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables_bd[indice_variable] + ' = %s, ' + listado_variables_bd[indice_variable] +  '_qf = %s WHERE id_disc_biogeoquim = %s;'
+                    cursor.execute(instruccion_sql, (df_seleccion['id_muestreo_bgq'].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['muestreo'].iloc[idato])))
                     conn.commit() 
-   
+
                 cursor.close()
                 conn.close()   
     
-            texto_exito = 'QF de la variable  ' + variable_seleccionada + ' asignados correctamente'
+            texto_exito = 'Datos de ' + variable_seleccionada + ' asignados correctamente'
             st.success(texto_exito)
    
    
