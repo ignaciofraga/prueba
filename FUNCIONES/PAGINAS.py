@@ -2351,7 +2351,6 @@ def procesado_nutrientes():
                     datos_corregidos['presion_ctd'].iloc[idato]    = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
                     datos_corregidos['id_salida'].iloc[idato]      = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice]
                     datos_corregidos['id_botella'].iloc[idato]     = df_muestreos['botella'][df_muestreos['id_muestreo']==indice]
-                    st.text(indice)
                     datos_corregidos['fecha_muestreo'].iloc[idato] = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice]
                                         
                     ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==indice]
@@ -2482,7 +2481,8 @@ def procesado_nutrientes():
         fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0]
         fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1]   
         
-        st.text(fecha_minima,fecha_maxima)
+        st.text(fecha_minima)
+        st.text(fecha_maxima)
         
         #df_seleccion                 = df_seleccion.sort_values('presion_ctd')
         # df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
