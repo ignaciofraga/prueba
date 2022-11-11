@@ -2501,8 +2501,9 @@ def procesado_nutrientes():
         df_rango_temporal = df_disponible_bd[df_disponible_bd['io_fecha']==1]
 
 
-        # Representa un gráfico con la variable seleccionada
-        fig, ax = plt.subplots()
+        # Representa un gráfico con la variable seleccionada junto a los oxígenos
+        fig, (ax, az) = plt.subplots(1, 2, width_ratios=[3, 1])
+   
         ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0')
         ax.plot(df_rango_temporal[listado_variables_bd[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040')
         ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r' )
@@ -2518,6 +2519,27 @@ def procesado_nutrientes():
             else:
                 nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
+       
+        az.plot(df_disponible_bd['Oxigeno'],df_disponible_bd['presion_ctd'],'.',color='#006633')
+        az.set(xlabel='Oxigeno ')
+        az.invert_yaxis()
+
+        # fig, ax = plt.subplots()
+        # ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0')
+        # ax.plot(df_rango_temporal[listado_variables_bd[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040')
+        # ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r' )
+        # texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
+        # ax.set(xlabel=texto_eje)
+        # ax.set(ylabel='Presion (db)')
+        # ax.invert_yaxis()
+        # # Añade el nombre de cada punto
+        # nombre_muestreos = [None]*df_seleccion.shape[0]
+        # for ipunto in range(df_seleccion.shape[0]):
+        #     if df_seleccion['id_botella'].iloc[ipunto] is None:
+        #         nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+        #     else:
+        #         nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+        #     ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
        
         st.pyplot(fig)
 
