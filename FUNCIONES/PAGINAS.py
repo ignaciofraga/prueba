@@ -2452,8 +2452,8 @@ def procesado_nutrientes():
             salida_seleccionada   = st.selectbox('Salida',(nombres_salidas))
             indice_salida         = listado_salidas[nombres_salidas.index(salida_seleccionada)]
 
-            listado_variables      = ['TON','NITRATO','NITRITO','SILICATO','FOSFATO']
-            listado_variables_bd   = ['tot_n','no3','no2','nh4','po4','sio2']
+            listado_variables      = ['NITRATO','NITRITO','SILICATO','FOSFATO']
+            listado_variables_bd   = ['no3','no2','nh4','po4','sio2']
             variable_seleccionada  = st.selectbox('Variable',(listado_variables))
             indice_variable        = listado_variables.index(variable_seleccionada)
             
