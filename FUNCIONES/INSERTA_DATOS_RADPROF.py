@@ -58,7 +58,7 @@ for iarchivo in range(len(listado_archivos)):
     datos_radprof_corregido,textos_aviso = FUNCIONES_INSERCION.control_calidad(datos_radprof,direccion_host,base_datos,usuario,contrasena,puerto)  
 
     # Recupera el identificador del programa de muestreo
-    id_programa = FUNCIONES_INSERCION.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+    id_programa,abreviatura_programa = FUNCIONES_INSERCION.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
     
     # Encuentra la estación asociada a cada registro
     print('Asignando la estación correspondiente a cada medida')
@@ -71,7 +71,7 @@ for iarchivo in range(len(listado_archivos)):
 
     # Encuentra el identificador asociado a cada registro
     print('Asignando el registro correspondiente a cada medida')
-    datos_radprof_corregido = FUNCIONES_INSERCION.evalua_registros(datos_radprof_corregido,programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+    datos_radprof_corregido = FUNCIONES_INSERCION.evalua_registros(datos_radprof_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
     
     # # # # Introduce los datos en la base de datos
     print('Introduciendo los datos en la base de datos')

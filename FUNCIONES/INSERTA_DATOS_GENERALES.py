@@ -69,7 +69,7 @@ conn.close()
 
 programas       = ['PELACUS','RADIAL VIGO','RADIAL CORUÑA','RADIAL SANTANDER','RADPROF','OTROS']
 centro_asociado = ['CORUNA','VIGO','CORUNA','SANTANDER','CORUNA','CORUNA']
-abreviatura     = ['PEL','RVG','RCOR','RSAN','RPROF','OTROS']
+abreviatura     = ['PELACUS','RADVIGO','RADCOR','RADCAN','RADPROF','OTROS']
 
 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
 cursor = conn.cursor()
@@ -196,7 +196,7 @@ conn.close()
 
 ### Informacion de las estaciones de la radial mensual ###
 
-nombre_estacion = ['E2CO','E3ACO','E3CCO','E3BCO','E4CO']
+nombre_estacion = ['2','3A','3C','3B','4']
 latitud         = [43.421667,43.406667,43.393333,43.388333,43.363333]
 longitud        = [-8.436667,-8.416667,-8.4,-8.383333,-8.37]
 
@@ -225,6 +225,41 @@ conn.close()
 
 
 
+### Informacion de los controles de calidad que se pueden realizar ###
+
+indice       = [1,2]
+descripcion  = ['control_primario','control_secundario']
+
+instruccion_sql = '''INSERT INTO control_calidad_nutrientes (id_control,tipo_control)
+    VALUES (%s,%s) ON CONFLICT (id_control) DO NOTHING;''' 
+        
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()
+for idato in range(len(indice)):
+    
+    cursor.execute(instruccion_sql, (int(indice[idato]),descripcion[idato]))
+    conn.commit()
+cursor.close()
+conn.close()
+
+
+
+### Informacion de los controles de calidad que se pueden realizar ###
+
+indice       = [1,2]
+descripcion  = ['phts25p0_unpur','phts25p0_pur']
+
+instruccion_sql = '''INSERT INTO metodo_pH (id_metodo,metodo_pH)
+    VALUES (%s,%s) ON CONFLICT (id_metodo) DO NOTHING;''' 
+        
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()
+for idato in range(len(indice)):
+    
+    cursor.execute(instruccion_sql, (int(indice[idato]),descripcion[idato]))
+    conn.commit()
+cursor.close()
+conn.close()
 
 # ### Informacion de los indices de calidad utilizados ###
 
@@ -320,7 +355,7 @@ conn.close()
 
 
 parametros_muestreo      = ['nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','num_cast','presion_ctd','prof_referencia','botella','configuracion_perfilador','configuracion_superficie','programa','latitud','longitud']
-variables_biogeoquimicas = ['oxigeno_ctd','fluorescencia_ctd','oxigeno_wk','sio2','no3','no2','nh4','po4','clorofila_a','tcarbn','doc','cdom','alkali','phts25p0_unpur','phts25p0_pur','r_clor','r_per','co3_temp']
+variables_biogeoquimicas = ['oxigeno_ctd','fluorescencia_ctd','oxigeno_wk','tot_nit','sio2','no3','no2','nh4','po4','clorofila_a','tcarbn','doc','cdom','alkali','ph','r_clor','r_per','co3_temp']
 variables_fisicas        = ['temperatura_ctd','salinidad_ctd','par_ctd','turbidez_ctd']
 
 index                    = numpy.arange(0,len(variables_biogeoquimicas)) 
@@ -334,7 +369,6 @@ datos_variables = pandas.DataFrame(
 
 
 datos_variables = datos_variables.replace({numpy.nan: None})
-
 
 instruccion_sql = '''INSERT INTO variables_procesado (id_variable,parametros_muestreo,variables_fisicas,variables_biogeoquimicas)
     VALUES (%s,%s,%s,%s) ON CONFLICT (id_variable) DO UPDATE SET (parametros_muestreo,variables_fisicas,variables_biogeoquimicas) = ROW(EXCLUDED.parametros_muestreo,EXCLUDED.variables_fisicas,EXCLUDED.variables_biogeoquimicas);''' 

@@ -14,8 +14,11 @@ import psycopg2
 import pandas.io.sql as psql
 from sqlalchemy import create_engine
 import json
-import os
+import re
 
+import streamlit as st
+from FUNCIONES_AUXILIARES import init_connection
+import matplotlib.pyplot as plt
 
 pandas.options.mode.chained_assignment = None
 
@@ -98,12 +101,34 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
         if datos_radiales['fluorescencia_ctd'][idato] < 0:
             datos_radiales['fluorescencia_ctd'][idato]    = None 
             datos_radiales['fluorescencia_ctd_qf'][idato] = 9    
+            
+    # Determina el origen de los datos de pH
+    datos_radiales['ph']        = numpy.zeros(datos_radiales.shape[0])
+    datos_radiales['ph_qf']     = numpy.zeros(datos_radiales.shape[0],dtype=int)
+    datos_radiales['ph_metodo'] = numpy.zeros(datos_radiales.shape[0],dtype=int)
+
+    for idato in range(datos_radiales.shape[0]):
+        if datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato] != 9 and  datos_radiales['PHTS25P0_PUR_FLAG_W'][idato] == 9:
+            datos_radiales['ph'][idato] =  datos_radiales['PHTS25P0_UNPUR'][idato]
+            datos_radiales['ph_qf']     = datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato]
+            datos_radiales['ph_metodo'] = 1
+        if datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato] == 9 and  datos_radiales['PHTS25P0_PUR_FLAG_W'][idato] != 9:
+            datos_radiales['ph'][idato] =  datos_radiales['PHTS25P0_PUR'][idato]
+            datos_radiales['ph_qf']     = datos_radiales['PHTS25P0_PUR_FLAG_W'][idato]
+            datos_radiales['ph_metodo'] = 2
+        if datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato] == 9 and  datos_radiales['PHTS25P0_PUR_FLAG_W'][idato] == 9:
+            datos_radiales['ph'][idato] =  None
+            datos_radiales['ph_qf']     = 9
+            datos_radiales['ph_metodo'] = None
+            
+              
+    
         
     # Asigna el valor del cast. Si es un texto no asigna valor
-#    datos_radiales['num_cast'] = numpy.ones(datos_radiales.shape[0])
-    datos_radiales['num_cast'] = [None]*datos_radiales.shape[0]
+    datos_radiales['num_cast'] = numpy.ones(datos_radiales.shape[0],dtype=int)
+#    datos_radiales['num_cast'] = [None]*datos_radiales.shape[0]
         
-    datos_radiales = datos_radiales.drop(columns=['CTDOXY_CAL','CTDOXY_CAL_FLAG_W','CTDFLOUR_SCUFA', 'CTDFLUOR_AFL','CTDFLUOR_SP','CTDFLOUR_SCUFA_FLAG_W','CTDFLUOR_AFL_FLAG_W','CTDFLUOR_SP_FLAG_W'])
+    datos_radiales = datos_radiales.drop(columns=['CTDOXY_CAL','CTDOXY_CAL_FLAG_W','CTDFLOUR_SCUFA', 'CTDFLUOR_AFL','CTDFLUOR_SP','CTDFLOUR_SCUFA_FLAG_W','CTDFLUOR_AFL_FLAG_W','CTDFLUOR_SP_FLAG_W','PHTS25P0_UNPUR','PHTS25P0_UNPUR_FLAG_W','PHTS25P0_PUR','PHTS25P0_PUR_FLAG_W'])
      
     # Renombra las columnas para mantener un mismo esquema de nombres   
     datos_radiales = datos_radiales.rename(columns={"DATE": "fecha_muestreo", "STNNBR": "estacion", 'EXPOCODE':'nombre_muestreo',
@@ -112,8 +137,7 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
                                                     "CTDOXY":"oxigeno_ctd","CTDOXY_FLAG_W":"oxigeno_ctd_qf","CTDPAR":"par_ctd","CTDPAR_FLAG_W":"par_ctd_qf",
                                                     "CTDTURB":"turbidez_ctd","CTDTURB_FLAG_W":"turbidez_ctd_qf","OXYGEN":"oxigeno_wk","OXYGEN_FLAG_W":"oxigeno_wk_qf",
                                                     "SILCAT":"sio2","SILCAT_FLAG_W":"sio2_qf","NITRAT":"no3","NITRAT_FLAG_W":"no3_qf","NITRIT":"no2","NITRIT_FLAG_W":"no2_qf",
-                                                    "PHSPHT":"po4","PHSPHT_FLAG_W":"po4_qf","TCARBN":"tcarbn","TCARBN_FLAG_W":"tcarbn_qf","ALKALI":"alkali","ALKALI_FLAG_W":"alkali_qf",
-                                                    "PHTS25P0_UNPUR":"phts25p0_unpur","PHTS25P0_UNPUR_FLAG_W":"phts25p0_unpur_qf","PHTS25P0_PUR":"phts25p0_pur","PHTS25P0_PUR_FLAG_W":"phts25p0_pur_qf",
+                                                    "PHSPHT":"po4","PHSPHT_FLAG_W":"po4_qf","TCARBN":"tcarbn","TCARBN_FLAG_W":"tcarbn_qf","ALKALI":"alkali","ALKALI_FLAG_W":"alkali_qf",                                                   
                                                     "R_CLOR":"r_clor","R_CLOR_FLAG_W":"r_clor_qf","R_PER":"r_per","R_PER_FLAG_W":"r_per_qf","CO3_TMP":"co3_temp"
                                                     })    
     
@@ -187,12 +211,17 @@ def lectura_datos_pelacus(nombre_archivo):
     datos_pelacus = datos_pelacus.drop(columns=['Prof_est','Prof_real', 'Prof_teor.'])  
   
     # Asigna el valor del cast. Si es un texto no asigna valor
-    datos_pelacus['num_cast'] = numpy.ones(datos_pelacus.shape[0])
+    
+#    import re
+#>>> re.findall(r'\d+', "hello 42 I'm a 32 string 30")
+
+    datos_pelacus['num_cast'] = numpy.ones(datos_pelacus.shape[0],dtype=int)
     for idato in range(datos_pelacus.shape[0]):
         try: # Si es entero
-            datos_pelacus['num_cast'][idato] = int(datos_pelacus['cast'][idato])           
+            texto       = datos_pelacus['cast'][idato]      
+            datos_pelacus['num_cast'][idato] = int(re.findall(r'\d+',texto)[0])            
         except:
-            pass
+            datos_pelacus['num_cast'][idato] = None
 
     # Asigna el identificador de cada muestreo siguiendo las indicaciones de EXPOCODE. 
     datos_pelacus['nombre_muestreo'] = [None]*datos_pelacus.shape[0]
@@ -324,7 +353,7 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
     variables_muestreo = [x for x in tabla_variables['parametros_muestreo'] if str(x) != 'None']
     variables_fisicas  = [x for x in tabla_variables['variables_fisicas'] if str(x) != 'None']    
     variables_biogeoquimicas  = [x for x in tabla_variables['variables_biogeoquimicas'] if str(x) != 'None'] 
-    
+        
     listado_completo = variables_muestreo
     
     # Comprueba que las variables relacionadas con el muestreo están incluidas,añadiéndolas si no es así.
@@ -359,6 +388,17 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
             datos[qf_variable] = None 
     
         listado_completo.extend([variables_biogeoquimicas[ivariable_biogeoquimica],qf_variable])
+        
+    # Mismo proceso para las variables pH_metodo y cc_nutrientes
+    variables_control = ['ph_metodo','cc_nutrientes']
+    for ivariable_control in range(len(variables_control)):
+
+        if variables_control[ivariable_control] not in datos:
+
+            datos[variables_control[ivariable_control]] = None 
+            
+        listado_completo.extend([variables_control[ivariable_control]])
+    
     
     # Reordena las columnas del dataframe para que tengan el mismo orden que el listado de variables
     datos = datos.reindex(columns=listado_completo)
@@ -405,13 +445,14 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
         # Valores nulos asigna un 9 en el QF
         qf_variable = variables_fisicas[ivariable_fisica] + '_qf'
         datos.loc[datos[variables_fisicas[ivariable_fisica]].isnull(),qf_variable] = 9
-    
+
     for ivariable_biogeoquimica in range(len(variables_biogeoquimicas)):
         # Valores negativos asigna None
         datos[variables_biogeoquimicas[ivariable_biogeoquimica]][datos[variables_biogeoquimicas[ivariable_biogeoquimica]]<0] = None
         # Valores nulos asigna un 9 en el QF
         qf_variable = variables_biogeoquimicas[ivariable_biogeoquimica] + '_qf'
         datos.loc[datos[variables_biogeoquimicas[ivariable_biogeoquimica]].isnull(),qf_variable] = 9
+
 
     return datos,textos_aviso    
  
@@ -685,7 +726,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
 ######## FUNCION PARA ENCONTRAR EL IDENTIFICADOR DE CADA REGISTRO  ########
 ###########################################################################
 
-def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto):
+def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto):
     
     # Recupera la tabla con los registros de los muestreos
     con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
@@ -710,14 +751,20 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
         exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
         for idato in range(exporta_registros.shape[0]):    
             nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == datos['id_estacion_temp'][idato]]['nombre_estacion'].iloc[0]
-            if datos['prof_referencia'][idato] is not None:
-                str_profundidad = str(round(datos['prof_referencia'][idato]))
-            else:
-                str_profundidad = str(round(datos['presion_ctd'][idato]))                
+            
+            nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'][idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
+            if datos['num_cast'][idato] is not None:
+                nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'][idato]))
+            if datos['botella'][idato] is not None:
+                nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'][idato]))                
                 
-            #exporta_registros['nombre_muestreo'][idato]  = nombre_programa + '_' + datos['fecha_muestreo'][idato].strftime("%Y_%m_%d")  + '_EST_' + str(nombre_estacion) + '_P_' + str_profundidad
+            exporta_registros['nombre_muestreo'][idato]  = nombre_muestreo
 
-            exporta_registros['nombre_muestreo'][idato]  = tabla_salidas['nombre_salida'][tabla_salidas['id_salida']==exporta_registros['salida_mar'][idato]].iloc[0] + ' ' + str(nombre_estacion) + ' P' + str_profundidad            
+            # if datos['prof_referencia'][idato] is not None:
+            #     str_profundidad = str(round(datos['prof_referencia'][idato]))
+            # else:
+            #     str_profundidad = str(round(datos['presion_ctd'][idato])) 
+            #exporta_registros['nombre_muestreo'][idato]  = tabla_salidas['nombre_salida'][tabla_salidas['id_salida']==exporta_registros['salida_mar'][idato]].iloc[0] + ' E' + str(nombre_estacion) + ' P' + str_profundidad            
             
             datos['id_muestreo_temp'] [idato]            = idato + 1
             
@@ -764,13 +811,21 @@ def evalua_registros(datos,nombre_programa,direccion_host,base_datos,usuario,con
             exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
             for idato in range(exporta_registros.shape[0]):    
                 nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == datos['id_estacion_temp'][idato]]['nombre_estacion'].iloc[0]
-                if datos['prof_referencia'][idato] is not None:
-                    str_profundidad = str(round(datos['prof_referencia'][idato]))
-                else:
-                    str_profundidad = str(round(datos['presion_ctd'][idato]))                
- 
-                #exporta_registros['nombre_muestreo'][idato]  = nombre_programa + '_' + datos['fecha_muestreo'][idato].strftime("%Y_%m_%d")  + '_EST_' + str(nombre_estacion) + '_P_' + str_profundidad
-                exporta_registros['nombre_muestreo'][idato]  = tabla_salidas['nombre_salida'][tabla_salidas['id_salida']==exporta_registros['salida_mar'][idato]].iloc[0] + ' ' + str(nombre_estacion) + ' P' + str_profundidad            
+              
+                nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'][idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
+                if datos['num_cast'][idato] is not None:
+                    nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'][idato]))
+                if datos['botella'][idato] is not None:
+                    nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'][idato]))                
+                 
+                exporta_registros['nombre_muestreo'][idato]  = nombre_muestreo
+                
+                
+                # if datos['prof_referencia'][idato] is not None:
+                #     str_profundidad = str(round(datos['prof_referencia'][idato]))
+                # else:
+                #     str_profundidad = str(round(datos['presion_ctd'][idato]))  
+                #exporta_registros['nombre_muestreo'][idato]  = tabla_salidas['nombre_salida'][tabla_salidas['id_salida']==exporta_registros['salida_mar'][idato]].iloc[0] + ' ' + str(nombre_estacion) + ' P' + str_profundidad            
 
 
             # # Inserta el dataframe resultante en la base de datos 
@@ -855,8 +910,8 @@ def inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrase
     
     # Genera un dataframe solo con las variales biogeoquimicas de los datos a importar 
     datos_biogeoquimica = datos[['id_muestreo_temp','fluorescencia_ctd','fluorescencia_ctd_qf','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk_qf',
-                                 'no3','no3_qf','no2','no2_qf','nh4','nh4_qf','po4','po4_qf','sio2','sio2_qf','tcarbn','tcarbn_qf','doc','doc_qf',
-                                 'cdom','cdom_qf','clorofila_a','clorofila_a_qf','alkali','alkali_qf','phts25p0_unpur','phts25p0_unpur_qf','phts25p0_pur','phts25p0_pur_qf','r_clor','r_clor_qf','r_per','r_per_qf','co3_temp']]    
+                                 'tot_nit','tot_nit_qf','no3','no3_qf','no2','no2_qf','nh4','nh4_qf','po4','po4_qf','sio2','sio2_qf','tcarbn','tcarbn_qf','doc','doc_qf',
+                                 'cdom','cdom_qf','clorofila_a','clorofila_a_qf','alkali','alkali_qf','ph','ph_qf','ph_metodo','r_clor','r_clor_qf','r_per','r_per_qf','co3_temp']]    
     datos_biogeoquimica = datos_biogeoquimica.rename(columns={"id_muestreo_temp": "muestreo"})
     
     # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
@@ -986,16 +1041,22 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
     cursor = conn.cursor()
     
-    # Identificador del programa (RADIAL CORUNA en este caso)
+    # Identificador del programa 
     instruccion_sql = "SELECT id_programa FROM programas WHERE nombre_programa = '" + nombre_programa + "';"
     cursor.execute(instruccion_sql)
     id_programa =cursor.fetchone()[0]
     conn.commit()
+
+    # Abrevatura del programa 
+    instruccion_sql = "SELECT abreviatura FROM programas WHERE nombre_programa = '" + nombre_programa + "';"
+    cursor.execute(instruccion_sql)
+    abreviatura_programa =cursor.fetchone()[0]
+    conn.commit()    
     
     cursor.close()
     conn.close()    
 
-    return id_programa
+    return id_programa,abreviatura_programa
 
 
 
@@ -1212,6 +1273,232 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
         
     return mensaje_error,datos_botellas,io_par,io_fluor,io_O2
 
+
+######################################################################
+######## FUNCION PARA LEER DATOS DE BOTELLAs (ARCHIVOS .BTL)  ########
+######################################################################
+def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_variables,listado_variables_bd,df_estaciones_muestreadas,direccion_host,base_datos,usuario,contrasena,puerto):
+
+    # Recupera los datos disponibles en la base de datos
+    conn                      = init_connection()
+    df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+    df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+    df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
+    conn.close()
+
+    # Genera listados de salidas y estaciones, para los menús desplegables    
+    nombres_salidas            = df_salidas_muestreadas['nombre_salida'].tolist()
+    listado_salidas            = df_salidas_muestreadas['id_salida'].tolist()
+
+    nombres_estaciones         = df_estaciones_muestreadas['nombre_estacion'].tolist()
+    listado_estaciones         = df_estaciones_muestreadas['id_estacion'].tolist()
+
+    ### CONTROL DE CALIDAD DE LOS DATOS
+
+    # Despliega menús de selección de la variable, salida y la estación a controlar                
+    col1, col2 = st.columns(2,gap="small")
+    with col1: 
+        
+        salida_seleccionada   = st.selectbox('Salida',(nombres_salidas))
+        indice_salida         = listado_salidas[nombres_salidas.index(salida_seleccionada)]
+
+        variable_seleccionada  = st.selectbox('Variable',(listado_variables))
+        indice_variable        = listado_variables.index(variable_seleccionada)
+        
+
+   
+    with col2:
+        estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
+        indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
+        
+        meses_offset           = st.number_input('Intervalo meses:',value=1)
+    
+    # Selecciona los datos correspondientes a la estación y salida seleccionada
+    df_seleccion               = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
+    
+
+    # Recupera los datos disponibles de la misma estación, para la misma variable
+    listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
+    df_disponible_bd           = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos_estacion)]
+    
+    df_disponible_bd            = df_disponible_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
+    df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bd, on="id_muestreo")
+   
+    # Determina los meses que marcan el rango de busqueda
+    df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
+    fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0][0] - datetime.timedelta(days=meses_offset*30)
+    fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1][0] + datetime.timedelta(days=meses_offset*30)  
+
+    if fecha_minima.year < fecha_maxima.year:
+        listado_meses_1 = numpy.arange(fecha_minima.month,13)
+        listado_meses_2 = numpy.arange(1,fecha_maxima.month+1)
+        listado_meses   = numpy.concatenate((listado_meses_1,listado_meses_2))
+    
+    else:
+        listado_meses   = numpy.arange(fecha_minima.month,fecha_maxima.month+1)
+ 
+    listado_meses = listado_meses.tolist()
+   
+    
+    # Busca los datos de la base de datos dentro del rango de meses seleccionados
+    df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
+    for idato in range(df_disponible_bd.shape[0]):
+        if (df_disponible_bd['fecha_muestreo'].iloc[idato]).month in listado_meses:
+            df_disponible_bd['io_fecha'].iloc[idato] = 1
+            
+    df_rango_temporal = df_disponible_bd[df_disponible_bd['io_fecha']==1]
+
+    ################# GRAFICOS ################
+
+    # Representa un gráfico con la variable seleccionada junto a los oxígenos
+    fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.05, 'hspace':0}, width_ratios=[3, 1])
+   
+    ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0')
+    ax.plot(df_rango_temporal[listado_variables_bd[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040')
+    ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r' )
+    texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
+    ax.set(xlabel=texto_eje)
+    ax.set(ylabel='Presion (db)')
+    ax.invert_yaxis()
+    rango_profs = ax.get_ylim()
+    # Añade el nombre de cada punto
+    nombre_muestreos = [None]*df_seleccion.shape[0]
+    for ipunto in range(df_seleccion.shape[0]):
+        if df_seleccion['id_botella'].iloc[ipunto] is None:
+            nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+        else:
+            nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+        ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
+   
+    az.plot(df_seleccion['Oxigeno'],df_seleccion['presion_ctd'],'.',color='#006633')
+    az.set(xlabel='Oxigeno (\u03BCmol/kg)')
+    az.yaxis.set_visible(False)
+    az.invert_yaxis()
+    az.set_ylim(rango_profs)
+
+    st.pyplot(fig)
+    
+    # Gráficos particulares para cada variable
+    if variable_seleccionada == 'FOSFATO':
+
+        fig, ax = plt.subplots()       
+        ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
+        ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
+        ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
+        ax.set(xlabel='Nitrato (\u03BCmol/kg)')
+        ax.set(ylabel='Fosfato (\u03BCmol/kg)')
+
+        # Añade el nombre de cada punto
+        nombre_muestreos = [None]*df_seleccion.shape[0]
+        for ipunto in range(df_seleccion.shape[0]):
+            if df_seleccion['id_botella'].iloc[ipunto] is None:
+                nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+            else:
+                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+            ax.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
+       
+        st.pyplot(fig)
+    
+    elif variable_seleccionada == 'NITRATO':
+
+        fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
+        ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
+        ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
+        ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
+        ax.set(xlabel='Nitrato (\u03BCmol/kg)')
+        ax.set(ylabel='Fosfato (\u03BCmol/kg)')
+
+        # Añade el nombre de cada punto
+        nombre_muestreos = [None]*df_seleccion.shape[0]
+        for ipunto in range(df_seleccion.shape[0]):
+            if df_seleccion['id_botella'].iloc[ipunto] is None:
+                nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+            else:
+                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+            ax.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
+
+        az.plot(df_disponible_bd['no3'],df_disponible_bd['phts25p0_unpur'],'.',color='#C0C0C0')
+        az.plot(df_rango_temporal['no3'],df_rango_temporal['phts25p0_unpur'],'.',color='#404040')
+        az.plot(df_disponible_bd['no3'],df_disponible_bd['phts25p0_pur'],'.',color='#C0C0C0')
+        az.plot(df_rango_temporal['no3'],df_rango_temporal['phts25p0_pur'],'.',color='#404040')
+        az.plot(df_seleccion['NITRATO'],df_seleccion['pH'],'.r' )
+        az.set(xlabel='Nitrato (\u03BCmol/kg)')
+        az.set(ylabel='pH')
+        az.yaxis.tick_right()
+        az.yaxis.set_label_position("right")
+
+        # Añade el nombre de cada punto
+        nombre_muestreos = [None]*df_seleccion.shape[0]
+        for ipunto in range(df_seleccion.shape[0]):
+            if df_seleccion['id_botella'].iloc[ipunto] is None:
+                nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+            else:
+                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+            az.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['pH'].iloc[ipunto]))
+ 
+
+        st.pyplot(fig)
+  
+    
+    # Gráficos particulares para cada variable
+    elif variable_seleccionada == 'SILICATO':
+
+        fig, ax = plt.subplots()       
+        ax.plot(df_disponible_bd['sio2'],df_disponible_bd['alkali'],'.',color='#C0C0C0')
+        ax.plot(df_rango_temporal['sio2'],df_rango_temporal['alkali'],'.',color='#404040')
+        ax.plot(df_seleccion['SILICATO'],df_seleccion['Alcalinidad'],'.r' )
+        ax.set(xlabel='Silicato (\u03BCmol/kg)')
+        ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')
+
+        # Añade el nombre de cada punto
+        nombre_muestreos = [None]*df_seleccion.shape[0]
+        for ipunto in range(df_seleccion.shape[0]):
+            if df_seleccion['id_botella'].iloc[ipunto] is None:
+                nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+            else:
+                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+            ax.annotate(nombre_muestreos[ipunto], (df_seleccion['SILICATO'].iloc[ipunto], df_seleccion['Alcalinidad'].iloc[ipunto]))
+       
+        st.pyplot(fig)
+    
+    
+    ################# FORMULARIOS CALIDAD ################        
+
+    # Formulario para asignar banderas de calidad
+    with st.form("Formulario", clear_on_submit=False):
+                  
+        indice_validacion = df_indices_calidad['indice'].tolist()
+        texto_indice      = df_indices_calidad['descripcion'].tolist()
+        qf_asignado       = numpy.zeros(df_seleccion.shape[0])
+       
+        for idato in range(df_seleccion.shape[0]):
+           
+            enunciado          = 'QF del muestreo ' + nombre_muestreos[idato]
+            valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
+            qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
+       
+        io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
+
+    if io_envio:
+
+        with st.spinner('Actualizando la base de datos'):
+       
+            # Introducir los valores en la base de datos
+            conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()  
+   
+            for idato in range(df_seleccion.shape[0]):
+
+                instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables_bd[indice_variable] + ' = %s, ' + listado_variables_bd[indice_variable] +  '_qf = %s WHERE id_disc_biogeoquim = %s;'
+                cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['id_muestreo_bgq'].iloc[idato])))
+                conn.commit() 
+
+            cursor.close()
+            conn.close()   
+
+        texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
+        st.success(texto_exito)
+   
 
 
 

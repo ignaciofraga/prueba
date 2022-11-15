@@ -471,7 +471,57 @@ conn.close()
 
 
 
+### TABLAS CON TIPOS DE PROCESADO
 
+## TABLA CON CONTROL CALIDAD APLICADO A DATO DE NUTRIENTE ##
+
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()
+
+nombre_tabla = 'control_calidad_nutrientes'
+
+# Borra la table si ya existía
+instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+cursor.execute(instruccion_sql)
+conn.commit()
+
+listado_variables = ('(id_control int PRIMARY KEY,'
+' tipo_control text NOT NULL,'
+) 
+
+listado_unicidades = (' UNIQUE (id_control))')
+
+instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
+cursor.execute(instruccion_sql)
+conn.commit()
+cursor.close()
+conn.close()
+
+
+
+## TABLA CON CONTROL CALIDAD APLICADO A DATO DE NUTRIENTE ##
+
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()
+
+nombre_tabla = 'metodo_pH'
+
+# Borra la table si ya existía
+instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+cursor.execute(instruccion_sql)
+conn.commit()
+
+listado_variables = ('(id_metodo int PRIMARY KEY,'
+' metodo_pH text NOT NULL,'
+) 
+
+listado_unicidades = (' UNIQUE (id_metodo))')
+
+instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
+cursor.execute(instruccion_sql)
+conn.commit()
+cursor.close()
+conn.close()
 
 
 
@@ -508,6 +558,8 @@ listado_variables = ('(id_disc_biogeoquim SERIAL PRIMARY KEY,'
 ' oxigeno_ctd_qf int DEFAULT 9,'
 ' oxigeno_wk NUMERIC (4, 1),'
 ' oxigeno_wk_qf int DEFAULT 9,'
+' tot_nit NUMERIC (5, 2),'
+' tot_nit_qf int DEFAULT 9,'
 ' no3 NUMERIC (5, 2),'
 ' no3_qf int DEFAULT 9,'
 ' no2 NUMERIC (5, 2),'
@@ -518,6 +570,7 @@ listado_variables = ('(id_disc_biogeoquim SERIAL PRIMARY KEY,'
 ' po4_qf int DEFAULT 9,'
 ' sio2 NUMERIC (5, 2),'
 ' sio2_qf int DEFAULT 9,'
+' cc_nutrientes int DEFAULT 1,'
 ' tcarbn NUMERIC (6, 1),'
 ' tcarbn_qf int DEFAULT 9,'
 ' doc NUMERIC (6, 3),'
@@ -528,10 +581,9 @@ listado_variables = ('(id_disc_biogeoquim SERIAL PRIMARY KEY,'
 ' clorofila_a_qf int DEFAULT 9,'
 ' alkali NUMERIC (9, 4),'
 ' alkali_qf int DEFAULT 9,'
-' phts25p0_unpur NUMERIC (5, 4),'
-' phts25p0_unpur_qf int DEFAULT 9,'
-' phts25p0_pur NUMERIC (5, 4),'
-' phts25p0_pur_qf int DEFAULT 9,'
+' ph NUMERIC (5, 4),'
+' ph_qf int DEFAULT 9,'
+' ph_metodo int DEFAULT 1,'
 ' r_clor NUMERIC (10, 8),'
 ' r_clor_qf int DEFAULT 9,'
 ' r_per NUMERIC (10, 8),'
@@ -541,6 +593,12 @@ listado_variables = ('(id_disc_biogeoquim SERIAL PRIMARY KEY,'
 
 listado_dependencias = ('FOREIGN KEY (muestreo)'
 'REFERENCES muestreos_discretos (id_muestreo)'
+'ON UPDATE CASCADE ON DELETE CASCADE,'
+'FOREIGN KEY (cc_nutrientes)'
+'REFERENCES control_calidad_nutrientes (id_control)'
+'ON UPDATE CASCADE ON DELETE CASCADE,'
+'FOREIGN KEY (pH_metodo)'
+'REFERENCES metodo_pH (id_metodo)'
 'ON UPDATE CASCADE ON DELETE CASCADE'
 )
 
@@ -552,7 +610,19 @@ conn.commit()
 cursor.close()
 conn.close()
 
+# listado_dependencias = ('FOREIGN KEY (centro_asociado)'
+#   'REFERENCES centros_oceanograficos (id_centro)'
+#   ' ON UPDATE CASCADE '
+#   'ON DELETE CASCADE,'
+#   'FOREIGN KEY (buque)'
+#   'REFERENCES buques (id_buque)'
+#   'ON UPDATE CASCADE ON DELETE CASCADE'
+#   )
 
+# ' phts25p0_unpur NUMERIC (5, 4),'
+# ' phts25p0_unpur_qf int DEFAULT 9,'
+# ' phts25p0_pur NUMERIC (5, 4),'
+# ' phts25p0_pur_qf int DEFAULT 9,'
 
 ################################################################
 ## TABLA CON DATOS FISICOS PROCEDENTES DE MUESTREOS PUNTUALES ##

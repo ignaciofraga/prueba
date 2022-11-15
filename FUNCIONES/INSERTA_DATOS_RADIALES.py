@@ -60,7 +60,7 @@ for iarchivo in range(len(listado_archivos)):
     datos_radiales_corregido,textos_aviso = FUNCIONES_INSERCION.control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)  
 
     # Recupera el identificador del programa de muestreo
-    id_programa = FUNCIONES_INSERCION.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+    id_programa,abreviatura_programa = FUNCIONES_INSERCION.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
     
     # Encuentra la estación asociada a cada registro
     print('Asignando la estación correspondiente a cada medida')
@@ -72,7 +72,7 @@ for iarchivo in range(len(listado_archivos)):
  
     # Encuentra el identificador asociado a cada registro
     print('Asignando el registro correspondiente a cada medida')
-    datos_radiales_corregido = FUNCIONES_INSERCION.evalua_registros(datos_radiales_corregido,programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+    datos_radiales_corregido = FUNCIONES_INSERCION.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
    
     # # # # Introduce los datos en la base de datos
     print('Introduciendo los datos en la base de datos')
@@ -82,11 +82,11 @@ for iarchivo in range(len(listado_archivos)):
     FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_radiales_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
 
 
-    # Actualiza estado
-    print('Actualizando el estado de los procesos')
-    FUNCIONES_INSERCION.actualiza_estado(datos_radiales_corregido,fecha_actualizacion,id_programa,programa_muestreo,itipo_informacion,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
+    # # Actualiza estado
+    # print('Actualizando el estado de los procesos')
+    # FUNCIONES_INSERCION.actualiza_estado(datos_radiales_corregido,fecha_actualizacion,id_programa,programa_muestreo,itipo_informacion,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
 
-    print('Procesado del año ', nombre_archivo[-9:-5], ' terminado')
+    # print('Procesado del año ', nombre_archivo[-9:-5], ' terminado')
     
 print('Fin del procesado de todos los datos disponibles')
   

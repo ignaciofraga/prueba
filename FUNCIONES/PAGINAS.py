@@ -1857,7 +1857,7 @@ def entrada_botellas():
         with col1: 
             programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
             df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
-            
+            abreviatura_programa      = df_programas['abreviatura'][['nombre_programa']==programa_seleccionado]            
         
         with col2:
             tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
@@ -1920,7 +1920,7 @@ def entrada_botellas():
                             datos_botellas ['id_salida'] =  id_salida
                 
                             # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-                            datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+                            datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
                 
                 
                             # Inserta datos físicos
@@ -2290,529 +2290,398 @@ def procesado_nutrientes():
     conn.close()     
     
     
-    variables_run = ['TON','NITRITO','SILICATO','FOSFATO']    
+    # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
+    acciones     = ['Procesar salidas del AA', 'Realizar control de calidad de datos disponibles']
+    tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
+    
 
-
-    # # Despliega un formulario para subir los archivos del AA y las referencias
-    # with st.form("my-form", clear_on_submit=False):
+    # Añade datos de botellas
+    if tipo_accion == acciones[0]:
         
-    with st.sidebar:
+        
+        variables_run = ['TON','NITRITO','SILICATO','FOSFATO']    
+    
+    
+        # Despliega un formulario para subir los archivos del AA y las referencias
+        temperatura_laboratorio  = st.number_input('Temperatura laboratorio:',value=20)
         archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
         archivo_refs             = st.file_uploader("Arrastra o selecciona los archivos con las referencias", accept_multiple_files=False)
-        temperatura_laboratorio = st.number_input('Temperatura laboratorio:',value=20)
-
-    #     envio = st.form_submit_button("Procesar el archivo subido")
-
-    if archivo_AA is not None and archivo_refs is not None:
-
-        # Lectura del archivo con las referencias
-        df_referencias        = pandas.read_excel(archivo_refs)   
-    
-        # Lectura del archivo con los resultados del AA
-        datos_brutos=pandas.read_excel(archivo_AA,skiprows=15)
-        
-        # Cambia los nombres de cada variable analizada
-        datos_AA      = datos_brutos.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
-    
-        # Predimensiona columnas en las que guardar información de salinidad y densidad    
-        datos_AA['Densidad']    = numpy.ones(datos_AA.shape[0])
-        datos_AA['Salinidad']   = numpy.ones(datos_AA.shape[0])
-        
-        # Genera un dataframe en el que se almacenarán los resultados de las correcciones aplicadas. 
-        datos_corregidos    = pandas.DataFrame(columns=variables_run)
-        # Añade columnas con variables a utilizar en el control de calidad posterior 
-        datos_corregidos['muestreo']        = [None]*datos_AA.shape[0]
-        datos_corregidos['presion_ctd']     = [None]*datos_AA.shape[0]
-        datos_corregidos['pH']              = [None]*datos_AA.shape[0]
-        datos_corregidos['Alcalinidad']     = [None]*datos_AA.shape[0]
-        datos_corregidos['Oxigeno']         = [None]*datos_AA.shape[0]  
-        datos_corregidos['id_estacion']     = numpy.zeros(datos_AA.shape[0],dtype=int)
-        datos_corregidos['id_salida']       = numpy.zeros(datos_AA.shape[0],dtype=int)
-        datos_corregidos['id_botella']      = numpy.zeros(datos_AA.shape[0],dtype=int)
-        datos_corregidos['id_muestreo_bgq'] = numpy.zeros(datos_AA.shape[0],dtype=int)
-        datos_corregidos['fecha_muestreo']  = [None]*datos_AA.shape[0] 
-    
-        # Busca los datos de cada tubo analizada en el AA
-        for idato in range(datos_AA.shape[0]):
             
-            if datos_AA['Sample ID'].iloc[idato] == 'RMN Low' : # Tubo correspondiente a referencia (RMN)
-                datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
-                
-            elif datos_AA['Sample ID'].iloc[idato] == 'RMN High': # Tubo correspondiente a referencia (RMN)
-                datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
-            
-            else:   # Resto de tubos
-                id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
-                
-                if len(id_temp) > 0:
-                    indice                                         = id_temp.iloc[0]
-                    datos_AA['Salinidad'].iloc[idato]              = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
+        if archivo_AA is not None and archivo_refs is not None:
     
-                    datos_corregidos['muestreo'].iloc[idato]       = indice
-                    datos_corregidos['presion_ctd'].iloc[idato]    = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
-                    datos_corregidos['id_salida'].iloc[idato]      = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice]
-                    datos_corregidos['id_botella'].iloc[idato]     = df_muestreos['botella'][df_muestreos['id_muestreo']==indice]
-                    datos_corregidos['fecha_muestreo'].iloc[idato] = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice]
-                                        
-                    datos_corregidos['id_muestreo_bgq'].iloc[idato] = df_datos_biogeoquimicos['id_disc_biogeoquim'][df_datos_biogeoquimicos['muestreo']==indice]
-                    ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==indice]
-                    ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_biogeoquimicos['muestreo']==indice]
-                    if ph_unpur is not None:
-                        datos_corregidos['pH'].iloc[idato]      = ph_unpur
-                    if ph_pur is not None:
-                        datos_corregidos['pH'].iloc[idato]      = ph_pur 
-                                            
-                    datos_corregidos['Alcalinidad'].iloc[idato] = df_datos_biogeoquimicos['alkali'][df_datos_biogeoquimicos['muestreo']==indice]
+            # Lectura del archivo con las referencias
+            df_referencias        = pandas.read_excel(archivo_refs)   
+        
+            # Lectura del archivo con los resultados del AA
+            datos_brutos=pandas.read_excel(archivo_AA,skiprows=15)
+            
+            # Cambia los nombres de cada variable analizada
+            datos_AA      = datos_brutos.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
+        
+            # Predimensiona columnas en las que guardar información de salinidad y densidad    
+            datos_AA['Densidad']    = numpy.ones(datos_AA.shape[0])
+            datos_AA['Salinidad']   = numpy.ones(datos_AA.shape[0])
+            
+            # Genera un dataframe en el que se almacenarán los resultados de las correcciones aplicadas. 
+            datos_corregidos    = pandas.DataFrame(columns=variables_run)
+            # Añade columnas con variables a utilizar en el control de calidad posterior 
+            datos_corregidos['muestreo']        = [None]*datos_AA.shape[0]
+            datos_corregidos['presion_ctd']     = [None]*datos_AA.shape[0]
+            datos_corregidos['pH']              = [None]*datos_AA.shape[0]
+            datos_corregidos['Alcalinidad']     = [None]*datos_AA.shape[0]
+            datos_corregidos['Oxigeno']         = [None]*datos_AA.shape[0]  
+            datos_corregidos['id_estacion']     = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['id_salida']       = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['id_botella']      = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['id_muestreo_bgq'] = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['fecha_muestreo']  = [None]*datos_AA.shape[0] 
+        
+            # Busca los datos de cada tubo analizada en el AA
+            for idato in range(datos_AA.shape[0]):
+                
+                if datos_AA['Sample ID'].iloc[idato] == 'RMN Low' : # Tubo correspondiente a referencia (RMN)
+                    datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
                     
-                    oxi_ctd = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==indice]
-                    oxi_wk  = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_biogeoquimicos['muestreo']==indice]
-                    if oxi_ctd is not None:
-                        datos_corregidos['Oxigeno'].iloc[idato]  = oxi_ctd
-                    if oxi_wk is not None:
-                        datos_corregidos['Oxigeno'].iloc[idato]  = oxi_wk 
+                elif datos_AA['Sample ID'].iloc[idato] == 'RMN High': # Tubo correspondiente a referencia (RMN)
+                    datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+                
+                else:   # Resto de tubos
+                    id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
+                    
+                    if len(id_temp) > 0:
+                        indice                                         = id_temp.iloc[0]
+                        datos_AA['Salinidad'].iloc[idato]              = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
+        
+                        datos_corregidos['muestreo'].iloc[idato]       = indice
+                        datos_corregidos['presion_ctd'].iloc[idato]    = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
+                        datos_corregidos['id_salida'].iloc[idato]      = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice]
+                        datos_corregidos['id_botella'].iloc[idato]     = df_muestreos['botella'][df_muestreos['id_muestreo']==indice]
+                        datos_corregidos['fecha_muestreo'].iloc[idato] = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice]
+                                            
+                        datos_corregidos['id_muestreo_bgq'].iloc[idato] = df_datos_biogeoquimicos['id_disc_biogeoquim'][df_datos_biogeoquimicos['muestreo']==indice]
+                        ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==indice]
+                        ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_biogeoquimicos['muestreo']==indice]
+                        if ph_unpur is not None:
+                            datos_corregidos['pH'].iloc[idato]      = ph_unpur
+                        if ph_pur is not None:
+                            datos_corregidos['pH'].iloc[idato]      = ph_pur 
+                                                
+                        datos_corregidos['Alcalinidad'].iloc[idato] = df_datos_biogeoquimicos['alkali'][df_datos_biogeoquimicos['muestreo']==indice]
                         
-                    datos_corregidos['id_estacion'].iloc[idato] =  df_muestreos['estacion'][df_muestreos['id_muestreo']==indice]
+                        oxi_ctd = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==indice]
+                        oxi_wk  = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_biogeoquimicos['muestreo']==indice]
+                        if oxi_ctd is not None:
+                            datos_corregidos['Oxigeno'].iloc[idato]  = oxi_ctd
+                        if oxi_wk is not None:
+                            datos_corregidos['Oxigeno'].iloc[idato]  = oxi_wk 
+                            
+                        datos_corregidos['id_estacion'].iloc[idato] =  df_muestreos['estacion'][df_muestreos['id_muestreo']==indice]
+                    
+                        datos_AA['Densidad'].iloc[idato]    = (999.1+0.77*((datos_AA['Salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+                       
+            # Asigna el identificador de cada registro al dataframe en el que se guardarán los resultados
+            datos_corregidos['tubo'] = datos_AA['Sample ID']
+                                 
+            # Aplica la corrección de drift de cada variable
+            for ivariable in range(len(variables_run)):
+        
+                valores_brutos = datos_AA[variables_run[ivariable]] # Selecciona la variable y convierte a concentraciones
+                densidades     = datos_AA['Densidad']
                 
-                    datos_AA['Densidad'].iloc[idato]    = (999.1+0.77*((datos_AA['Salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
-                   
-        # Asigna el identificador de cada registro al dataframe en el que se guardarán los resultados
-        datos_corregidos['tubo'] = datos_AA['Sample ID']
-                             
-        # Aplica la corrección de drift de cada variable
-        for ivariable in range(len(variables_run)):
-    
-            valores_brutos = datos_AA[variables_run[ivariable]] # Selecciona la variable y convierte a concentraciones
-            densidades     = datos_AA['Densidad']
-            
-            valores_concentraciones = valores_brutos / densidades
-            
-            # Concentraciones de las referencias
-            RMN_CE_variable = df_referencias[variables_run[ivariable]][0] 
-            RMN_CI_variable = df_referencias[variables_run[ivariable]][1]     
-    
-            # Encuentra las posiciones de los RMNs
-            posicion_RMN_bajos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN Low']
-            posicion_RMN_altos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN High']
-    
-            # Predimensiona las rectas a y b
-            posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0],posicion_RMN_bajos[1])
-            recta_at              = numpy.zeros(datos_AA.shape[0])
-            recta_bt              = numpy.zeros(datos_AA.shape[0])
-    
-            RMN_altos = valores_concentraciones[posicion_RMN_altos]
-            RMN_bajos = valores_concentraciones[posicion_RMN_bajos]
-    
-            pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
-            t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos.iloc[0] 
-    
-            variable_drift = numpy.zeros(datos_AA.shape[0])
-    
-            # Aplica la corrección basada de dos rectas, descrita en Hassenmueller
-            for idato in range(posiciones_corr_drift[0],posiciones_corr_drift[-1]):
+                valores_concentraciones = valores_brutos / densidades
                 
-            
-                factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
-                recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[0]-RMN_bajos.iloc[-1]) 
-                recta_bt[idato] = RMN_altos.iloc[0] -  factor_f*(RMN_altos.iloc[0]-RMN_altos.iloc[-1]) 
+                # Concentraciones de las referencias
+                RMN_CE_variable = df_referencias[variables_run[ivariable]][0] 
+                RMN_CI_variable = df_referencias[variables_run[ivariable]][1]     
+        
+                # Encuentra las posiciones de los RMNs
+                posicion_RMN_bajos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN Low']
+                posicion_RMN_altos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN High']
+        
+                # Predimensiona las rectas a y b
+                posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0],posicion_RMN_bajos[1])
+                recta_at              = numpy.zeros(datos_AA.shape[0])
+                recta_bt              = numpy.zeros(datos_AA.shape[0])
+        
+                RMN_altos = valores_concentraciones[posicion_RMN_altos]
+                RMN_bajos = valores_concentraciones[posicion_RMN_bajos]
+        
+                pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
+                t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos.iloc[0] 
+        
+                variable_drift = numpy.zeros(datos_AA.shape[0])
+        
+                # Aplica la corrección basada de dos rectas, descrita en Hassenmueller
+                for idato in range(posiciones_corr_drift[0],posiciones_corr_drift[-1]):
+                    
                 
-                val_combinado         = ((valores_concentraciones[idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
-    
-                variable_drift[idato] = val_combinado*pte_RMN+t_indep_RMN
-    
-            variable_drift[variable_drift<0] = 0
-    
-            # Almacena los resultados en un dataframe    
-            datos_corregidos[variables_run[ivariable]] = variable_drift
-     
-        # # Calcula el NO3 como diferencia entre el TON y el NO2
-        datos_corregidos['NITRATO'] = numpy.zeros(datos_corregidos.shape[0])
-        for idato in range(datos_corregidos.shape[0]):
-            datos_corregidos['NITRATO'].iloc[idato] = datos_corregidos['TON'].iloc[idato] - datos_corregidos['NITRITO'].iloc[idato]
-    
+                    factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
+                    recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[0]-RMN_bajos.iloc[-1]) 
+                    recta_bt[idato] = RMN_altos.iloc[0] -  factor_f*(RMN_altos.iloc[0]-RMN_altos.iloc[-1]) 
+                    
+                    val_combinado         = ((valores_concentraciones[idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
+        
+                    variable_drift[idato] = val_combinado*pte_RMN+t_indep_RMN
+        
+                variable_drift[variable_drift<0] = 0
+        
+                # Almacena los resultados en un dataframe    
+                datos_corregidos[variables_run[ivariable]] = variable_drift
+         
+            # # Calcula el NO3 como diferencia entre el TON y el NO2
+            datos_corregidos['NITRATO'] = numpy.zeros(datos_corregidos.shape[0])
+            for idato in range(datos_corregidos.shape[0]):
+                datos_corregidos['NITRATO'].iloc[idato] = datos_corregidos['TON'].iloc[idato] - datos_corregidos['NITRITO'].iloc[idato]
+                
+        texto_exito = 'Datos del Autoanalizador procesados correctamente'
+        st.success(texto_exito)
+        
         # Mantén sólo las filas del dataframe con valores no nulos
         datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
+ 
+        listado_salidas            = datos_muestras['id_salida'].unique()
+        df_salidas_muestreadas     = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
         
-    
-        ### CONTROL DE CALIDAD DE LOS DATOS
-    
-        # Determina las estaciones muestreadas en la salida selecionada
         listado_estaciones         = datos_muestras['id_estacion'].unique()
         df_estaciones_muestreadas  = df_estaciones[df_estaciones['id_estacion'].isin(listado_estaciones)]
-        nombres_estaciones         = df_estaciones_muestreadas['nombre_estacion'].tolist()
-        listado_estaciones         = df_estaciones_muestreadas['id_estacion'].tolist()
-       
-        # Determina los muestreos realizados  
-        listado_salidas            = datos_corregidos['id_salida'].unique()
-        df_salidas_muestreadas     = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
-        nombres_salidas            = df_salidas_muestreadas['nombre_salida'].tolist()
-        listado_salidas            = df_salidas_muestreadas['id_salida'].tolist()
-        
-        # Despliega menús de selección de la variable, salida y la estación a controlar                
-        col1, col2 = st.columns(2,gap="small")
-        with col1: 
             
-            salida_seleccionada   = st.selectbox('Salida',(nombres_salidas))
-            indice_salida         = listado_salidas[nombres_salidas.index(salida_seleccionada)]
-
-            listado_variables      = ['NITRATO','NITRITO','SILICATO','FOSFATO']
-            listado_variables_bd   = ['no3','no2','sio2','po4']
-            variable_seleccionada  = st.selectbox('Variable',(listado_variables))
-            indice_variable        = listado_variables.index(variable_seleccionada)
-            
-
-       
-        with col2:
-            estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
-            indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
-            
-            meses_offset           = st.number_input('Intervalo meses:',value=1)
+        listado_variables      = ['NITRATO','NITRITO','SILICATO','FOSFATO']
+        listado_variables_bd   = ['no3','no2','sio2','po4']
         
-        # Selecciona los datos correspondientes a la estación y salida seleccionada
-        df_seleccion               = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
-        
-
-        # Recupera los datos disponibles de la misma estación, para la misma variable
-        listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
-        df_disponible_bd           = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos_estacion)]
-        
-        df_disponible_bd            = df_disponible_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
-        df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bd, on="id_muestreo")
-       
-        # Determina los meses que marcan el rango de busqueda
-        df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
-        fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0][0] - datetime.timedelta(days=meses_offset*30)
-        fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1][0] + datetime.timedelta(days=meses_offset*30)  
-
-        if fecha_minima.year < fecha_maxima.year:
-            listado_meses_1 = numpy.arange(fecha_minima.month,13)
-            listado_meses_2 = numpy.arange(1,fecha_maxima.month+1)
-            listado_meses   = numpy.concatenate((listado_meses_1,listado_meses_2))
-        
-        else:
-            listado_meses   = numpy.arange(fecha_minima.month,fecha_maxima.month+1)
+        FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_variables,listado_variables_bd,df_estaciones_muestreadas,direccion_host,base_datos,usuario,contrasena,puerto)
  
-        listado_meses = listado_meses.tolist()
-   
+    
+ 
+    
         
-        # Busca los datos de la base de datos dentro del rango de meses seleccionados
-        df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
-        for idato in range(df_disponible_bd.shape[0]):
-            if (df_disponible_bd['fecha_muestreo'].iloc[idato]).month in listado_meses:
-                df_disponible_bd['io_fecha'].iloc[idato] = 1
+            # ### CONTROL DE CALIDAD DE LOS DATOS
+        
+            # # Determina las estaciones muestreadas en la salida selecionada
+            # listado_estaciones         = datos_muestras['id_estacion'].unique()
+            # df_estaciones_muestreadas  = df_estaciones[df_estaciones['id_estacion'].isin(listado_estaciones)]
+            # nombres_estaciones         = df_estaciones_muestreadas['nombre_estacion'].tolist()
+            # listado_estaciones         = df_estaciones_muestreadas['id_estacion'].tolist()
+           
+            # # Determina los muestreos realizados  
+            # listado_salidas            = datos_corregidos['id_salida'].unique()
+            # df_salidas_muestreadas     = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
+            # nombres_salidas            = df_salidas_muestreadas['nombre_salida'].tolist()
+            # listado_salidas            = df_salidas_muestreadas['id_salida'].tolist()
+            
+            # # Despliega menús de selección de la variable, salida y la estación a controlar                
+            # col1, col2 = st.columns(2,gap="small")
+            # with col1: 
                 
-        df_rango_temporal = df_disponible_bd[df_disponible_bd['io_fecha']==1]
-
-        ################# GRAFICOS ################
-
-        # Representa un gráfico con la variable seleccionada junto a los oxígenos
-        fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.05, 'hspace':0}, width_ratios=[3, 1])
-   
-        ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0')
-        ax.plot(df_rango_temporal[listado_variables_bd[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040')
-        ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r' )
-        texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
-        ax.set(xlabel=texto_eje)
-        ax.set(ylabel='Presion (db)')
-        ax.invert_yaxis()
-        rango_profs = ax.get_ylim()
-        # Añade el nombre de cada punto
-        nombre_muestreos = [None]*df_seleccion.shape[0]
-        for ipunto in range(df_seleccion.shape[0]):
-            if df_seleccion['id_botella'].iloc[ipunto] is None:
-                nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-            else:
-                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
-            ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
-       
-        az.plot(df_seleccion['Oxigeno'],df_seleccion['presion_ctd'],'.',color='#006633')
-        az.set(xlabel='Oxigeno (\u03BCmol/kg)')
-        az.yaxis.set_visible(False)
-        az.invert_yaxis()
-        az.set_ylim(rango_profs)
-
-        st.pyplot(fig)
-        
-        # Gráficos particulares para cada variable
-        if variable_seleccionada == 'FOSFATO':
-
-            fig, ax = plt.subplots()       
-            ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
-            ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
-            ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
-            ax.set(xlabel='Nitrato (\u03BCmol/kg)')
-            ax.set(ylabel='Fosfato (\u03BCmol/kg)')
-
-            # Añade el nombre de cada punto
-            nombre_muestreos = [None]*df_seleccion.shape[0]
-            for ipunto in range(df_seleccion.shape[0]):
-                if df_seleccion['id_botella'].iloc[ipunto] is None:
-                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-                else:
-                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
-                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
+            #     salida_seleccionada   = st.selectbox('Salida',(nombres_salidas))
+            #     indice_salida         = listado_salidas[nombres_salidas.index(salida_seleccionada)]
+    
+            #     listado_variables      = ['NITRATO','NITRITO','SILICATO','FOSFATO']
+            #     listado_variables_bd   = ['no3','no2','sio2','po4']
+            #     variable_seleccionada  = st.selectbox('Variable',(listado_variables))
+            #     indice_variable        = listado_variables.index(variable_seleccionada)
+                
+    
            
-            st.pyplot(fig)
-        
-        elif variable_seleccionada == 'NITRATO':
-
-            fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
-            ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
-            ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
-            ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
-            ax.set(xlabel='Nitrato (\u03BCmol/kg)')
-            ax.set(ylabel='Fosfato (\u03BCmol/kg)')
-
-            # Añade el nombre de cada punto
-            nombre_muestreos = [None]*df_seleccion.shape[0]
-            for ipunto in range(df_seleccion.shape[0]):
-                if df_seleccion['id_botella'].iloc[ipunto] is None:
-                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-                else:
-                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
-                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
-
-            az.plot(df_disponible_bd['no3'],df_disponible_bd['phts25p0_unpur'],'.',color='#C0C0C0')
-            az.plot(df_rango_temporal['no3'],df_rango_temporal['phts25p0_unpur'],'.',color='#404040')
-            az.plot(df_disponible_bd['no3'],df_disponible_bd['phts25p0_pur'],'.',color='#C0C0C0')
-            az.plot(df_rango_temporal['no3'],df_rango_temporal['phts25p0_pur'],'.',color='#404040')
-            az.plot(df_seleccion['NITRATO'],df_seleccion['pH'],'.r' )
-            az.set(xlabel='Nitrato (\u03BCmol/kg)')
-            az.set(ylabel='pH')
-            az.yaxis.tick_right()
-            az.yaxis.set_label_position("right")
-
-            # Añade el nombre de cada punto
-            nombre_muestreos = [None]*df_seleccion.shape[0]
-            for ipunto in range(df_seleccion.shape[0]):
-                if df_seleccion['id_botella'].iloc[ipunto] is None:
-                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-                else:
-                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
-                az.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['pH'].iloc[ipunto]))
+            # with col2:
+            #     estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
+            #     indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
+                
+            #     meses_offset           = st.number_input('Intervalo meses:',value=1)
+            
+            # # Selecciona los datos correspondientes a la estación y salida seleccionada
+            # df_seleccion               = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
+            
+    
+    
+    
+    
+    
+    
+    
+            # # Recupera los datos disponibles de la misma estación, para la misma variable
+            # listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
+            # df_disponible_bd           = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos_estacion)]
+            
+            # df_disponible_bd            = df_disponible_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
+            # df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bd, on="id_muestreo")
+           
+            # # Determina los meses que marcan el rango de busqueda
+            # df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
+            # fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0][0] - datetime.timedelta(days=meses_offset*30)
+            # fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1][0] + datetime.timedelta(days=meses_offset*30)  
+    
+            # if fecha_minima.year < fecha_maxima.year:
+            #     listado_meses_1 = numpy.arange(fecha_minima.month,13)
+            #     listado_meses_2 = numpy.arange(1,fecha_maxima.month+1)
+            #     listado_meses   = numpy.concatenate((listado_meses_1,listado_meses_2))
+            
+            # else:
+            #     listado_meses   = numpy.arange(fecha_minima.month,fecha_maxima.month+1)
      
-
-            st.pyplot(fig)
-  
-        
-        # Gráficos particulares para cada variable
-        elif variable_seleccionada == 'SILICATO':
-
-            fig, ax = plt.subplots()       
-            ax.plot(df_disponible_bd['sio2'],df_disponible_bd['alkali'],'.',color='#C0C0C0')
-            ax.plot(df_rango_temporal['sio2'],df_rango_temporal['alkali'],'.',color='#404040')
-            ax.plot(df_seleccion['SILICATO'],df_seleccion['Alcalinidad'],'.r' )
-            ax.set(xlabel='Silicato (\u03BCmol/kg)')
-            ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')
-
-            # Añade el nombre de cada punto
-            nombre_muestreos = [None]*df_seleccion.shape[0]
-            for ipunto in range(df_seleccion.shape[0]):
-                if df_seleccion['id_botella'].iloc[ipunto] is None:
-                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-                else:
-                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
-                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['SILICATO'].iloc[ipunto], df_seleccion['Alcalinidad'].iloc[ipunto]))
-           
-            st.pyplot(fig)
-        
-        
-        ################# FORMULARIOS CALIDAD ################        
-
-        # Formulario para asignar banderas de calidad
-        with st.form("Formulario", clear_on_submit=False):
-                      
-            indice_validacion = df_indices_calidad['indice'].tolist()
-            texto_indice      = df_indices_calidad['descripcion'].tolist()
-            qf_asignado       = numpy.zeros(df_seleccion.shape[0])
-           
-            for idato in range(df_seleccion.shape[0]):
-               
-                enunciado          = 'QF del muestreo ' + nombre_muestreos[idato]
-                valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
-                qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
-           
-            io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
-    
-        if io_envio:
-
-            with st.spinner('Actualizando la base de datos'):
-           
-                # Introducir los valores en la base de datos
-                conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                cursor = conn.cursor()  
+            # listado_meses = listado_meses.tolist()
        
-                for idato in range(df_seleccion.shape[0]):
-    
-                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables_bd[indice_variable] + ' = %s, ' + listado_variables_bd[indice_variable] +  '_qf = %s WHERE id_disc_biogeoquim = %s;'
-                    cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['id_muestreo_bgq'].iloc[idato])))
-                    conn.commit() 
-
-                cursor.close()
-                conn.close()   
-    
-            texto_exito = 'Datos de ' + variable_seleccionada + ' asignados correctamente'
-            st.success(texto_exito)
-   
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            # # Muestra una tabla con las salidas realizadas
-            # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_muestras)
-            # gridOptions = gb.build()
-            # st_aggrid.AgGrid(datos_muestras,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
-
-
-        
-        
-            # # Mantén sólo las filas del dataframe con valores no nulos
-            # datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
             
-            #st.text(datos_muestras)
-        
-        
-        # # Recupera las propiedades de cada muestreo
-        # datos_AA            = datos_AA.rename(columns={"Sample ID": "nombre_muestreo"})                                                
-        # datos_AA_muestreos  = pandas.merge(datos_AA, df_muestreos, on="nombre_muestreo")
-        
-        # df_datos_fisicos        = df_datos_fisicos.rename(columns={"muestreo": "id_muestreo"})                                                
-        # datos_AA_muestreos      = pandas.merge(datos_AA_muestreos, df_datos_fisicos, on="id_muestreo")
-
-        # df_datos_biogeoquimicos = df_datos_biogeoquimicos.rename(columns={"muestreo": "id_muestreo"})
-        # datos_AA_muestreos      = pandas.merge(datos_AA_muestreos, df_datos_biogeoquimicos, on="id_muestreo")
-        
-        # # Determina propiedades de las muestras en el momento de su toma
-        # densidad_muestras,pH_muestras,alc_muestras,profundidad_muestras,fecha_muestras,estacion_muestras,oxigenos_muestras = FUNCIONES_CORRECCION.propiedades_muestras(dir_base,fecha_run,datos_brutos,temperatura_laboratorio,salinidad_referencias)
-        
-        # # Determina los índices de los distintos picos (baselines, drift...)
-        # indices_carryover_altos,indices_carryover_bajos,indices_drift,indices_baselines,posicion_baseline_inicial = FUNCIONES_CORRECCION.identifica_indices(datos_brutos)
-        
-        # # Aplica las funciones de correccion para las distintas variables (TON,NO2...)
-        # for ivariable in range(len(variables_run)):
-        # #for ivariable in range(1):
+            # # Busca los datos de la base de datos dentro del rango de meses seleccionados
+            # df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
+            # for idato in range(df_disponible_bd.shape[0]):
+            #     if (df_disponible_bd['fecha_muestreo'].iloc[idato]).month in listado_meses:
+            #         df_disponible_bd['io_fecha'].iloc[idato] = 1
+                    
+            # df_rango_temporal = df_disponible_bd[df_disponible_bd['io_fecha']==1]
+    
+            # ################# GRAFICOS ################
+    
+            # # Representa un gráfico con la variable seleccionada junto a los oxígenos
+            # fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.05, 'hspace':0}, width_ratios=[3, 1])
+       
+            # ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0')
+            # ax.plot(df_rango_temporal[listado_variables_bd[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040')
+            # ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r' )
+            # texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
+            # ax.set(xlabel=texto_eje)
+            # ax.set(ylabel='Presion (db)')
+            # ax.invert_yaxis()
+            # rango_profs = ax.get_ylim()
+            # # Añade el nombre de cada punto
+            # nombre_muestreos = [None]*df_seleccion.shape[0]
+            # for ipunto in range(df_seleccion.shape[0]):
+            #     if df_seleccion['id_botella'].iloc[ipunto] is None:
+            #         nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+            #     else:
+            #         nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+            #     ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
+           
+            # az.plot(df_seleccion['Oxigeno'],df_seleccion['presion_ctd'],'.',color='#006633')
+            # az.set(xlabel='Oxigeno (\u03BCmol/kg)')
+            # az.yaxis.set_visible(False)
+            # az.invert_yaxis()
+            # az.set_ylim(rango_profs)
+    
+            # st.pyplot(fig)
             
-        #     valores_brutos = datos_brutos_senal.loc[:,variables_run[ivariable]]
+            # # Gráficos particulares para cada variable
+            # if variable_seleccionada == 'FOSFATO':
+    
+            #     fig, ax = plt.subplots()       
+            #     ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
+            #     ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
+            #     ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
+            #     ax.set(xlabel='Nitrato (\u03BCmol/kg)')
+            #     ax.set(ylabel='Fosfato (\u03BCmol/kg)')
+    
+            #     # Añade el nombre de cada punto
+            #     nombre_muestreos = [None]*df_seleccion.shape[0]
+            #     for ipunto in range(df_seleccion.shape[0]):
+            #         if df_seleccion['id_botella'].iloc[ipunto] is None:
+            #             nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+            #         else:
+            #             nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+            #         ax.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
                
-        #     # Corrección baselines
-        #     salida_corr_baseline   = FUNCIONES_CORRECCION.correccion_baseline(valores_brutos,indices_baselines,posicion_baseline_inicial)
+            #     st.pyplot(fig)
+            
+            # elif variable_seleccionada == 'NITRATO':
+    
+            #     fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
+            #     ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
+            #     ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
+            #     ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
+            #     ax.set(xlabel='Nitrato (\u03BCmol/kg)')
+            #     ax.set(ylabel='Fosfato (\u03BCmol/kg)')
+    
+            #     # Añade el nombre de cada punto
+            #     nombre_muestreos = [None]*df_seleccion.shape[0]
+            #     for ipunto in range(df_seleccion.shape[0]):
+            #         if df_seleccion['id_botella'].iloc[ipunto] is None:
+            #             nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+            #         else:
+            #             nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+            #         ax.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
+    
+            #     az.plot(df_disponible_bd['no3'],df_disponible_bd['phts25p0_unpur'],'.',color='#C0C0C0')
+            #     az.plot(df_rango_temporal['no3'],df_rango_temporal['phts25p0_unpur'],'.',color='#404040')
+            #     az.plot(df_disponible_bd['no3'],df_disponible_bd['phts25p0_pur'],'.',color='#C0C0C0')
+            #     az.plot(df_rango_temporal['no3'],df_rango_temporal['phts25p0_pur'],'.',color='#404040')
+            #     az.plot(df_seleccion['NITRATO'],df_seleccion['pH'],'.r' )
+            #     az.set(xlabel='Nitrato (\u03BCmol/kg)')
+            #     az.set(ylabel='pH')
+            #     az.yaxis.tick_right()
+            #     az.yaxis.set_label_position("right")
+    
+            #     # Añade el nombre de cada punto
+            #     nombre_muestreos = [None]*df_seleccion.shape[0]
+            #     for ipunto in range(df_seleccion.shape[0]):
+            #         if df_seleccion['id_botella'].iloc[ipunto] is None:
+            #             nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+            #         else:
+            #             nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+            #         az.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['pH'].iloc[ipunto]))
          
-        #     # Corrección carryover
-        #     salida_corr_carryover  = FUNCIONES_CORRECCION.correccion_carryover(salida_corr_baseline,indices_carryover_altos,indices_carryover_bajos,indices_drift,posicion_baseline_inicial)
-        
-        #     # Corrección deriva sensibilidad
-        #     salida_corr_sens_drift = FUNCIONES_CORRECCION.correccion_sensitivity_drift(salida_corr_carryover,posicion_baseline_inicial,indices_drift)
-        
-        #     # Conversión de señal a concentraciones
-        #     conc_corregida = FUNCIONES_CORRECCION.conversion_concentraciones(datos_brutos,variables_run,ivariable,salida_corr_sens_drift)
-        
-        #     # Conversion a umol/kg
-        #     conc_corr_kg = conc_corregida/densidad_muestras
-        
-        #     # Corrección deriva
-        #     conc_corr_drift = FUNCIONES_CORRECCION.correccion_drift(datos_brutos,conc_corr_kg,conc_referencias,ivariable)
+    
+            #     st.pyplot(fig)
+      
+            
+            # # Gráficos particulares para cada variable
+            # elif variable_seleccionada == 'SILICATO':
+    
+            #     fig, ax = plt.subplots()       
+            #     ax.plot(df_disponible_bd['sio2'],df_disponible_bd['alkali'],'.',color='#C0C0C0')
+            #     ax.plot(df_rango_temporal['sio2'],df_rango_temporal['alkali'],'.',color='#404040')
+            #     ax.plot(df_seleccion['SILICATO'],df_seleccion['Alcalinidad'],'.r' )
+            #     ax.set(xlabel='Silicato (\u03BCmol/kg)')
+            #     ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')
+    
+            #     # Añade el nombre de cada punto
+            #     nombre_muestreos = [None]*df_seleccion.shape[0]
+            #     for ipunto in range(df_seleccion.shape[0]):
+            #         if df_seleccion['id_botella'].iloc[ipunto] is None:
+            #             nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+            #         else:
+            #             nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+            #         ax.annotate(nombre_muestreos[ipunto], (df_seleccion['SILICATO'].iloc[ipunto], df_seleccion['Alcalinidad'].iloc[ipunto]))
                
-        #     # Almacena los resultados en un dataframe    
-        #     datos_corregidos.iloc[:,ivariable] = conc_corr_drift
-            
-        # # Calcula el NO3 como diferencia entre el TON y el NO2
-        # datos_corregidos['NITRATO']          = datos_corregidos['TON']-datos_corregidos['NITRITO']
-        # datos_corregidos[datos_corregidos['NITRATO']<0] = 0
-        
-        # # Extrae las concentraciones correspondientes a las muestras
-        # datos_muestras = FUNCIONES_CORRECCION.extrae_resultados_muestras(datos_brutos,datos_corregidos,pH_muestras,alc_muestras,profundidad_muestras,fecha_muestras,estacion_muestras,oxigenos_muestras)
-        
-            # import matplotlib.pyplot as plt
-            # #plt.plot(datos_brutos['Peak Number'],datos_brutos['TON'],'-k')
-            # plt.plot(datos_brutos['Peak Number'],datos_corregidos['TON'],'.r')
-            
-                        
+            #     st.pyplot(fig)
             
             
-            
-# datos_brutos        = pandas.read_excel(archivo_datos,skiprows=15)
-
-# # Cambia los nombres de cada variable analizada
-# datos_brutos_senal  = datos_brutos.rename(columns={"AD Values":variables_run[0],"AD Values.1":variables_run[1],"AD Values.2":variables_run[2],"AD Values.3":variables_run[3]})
-
-# # Genera un dataframe en el que se almacenarán los resultados de las correcciones aplicadas. 
-# datos_corregidos    = pandas.DataFrame(columns=variables_run)
-
-# # Recupera información de las referencias utilizadas en el procesado
-# salinidad_referencias,conc_referencias = FUNCIONES_CORRECCION.propiedades_referencias(dir_base,fecha_run)
-
-# # Determina propiedades de las muestras en el momento de su toma
-# densidad_muestras,pH_muestras,alc_muestras,profundidad_muestras,fecha_muestras,estacion_muestras,oxigenos_muestras = FUNCIONES_CORRECCION.propiedades_muestras(dir_base,fecha_run,datos_brutos,temperatura_laboratorio,salinidad_referencias)
-
-# # Determina los índices de los distintos picos (baselines, drift...)
-# indices_carryover_altos,indices_carryover_bajos,indices_drift,indices_baselines,posicion_baseline_inicial = FUNCIONES_CORRECCION.identifica_indices(datos_brutos)
-
-# # Aplica las funciones de correccion para las distintas variables (TON,NO2...)
-# for ivariable in range(len(variables_run)):
-# #for ivariable in range(1):
+            # ################# FORMULARIOS CALIDAD ################        
     
-#     valores_brutos = datos_brutos_senal.loc[:,variables_run[ivariable]]
-       
-#     # Corrección baselines
-#     salida_corr_baseline   = FUNCIONES_CORRECCION.correccion_baseline(valores_brutos,indices_baselines,posicion_baseline_inicial)
- 
-#     # Corrección carryover
-#     salida_corr_carryover  = FUNCIONES_CORRECCION.correccion_carryover(salida_corr_baseline,indices_carryover_altos,indices_carryover_bajos,indices_drift,posicion_baseline_inicial)
-
-#     # Corrección deriva sensibilidad
-#     salida_corr_sens_drift = FUNCIONES_CORRECCION.correccion_sensitivity_drift(salida_corr_carryover,posicion_baseline_inicial,indices_drift)
-
-#     # Conversión de señal a concentraciones
-#     conc_corregida = FUNCIONES_CORRECCION.conversion_concentraciones(datos_brutos,variables_run,ivariable,salida_corr_sens_drift)
-
-#     # Conversion a umol/kg
-#     conc_corr_kg = conc_corregida/densidad_muestras
-
-#     # Corrección deriva
-#     conc_corr_drift = FUNCIONES_CORRECCION.correccion_drift(datos_brutos,conc_corr_kg,conc_referencias,ivariable)
-       
-#     # Almacena los resultados en un dataframe    
-#     datos_corregidos.iloc[:,ivariable] = conc_corr_drift
+            # # Formulario para asignar banderas de calidad
+            # with st.form("Formulario", clear_on_submit=False):
+                          
+            #     indice_validacion = df_indices_calidad['indice'].tolist()
+            #     texto_indice      = df_indices_calidad['descripcion'].tolist()
+            #     qf_asignado       = numpy.zeros(df_seleccion.shape[0])
+               
+            #     for idato in range(df_seleccion.shape[0]):
+                   
+            #         enunciado          = 'QF del muestreo ' + nombre_muestreos[idato]
+            #         valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
+            #         qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
+               
+            #     io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
+        
+            # if io_envio:
     
-# # Calcula el NO3 como diferencia entre el TON y el NO2
-# datos_corregidos['NITRATO']          = datos_corregidos['TON']-datos_corregidos['NITRITO']
-# datos_corregidos[datos_corregidos['NITRATO']<0] = 0
+            #     with st.spinner('Actualizando la base de datos'):
+               
+            #         # Introducir los valores en la base de datos
+            #         conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            #         cursor = conn.cursor()  
+           
+            #         for idato in range(df_seleccion.shape[0]):
+        
+            #             instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables_bd[indice_variable] + ' = %s, ' + listado_variables_bd[indice_variable] +  '_qf = %s WHERE id_disc_biogeoquim = %s;'
+            #             cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['id_muestreo_bgq'].iloc[idato])))
+            #             conn.commit() 
+    
+            #         cursor.close()
+            #         conn.close()   
+        
+            #     texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
+            #     st.success(texto_exito)
+       
+       
 
-# # Extrae las concentraciones correspondientes a las muestras
-# datos_muestras = FUNCIONES_CORRECCION.extrae_resultados_muestras(datos_brutos,datos_corregidos,pH_muestras,alc_muestras,profundidad_muestras,fecha_muestras,estacion_muestras,oxigenos_muestras)
-
-# # import matplotlib.pyplot as plt
-# # #plt.plot(datos_brutos['Peak Number'],datos_brutos['TON'],'-k')
-# # plt.plot(datos_brutos['Peak Number'],datos_corregidos['TON'],'.r')
-
-            
-            
-            
-            
-            
-            
-            
             
             
             
