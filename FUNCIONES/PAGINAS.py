@@ -2327,7 +2327,7 @@ def procesado_nutrientes():
             # Añade columnas con variables a utilizar en el control de calidad posterior 
             datos_corregidos['muestreo']        = [None]*datos_AA.shape[0]
             datos_corregidos['presion_ctd']     = [None]*datos_AA.shape[0]
-            datos_corregidos['pH']              = [None]*datos_AA.shape[0]
+            datos_corregidos['ph']              = [None]*datos_AA.shape[0]
             datos_corregidos['Alcalinidad']     = [None]*datos_AA.shape[0]
             datos_corregidos['Oxigeno']         = [None]*datos_AA.shape[0]  
             datos_corregidos['id_estacion']     = numpy.zeros(datos_AA.shape[0],dtype=int)
@@ -2359,14 +2359,8 @@ def procesado_nutrientes():
                         datos_corregidos['fecha_muestreo'].iloc[idato] = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice]
                                             
                         datos_corregidos['id_muestreo_bgq'].iloc[idato] = df_datos_biogeoquimicos['id_disc_biogeoquim'][df_datos_biogeoquimicos['muestreo']==indice]
-                        ph_unpur = df_datos_biogeoquimicos['phts25p0_unpur'][df_datos_biogeoquimicos['muestreo']==indice]
-                        ph_pur   = df_datos_biogeoquimicos['phts25p0_pur'][df_datos_biogeoquimicos['muestreo']==indice]
-                        if ph_unpur is not None:
-                            datos_corregidos['pH'].iloc[idato]      = ph_unpur
-                        if ph_pur is not None:
-                            datos_corregidos['pH'].iloc[idato]      = ph_pur 
-                                                
-                        datos_corregidos['Alcalinidad'].iloc[idato] = df_datos_biogeoquimicos['alkali'][df_datos_biogeoquimicos['muestreo']==indice]
+                        datos_corregidos['ph'].iloc[idato]              = df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice]                              
+                        datos_corregidos['Alcalinidad'].iloc[idato]     = df_datos_biogeoquimicos['alkali'][df_datos_biogeoquimicos['muestreo']==indice]
                         
                         oxi_ctd = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==indice]
                         oxi_wk  = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_biogeoquimicos['muestreo']==indice]
