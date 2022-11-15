@@ -1373,6 +1373,10 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
             nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
         ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
    
+    qf_variable_seleccionada = variable_seleccionada + '_qf'
+    datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==4]
+    ax.plot(datos_malos[variable_seleccionada],df_seleccion['presion_ctd'],'.',color='#00CCCC')    
+   
     az.plot(df_seleccion['Oxigeno'],df_seleccion['presion_ctd'],'.',color='#006633')
     az.set(xlabel='Oxigeno (\u03BCmol/kg)')
     az.yaxis.set_visible(False)
@@ -1390,6 +1394,8 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
         ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
         
         datos_malos = df_disponible_bd[df_disponible_bd['po4_qf']==4]
+        ax.plot(datos_malos['no3'],datos_malos['po4'],'.',color='#00CCCC')
+        datos_malos = df_disponible_bd[df_disponible_bd['no3_qf']==4]
         ax.plot(datos_malos['no3'],datos_malos['po4'],'.',color='#00CCCC')
         
         ax.set(xlabel='Nitrato (\u03BCmol/kg)')
@@ -1412,6 +1418,12 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
         ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
         ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
         ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
+        
+        datos_malos = df_disponible_bd[df_disponible_bd['po4_qf']==4]
+        ax.plot(datos_malos['no3'],datos_malos['po4'],'.',color='#00CCCC')
+        datos_malos = df_disponible_bd[df_disponible_bd['no3_qf']==4]
+        ax.plot(datos_malos['no3'],datos_malos['po4'],'.',color='#00CCCC')
+        
         ax.set(xlabel='Nitrato (\u03BCmol/kg)')
         ax.set(ylabel='Fosfato (\u03BCmol/kg)')
 
@@ -1452,6 +1464,12 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
         ax.plot(df_disponible_bd['sio2'],df_disponible_bd['alkali'],'.',color='#C0C0C0')
         ax.plot(df_rango_temporal['sio2'],df_rango_temporal['alkali'],'.',color='#404040')
         ax.plot(df_seleccion['SILICATO'],df_seleccion['Alcalinidad'],'.r' )
+        
+        datos_malos = df_disponible_bd[df_disponible_bd['sio2_qf']==4]
+        ax.plot(datos_malos['sio2'],datos_malos['alkali'],'.',color='#00CCCC')
+        datos_malos = df_disponible_bd[df_disponible_bd['alkali_qf']==4]
+        ax.plot(datos_malos['sio2'],datos_malos['alkali_qf'],'.',color='#00CCCC')
+        
         ax.set(xlabel='Silicato (\u03BCmol/kg)')
         ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')
 
