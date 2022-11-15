@@ -1389,7 +1389,7 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
         ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
         ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
         
-        datos_malos = df_disponible_bd[df_disponible_bd['po4_qf']==9]
+        datos_malos = df_disponible_bd[df_disponible_bd['po4_qf']==4]
         ax.plot(datos_malos['no3'],datos_malos['po4'],'.',color='#FF8000')
         
         ax.set(xlabel='Nitrato (\u03BCmol/kg)')
