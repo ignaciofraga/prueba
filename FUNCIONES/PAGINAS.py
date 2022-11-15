@@ -2428,7 +2428,7 @@ def procesado_nutrientes():
                 datos_corregidos['NITRATO'].iloc[idato] = datos_corregidos['TON'].iloc[idato] - datos_corregidos['NITRITO'].iloc[idato]
             
             if datos_corregidos['muestreo'].isnull().all():
-                texto_error = "Ninguna de las muestras analizadas no se corresponde con muestreos incluidos en la base de datos"
+                texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
                 st.warning(texto_error, icon="⚠️") 
                 
             else:
