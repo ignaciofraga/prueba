@@ -16,9 +16,7 @@ from sqlalchemy import create_engine
 import json
 import re
 
-import streamlit as st
-from FUNCIONES_AUXILIARES import init_connection
-import matplotlib.pyplot as plt
+
 
 pandas.options.mode.chained_assignment = None
 
@@ -1278,6 +1276,10 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
 ######## FUNCION PARA LEER DATOS DE BOTELLAs (ARCHIVOS .BTL)  ########
 ######################################################################
 def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_variables,listado_variables_bd,df_estaciones_muestreadas,direccion_host,base_datos,usuario,contrasena,puerto):
+
+    import streamlit as st
+    import matplotlib.pyplot as plt
+    from FUNCIONES.FUNCIONES_AUXILIARES import init_connection    
 
     # Recupera los datos disponibles en la base de datos
     conn                      = init_connection()
