@@ -1373,9 +1373,9 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
             nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
         ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
    
-    qf_variable_seleccionada = variable_seleccionada + '_qf'
+    qf_variable_seleccionada = listado_variables_bd[indice_variable] + '_qf'
     datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==4]
-    ax.plot(datos_malos[variable_seleccionada],df_seleccion['presion_ctd'],'.',color='#00CCCC')    
+    ax.plot(datos_malos[listado_variables_bd[indice_variable]],df_seleccion['presion_ctd'],'.',color='#00CCCC')    
    
     az.plot(df_seleccion['Oxigeno'],df_seleccion['presion_ctd'],'.',color='#006633')
     az.set(xlabel='Oxigeno (\u03BCmol/kg)')
