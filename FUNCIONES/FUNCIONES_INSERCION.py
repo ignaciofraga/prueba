@@ -1289,6 +1289,7 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
     conn.close()
 
     id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'][0]
+    st.text(id_dato_malo)
 
     # Genera listados de salidas y estaciones, para los menús desplegables    
     nombres_salidas            = df_salidas_muestreadas['nombre_salida'].tolist()
