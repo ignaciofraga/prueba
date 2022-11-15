@@ -2432,7 +2432,10 @@ def procesado_nutrientes():
             datos_corregidos['NITRATO'] = numpy.zeros(datos_corregidos.shape[0])
             for idato in range(datos_corregidos.shape[0]):
                 datos_corregidos['NITRATO'].iloc[idato] = datos_corregidos['TON'].iloc[idato] - datos_corregidos['NITRITO'].iloc[idato]
-                
+            
+            if datos_corregidos['muestreo'].isnull().all():
+                st.text("All values in the column 'B' are NaN")    
+            
             texto_exito = 'Datos del Autoanalizador procesados correctamente'
             st.success(texto_exito)
             
