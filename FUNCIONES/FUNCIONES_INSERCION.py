@@ -1295,8 +1295,6 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
     nombres_estaciones         = df_estaciones_muestreadas['nombre_estacion'].tolist()
     listado_estaciones         = df_estaciones_muestreadas['id_estacion'].tolist()
     
-    st.text(listado_salidas)
-
     ### CONTROL DE CALIDAD DE LOS DATOS
 
     # Despliega menús de selección de la variable, salida y la estación a controlar                
@@ -1421,11 +1419,9 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
                 nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
 
-        az.plot(df_disponible_bd['no3'],df_disponible_bd['phts25p0_unpur'],'.',color='#C0C0C0')
-        az.plot(df_rango_temporal['no3'],df_rango_temporal['phts25p0_unpur'],'.',color='#404040')
-        az.plot(df_disponible_bd['no3'],df_disponible_bd['phts25p0_pur'],'.',color='#C0C0C0')
-        az.plot(df_rango_temporal['no3'],df_rango_temporal['phts25p0_pur'],'.',color='#404040')
-        az.plot(df_seleccion['NITRATO'],df_seleccion['pH'],'.r' )
+        az.plot(df_disponible_bd['no3'],df_disponible_bd['ph'],'.',color='#C0C0C0')
+        az.plot(df_rango_temporal['no3'],df_rango_temporal['ph'],'.',color='#404040')
+        az.plot(df_seleccion['NITRATO'],df_seleccion['ph'],'.r' )
         az.set(xlabel='Nitrato (\u03BCmol/kg)')
         az.set(ylabel='pH')
         az.yaxis.tick_right()
