@@ -1359,7 +1359,8 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
     ax.plot(df_rango_temporal[listado_variables_bd[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040')
     
     texto_qf = listado_variables_bd[indice_variable] + '_qf'
-    ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]][texto_qf ==9 ],df_disponible_bd['presion_ctd'][texto_qf ==9 ],'.',color='#FF9933')
+    #df_calidad = df_disponible_bd[texto_qf == 9]
+    ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]][df_disponible_bd[texto_qf] ==9 ],df_disponible_bd['presion_ctd'][df_disponible_bd[texto_qf] ==9 ],'.',color='#FF9933')
    
     ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r' )
     texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
