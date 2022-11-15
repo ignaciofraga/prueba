@@ -2440,6 +2440,7 @@ def procesado_nutrientes():
             datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
      
             st.text(datos_corregidos)
+            st.text(datos_corregidos['muestreo'])
             st.text(datos_muestras)
         
             listado_salidas            = datos_muestras['id_salida'].unique()
