@@ -1358,10 +1358,10 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
     # Representa un gráfico con la variable seleccionada junto a los oxígenos
     fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.05, 'hspace':0}, width_ratios=[3, 1])
    
-    ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0')
-    ax.plot(df_rango_temporal[listado_variables_bd[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040')
+    ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0',label='DATO PREVIO(OK)')
+    ax.plot(df_rango_temporal[listado_variables_bd[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040',label='DATO PREVIO(INTERVALO)')
        
-    ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r' )
+    ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r',label='PROCESADO' )
     texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
     ax.set(xlabel=texto_eje)
     ax.set(ylabel='Presion (db)')
@@ -1378,7 +1378,9 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
    
     qf_variable_seleccionada = listado_variables_bd[indice_variable] + '_qf'
     datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
-    ax.plot(datos_malos[listado_variables_bd[indice_variable]],datos_malos['presion_ctd'],'.',color='#00CCCC')    
+    ax.plot(datos_malos[listado_variables_bd[indice_variable]],datos_malos['presion_ctd'],'.',color='#00CCCC',label='DATO PREVIO(MALO)')    
+    ax.legend(bbox_to_anchor=(1.1, 1.05),ncol=4)
+    
    
     az.plot(df_seleccion['Oxigeno'],df_seleccion['presion_ctd'],'.',color='#006633')
     az.set(xlabel='Oxigeno (\u03BCmol/kg)')
