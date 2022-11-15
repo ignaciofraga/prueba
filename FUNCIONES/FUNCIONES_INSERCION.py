@@ -1294,6 +1294,8 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
 
     nombres_estaciones         = df_estaciones_muestreadas['nombre_estacion'].tolist()
     listado_estaciones         = df_estaciones_muestreadas['id_estacion'].tolist()
+    
+    st.text(listado_salidas)
 
     ### CONTROL DE CALIDAD DE LOS DATOS
 
