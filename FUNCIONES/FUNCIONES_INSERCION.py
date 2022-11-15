@@ -1288,7 +1288,7 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
     df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
     conn.close()
 
-    id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo']
+    id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'][0]
 
     # Genera listados de salidas y estaciones, para los menús desplegables    
     nombres_salidas            = df_salidas_muestreadas['nombre_salida'].tolist()
