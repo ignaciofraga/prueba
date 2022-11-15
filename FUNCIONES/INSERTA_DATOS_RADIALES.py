@@ -48,9 +48,8 @@ for iarchivo in range(len(listado_archivos)):
 #for iarchivo in range(1):
 
     nombre_archivo = directorio_datos + '/' + listado_archivos[iarchivo]
-   
+    
     print('Procesando la informacion correspondiente al año ',nombre_archivo[-9:-5])
-
 
     print('Leyendo los datos contenidos en el archivo excel')
     datos_radiales = FUNCIONES_INSERCION.lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto)

@@ -110,11 +110,11 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
             datos_radiales['ph'][idato] =  datos_radiales['PHTS25P0_UNPUR'][idato]
             datos_radiales['ph_qf']     = datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato]
             datos_radiales['ph_metodo'] = 1
-        if datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato] == 9 and  datos_radiales['PHTS25P0_PUR_FLAG_W'][idato] != 9:
+        elif datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato] == 9 and  datos_radiales['PHTS25P0_PUR_FLAG_W'][idato] != 9:
             datos_radiales['ph'][idato] =  datos_radiales['PHTS25P0_PUR'][idato]
             datos_radiales['ph_qf']     = datos_radiales['PHTS25P0_PUR_FLAG_W'][idato]
             datos_radiales['ph_metodo'] = 2
-        if datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato] == 9 and  datos_radiales['PHTS25P0_PUR_FLAG_W'][idato] == 9:
+        else: 
             datos_radiales['ph'][idato] =  None
             datos_radiales['ph_qf']     = 9
             datos_radiales['ph_metodo'] = None
@@ -1357,6 +1357,10 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
    
     ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0')
     ax.plot(df_rango_temporal[listado_variables_bd[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040')
+    
+    texto_qf = listado_variables_bd[indice_variable] + '_qf'
+    ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]][texto_qf ==9 ],df_disponible_bd['presion_ctd'][texto_qf ==9 ],'.',color='#FF9933')
+   
     ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r' )
     texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
     ax.set(xlabel=texto_eje)
