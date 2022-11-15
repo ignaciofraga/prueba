@@ -1357,11 +1357,7 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
    
     ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0')
     ax.plot(df_rango_temporal[listado_variables_bd[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040')
-    
-#    texto_qf = listado_variables_bd[indice_variable] + '_qf'
-    #df_calidad = df_disponible_bd[texto_qf == 9]
-#    ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]][df_disponible_bd[texto_qf] ==9 ],df_disponible_bd['presion_ctd'][df_disponible_bd[texto_qf] ==9 ],'.',color='#FF9933')
-   
+       
     ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r' )
     texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
     ax.set(xlabel=texto_eje)
@@ -1392,6 +1388,10 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
         ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
         ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
         ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
+        
+        datos_malos = df_disponible_bd[df_disponible_bd['po4_qf']==9]
+        ax.plot(datos_malos['no3'],datos_malos['po4'],'.',color='#FF8000')
+        
         ax.set(xlabel='Nitrato (\u03BCmol/kg)')
         ax.set(ylabel='Fosfato (\u03BCmol/kg)')
 
