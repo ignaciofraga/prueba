@@ -1379,8 +1379,10 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
     qf_variable_seleccionada = listado_variables_bd[indice_variable] + '_qf'
     datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
     ax.plot(datos_malos[listado_variables_bd[indice_variable]],datos_malos['presion_ctd'],'.',color='#00CCCC',label='DATO PREVIO(MALO)')    
-    ax.legend(bbox_to_anchor=(1.05, 1.2),ncol=4)
+    ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.2),ncol=4, fancybox=True)
     
+   # ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
+   #        ncol=3, fancybox=True, shadow=True)
    
     az.plot(df_seleccion['Oxigeno'],df_seleccion['presion_ctd'],'.',color='#006633')
     az.set(xlabel='Oxigeno (\u03BCmol/kg)')
