@@ -2428,29 +2428,27 @@ def procesado_nutrientes():
                 datos_corregidos['NITRATO'].iloc[idato] = datos_corregidos['TON'].iloc[idato] - datos_corregidos['NITRITO'].iloc[idato]
             
             if datos_corregidos['muestreo'].isnull().all():
-                st.text("All values in the column 'B' are NaN")    
-            
-            texto_exito = 'Datos del Autoanalizador procesados correctamente'
-            st.success(texto_exito)
-            
-            # Mantén sólo las filas del dataframe con valores no nulos
-            datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
-     
-            st.text(datos_corregidos)
-            for idato in range(datos_corregidos.shape[0]):
-                st.text(datos_corregidos['muestreo'][idato])
-            st.text(datos_muestras)
-        
-            listado_salidas            = datos_muestras['id_salida'].unique()
-            df_salidas_muestreadas     = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
-            
-            listado_estaciones         = datos_muestras['id_estacion'].unique()
-            df_estaciones_muestreadas  = df_estaciones[df_estaciones['id_estacion'].isin(listado_estaciones)]
+                texto_error = "Ninguna de las muestras analizadas no se corresponde con muestreos incluidos en la base de datos"
+                st.warning(texto_error, icon="⚠️") 
                 
-            listado_variables      = ['NITRATO','NITRITO','SILICATO','FOSFATO']
-            listado_variables_bd   = ['no3','no2','sio2','po4']
+            else:
             
-            FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_variables,listado_variables_bd,df_estaciones_muestreadas,direccion_host,base_datos,usuario,contrasena,puerto)
+                texto_exito = 'Datos del Autoanalizador procesados correctamente'
+                st.success(texto_exito)
+            
+                # Mantén sólo las filas del dataframe con valores no nulos
+                datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
+             
+                listado_salidas            = datos_muestras['id_salida'].unique()
+                df_salidas_muestreadas     = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
+            
+                listado_estaciones         = datos_muestras['id_estacion'].unique()
+                df_estaciones_muestreadas  = df_estaciones[df_estaciones['id_estacion'].isin(listado_estaciones)]
+                
+                listado_variables      = ['NITRATO','NITRITO','SILICATO','FOSFATO']
+                listado_variables_bd   = ['no3','no2','sio2','po4']
+            
+                FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_variables,listado_variables_bd,df_estaciones_muestreadas,direccion_host,base_datos,usuario,contrasena,puerto)
      
         
  
