@@ -1434,7 +1434,7 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
                 nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
             else:
                 nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
-            az.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['pH'].iloc[ipunto]))
+            az.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['ph'].iloc[ipunto]))
  
 
         st.pyplot(fig)
