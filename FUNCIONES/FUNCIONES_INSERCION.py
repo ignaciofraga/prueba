@@ -1310,7 +1310,6 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     with col1: 
         
         listado_salidas           = datos_procesados['salida_mar'].unique()
-        st.text(listado_salidas)
         df_salidas_muestreadas    = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
         salida_seleccionada       = st.selectbox('Salida',(df_salidas_muestreadas['nombre_salida']))
         indice_salida             = df_salidas['id_salida'][df_salidas['nombre_salida']==salida_seleccionada].iloc[0]
@@ -1323,7 +1322,8 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     with col2:
         
         df_datos_salida_seleccionada = datos_procesados[datos_procesados['salida_mar']==salida_seleccionada]
-        listado_id_estaciones        = df_datos_salida_seleccionada['estacion'].unique()       
+        listado_id_estaciones        = df_datos_salida_seleccionada['estacion'].unique() 
+        st.text(listado_id_estaciones)
         df_estaciones_disponibles    = df_estaciones[df_estaciones['id_estacion'].isin(listado_id_estaciones)]
         
         estacion_seleccionada        = st.selectbox('Estación',(df_estaciones_disponibles['nombre_estacion']))
