@@ -1396,6 +1396,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
    # ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
    #        ncol=3, fancybox=True, shadow=True)
    
+    st.text(df_seleccion['oxigeno_ctd'])
     az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#006633')
     az.set(xlabel='Oxigeno (\u03BCmol/kg)')
     az.yaxis.set_visible(False)
