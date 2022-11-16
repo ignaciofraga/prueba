@@ -1321,10 +1321,8 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
    
     with col2:
         st.text(datos_procesados)
-        df_datos_salida_seleccionada = datos_procesados[datos_procesados['salida_mar']==salida_seleccionada]
-        st.text(df_datos_salida_seleccionada)
+        df_datos_salida_seleccionada = datos_procesados[datos_procesados['salida_mar']==indice_salida]
         listado_id_estaciones        = df_datos_salida_seleccionada['estacion'].unique() 
-        st.text(listado_id_estaciones)
         df_estaciones_disponibles    = df_estaciones[df_estaciones['id_estacion'].isin(listado_id_estaciones)]
         
         estacion_seleccionada        = st.selectbox('Estación',(df_estaciones_disponibles['nombre_estacion']))
