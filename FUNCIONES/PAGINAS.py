@@ -2295,11 +2295,11 @@ def procesado_nutrientes():
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
     
 
-    # Añade datos de botellas
+    # Añade salidas del AA
     if tipo_accion == acciones[0]:
         
         
-        variables_run = ['TON','NITRITO','SILICATO','FOSFATO']    
+        variables_run = ['nitrogeno_total','nitrito','silicato','fosfato']    
     
     
         # Despliega un formulario para subir los archivos del AA y las referencias
@@ -2319,8 +2319,7 @@ def procesado_nutrientes():
             datos_AA      = datos_brutos.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
         
             # Predimensiona columnas en las que guardar información de salinidad y densidad    
-            datos_AA['Densidad']    = numpy.ones(datos_AA.shape[0])
-            datos_AA['Salinidad']   = numpy.ones(datos_AA.shape[0])
+            datos_AA['densidad']    = numpy.ones(datos_AA.shape[0])
             
             # Genera un dataframe en el que se almacenarán los resultados de las correcciones aplicadas. 
             datos_corregidos    = pandas.DataFrame(columns=variables_run)
@@ -2328,50 +2327,46 @@ def procesado_nutrientes():
             datos_corregidos['muestreo']        = [None]*datos_AA.shape[0]
             datos_corregidos['presion_ctd']     = [None]*datos_AA.shape[0]
             datos_corregidos['ph']              = [None]*datos_AA.shape[0]
-            datos_corregidos['Alcalinidad']     = [None]*datos_AA.shape[0]
-            datos_corregidos['Oxigeno']         = [None]*datos_AA.shape[0]  
-            datos_corregidos['id_estacion']     = numpy.zeros(datos_AA.shape[0],dtype=int)
-            datos_corregidos['id_salida']       = numpy.zeros(datos_AA.shape[0],dtype=int)
-            datos_corregidos['id_botella']      = numpy.zeros(datos_AA.shape[0],dtype=int)
-            datos_corregidos['id_muestreo_bgq'] = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['alcalinidad']     = [None]*datos_AA.shape[0]
+            datos_corregidos['oxigeno_ctd']     = [None]*datos_AA.shape[0]  
+            datos_corregidos['oxigeno_wk']      = [None]*datos_AA.shape[0] 
+            datos_corregidos['estacion']        = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['salida_mar']      = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['botella']         = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['id_disc_biogeoquim'] = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['fecha_muestreo']  = [None]*datos_AA.shape[0] 
         
             # Busca los datos de cada tubo analizada en el AA
             for idato in range(datos_AA.shape[0]):
                 
                 if datos_AA['Sample ID'].iloc[idato] == 'RMN Low' : # Tubo correspondiente a referencia (RMN)
-                    datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+                    datos_AA['densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
                     
                 elif datos_AA['Sample ID'].iloc[idato] == 'RMN High': # Tubo correspondiente a referencia (RMN)
-                    datos_AA['Densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+                    datos_AA['densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
                 
                 else:   # Resto de tubos
                     id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
                     
                     if len(id_temp) > 0:
-                        indice                                         = id_temp.iloc[0]
-                        datos_AA['Salinidad'].iloc[idato]              = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
+                        indice                                             = id_temp.iloc[0]
+                        salinidad                                          = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
         
-                        datos_corregidos['muestreo'].iloc[idato]       = indice
-                        datos_corregidos['presion_ctd'].iloc[idato]    = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
-                        datos_corregidos['id_salida'].iloc[idato]      = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice]
-                        datos_corregidos['id_botella'].iloc[idato]     = df_muestreos['botella'][df_muestreos['id_muestreo']==indice]
-                        datos_corregidos['fecha_muestreo'].iloc[idato] = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice]
+                        datos_corregidos['muestreo'].iloc[idato]           = indice
+                        datos_corregidos['presion_ctd'].iloc[idato]        = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice]
+                        datos_corregidos['salida_mar'].iloc[idato]         = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice]
+                        datos_corregidos['botella'].iloc[idato]            = df_muestreos['botella'][df_muestreos['id_muestreo']==indice]
+                        datos_corregidos['fecha_muestreo'].iloc[idato]     = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice]
                                             
-                        datos_corregidos['id_muestreo_bgq'].iloc[idato] = df_datos_biogeoquimicos['id_disc_biogeoquim'][df_datos_biogeoquimicos['muestreo']==indice]
-                        datos_corregidos['ph'].iloc[idato]              = df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice]                              
-                        datos_corregidos['Alcalinidad'].iloc[idato]     = df_datos_biogeoquimicos['alkali'][df_datos_biogeoquimicos['muestreo']==indice]
-                        
-                        oxi_ctd = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==indice]
-                        oxi_wk  = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_biogeoquimicos['muestreo']==indice]
-                        if oxi_ctd is not None:
-                            datos_corregidos['Oxigeno'].iloc[idato]  = oxi_ctd
-                        if oxi_wk is not None:
-                            datos_corregidos['Oxigeno'].iloc[idato]  = oxi_wk 
+                        datos_corregidos['id_disc_biogeoquim'].iloc[idato] = df_datos_biogeoquimicos['id_disc_biogeoquim'][df_datos_biogeoquimicos['muestreo']==indice]
+                        datos_corregidos['ph'].iloc[idato]                 = df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice]                              
+                        datos_corregidos['alcalinidad'].iloc[idato]        = df_datos_biogeoquimicos['alcalinidad'][df_datos_biogeoquimicos['muestreo']==indice]
+                        datos_corregidos['oxigeno_ctd'].iloc[idato]        = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==indice]
+                        datos_corregidos['oxigeno_wk'].iloc[idato]         = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_biogeoquimicos['muestreo']==indice]
                             
-                        datos_corregidos['id_estacion'].iloc[idato] =  df_muestreos['estacion'][df_muestreos['id_muestreo']==indice]
+                        datos_corregidos['estacion'].iloc[idato]           =  df_muestreos['estacion'][df_muestreos['id_muestreo']==indice]
                     
-                        datos_AA['Densidad'].iloc[idato]    = (999.1+0.77*((datos_AA['Salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+                        datos_AA['densidad'].iloc[idato]    = (999.1+0.77*((salinidad)-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
                        
             # Asigna el identificador de cada registro al dataframe en el que se guardarán los resultados
             datos_corregidos['tubo'] = datos_AA['Sample ID']
@@ -2380,7 +2375,7 @@ def procesado_nutrientes():
             for ivariable in range(len(variables_run)):
         
                 valores_brutos = datos_AA[variables_run[ivariable]] # Selecciona la variable y convierte a concentraciones
-                densidades     = datos_AA['Densidad']
+                densidades     = datos_AA['densidad']
                 
                 valores_concentraciones = valores_brutos / densidades
                 
@@ -2423,9 +2418,9 @@ def procesado_nutrientes():
                 datos_corregidos[variables_run[ivariable]] = variable_drift
          
             # # Calcula el NO3 como diferencia entre el TON y el NO2
-            datos_corregidos['NITRATO'] = numpy.zeros(datos_corregidos.shape[0])
+            datos_corregidos['nitrato'] = numpy.zeros(datos_corregidos.shape[0])
             for idato in range(datos_corregidos.shape[0]):
-                datos_corregidos['NITRATO'].iloc[idato] = datos_corregidos['TON'].iloc[idato] - datos_corregidos['NITRITO'].iloc[idato]
+                datos_corregidos['nitrato'].iloc[idato] = datos_corregidos['nitrogeno_total'].iloc[idato] - datos_corregidos['nitrito'].iloc[idato]
             
             if datos_corregidos['muestreo'].isnull().all():
                 texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
@@ -2439,20 +2434,71 @@ def procesado_nutrientes():
                 # Mantén sólo las filas del dataframe con valores no nulos
                 datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
              
-                listado_salidas            = datos_muestras['id_salida'].unique()
-                df_salidas_muestreadas     = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
+                listado_salidas            = datos_muestras['salida_mar'].unique()
+                df_salidas_muestreadas     = df_salidas[df_salidas['salida_mar'].isin(listado_salidas)]
             
-                listado_estaciones         = datos_muestras['id_estacion'].unique()
-                df_estaciones_muestreadas  = df_estaciones[df_estaciones['id_estacion'].isin(listado_estaciones)]
-                
-                listado_variables      = ['NITRATO','NITRITO','SILICATO','FOSFATO']
-                listado_variables_bd   = ['no3','no2','sio2','po4']
-            
-                FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_variables,listado_variables_bd,df_estaciones_muestreadas,direccion_host,base_datos,usuario,contrasena,puerto)
+                listado_estaciones         = datos_muestras['estacion'].unique()
+                df_estaciones_muestreadas  = df_estaciones[df_estaciones['estacion'].isin(listado_estaciones)]
+                            
+                FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,variables_run,df_estaciones_muestreadas,direccion_host,base_datos,usuario,contrasena,puerto)
      
         
+    # control de calidad de salidas previamente disponibles
+    if tipo_accion == acciones[1]: 
+ 
+        nombres_salidas            = df_salidas['nombre_salida'].tolist()
+        listado_salidas            = df_salidas['id_salida'].tolist()       
+ 
+    #     # Despliega menús de selección de la variable, salida y la estación a controlar                
+    #     col1, col2 = st.columns(2,gap="small")
+    #     with col1: 
+            
+    #         salida_seleccionada   = st.selectbox('Salida',(nombres_salidas))
+    #         indice_salida         = listado_salidas[nombres_salidas.index(salida_seleccionada)]
+    
+    #         variable_seleccionada  = st.selectbox('Variable',(listado_variables))
+    #         indice_variable        = listado_variables.index(variable_seleccionada)
+            
+    #         df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar']==indice_salida]
+       
+    #     with col2:
+            
+    #         listado_estaciones         = df_muestreos_seleccionados['estacion'].unique()
+    #         df_estaciones_muestreadas  = df_estaciones[df_estaciones['id_estacion'].isin(listado_estaciones)]
+                
+    #         estacion_seleccionada      = st.selectbox('Estación',(df_estaciones_muestreadas['nombre_estacion']))
+    #         indice_estacion            = df_estaciones['id_estacion'][df_estaciones['id_estacion'].isin(listado_estaciones)]
+            
+    #         df_datos_estacion          = 
+            
+    #         meses_offset           = st.number_input('Intervalo meses:',value=1)
+            
+    #     FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_variables,listado_variables_bd,df_estaciones_muestreadas,direccion_host,base_datos,usuario,contrasena,puerto)
+
+    
+    # df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    # df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+    # df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+    # df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+    # df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
+    # df_indices_calidad      = psql.read_sql('SELECT * FROM indices_calidad', conn)    
  
     
+    #             # Mantén sólo las filas del dataframe con valores no nulos
+    #             datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
+             
+    #             listado_salidas            = datos_muestras['id_salida'].unique()
+    #             df_salidas_muestreadas     = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
+            
+    #             listado_estaciones         = datos_muestras['id_estacion'].unique()
+    #             df_estaciones_muestreadas  = df_estaciones[df_estaciones['id_estacion'].isin(listado_estaciones)]
+                
+    #             listado_variables      = ['NITRATO','NITRITO','SILICATO','FOSFATO']
+    #             listado_variables_bd   = ['no3','no2','sio2','po4']
+            
+    #             FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_variables,listado_variables_bd,df_estaciones_muestreadas,direccion_host,base_datos,usuario,contrasena,puerto)
+     
+
         
             # ### CONTROL DE CALIDAD DE LOS DATOS
         

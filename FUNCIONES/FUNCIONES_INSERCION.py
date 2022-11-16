@@ -134,8 +134,8 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
                                                     "CTDTMP":"temperatura_ctd","CTDSAL":"salinidad_ctd","CTDSAL_FLAG_W":"salinidad_ctd_qf",
                                                     "CTDOXY":"oxigeno_ctd","CTDOXY_FLAG_W":"oxigeno_ctd_qf","CTDPAR":"par_ctd","CTDPAR_FLAG_W":"par_ctd_qf",
                                                     "CTDTURB":"turbidez_ctd","CTDTURB_FLAG_W":"turbidez_ctd_qf","OXYGEN":"oxigeno_wk","OXYGEN_FLAG_W":"oxigeno_wk_qf",
-                                                    "SILCAT":"sio2","SILCAT_FLAG_W":"sio2_qf","NITRAT":"no3","NITRAT_FLAG_W":"no3_qf","NITRIT":"no2","NITRIT_FLAG_W":"no2_qf",
-                                                    "PHSPHT":"po4","PHSPHT_FLAG_W":"po4_qf","TCARBN":"tcarbn","TCARBN_FLAG_W":"tcarbn_qf","ALKALI":"alkali","ALKALI_FLAG_W":"alkali_qf",                                                   
+                                                    "SILCAT":"silicato","SILCAT_FLAG_W":"silicato_qf","NITRAT":"nitrato","NITRAT_FLAG_W":"nitrato_qf","NITRIT":"nitrito","NITRIT_FLAG_W":"nitrito_qf",
+                                                    "PHSPHT":"fosfato","PHSPHT_FLAG_W":"fosfato_qf","TCARBN":"tcarbn","TCARBN_FLAG_W":"tcarbn_qf","ALKALI":"alcalinidad","ALKALI_FLAG_W":"alcalinidad_qf",                                                   
                                                     "R_CLOR":"r_clor","R_CLOR_FLAG_W":"r_clor_qf","R_PER":"r_per","R_PER_FLAG_W":"r_per_qf","CO3_TMP":"co3_temp"
                                                     })    
     
@@ -236,8 +236,8 @@ def lectura_datos_pelacus(nombre_archivo):
             
     # Renombra las columnas para mantener una denominación homogénea
     datos_pelacus = datos_pelacus.rename(columns={"campaña":"programa","fecha":"fecha_muestreo","hora":"hora_muestreo","estación":"estacion",
-                                                  "Latitud":"latitud","Longitud":"longitud","t_CTD":"temperatura_ctd","Sal_CTD":"salinidad_ctd","SiO2":"sio2","SiO2_flag":"sio2_qf",
-                                                  "NO3":"no3","NO3T_flag":"no3_qf","NO2":"no2","NO2_flag":"no2_qf","NH4":"nh4","NH4_flag":"nh4_qf","PO4":"po4","PO4_flag":"po4_qf","Cla":"clorofila_a"
+                                                  "Latitud":"latitud","Longitud":"longitud","t_CTD":"temperatura_ctd","Sal_CTD":"salinidad_ctd","SiO2":"silicato","SiO2_flag":"silicato_qf",
+                                                  "NO3":"nitrato","NO3T_flag":"nitrato_qf","NO2":"nitrito","NO2_flag":"nitrito_qf","NH4":"amonio","NH4_flag":"amonio_qf","PO4":"fosfato","PO4_flag":"fosfato_qf","Cla":"clorofila_a"
                                                   })
 
     return datos_pelacus
@@ -274,21 +274,21 @@ def lectura_datos_radprof(nombre_archivo):
         datos_radprof['st'][idato]             = str(datos_radprof['st'][idato])
         
     # Calcula la columna de NO3 a partir de la suma NO3+NO2
-    datos_radprof['no3']    =  datos_radprof['NO3+NO2 umol/Kg'] - datos_radprof['NO2 umol/kg']
-    datos_radprof['no3_qf'] =  datos_radprof['Flag_TON'] 
+    datos_radprof['nitrato']    =  datos_radprof['NO3+NO2 umol/Kg'] - datos_radprof['NO2 umol/kg']
+    datos_radprof['nitrato_qf'] =  datos_radprof['Flag_TON'] 
        
 
     # Renombra las columnas para mantener una denominación homogénea
     datos_radprof = datos_radprof.rename(columns={"st":"estacion","Niskin":"botella","Cast":'num_cast',
                                                   "Lat":"latitud","Lon":"longitud","CTDPRS":"presion_ctd","CTDtemp":"temperatura_ctd","SALCTD":"salinidad_ctd",
-                                                  "SiO2 umol/Kg":"sio2","Flag_SiO2":"sio2_qf",
-                                                  "NO2 umol/kg":"no2","Flag_NO2":"no2_qf","PO4 umol/Kg":"po4","Flag_PO4":"po4_qf"
+                                                  "SiO2 umol/Kg":"silicato","Flag_SiO2":"silicato_qf",
+                                                  "NO2 umol/kg":"nitrito","Flag_NO2":"nitrito_qf","PO4 umol/Kg":"fosfato","Flag_PO4":"fosfato_qf"
                                                   })
     
     
     # Mantén solo las columnas que interesan
     datos_radprof_recorte = datos_radprof[['estacion','botella','fecha_muestreo','hora_muestreo','latitud','longitud','presion_ctd','num_cast','temperatura_ctd','salinidad_ctd',
-                                           'no3','no3_qf','no2','no2_qf','sio2','sio2_qf','po4','po4_qf','configuracion_superficie','configuracion_perfilador']]
+                                           'nitrato','nitrato_qf','nitrito','nitrito_qf','silicato','silicato_qf','fosfato','fosfato_qf','configuracion_superficie','configuracion_perfilador']]
 
     del(datos_radprof)
 
@@ -908,8 +908,8 @@ def inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrase
     
     # Genera un dataframe solo con las variales biogeoquimicas de los datos a importar 
     datos_biogeoquimica = datos[['id_muestreo_temp','fluorescencia_ctd','fluorescencia_ctd_qf','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk_qf',
-                                 'tot_nit','tot_nit_qf','no3','no3_qf','no2','no2_qf','nh4','nh4_qf','po4','po4_qf','sio2','sio2_qf','tcarbn','tcarbn_qf','doc','doc_qf',
-                                 'cdom','cdom_qf','clorofila_a','clorofila_a_qf','alkali','alkali_qf','ph','ph_qf','ph_metodo','r_clor','r_clor_qf','r_per','r_per_qf','co3_temp']]    
+                                 'nitrogeno_total','nitrogeno_total_qf','nitrato','nitrato_qf','nitrito','nitrito_qf','amonio','amonio_qf','fosfato','fosfato_qf','silicato','silicato_qf','tcarbn','tcarbn_qf','doc','doc_qf',
+                                 'cdom','cdom_qf','clorofila_a','clorofila_a_qf','alcalinidad','alcalinidad_qf','ph','ph_qf','ph_metodo','r_clor','r_clor_qf','r_per','r_per_qf','co3_temp']]    
     datos_biogeoquimica = datos_biogeoquimica.rename(columns={"id_muestreo_temp": "muestreo"})
     
     # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
@@ -1275,7 +1275,7 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
 ######################################################################
 ######## FUNCION PARA LEER DATOS DE BOTELLAs (ARCHIVOS .BTL)  ########
 ######################################################################
-def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_variables,listado_variables_bd,df_estaciones_muestreadas,direccion_host,base_datos,usuario,contrasena,puerto):
+def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host,base_datos,usuario,contrasena,puerto):
 
     import streamlit as st
     import matplotlib.pyplot as plt
@@ -1286,17 +1286,22 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
     df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
     df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
     df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
+    df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
     conn.close()
 
     id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'].iloc[0]
-    st.text(id_dato_malo)
 
-    # Genera listados de salidas y estaciones, para los menús desplegables    
-    nombres_salidas            = df_salidas_muestreadas['nombre_salida'].tolist()
-    listado_salidas            = df_salidas_muestreadas['id_salida'].tolist()
+    # # Genera listados de salidas y estaciones, para los menús desplegables
+    # listado_salidas           = datos_procesados['salida_mar'].unique()
+    # df_salidas_muestreadas    = df_salidas[df_salidas['salida_mar'].isin(listado_salidas)]
 
-    nombres_estaciones         = df_estaciones_muestreadas['nombre_estacion'].tolist()
-    listado_estaciones         = df_estaciones_muestreadas['id_estacion'].tolist()
+    # # Genera listados de salidas y estaciones, para los menús desplegables    
+    # nombres_salidas            = df_salidas_muestreadas['nombre_salida'].tolist()
+    # listado_salidas            = df_salidas_muestreadas['id_salida'].tolist()
+
+    # nombres_estaciones         = df_estaciones_muestreadas['nombre_estacion'].tolist()
+    # listado_estaciones         = df_estaciones_muestreadas['id_estacion'].tolist()
     
     ### CONTROL DE CALIDAD DE LOS DATOS
 
@@ -1304,22 +1309,29 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
     col1, col2 = st.columns(2,gap="small")
     with col1: 
         
-        salida_seleccionada   = st.selectbox('Salida',(nombres_salidas))
-        indice_salida         = listado_salidas[nombres_salidas.index(salida_seleccionada)]
+        listado_salidas           = datos_procesados['salida_mar'].unique()
+        df_salidas_muestreadas    = df_salidas[df_salidas['salida_mar'].isin(listado_salidas)]
+        salida_seleccionada       = st.selectbox('Salida',(df_salidas_muestreadas['nombre_salida']))
+        indice_salida             = df_salidas['id_salida'][df_salidas['nombre_salida']==salida_seleccionada].iloc[0]
 
-        variable_seleccionada  = st.selectbox('Variable',(listado_variables))
-        indice_variable        = listado_variables.index(variable_seleccionada)
+        variable_seleccionada     = st.selectbox('Variable',(listado_variables))
+        indice_variable           = listado_variables.index(variable_seleccionada)
         
 
    
     with col2:
-        estacion_seleccionada = st.selectbox('Estación',(nombres_estaciones))
-        indice_estacion       = listado_estaciones[nombres_estaciones.index(estacion_seleccionada)]
         
-        meses_offset           = st.number_input('Intervalo meses:',value=1)
+        df_datos_salida_seleccionada = datos_procesados[datos_procesados['salida_mar']==salida_seleccionada]
+        listado_id_estaciones        = df_datos_salida_seleccionada['estacion'].unique()       
+        df_estaciones_disponibles    = df_estaciones[df_estaciones['id_estacion'].isin(listado_id_estaciones)]
+        
+        estacion_seleccionada        = st.selectbox('Estación',(df_estaciones_disponibles['nombre_estacion']))
+        indice_estacion              = df_estaciones_disponibles['id_salida'][df_estaciones_disponibles['nombre_estacion']==estacion_seleccionada].iloc[0]
+
+        meses_offset                 = st.number_input('Intervalo meses:',value=1)
     
     # Selecciona los datos correspondientes a la estación y salida seleccionada
-    df_seleccion               = datos_muestras[(datos_muestras["id_estacion"] == indice_estacion) & (datos_muestras["id_salida"] == indice_salida)]
+    df_seleccion               = datos_procesados[(datos_procesados["estacion"] == indice_estacion) & (datos_procesados["salida_mar"] == indice_salida)]
     
 
     # Recupera los datos disponibles de la misma estación, para la misma variable
@@ -1358,8 +1370,8 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
     # Representa un gráfico con la variable seleccionada junto a los oxígenos
     fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.05, 'hspace':0}, width_ratios=[3, 1])
    
-    ax.plot(df_disponible_bd[listado_variables_bd[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0',label='DATO PREVIO(OK)')
-    ax.plot(df_rango_temporal[listado_variables_bd[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040',label='DATO PREVIO(INTERVALO)')
+    ax.plot(df_disponible_bd[listado_variables[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0',label='DATO PREVIO(OK)')
+    ax.plot(df_rango_temporal[listado_variables[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040',label='DATO PREVIO(INTERVALO)')
        
     ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r',label='PROCESADO' )
     texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
@@ -1376,15 +1388,15 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
             nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
         ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
    
-    qf_variable_seleccionada = listado_variables_bd[indice_variable] + '_qf'
+    qf_variable_seleccionada = listado_variables[indice_variable] + '_qf'
     datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
-    ax.plot(datos_malos[listado_variables_bd[indice_variable]],datos_malos['presion_ctd'],'.',color='#00CCCC',label='DATO PREVIO(MALO)')    
-    ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.1),ncol=2, fancybox=True,fontsize=7)
+    ax.plot(datos_malos[listado_variables[indice_variable]],datos_malos['presion_ctd'],'.',color='#00CCCC',label='DATO PREVIO(MALO)')    
+    ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
     
    # ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
    #        ncol=3, fancybox=True, shadow=True)
    
-    az.plot(df_seleccion['Oxigeno'],df_seleccion['presion_ctd'],'.',color='#006633')
+    az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#006633')
     az.set(xlabel='Oxigeno (\u03BCmol/kg)')
     az.yaxis.set_visible(False)
     az.invert_yaxis()
@@ -1393,17 +1405,17 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
     st.pyplot(fig)
     
     # Gráficos particulares para cada variable
-    if variable_seleccionada == 'FOSFATO':
+    if variable_seleccionada == 'fosfato':
 
         fig, ax = plt.subplots()       
-        ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
-        ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
-        ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
+        ax.plot(df_disponible_bd['nitrato'],df_disponible_bd['fosfato'],'.',color='#C0C0C0')
+        ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color='#404040')
+        ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
         
-        datos_malos = df_disponible_bd[df_disponible_bd['po4_qf']==id_dato_malo]
-        ax.plot(datos_malos['no3'],datos_malos['po4'],'.',color='#00CCCC')
-        datos_malos = df_disponible_bd[df_disponible_bd['no3_qf']==id_dato_malo]
-        ax.plot(datos_malos['no3'],datos_malos['po4'],'.',color='#00CCCC')
+        datos_malos = df_disponible_bd[df_disponible_bd['fosfato_qf']==id_dato_malo]
+        ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
+        datos_malos = df_disponible_bd[df_disponible_bd['nitrato_qf']==id_dato_malo]
+        ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
         
         ax.set(xlabel='Nitrato (\u03BCmol/kg)')
         ax.set(ylabel='Fosfato (\u03BCmol/kg)')
@@ -1411,25 +1423,25 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
         for ipunto in range(df_seleccion.shape[0]):
-            if df_seleccion['id_botella'].iloc[ipunto] is None:
+            if df_seleccion['botella'].iloc[ipunto] is None:
                 nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
             else:
-                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
-            ax.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
+                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+            ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
        
         st.pyplot(fig)
     
-    elif variable_seleccionada == 'NITRATO':
+    elif variable_seleccionada == 'nitrato':
 
         fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
-        ax.plot(df_disponible_bd['no3'],df_disponible_bd['po4'],'.',color='#C0C0C0')
-        ax.plot(df_rango_temporal['no3'],df_rango_temporal['po4'],'.',color='#404040')
-        ax.plot(df_seleccion['NITRATO'],df_seleccion['FOSFATO'],'.r' )
+        ax.plot(df_disponible_bd['nitrato'],df_disponible_bd['fosfato'],'.',color='#C0C0C0')
+        ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color='#404040')
+        ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
         
-        datos_malos = df_disponible_bd[df_disponible_bd['po4_qf']==id_dato_malo]
-        ax.plot(datos_malos['no3'],datos_malos['po4'],'.',color='#00CCCC')
-        datos_malos = df_disponible_bd[df_disponible_bd['no3_qf']==id_dato_malo]
-        ax.plot(datos_malos['no3'],datos_malos['po4'],'.',color='#00CCCC')
+        datos_malos = df_disponible_bd[df_disponible_bd['fosfato_qf']==id_dato_malo]
+        ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
+        datos_malos = df_disponible_bd[df_disponible_bd['nitrato_qf']==id_dato_malo]
+        ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
         
         ax.set(xlabel='Nitrato (\u03BCmol/kg)')
         ax.set(ylabel='Fosfato (\u03BCmol/kg)')
@@ -1437,15 +1449,15 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
         for ipunto in range(df_seleccion.shape[0]):
-            if df_seleccion['id_botella'].iloc[ipunto] is None:
+            if df_seleccion['botella'].iloc[ipunto] is None:
                 nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
             else:
-                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
-            ax.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['FOSFATO'].iloc[ipunto]))
+                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+            ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
 
-        az.plot(df_disponible_bd['no3'],df_disponible_bd['ph'],'.',color='#C0C0C0')
-        az.plot(df_rango_temporal['no3'],df_rango_temporal['ph'],'.',color='#404040')
-        az.plot(df_seleccion['NITRATO'],df_seleccion['ph'],'.r' )
+        az.plot(df_disponible_bd['nitrato'],df_disponible_bd['ph'],'.',color='#C0C0C0')
+        az.plot(df_rango_temporal['nitrato'],df_rango_temporal['ph'],'.',color='#404040')
+        az.plot(df_seleccion['nitrato'],df_seleccion['ph'],'.r' )
         az.set(xlabel='Nitrato (\u03BCmol/kg)')
         az.set(ylabel='pH')
         az.yaxis.tick_right()
@@ -1454,28 +1466,28 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
         for ipunto in range(df_seleccion.shape[0]):
-            if df_seleccion['id_botella'].iloc[ipunto] is None:
+            if df_seleccion['botella'].iloc[ipunto] is None:
                 nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
             else:
-                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
-            az.annotate(nombre_muestreos[ipunto], (df_seleccion['NITRATO'].iloc[ipunto], df_seleccion['ph'].iloc[ipunto]))
+                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+            az.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['ph'].iloc[ipunto]))
  
 
         st.pyplot(fig)
   
     
     # Gráficos particulares para cada variable
-    elif variable_seleccionada == 'SILICATO':
+    elif variable_seleccionada == 'silicato':
 
         fig, ax = plt.subplots()       
-        ax.plot(df_disponible_bd['sio2'],df_disponible_bd['alkali'],'.',color='#C0C0C0')
-        ax.plot(df_rango_temporal['sio2'],df_rango_temporal['alkali'],'.',color='#404040')
-        ax.plot(df_seleccion['SILICATO'],df_seleccion['Alcalinidad'],'.r' )
+        ax.plot(df_disponible_bd['silicato'],df_disponible_bd['alcalinidad'],'.',color='#C0C0C0')
+        ax.plot(df_rango_temporal['silicato'],df_rango_temporal['alcalinidad'],'.',color='#404040')
+        ax.plot(df_seleccion['silicato'],df_seleccion['alcalinidad'],'.r' )
         
-        datos_malos = df_disponible_bd[df_disponible_bd['sio2_qf']==id_dato_malo]
-        ax.plot(datos_malos['sio2'],datos_malos['alkali'],'.',color='#00CCCC')
-        datos_malos = df_disponible_bd[df_disponible_bd['alkali_qf']==id_dato_malo]
-        ax.plot(datos_malos['sio2'],datos_malos['alkali_qf'],'.',color='#00CCCC')
+        datos_malos = df_disponible_bd[df_disponible_bd['silicato_qf']==id_dato_malo]
+        ax.plot(datos_malos['silicato'],datos_malos['alcalinidad'],'.',color='#00CCCC')
+        datos_malos = df_disponible_bd[df_disponible_bd['alcalinidad_qf']==id_dato_malo]
+        ax.plot(datos_malos['silicato'],datos_malos['alcalinidad_qf'],'.',color='#00CCCC')
         
         ax.set(xlabel='Silicato (\u03BCmol/kg)')
         ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')
@@ -1483,11 +1495,11 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
         for ipunto in range(df_seleccion.shape[0]):
-            if df_seleccion['id_botella'].iloc[ipunto] is None:
+            if df_seleccion['botella'].iloc[ipunto] is None:
                 nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
             else:
-                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
-            ax.annotate(nombre_muestreos[ipunto], (df_seleccion['SILICATO'].iloc[ipunto], df_seleccion['Alcalinidad'].iloc[ipunto]))
+                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+            ax.annotate(nombre_muestreos[ipunto], (df_seleccion['silicato'].iloc[ipunto], df_seleccion['alcalinidad'].iloc[ipunto]))
        
         st.pyplot(fig)
     
@@ -1519,8 +1531,8 @@ def control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,listado_var
    
             for idato in range(df_seleccion.shape[0]):
 
-                instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables_bd[indice_variable] + ' = %s, ' + listado_variables_bd[indice_variable] +  '_qf = %s WHERE id_disc_biogeoquim = %s;'
-                cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['id_muestreo_bgq'].iloc[idato])))
+                instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables[indice_variable] + ' = %s, ' + listado_variables[indice_variable] +  '_qf = %s WHERE id_disc_biogeoquim = %s;'
+                cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['id_disc_biogeoquim'].iloc[idato])))
                 conn.commit() 
 
             cursor.close()

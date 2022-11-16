@@ -355,7 +355,7 @@ conn.close()
 
 
 parametros_muestreo      = ['nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','num_cast','presion_ctd','prof_referencia','botella','configuracion_perfilador','configuracion_superficie','programa','latitud','longitud']
-variables_biogeoquimicas = ['oxigeno_ctd','fluorescencia_ctd','oxigeno_wk','tot_nit','sio2','no3','no2','nh4','po4','clorofila_a','tcarbn','doc','cdom','alkali','ph','r_clor','r_per','co3_temp']
+variables_biogeoquimicas = ['oxigeno_ctd','fluorescencia_ctd','oxigeno_wk','nitrogeno_total','silicato','nitrato','nitrito','amonio','fosfato','clorofila_a','tcarbn','doc','cdom','alcalinidad','ph','r_clor','r_per','co3_temp']
 variables_fisicas        = ['temperatura_ctd','salinidad_ctd','par_ctd','turbidez_ctd']
 
 index                    = numpy.arange(0,len(variables_biogeoquimicas)) 
