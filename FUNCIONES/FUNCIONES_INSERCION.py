@@ -1327,7 +1327,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
         df_estaciones_disponibles    = df_estaciones[df_estaciones['id_estacion'].isin(listado_id_estaciones)]
         
         estacion_seleccionada        = st.selectbox('Estación',(df_estaciones_disponibles['nombre_estacion']))
-        indice_estacion              = df_estaciones_disponibles['id_estacion'][df_estaciones_disponibles['nombre_estacion']==estacion_seleccionada].iloc[0]
+        indice_estacion              = df_estaciones_disponibles['id_estacion'][df_estaciones_disponibles['nombre_estacion']==estacion_seleccionada] #.iloc[0]
 
         meses_offset                 = st.number_input('Intervalo meses:',value=1)
     
