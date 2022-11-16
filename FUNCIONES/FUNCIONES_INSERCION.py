@@ -1382,10 +1382,10 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     # Añade el nombre de cada punto
     nombre_muestreos = [None]*df_seleccion.shape[0]
     for ipunto in range(df_seleccion.shape[0]):
-        if df_seleccion['id_botella'].iloc[ipunto] is None:
+        if df_seleccion['botella'].iloc[ipunto] is None:
             nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
         else:
-            nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['id_botella'].iloc[ipunto])
+            nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
         ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
    
     qf_variable_seleccionada = listado_variables[indice_variable] + '_qf'
