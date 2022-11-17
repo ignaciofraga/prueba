@@ -1313,7 +1313,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
         estacion_seleccionada        = st.selectbox('Estación',(df_estaciones_disponibles['nombre_estacion']))
         indice_estacion              = df_estaciones_disponibles['id_estacion'][df_estaciones_disponibles['nombre_estacion']==estacion_seleccionada].iloc[0]
         
-    col1, col2,col3 = st.columns(2,gap="small")
+    col1, col2,col3 = st.columns(3,gap="small")
     with col1: 
         
         listado_casts_estaciones  = df_datos_salida_seleccionada['num_cast'].unique() 
