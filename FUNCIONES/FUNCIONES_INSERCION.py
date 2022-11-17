@@ -1333,8 +1333,11 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
    
     # Determina los meses que marcan el rango de busqueda
     df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
-    fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0][0] - datetime.timedelta(days=meses_offset*30)
-    fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1][0] + datetime.timedelta(days=meses_offset*30)  
+    # fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0][0] - datetime.timedelta(days=meses_offset*30)
+    # fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1][0] + datetime.timedelta(days=meses_offset*30)  
+    fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0] - datetime.timedelta(days=meses_offset*30)
+    fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1] + datetime.timedelta(days=meses_offset*30)  
+
 
     if fecha_minima.year < fecha_maxima.year:
         listado_meses_1 = numpy.arange(fecha_minima.month,13)
