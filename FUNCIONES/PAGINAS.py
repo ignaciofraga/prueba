@@ -2354,7 +2354,7 @@ def procesado_nutrientes():
                         datos_corregidos['presion_ctd'].iloc[idato]        = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice].iloc[0]
                         datos_corregidos['salida_mar'].iloc[idato]         = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice].iloc[0]
                         datos_corregidos['botella'].iloc[idato]            = df_muestreos['botella'][df_muestreos['id_muestreo']==indice].iloc[0]
-                        datos_corregidos['fecha_muestreo'].iloc[idato]     = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice]
+                        datos_corregidos['fecha_muestreo'].iloc[idato]     = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice].iloc[0]
                                             
                         datos_corregidos['id_disc_biogeoquim'].iloc[idato] = df_datos_biogeoquimicos['id_disc_biogeoquim'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
                         datos_corregidos['ph'].iloc[idato]                 = df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]                              
