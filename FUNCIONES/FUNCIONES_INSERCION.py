@@ -1316,10 +1316,8 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     col1, col2,col3 = st.columns(3,gap="small")
     with col1: 
         
-        listado_casts_estaciones  = df_datos_salida_seleccionada['num_cast'].unique() 
-        df_casts_disponibles      = df_muestreos[df_muestreos['num_cast'].isin(listado_casts_estaciones)]
-
-        cast_seleccionado         = st.selectbox('Cast',(df_casts_disponibles['num_cast']))
+        listado_casts_estaciones  = datos_procesados['num_cast'].unique() 
+        cast_seleccionado         = st.selectbox('Cast',(listado_casts_estaciones))
         
     with col2: 
         variable_seleccionada     = st.selectbox('Variable',(listado_variables))
