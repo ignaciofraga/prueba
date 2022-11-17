@@ -2437,6 +2437,8 @@ def procesado_nutrientes():
              
                 variables_procesado = ['nitrogeno_total','nitrato','nitrito','silicato','fosfato']  
 
+                datos_muestras = datos_muestras.replace('None', numpy.nan)
+
                 FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,variables_procesado,direccion_host,base_datos,usuario,contrasena,puerto)
 
         
