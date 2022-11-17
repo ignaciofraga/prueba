@@ -2434,14 +2434,9 @@ def procesado_nutrientes():
                 # Mantén sólo las filas del dataframe con valores no nulos
                 datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
              
-                # listado_salidas            = datos_muestras['salida_mar'].unique()
-                # df_salidas_muestreadas     = df_salidas[df_salidas['salida_mar'].isin(listado_salidas)]
-            
-                # listado_estaciones         = datos_muestras['estacion'].unique()
-                # df_estaciones_muestreadas  = df_estaciones[df_estaciones['estacion'].isin(listado_estaciones)]
-                            
-                #FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,df_salidas_muestreadas,variables_run,df_estaciones_muestreadas,direccion_host,base_datos,usuario,contrasena,puerto)
-                FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,variables_run,direccion_host,base_datos,usuario,contrasena,puerto)
+                variables_procesado = ['nitrogeno_total','nitrato','nitrito','silicato','fosfato']  
+
+                FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,variables_procesado,direccion_host,base_datos,usuario,contrasena,puerto)
 
         
     # control de calidad de salidas previamente disponibles

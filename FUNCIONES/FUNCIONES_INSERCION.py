@@ -1393,15 +1393,21 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     ax.plot(datos_malos[listado_variables[indice_variable]],datos_malos['presion_ctd'],'.',color='#00CCCC',label='DATO PREVIO(MALO)')    
     ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
     
-   # ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.05),
-   #        ncol=3, fancybox=True, shadow=True)
-   
-    st.text(df_seleccion['oxigeno_ctd'])
-    az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#006633')
-    az.set(xlabel='Oxigeno (\u03BCmol/kg)')
-    az.yaxis.set_visible(False)
-    az.invert_yaxis()
-    az.set_ylim(rango_profs)
+    io_plot = 0
+    if not df_seleccion['oxigeno_ctd'].isnull().all(): 
+        az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#006633',label='OXIMETRO')
+        io_plot = 1
+            
+    if not df_seleccion['oxigeno_wk'].isnull().all(): 
+        az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#00CC66',label='WINKLER')
+        io_plot = 1
+        
+    if io_plot == 1:
+        az.set(xlabel='Oxigeno (\u03BCmol/kg)')
+        az.yaxis.set_visible(False)
+        az.invert_yaxis()
+        az.set_ylim(rango_profs)
+        az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
 
     st.pyplot(fig)
     
