@@ -2327,7 +2327,7 @@ def procesado_nutrientes():
             datos_corregidos['muestreo']        = [None]*datos_AA.shape[0]
             datos_corregidos['presion_ctd']     = [None]*datos_AA.shape[0]
 #            datos_corregidos['ph']              = [None]*datos_AA.shape[0]
-            datos_corregidos['ph']              = None
+            datos_corregidos['ph']              = numpy.nan
             datos_corregidos['alcalinidad']     = [None]*datos_AA.shape[0]
             datos_corregidos['oxigeno_ctd']     = [None]*datos_AA.shape[0]  
             datos_corregidos['oxigeno_wk']      = [None]*datos_AA.shape[0] 
