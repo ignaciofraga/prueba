@@ -1361,144 +1361,73 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     ################# GRAFICOS ################
 
     # Representa un gráfico con la variable seleccionada junto a los oxígenos
-    fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.05, 'hspace':0}, width_ratios=[3, 1])
-   
-    ax.plot(df_disponible_bd[listado_variables[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0',label='DATO PREVIO(OK)')
-    ax.plot(df_rango_temporal[listado_variables[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040',label='DATO PREVIO(INTERVALO)')
-       
-    ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r',label='PROCESADO' )
-    texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
-    ax.set(xlabel=texto_eje)
-    ax.set(ylabel='Presion (db)')
-    ax.invert_yaxis()
-    rango_profs = ax.get_ylim()
-    # Añade el nombre de cada punto
-    nombre_muestreos = [None]*df_seleccion.shape[0]
-    for ipunto in range(df_seleccion.shape[0]):
-        if df_seleccion['botella'].iloc[ipunto] is None:
-            nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-        else:
-            nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
-        ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
-   
-    qf_variable_seleccionada = listado_variables[indice_variable] + '_qf'
-    datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
-    ax.plot(datos_malos[listado_variables[indice_variable]],datos_malos['presion_ctd'],'.',color='#00CCCC',label='DATO PREVIO(MALO)')    
-    ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
+    if df_seleccion['ph'].isnull().all():
+        io_control = 0
+        texto_error = "La base de datos no contiene información para la variable, salida y estación seleccionadas"
+        st.warning(texto_error, icon="⚠️")
+        
+    else:
+        io_control = 1
     
-    io_plot = 0
-    if not df_seleccion['oxigeno_ctd'].isnull().all(): 
-        az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#006633',label='OXIMETRO')
-        io_plot = 1
+        fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.05, 'hspace':0}, width_ratios=[3, 1])
+       
+        ax.plot(df_disponible_bd[listado_variables[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0',label='DATO PREVIO(OK)')
+        ax.plot(df_rango_temporal[listado_variables[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040',label='DATO PREVIO(INTERVALO)')
+           
+        ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r',label='PROCESADO' )
+        texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
+        ax.set(xlabel=texto_eje)
+        ax.set(ylabel='Presion (db)')
+        ax.invert_yaxis()
+        rango_profs = ax.get_ylim()
+        # Añade el nombre de cada punto
+        nombre_muestreos = [None]*df_seleccion.shape[0]
+        for ipunto in range(df_seleccion.shape[0]):
+            if df_seleccion['botella'].iloc[ipunto] is None:
+                nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+            else:
+                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+            ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
+       
+        qf_variable_seleccionada = listado_variables[indice_variable] + '_qf'
+        datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
+        ax.plot(datos_malos[listado_variables[indice_variable]],datos_malos['presion_ctd'],'.',color='#00CCCC',label='DATO PREVIO(MALO)')    
+        ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
+        
+        io_plot = 0
+        if not df_seleccion['oxigeno_ctd'].isnull().all(): 
+            az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#006633',label='OXIMETRO')
+            io_plot = 1
+                
+        if not df_seleccion['oxigeno_wk'].isnull().all(): 
+            az.plot(df_seleccion['oxigeno_wk'],df_seleccion['presion_ctd'],'.',color='#00CC66',label='WINKLER')
+            io_plot = 1
             
-    if not df_seleccion['oxigeno_wk'].isnull().all(): 
-        az.plot(df_seleccion['oxigeno_wk'],df_seleccion['presion_ctd'],'.',color='#00CC66',label='WINKLER')
-        io_plot = 1
-        
-    if io_plot == 1:
-        az.set(xlabel='Oxigeno (\u03BCmol/kg)')
-        az.yaxis.set_visible(False)
-        az.invert_yaxis()
-        az.set_ylim(rango_profs)
-        az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
-
-    st.pyplot(fig)
+        if io_plot == 1:
+            az.set(xlabel='Oxigeno (\u03BCmol/kg)')
+            az.yaxis.set_visible(False)
+            az.invert_yaxis()
+            az.set_ylim(rango_profs)
+            az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
     
-    # Gráficos particulares para cada variable
-    if variable_seleccionada == 'fosfato':
-
-        fig, ax = plt.subplots()       
-        ax.plot(df_disponible_bd['nitrato'],df_disponible_bd['fosfato'],'.',color='#C0C0C0')
-        ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color='#404040')
-        ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
-        
-        datos_malos = df_disponible_bd[df_disponible_bd['fosfato_qf']==id_dato_malo]
-        ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
-        datos_malos = df_disponible_bd[df_disponible_bd['nitrato_qf']==id_dato_malo]
-        ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
-        
-        ax.set(xlabel='Nitrato (\u03BCmol/kg)')
-        ax.set(ylabel='Fosfato (\u03BCmol/kg)')
-
-        # Añade el nombre de cada punto
-        nombre_muestreos = [None]*df_seleccion.shape[0]
-        for ipunto in range(df_seleccion.shape[0]):
-            if df_seleccion['botella'].iloc[ipunto] is None:
-                nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-            else:
-                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
-            ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
-       
         st.pyplot(fig)
+ 
+    if io_control == 1:    
+        # Gráficos particulares para cada variable
+        if variable_seleccionada == 'fosfato':
     
-    elif variable_seleccionada == 'nitrato':
-
-        if df_seleccion['ph'].isnull().all():         
-            fig, ax = plt.subplots()      
-        else:
-            fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
-
-        ax.plot(df_disponible_bd['nitrato'],df_disponible_bd['fosfato'],'.',color='#C0C0C0')
-        ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color='#404040')
-        ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
-        
-        datos_malos = df_disponible_bd[df_disponible_bd['fosfato_qf']==id_dato_malo]
-        ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
-        datos_malos = df_disponible_bd[df_disponible_bd['nitrato_qf']==id_dato_malo]
-        ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
-        
-        ax.set(xlabel='Nitrato (\u03BCmol/kg)')
-        ax.set(ylabel='Fosfato (\u03BCmol/kg)')
-
-        # Añade el nombre de cada punto
-        nombre_muestreos = [None]*df_seleccion.shape[0]
-        for ipunto in range(df_seleccion.shape[0]):
-            if df_seleccion['botella'].iloc[ipunto] is None:
-                nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-            else:
-                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
-            ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
-
-
-        az.plot(df_disponible_bd['nitrato'],df_disponible_bd['ph'],'.',color='#C0C0C0')
-        az.plot(df_rango_temporal['nitrato'],df_rango_temporal['ph'],'.',color='#404040')
-        az.set(xlabel='Nitrato (\u03BCmol/kg)')
-        az.set(ylabel='pH')
-        if df_seleccion['ph'].isnull().all():    
-            az.plot(df_seleccion['nitrato'],df_seleccion['ph'],'.r' )
-            az.yaxis.tick_right()
-            az.yaxis.set_label_position("right")
-        
-            # Añade el nombre de cada punto
-            nombre_muestreos = [None]*df_seleccion.shape[0]
-            for ipunto in range(df_seleccion.shape[0]):
-                if df_seleccion['botella'].iloc[ipunto] is None:
-                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-                else:
-                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
-                az.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['ph'].iloc[ipunto]))
-     
-
-        st.pyplot(fig)
-  
-    
-    # Gráficos particulares para cada variable
-    elif variable_seleccionada == 'silicato':
-
-        if df_seleccion['silicato'].isnull().all() is False:         
-
             fig, ax = plt.subplots()       
-            ax.plot(df_disponible_bd['silicato'],df_disponible_bd['alcalinidad'],'.',color='#C0C0C0')
-            ax.plot(df_rango_temporal['silicato'],df_rango_temporal['alcalinidad'],'.',color='#404040')
-            ax.plot(df_seleccion['silicato'],df_seleccion['alcalinidad'],'.r' )
+            ax.plot(df_disponible_bd['nitrato'],df_disponible_bd['fosfato'],'.',color='#C0C0C0')
+            ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color='#404040')
+            ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
             
-            datos_malos = df_disponible_bd[df_disponible_bd['silicato_qf']==id_dato_malo]
-            ax.plot(datos_malos['silicato'],datos_malos['alcalinidad'],'.',color='#00CCCC')
-            datos_malos = df_disponible_bd[df_disponible_bd['alcalinidad_qf']==id_dato_malo]
-            ax.plot(datos_malos['silicato'],datos_malos['alcalinidad_qf'],'.',color='#00CCCC')
+            datos_malos = df_disponible_bd[df_disponible_bd['fosfato_qf']==id_dato_malo]
+            ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
+            datos_malos = df_disponible_bd[df_disponible_bd['nitrato_qf']==id_dato_malo]
+            ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
             
-            ax.set(xlabel='Silicato (\u03BCmol/kg)')
-            ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')
+            ax.set(xlabel='Nitrato (\u03BCmol/kg)')
+            ax.set(ylabel='Fosfato (\u03BCmol/kg)')
     
             # Añade el nombre de cada punto
             nombre_muestreos = [None]*df_seleccion.shape[0]
@@ -1507,48 +1436,128 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
                     nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
                 else:
                     nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
-                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['silicato'].iloc[ipunto], df_seleccion['alcalinidad'].iloc[ipunto]))
+                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
            
             st.pyplot(fig)
+        
+        elif variable_seleccionada == 'nitrato':
+    
+            if df_seleccion['ph'].isnull().all():         
+                fig, ax = plt.subplots()      
+            else:
+                fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
+    
+            ax.plot(df_disponible_bd['nitrato'],df_disponible_bd['fosfato'],'.',color='#C0C0C0')
+            ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color='#404040')
+            ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
+            
+            datos_malos = df_disponible_bd[df_disponible_bd['fosfato_qf']==id_dato_malo]
+            ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
+            datos_malos = df_disponible_bd[df_disponible_bd['nitrato_qf']==id_dato_malo]
+            ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
+            
+            ax.set(xlabel='Nitrato (\u03BCmol/kg)')
+            ax.set(ylabel='Fosfato (\u03BCmol/kg)')
+    
+            # Añade el nombre de cada punto
+            nombre_muestreos = [None]*df_seleccion.shape[0]
+            for ipunto in range(df_seleccion.shape[0]):
+                if df_seleccion['botella'].iloc[ipunto] is None:
+                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+                else:
+                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
     
     
-    ################# FORMULARIOS CALIDAD ################        
-
-    # Formulario para asignar banderas de calidad
-    with st.form("Formulario", clear_on_submit=False):
-                  
-        indice_validacion = df_indices_calidad['indice'].tolist()
-        texto_indice      = df_indices_calidad['descripcion'].tolist()
-        qf_asignado       = numpy.zeros(df_seleccion.shape[0])
-       
-        for idato in range(df_seleccion.shape[0]):
+            az.plot(df_disponible_bd['nitrato'],df_disponible_bd['ph'],'.',color='#C0C0C0')
+            az.plot(df_rango_temporal['nitrato'],df_rango_temporal['ph'],'.',color='#404040')
+            az.set(xlabel='Nitrato (\u03BCmol/kg)')
+            az.set(ylabel='pH')
+            if df_seleccion['ph'].isnull().all():    
+                az.plot(df_seleccion['nitrato'],df_seleccion['ph'],'.r' )
+                az.yaxis.tick_right()
+                az.yaxis.set_label_position("right")
+            
+                # Añade el nombre de cada punto
+                nombre_muestreos = [None]*df_seleccion.shape[0]
+                for ipunto in range(df_seleccion.shape[0]):
+                    if df_seleccion['botella'].iloc[ipunto] is None:
+                        nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+                    else:
+                        nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+                    az.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['ph'].iloc[ipunto]))
+         
+    
+            st.pyplot(fig)
+      
+        
+        # Gráficos particulares para cada variable
+        elif variable_seleccionada == 'silicato':
+    
+            if df_seleccion['silicato'].isnull().all() is False:         
+    
+                fig, ax = plt.subplots()       
+                ax.plot(df_disponible_bd['silicato'],df_disponible_bd['alcalinidad'],'.',color='#C0C0C0')
+                ax.plot(df_rango_temporal['silicato'],df_rango_temporal['alcalinidad'],'.',color='#404040')
+                ax.plot(df_seleccion['silicato'],df_seleccion['alcalinidad'],'.r' )
+                
+                datos_malos = df_disponible_bd[df_disponible_bd['silicato_qf']==id_dato_malo]
+                ax.plot(datos_malos['silicato'],datos_malos['alcalinidad'],'.',color='#00CCCC')
+                datos_malos = df_disponible_bd[df_disponible_bd['alcalinidad_qf']==id_dato_malo]
+                ax.plot(datos_malos['silicato'],datos_malos['alcalinidad_qf'],'.',color='#00CCCC')
+                
+                ax.set(xlabel='Silicato (\u03BCmol/kg)')
+                ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')
+        
+                # Añade el nombre de cada punto
+                nombre_muestreos = [None]*df_seleccion.shape[0]
+                for ipunto in range(df_seleccion.shape[0]):
+                    if df_seleccion['botella'].iloc[ipunto] is None:
+                        nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+                    else:
+                        nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+                    ax.annotate(nombre_muestreos[ipunto], (df_seleccion['silicato'].iloc[ipunto], df_seleccion['alcalinidad'].iloc[ipunto]))
+               
+                st.pyplot(fig)
+        
+        
+        ################# FORMULARIOS CALIDAD ################        
+    
+        # Formulario para asignar banderas de calidad
+        with st.form("Formulario", clear_on_submit=False):
+                      
+            indice_validacion = df_indices_calidad['indice'].tolist()
+            texto_indice      = df_indices_calidad['descripcion'].tolist()
+            qf_asignado       = numpy.zeros(df_seleccion.shape[0])
            
-            enunciado          = 'QF del muestreo ' + nombre_muestreos[idato]
-            valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
-            qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
-       
-        io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
-
-    if io_envio:
-
-        with st.spinner('Actualizando la base de datos'):
-       
-            # Introducir los valores en la base de datos
-            conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-            cursor = conn.cursor()  
-   
             for idato in range(df_seleccion.shape[0]):
-
-                instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables[indice_variable] + ' = %s, ' + listado_variables[indice_variable] +  '_qf = %s WHERE id_disc_biogeoquim = %s;'
-                cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['id_disc_biogeoquim'].iloc[idato])))
-                conn.commit() 
-
-            cursor.close()
-            conn.close()   
-
-        texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
-        st.success(texto_exito)
-   
+               
+                enunciado          = 'QF del muestreo ' + nombre_muestreos[idato]
+                valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
+                qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
+           
+            io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
+    
+        if io_envio:
+    
+            with st.spinner('Actualizando la base de datos'):
+           
+                # Introducir los valores en la base de datos
+                conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()  
+       
+                for idato in range(df_seleccion.shape[0]):
+    
+                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables[indice_variable] + ' = %s, ' + listado_variables[indice_variable] +  '_qf = %s WHERE id_disc_biogeoquim = %s;'
+                    cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['id_disc_biogeoquim'].iloc[idato])))
+                    conn.commit() 
+    
+                cursor.close()
+                conn.close()   
+    
+            texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
+            st.success(texto_exito)
+       
 
 
 
