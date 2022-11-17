@@ -1465,7 +1465,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
   
         az.plot(df_disponible_bd['nitrato'],df_disponible_bd['ph'],'.',color='#C0C0C0')
         az.plot(df_rango_temporal['nitrato'],df_rango_temporal['ph'],'.',color='#404040')
-        #az.plot(df_seleccion['nitrato'],df_seleccion['ph'],'.r' )
+        az.plot(df_seleccion['nitrato'],df_seleccion['ph'],'.r' )
         az.set(xlabel='Nitrato (\u03BCmol/kg)')
         az.set(ylabel='pH')
         az.yaxis.tick_right()

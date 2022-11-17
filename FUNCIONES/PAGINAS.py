@@ -2324,18 +2324,17 @@ def procesado_nutrientes():
             # Genera un dataframe en el que se almacenarán los resultados de las correcciones aplicadas. 
             datos_corregidos    = pandas.DataFrame(columns=variables_run)
             # Añade columnas con variables a utilizar en el control de calidad posterior 
-            datos_corregidos['muestreo']        = [None]*datos_AA.shape[0]
-            datos_corregidos['presion_ctd']     = [None]*datos_AA.shape[0]
-#            datos_corregidos['ph']              = [None]*datos_AA.shape[0]
-            datos_corregidos['ph']              = None
-            datos_corregidos['alcalinidad']     = [None]*datos_AA.shape[0]
-            datos_corregidos['oxigeno_ctd']     = [None]*datos_AA.shape[0]  
-            datos_corregidos['oxigeno_wk']      = [None]*datos_AA.shape[0] 
-            datos_corregidos['estacion']        = numpy.zeros(datos_AA.shape[0],dtype=int)
-            datos_corregidos['salida_mar']      = numpy.zeros(datos_AA.shape[0],dtype=int)
-            datos_corregidos['botella']         = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['muestreo']           = None
+            datos_corregidos['presion_ctd']        = None
+            datos_corregidos['ph']                 = None
+            datos_corregidos['alcalinidad']        = None
+            datos_corregidos['oxigeno_ctd']        = None  
+            datos_corregidos['oxigeno_wk']         = None
+            datos_corregidos['estacion']           = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['salida_mar']         = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['botella']            = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['id_disc_biogeoquim'] = numpy.zeros(datos_AA.shape[0],dtype=int)
-            datos_corregidos['fecha_muestreo']  = [None]*datos_AA.shape[0] 
+            datos_corregidos['fecha_muestreo']     = None 
         
             # Busca los datos de cada tubo analizada en el AA
             for idato in range(datos_AA.shape[0]):
