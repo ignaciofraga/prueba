@@ -2402,8 +2402,7 @@ def procesado_nutrientes():
                 datos_AA['nitrato_rendimiento'].iloc[idato]         = (datos_AA['nitrogeno_total'].iloc[idato]*factor - datos_AA['nitrito'].iloc[idato])/(rendimiento_columna/100) 
                 datos_AA['nitrogeno_total_rendimiento'].iloc[idato] = datos_AA['nitrato_rendimiento'].iloc[idato] + datos_AA['nitrito'].iloc[idato]
             
-            datos_AA['nitrogeno_total'] = datos_AA['nitrogeno_total_rendimiento']/datos_AA['densidad']  
-            datos_AA['nitrato']         = datos_AA['nitrato_rendimiento']/datos_AA['densidad']  
+            datos_AA['nitrogeno_total'] = datos_AA['nitrogeno_total_rendimiento']/datos_AA['densidad']    
             datos_AA['nitrito']         = datos_AA['nitrito']/datos_AA['densidad']  
             datos_AA['silicato']        = datos_AA['silicato']/datos_AA['densidad']  
             datos_AA['fosfato']         = datos_AA['fosfato']/datos_AA['densidad']  
@@ -2451,63 +2450,17 @@ def procesado_nutrientes():
                 
                 datos_corregidos[variables_run[ivariable]] = variable_drift
             
-           #variables_run = ['nitrogeno_total','nitrito','silicato','silicato']          
-                
-
-            # # Aplica la corrección de drift de cada variable
-            # for ivariable in range(len(variables_run)):
-        
-            #     valores_brutos = datos_AA[variables_run[ivariable]] # Selecciona la variable y convierte a concentraciones
-            #     densidades     = datos_AA['densidad']
-                
-            #     valores_concentraciones = valores_brutos / densidades
-                
-            #     # Concentraciones de las referencias
-            #     RMN_CE_variable = df_referencias[variables_run[ivariable]][0] 
-            #     RMN_CI_variable = df_referencias[variables_run[ivariable]][1]     
-        
-            #     # Encuentra las posiciones de los RMNs
-            #     posicion_RMN_bajos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN Low']
-            #     posicion_RMN_altos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN High']
-        
-            #     # Predimensiona las rectas a y b
-            #     posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0],posicion_RMN_bajos[1])
-            #     recta_at              = numpy.zeros(datos_AA.shape[0])
-            #     recta_bt              = numpy.zeros(datos_AA.shape[0])
-        
-            #     RMN_altos = valores_concentraciones[posicion_RMN_altos]
-            #     RMN_bajos = valores_concentraciones[posicion_RMN_bajos]
-        
-            #     pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
-            #     t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos.iloc[0] 
-        
-            #     variable_drift = numpy.zeros(datos_AA.shape[0])
-        
-            #     # Aplica la corrección basada de dos rectas, descrita en Hassenmueller
-            #     for idato in range(posiciones_corr_drift[0],posiciones_corr_drift[-1]):
-                    
-                
-            #         factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
-            #         recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[0]-RMN_bajos.iloc[-1]) 
-            #         recta_bt[idato] = RMN_altos.iloc[0] -  factor_f*(RMN_altos.iloc[0]-RMN_altos.iloc[-1]) 
-                    
-            #         val_combinado         = ((valores_concentraciones[idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
-        
-            #         variable_drift[idato] = val_combinado*pte_RMN+t_indep_RMN
-        
-            #     variable_drift[variable_drift<0] = 0
-        
-            #     # Almacena los resultados en un dataframe    
-            #     datos_corregidos[variables_run[ivariable]] = variable_drift
          
-            #datos_corregidos = FUNCIONES_INSERCION.correccion_drift(datos_brutos,datos_corregidos,datos_estadillo,datos_referencias,variables_run,rendimiento_columna,temperatura_laboratorio)
-   
-         
-            # # # Calcula el NO3 como diferencia entre el TON y el NO2
-            # datos_corregidos['nitrato'] = numpy.zeros(datos_corregidos.shape[0])
-            # for idato in range(datos_corregidos.shape[0]):
-            #     datos_corregidos['nitrato'].iloc[idato] = datos_corregidos['nitrogeno_total'].iloc[idato] - datos_corregidos['nitrito'].iloc[idato]
+            # Calcula el NO3 como diferencia entre el TON y el NO2
+            datos_corregidos['nitrato'] = datos_corregidos['nitrogeno_total'] - datos_corregidos['nitrito']
             
+            # corrige posibles valores negativos
+            datos_corregidos['nitrato'][datos_corregidos['nitrato']<0] = 0
+            datos_corregidos['nitrito'][datos_corregidos['nitrito']<0] = 0
+            datos_corregidos['silicato'][datos_corregidos['silicato']<0] = 0
+            datos_corregidos['fosfato'][datos_corregidos['fosfato']<0] = 0
+            
+
             if datos_corregidos['muestreo'].isnull().all():
                 texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
                 st.warning(texto_error, icon="⚠️") 
