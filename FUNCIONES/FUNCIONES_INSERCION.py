@@ -1399,7 +1399,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
         io_plot = 1
             
     if not df_seleccion['oxigeno_wk'].isnull().all(): 
-        az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#00CC66',label='WINKLER')
+        az.plot(df_seleccion['oxigeno_wk'],df_seleccion['presion_ctd'],'.',color='#00CC66',label='WINKLER')
         io_plot = 1
         
     if io_plot == 1:
