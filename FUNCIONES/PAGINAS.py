@@ -2359,9 +2359,6 @@ def procesado_nutrientes():
                         datos_corregidos['fecha_muestreo'].iloc[idato]     = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice]
                                             
                         datos_corregidos['id_disc_biogeoquim'].iloc[idato] = df_datos_biogeoquimicos['id_disc_biogeoquim'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
-                        # if df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice] is None:
-                        #     st.text('ko')
-                        st.text(df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0])
                         datos_corregidos['ph'].iloc[idato]                 = df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]                              
                         datos_corregidos['alcalinidad'].iloc[idato]        = df_datos_biogeoquimicos['alcalinidad'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
                         datos_corregidos['oxigeno_ctd'].iloc[idato]        = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
@@ -2439,7 +2436,6 @@ def procesado_nutrientes():
              
                 variables_procesado = ['nitrogeno_total','nitrato','nitrito','silicato','fosfato']  
 
-                datos_muestras = datos_muestras.replace('None', numpy.nan)
 
                 FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,variables_procesado,direccion_host,base_datos,usuario,contrasena,puerto)
 

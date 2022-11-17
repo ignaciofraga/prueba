@@ -1492,29 +1492,31 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     # Gráficos particulares para cada variable
     elif variable_seleccionada == 'silicato':
 
-        fig, ax = plt.subplots()       
-        ax.plot(df_disponible_bd['silicato'],df_disponible_bd['alcalinidad'],'.',color='#C0C0C0')
-        ax.plot(df_rango_temporal['silicato'],df_rango_temporal['alcalinidad'],'.',color='#404040')
-        ax.plot(df_seleccion['silicato'],df_seleccion['alcalinidad'],'.r' )
-        
-        datos_malos = df_disponible_bd[df_disponible_bd['silicato_qf']==id_dato_malo]
-        ax.plot(datos_malos['silicato'],datos_malos['alcalinidad'],'.',color='#00CCCC')
-        datos_malos = df_disponible_bd[df_disponible_bd['alcalinidad_qf']==id_dato_malo]
-        ax.plot(datos_malos['silicato'],datos_malos['alcalinidad_qf'],'.',color='#00CCCC')
-        
-        ax.set(xlabel='Silicato (\u03BCmol/kg)')
-        ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')
+        if not df_seleccion['silicato'].isnull().all():         
 
-        # Añade el nombre de cada punto
-        nombre_muestreos = [None]*df_seleccion.shape[0]
-        for ipunto in range(df_seleccion.shape[0]):
-            if df_seleccion['botella'].iloc[ipunto] is None:
-                nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-            else:
-                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
-            ax.annotate(nombre_muestreos[ipunto], (df_seleccion['silicato'].iloc[ipunto], df_seleccion['alcalinidad'].iloc[ipunto]))
-       
-        st.pyplot(fig)
+            fig, ax = plt.subplots()       
+            ax.plot(df_disponible_bd['silicato'],df_disponible_bd['alcalinidad'],'.',color='#C0C0C0')
+            ax.plot(df_rango_temporal['silicato'],df_rango_temporal['alcalinidad'],'.',color='#404040')
+            ax.plot(df_seleccion['silicato'],df_seleccion['alcalinidad'],'.r' )
+            
+            datos_malos = df_disponible_bd[df_disponible_bd['silicato_qf']==id_dato_malo]
+            ax.plot(datos_malos['silicato'],datos_malos['alcalinidad'],'.',color='#00CCCC')
+            datos_malos = df_disponible_bd[df_disponible_bd['alcalinidad_qf']==id_dato_malo]
+            ax.plot(datos_malos['silicato'],datos_malos['alcalinidad_qf'],'.',color='#00CCCC')
+            
+            ax.set(xlabel='Silicato (\u03BCmol/kg)')
+            ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')
+    
+            # Añade el nombre de cada punto
+            nombre_muestreos = [None]*df_seleccion.shape[0]
+            for ipunto in range(df_seleccion.shape[0]):
+                if df_seleccion['botella'].iloc[ipunto] is None:
+                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+                else:
+                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['silicato'].iloc[ipunto], df_seleccion['alcalinidad'].iloc[ipunto]))
+           
+            st.pyplot(fig)
     
     
     ################# FORMULARIOS CALIDAD ################        
