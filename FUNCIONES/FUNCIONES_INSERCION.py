@@ -1304,24 +1304,31 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
         salida_seleccionada       = st.selectbox('Salida',(df_salidas_muestreadas['nombre_salida']))
         indice_salida             = df_salidas['id_salida'][df_salidas['nombre_salida']==salida_seleccionada].iloc[0]
 
-        variable_seleccionada     = st.selectbox('Variable',(listado_variables))
-        indice_variable           = listado_variables.index(variable_seleccionada)
-        
-
-   
     with col2:
 
         df_datos_salida_seleccionada = datos_procesados[datos_procesados['salida_mar']==indice_salida]
         listado_id_estaciones        = df_datos_salida_seleccionada['estacion'].unique() 
         df_estaciones_disponibles    = df_estaciones[df_estaciones['id_estacion'].isin(listado_id_estaciones)]
-        
+
         estacion_seleccionada        = st.selectbox('Estación',(df_estaciones_disponibles['nombre_estacion']))
         indice_estacion              = df_estaciones_disponibles['id_estacion'][df_estaciones_disponibles['nombre_estacion']==estacion_seleccionada].iloc[0]
+        
+    col1, col2,col3 = st.columns(2,gap="small")
+    with col1: 
+        
+        listado_casts_estaciones  = df_datos_salida_seleccionada['num_cast'].unique() 
+        df_casts_disponibles      = df_muestreos[df_muestreos['num_cast'].isin(listado_casts_estaciones)]
 
-        meses_offset                 = st.number_input('Intervalo meses:',value=1)
+        cast_seleccionado         = st.selectbox('Cast',(df_casts_disponibles['num_cast']))
+        
+    with col2: 
+        variable_seleccionada     = st.selectbox('Variable',(listado_variables))
+        indice_variable           = listado_variables.index(variable_seleccionada)
+    with col3:  
+        meses_offset              = st.number_input('Intervalo meses:',value=1)
     
     # Selecciona los datos correspondientes a la estación y salida seleccionada
-    df_seleccion               = datos_procesados[(datos_procesados["estacion"] == indice_estacion) & (datos_procesados["salida_mar"] == indice_salida)]
+    df_seleccion               = datos_procesados[(datos_procesados["estacion"] == indice_estacion) & (datos_procesados["salida_mar"] == indice_salida) & (datos_procesados["num_cast"] == cast_seleccionado)]
     
 
     # Recupera los datos disponibles de la misma estación, para la misma variable

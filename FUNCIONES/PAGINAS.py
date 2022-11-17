@@ -2339,6 +2339,7 @@ def procesado_nutrientes():
             datos_corregidos['salida_mar']         = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['botella']            = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['id_disc_biogeoquim'] = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['num_cast']           = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['fecha_muestreo']     = None 
         
             # Encuentra las posiciones de las referencias de sw
@@ -2370,6 +2371,7 @@ def procesado_nutrientes():
                         datos_corregidos['salida_mar'].iloc[idato]         = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice].iloc[0]
                         datos_corregidos['botella'].iloc[idato]            = df_muestreos['botella'][df_muestreos['id_muestreo']==indice].iloc[0]
                         datos_corregidos['fecha_muestreo'].iloc[idato]     = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice].iloc[0]
+                        datos_corregidos['num_cast'].iloc[idato]           = df_muestreos['num_cast'][df_muestreos['id_muestreo']==indice].iloc[0]
                                             
                         datos_corregidos['id_disc_biogeoquim'].iloc[idato] = df_datos_biogeoquimicos['id_disc_biogeoquim'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
                         datos_corregidos['ph'].iloc[idato]                 = df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]                              
@@ -2383,8 +2385,8 @@ def procesado_nutrientes():
 
                     else:
                         datos_AA['io_disponible']           = 0
-                        # texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
-                        # st.warning(texto_error, icon="⚠️") 
+                        texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
+                        st.warning(texto_error, icon="⚠️") 
                        
             # Asigna el identificador de cada registro al dataframe en el que se guardarán los resultados
             datos_corregidos['tubo'] = datos_AA['Sample ID']
@@ -2410,11 +2412,9 @@ def procesado_nutrientes():
             
             # Cálculo de la deriva propiamente
             for ivariable in range(len(variables_run)):
-            #for ivariable in range(1):
                 
                 variable_concentracion  = variables_run[ivariable] 
-                
-                
+                                
                 # Concentraciones de las referencias
                 RMN_CE_variable = df_referencias[variables_run[ivariable]].iloc[0]
                 RMN_CI_variable = df_referencias[variables_run[ivariable]].iloc[1]  
@@ -2467,7 +2467,7 @@ def procesado_nutrientes():
                 
             else:
             
-                texto_exito = 'Datos del Autoanalizador procesados correctamente'
+                texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
             
                 # Mantén sólo las filas del dataframe con valores no nulos
