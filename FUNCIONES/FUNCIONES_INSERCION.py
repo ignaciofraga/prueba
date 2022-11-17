@@ -1440,7 +1440,11 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     
     elif variable_seleccionada == 'nitrato':
 
-        fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
+        if df_seleccion['ph'].isnull().all():         
+            fig, ax = plt.subplots()      
+        else:
+            fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
+
         ax.plot(df_disponible_bd['nitrato'],df_disponible_bd['fosfato'],'.',color='#C0C0C0')
         ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color='#404040')
         ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
