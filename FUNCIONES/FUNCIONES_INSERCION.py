@@ -1292,16 +1292,6 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
 
     id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'].iloc[0]
 
-    # # Genera listados de salidas y estaciones, para los menús desplegables
-    # listado_salidas           = datos_procesados['salida_mar'].unique()
-    # df_salidas_muestreadas    = df_salidas[df_salidas['salida_mar'].isin(listado_salidas)]
-
-    # # Genera listados de salidas y estaciones, para los menús desplegables    
-    # nombres_salidas            = df_salidas_muestreadas['nombre_salida'].tolist()
-    # listado_salidas            = df_salidas_muestreadas['id_salida'].tolist()
-
-    # nombres_estaciones         = df_estaciones_muestreadas['nombre_estacion'].tolist()
-    # listado_estaciones         = df_estaciones_muestreadas['id_estacion'].tolist()
     
     ### CONTROL DE CALIDAD DE LOS DATOS
 

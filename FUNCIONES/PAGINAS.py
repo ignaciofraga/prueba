@@ -2293,8 +2293,9 @@ def procesado_nutrientes():
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
     acciones     = ['Procesar salidas del AA', 'Realizar control de calidad de datos disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
-    
-
+ 
+    variables_procesado = ['nitrogeno_total','nitrato','nitrito','silicato','fosfato']    
+ 
     # Añade salidas del AA
     if tipo_accion == acciones[0]:
         
@@ -2434,17 +2435,22 @@ def procesado_nutrientes():
                 # Mantén sólo las filas del dataframe con valores no nulos
                 datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]
              
-                variables_procesado = ['nitrogeno_total','nitrato','nitrito','silicato','fosfato']  
-
-
                 FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,variables_procesado,direccion_host,base_datos,usuario,contrasena,puerto)
 
         
     # control de calidad de salidas previamente disponibles
     if tipo_accion == acciones[1]: 
  
-        nombres_salidas            = df_salidas['nombre_salida'].tolist()
-        listado_salidas            = df_salidas['id_salida'].tolist()       
+        # compón un dataframe con la información de muestreo y datos biogeoquímicos
+        df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
+        df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
+        
+        st.text(df_datos_disponibles)
+        
+        # procesa ese dataframe
+        FUNCIONES_INSERCION.control_calidad_nutrientes(df_datos_disponibles,variables_procesado,direccion_host,base_datos,usuario,contrasena,puerto)
+
+        
  
     #     # Despliega menús de selección de la variable, salida y la estación a controlar                
     #     col1, col2 = st.columns(2,gap="small")
