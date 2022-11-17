@@ -2317,7 +2317,8 @@ def procesado_nutrientes():
             datos_AA      = datos_brutos.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
         
             # Predimensiona columnas en las que guardar información de salinidad y densidad    
-            datos_AA['densidad']    = numpy.ones(datos_AA.shape[0])
+            datos_AA['densidad']      = numpy.ones(datos_AA.shape[0])
+            datos_AA['io_disponible'] = numpy.ones(datos_AA.shape[0])
             
             # Genera un dataframe en el que se almacenarán los resultados de las correcciones aplicadas. 
             datos_corregidos    = pandas.DataFrame(columns=variables_run)
@@ -2334,18 +2335,26 @@ def procesado_nutrientes():
             datos_corregidos['id_disc_biogeoquim'] = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['fecha_muestreo']     = None 
         
-            # Busca los datos de cada tubo analizada en el AA
-            for idato in range(datos_AA.shape[0]):
-                
-                if datos_AA['Sample ID'].iloc[idato] == 'RMN Low' : # Tubo correspondiente a referencia (RMN)
-                    datos_AA['densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
-                    
-                elif datos_AA['Sample ID'].iloc[idato] == 'RMN High': # Tubo correspondiente a referencia (RMN)
-                    datos_AA['densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
-                
-                else:   # Resto de tubos
+            # Encuentra las posiciones de las referencias de sw
+            indices_referencias = numpy.asarray(datos_brutos['Peak Number'][datos_brutos['Sample ID']=='sw']) - 1
+            # Agrupa en dos tandas, las iniciales y las finales
+            spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
+            listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
+            
+            ref_inicial        = listado_refs[0][-1]
+            ref_final          = listado_refs[1][0]
+            indices_rmns_altos = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='RMN High']) - 1
+            indices_rmns_bajos = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='RMN Low']) - 1
+
+            # Determina las densidades de los RMNs            
+            datos_AA['densidad'].iloc[indices_rmns_bajos]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+            datos_AA['densidad'].iloc[indices_rmns_altos]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+
+            # Determina las densidades de las muestas        
+            for idato in range(ref_inicial,ref_final):
+                if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
                     id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
-                    
+                            
                     if len(id_temp) > 0:
                         indice                                             = id_temp.iloc[0]
                         salinidad                                          = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
@@ -2365,9 +2374,54 @@ def procesado_nutrientes():
                         datos_corregidos['estacion'].iloc[idato]           =  df_muestreos['estacion'][df_muestreos['id_muestreo']==indice].iloc[0]
                     
                         datos_AA['densidad'].iloc[idato]    = (999.1+0.77*((salinidad)-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+
+                    else:
+                        datos_AA['io_disponible']           = 0
+                        texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
+                        st.warning(texto_error, icon="⚠️") 
                        
             # Asigna el identificador de cada registro al dataframe en el que se guardarán los resultados
             datos_corregidos['tubo'] = datos_AA['Sample ID']
+                    
+                    
+                    
+            # # Busca los datos de cada tubo analizada en el AA
+            # for idato in range(datos_AA.shape[0]):
+                
+                
+            #     Cup Type
+                
+            #     if datos_AA['Sample ID'].iloc[idato] == 'RMN Low' : # Tubo correspondiente a referencia (RMN)
+            #         datos_AA['densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+                    
+            #     elif datos_AA['Sample ID'].iloc[idato] == 'RMN High': # Tubo correspondiente a referencia (RMN)
+            #         datos_AA['densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+                
+            #     else:   # Resto de tubos
+            #         id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
+                    
+            #         if len(id_temp) > 0:
+            #             indice                                             = id_temp.iloc[0]
+            #             salinidad                                          = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
+        
+            #             datos_corregidos['muestreo'].iloc[idato]           = indice
+            #             datos_corregidos['presion_ctd'].iloc[idato]        = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice].iloc[0]
+            #             datos_corregidos['salida_mar'].iloc[idato]         = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice].iloc[0]
+            #             datos_corregidos['botella'].iloc[idato]            = df_muestreos['botella'][df_muestreos['id_muestreo']==indice].iloc[0]
+            #             datos_corregidos['fecha_muestreo'].iloc[idato]     = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice].iloc[0]
+                                            
+            #             datos_corregidos['id_disc_biogeoquim'].iloc[idato] = df_datos_biogeoquimicos['id_disc_biogeoquim'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
+            #             datos_corregidos['ph'].iloc[idato]                 = df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]                              
+            #             datos_corregidos['alcalinidad'].iloc[idato]        = df_datos_biogeoquimicos['alcalinidad'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
+            #             datos_corregidos['oxigeno_ctd'].iloc[idato]        = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
+            #             datos_corregidos['oxigeno_wk'].iloc[idato]         = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
+                            
+            #             datos_corregidos['estacion'].iloc[idato]           =  df_muestreos['estacion'][df_muestreos['id_muestreo']==indice].iloc[0]
+                    
+            #             datos_AA['densidad'].iloc[idato]    = (999.1+0.77*((salinidad)-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+                       
+            # # Asigna el identificador de cada registro al dataframe en el que se guardarán los resultados
+            # datos_corregidos['tubo'] = datos_AA['Sample ID']
                                  
             # Aplica la corrección de drift de cada variable
             for ivariable in range(len(variables_run)):
