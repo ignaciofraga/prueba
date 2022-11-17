@@ -1492,7 +1492,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     # Gráficos particulares para cada variable
     elif variable_seleccionada == 'silicato':
 
-        if not df_seleccion['silicato'].isnull().all():         
+        if df_seleccion['silicato'].isnull().all() is False:         
 
             fig, ax = plt.subplots()       
             ax.plot(df_disponible_bd['silicato'],df_disponible_bd['alcalinidad'],'.',color='#C0C0C0')
