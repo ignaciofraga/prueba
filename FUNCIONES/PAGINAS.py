@@ -2362,7 +2362,7 @@ def procesado_nutrientes():
                         datos_corregidos['id_disc_biogeoquim'].iloc[idato] = df_datos_biogeoquimicos['id_disc_biogeoquim'][df_datos_biogeoquimicos['muestreo']==indice]
                         if df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice] is None:
                             st.text('ko')
-                        st.text(df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice])
+                        st.text(df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice][0])
                         datos_corregidos['ph'].iloc[idato]                 = df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice]                              
                         datos_corregidos['alcalinidad'].iloc[idato]        = df_datos_biogeoquimicos['alcalinidad'][df_datos_biogeoquimicos['muestreo']==indice]
                         datos_corregidos['oxigeno_ctd'].iloc[idato]        = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==indice]
