@@ -1462,6 +1462,8 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
                 nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
 
+        st.text(df_seleccion['nitrato'])
+        st.text(df_seleccion['ph'])
         if not df_seleccion['ph'].isnull().all():
             az.plot(df_disponible_bd['nitrato'],df_disponible_bd['ph'],'.',color='#C0C0C0')
             az.plot(df_rango_temporal['nitrato'],df_rango_temporal['ph'],'.',color='#404040')
