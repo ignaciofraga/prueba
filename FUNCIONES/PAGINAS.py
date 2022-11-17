@@ -2402,11 +2402,11 @@ def procesado_nutrientes():
                 datos_AA['nitrato_rendimiento'].iloc[idato] = (datos_AA['nitrogeno_total'].iloc[idato]*factor - datos_AA['nitrito'].iloc[idato])/(rendimiento_columna/100) 
                 datos_AA['nitrogeno_total_rendimiento'].iloc[idato] = datos_AA['nitrato_rendimiento'].iloc[idato] + datos_AA['nitrito'].iloc[idato]
             
-            datos_brutos['nitrogeno_total_conc'] = datos_brutos['nitrogeno_total_rendimiento']/datos_brutos['DENSIDAD']  
-            datos_brutos['nitrato_conc'] = datos_brutos['nitrato_conc_rendimiento']/datos_brutos['DENSIDAD']  
-            datos_brutos['nitrito_conc'] = datos_brutos['nitrito']/datos_brutos['DENSIDAD']  
-            datos_brutos['silicato_conc'] = datos_brutos['silicato']/datos_brutos['DENSIDAD']  
-            datos_brutos['fosfato_conc'] = datos_brutos['fosfato']/datos_brutos['DENSIDAD']  
+            datos_brutos['nitrogeno_total_conc'] = datos_brutos['nitrogeno_total_rendimiento']/datos_brutos['densidad']  
+            datos_brutos['nitrato_conc'] = datos_brutos['nitrato_conc_rendimiento']/datos_brutos['densidad']  
+            datos_brutos['nitrito_conc'] = datos_brutos['nitrito']/datos_brutos['densidad']  
+            datos_brutos['silicato_conc'] = datos_brutos['silicato']/datos_brutos['densidad']  
+            datos_brutos['fosfato_conc'] = datos_brutos['fosfato']/datos_brutos['densidad']  
             
             
             # Cálculo de la deriva propiamente
