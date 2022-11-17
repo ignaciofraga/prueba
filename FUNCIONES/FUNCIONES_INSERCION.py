@@ -1464,7 +1464,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
 
         st.text(df_seleccion['nitrato'])
         st.text(df_seleccion['ph'])
-        if all(v is None for v in df_seleccion['ph']):
+        if all(v is None for v in df_seleccion['ph']) is True:
             st.text('sososl')
         if not df_seleccion['ph'].isnull().all():
             az.plot(df_disponible_bd['nitrato'],df_disponible_bd['ph'],'.',color='#C0C0C0')
