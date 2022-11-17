@@ -2326,8 +2326,8 @@ def procesado_nutrientes():
             # Añade columnas con variables a utilizar en el control de calidad posterior 
             datos_corregidos['muestreo']        = [None]*datos_AA.shape[0]
             datos_corregidos['presion_ctd']     = [None]*datos_AA.shape[0]
-#            datos_corregidos['ph']              = [None]*datos_AA.shape[0]
-            datos_corregidos['ph']              = None
+            datos_corregidos['ph']              = [None]*datos_AA.shape[0]
+#            datos_corregidos['ph']              = None
             datos_corregidos['alcalinidad']     = [None]*datos_AA.shape[0]
             datos_corregidos['oxigeno_ctd']     = [None]*datos_AA.shape[0]  
             datos_corregidos['oxigeno_wk']      = [None]*datos_AA.shape[0] 
