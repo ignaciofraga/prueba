@@ -1561,6 +1561,97 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
 
 
 
+################################################################
+######## FUNCION PARA REALIZAR LA CORRECCIÓN DE DERIVA  ########
+################################################################
+
+def correccion_drift(datos_brutos,datos_corregidos,datos_estadillo,datos_referencias,variables_run,rendimiento_columna,temperatura_laboratorio):
+
+    # Encuentra los índices (picos) correspondientes a la calbración
+    indices_calibracion = numpy.asarray(datos_brutos['Peak Number'][datos_brutos['Cup Type']=='CALB']) - 1
+       
+    # Corrige las concentraciones a partir de los rendimientos de la coumna reductora
+    datos_brutos['NO3_rendimiento'] = numpy.zeros(datos_brutos.shape[0])
+    datos_brutos['TON_rendimiento'] = numpy.zeros(datos_brutos.shape[0])
+    factor = ((datos_brutos['TON'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_brutos['NO2'].iloc[indices_calibracion[-1]])/(datos_brutos['TON'].iloc[indices_calibracion[-1]] + datos_brutos['NO2'].iloc[indices_calibracion[-1]])
+    for idato in range(datos_brutos.shape[0]):
+        datos_brutos['NO3_rendimiento'].iloc[idato] = (datos_brutos['TON'].iloc[idato]*factor - datos_brutos['NO2'].iloc[idato])/(rendimiento_columna/100) 
+        datos_brutos['TON_rendimiento'].iloc[idato] = datos_brutos['NO3_rendimiento'].iloc[idato] + datos_brutos['NO2'].iloc[idato]
+    
+    
+    # Pasa las concentraciones a mol/kg
+    datos_brutos['DENSIDAD'] = numpy.ones(datos_brutos.shape[0])
+    for idato in range(datos_brutos.shape[0]):
+        if datos_brutos['Sample ID'].iloc[idato] == 'RMN Low CE' :
+            datos_brutos['DENSIDAD'].iloc[idato]  = (999.1+0.77*((datos_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+            
+        elif datos_brutos['Sample ID'].iloc[idato] == 'RMN High CG':
+            datos_brutos['DENSIDAD'].iloc[idato]  = (999.1+0.77*((datos_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+            
+        else:
+            for iestadillo in range(datos_estadillo.shape[0]):
+                if datos_brutos['Sample ID'].iloc[idato] == datos_estadillo['ID'].iloc[iestadillo]:
+                    datos_brutos['DENSIDAD'].iloc[idato] = (999.1+0.77*((datos_estadillo['SALCTD'].iloc[iestadillo])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+                   
+                    
+    datos_brutos['TON_CONC'] = datos_brutos['TON_rendimiento']/datos_brutos['DENSIDAD']  
+    datos_brutos['NO3_CONC'] = datos_brutos['NO3_rendimiento']/datos_brutos['DENSIDAD']  
+    datos_brutos['NO2_CONC'] = datos_brutos['NO2']/datos_brutos['DENSIDAD']  
+    datos_brutos['SiO2_CONC'] = datos_brutos['SiO2']/datos_brutos['DENSIDAD']  
+    datos_brutos['PO4_CONC'] = datos_brutos['PO4']/datos_brutos['DENSIDAD']  
+    
+    
+    ####  APLICA LA CORRECCIÓN DE DERIVA ####
+    # Encuentra las posiciones de los RMNs
+    posicion_RMN_bajos  = [i for i, e in enumerate(datos_brutos['Sample ID']) if e == 'RMN Low CE']
+    posicion_RMN_altos  = [i for i, e in enumerate(datos_brutos['Sample ID']) if e == 'RMN High CG']
+    
+    for ivariable in range(len(variables_run)):
+    #for ivariable in range(1):
+        
+        variable_concentracion  = variables_run[ivariable] + '_CONC'
+        
+        # Concentraciones de las referencias
+        RMN_CE_variable = datos_referencias[variables_run[ivariable]].iloc[0]
+        RMN_CI_variable = datos_referencias[variables_run[ivariable]].iloc[1]  
+        
+        # Concentraciones de las muestras analizadas como referencias
+        RMN_altos       = datos_brutos[variable_concentracion][posicion_RMN_altos]
+        RMN_bajos       = datos_brutos[variable_concentracion][posicion_RMN_bajos]
+    
+        # Predimensiona las rectas a y b
+        posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0]-1,posicion_RMN_bajos[1]+1)
+        recta_at              = numpy.zeros(datos_brutos.shape[0])
+        recta_bt              = numpy.zeros(datos_brutos.shape[0])
+        
+        store = numpy.zeros(datos_brutos.shape[0])
+    
+        pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
+        t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos.iloc[0] 
+    
+        variable_drift = numpy.zeros(datos_brutos.shape[0])
+    
+        # Aplica la corrección basada de dos rectas, descrita en Hassenmueller
+        for idato in range(posiciones_corr_drift[0],posiciones_corr_drift[-1]):
+            factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
+            store[idato]    = factor_f
+            recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[0]-RMN_bajos.iloc[-1]) 
+            recta_bt[idato] = RMN_altos.iloc[0] -  factor_f*(RMN_altos.iloc[0]-RMN_altos.iloc[-1]) 
+    
+            val_combinado         = ((datos_brutos[variable_concentracion][idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
+    
+            variable_drift[idato] = val_combinado*pte_RMN+t_indep_RMN
+    
+        variable_drift[variable_drift<0] = 0
+        
+        datos_corregidos[variables_run[ivariable]] = variable_drift
+        
+        return datos_corregidos
+    
+    
+    
+
+
 
 # VERSIONES ANTERIORES; 
 

@@ -2301,10 +2301,16 @@ def procesado_nutrientes():
     
     
         # Despliega un formulario para subir los archivos del AA y las referencias
-        temperatura_laboratorio  = st.number_input('Temperatura laboratorio:',value=20)
-        archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
-        archivo_refs             = st.file_uploader("Arrastra o selecciona los archivos con las referencias", accept_multiple_files=False)
+        col1, col2 = st.columns(2,gap="small")
+        with col1:
+            temperatura_laboratorio  = st.number_input('Temperatura laboratorio:',value=20)
+            archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
+        with col2:
+            rendimiento_columna      = st.number_input('Rendimiento columna:',value=100,min_value=0,max_value=100)
+            archivo_refs             = st.file_uploader("Arrastra o selecciona los archivos con las referencias", accept_multiple_files=False)
             
+        
+        
         if archivo_AA is not None and archivo_refs is not None:
     
             # Lectura del archivo con las referencias
@@ -2343,15 +2349,15 @@ def procesado_nutrientes():
             
             ref_inicial        = listado_refs[0][-1]
             ref_final          = listado_refs[1][0]
-            indices_rmns_altos = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='RMN High']) - 1
-            indices_rmns_bajos = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='RMN Low']) - 1
+            posicion_RMN_altos = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='RMN High']) - 1
+            posicion_RMN_bajos = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='RMN Low']) - 1
 
             # Determina las densidades de los RMNs            
-            datos_AA['densidad'].iloc[indices_rmns_bajos]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
-            datos_AA['densidad'].iloc[indices_rmns_altos]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+            datos_AA['densidad'].iloc[posicion_RMN_bajos]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+            datos_AA['densidad'].iloc[posicion_RMN_altos]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
 
             # Determina las densidades de las muestas        
-            for idato in range(ref_inicial,ref_final):
+            for idato in range(ref_inicial+1,ref_final):
                 if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
                     id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
                             
@@ -2377,102 +2383,129 @@ def procesado_nutrientes():
 
                     else:
                         datos_AA['io_disponible']           = 0
-                        texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
-                        st.warning(texto_error, icon="⚠️") 
+                        # texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
+                        # st.warning(texto_error, icon="⚠️") 
                        
             # Asigna el identificador de cada registro al dataframe en el que se guardarán los resultados
             datos_corregidos['tubo'] = datos_AA['Sample ID']
                     
-                    
-                    
-            # # Busca los datos de cada tubo analizada en el AA
-            # for idato in range(datos_AA.shape[0]):
-                
-                
-            #     Cup Type
-                
-            #     if datos_AA['Sample ID'].iloc[idato] == 'RMN Low' : # Tubo correspondiente a referencia (RMN)
-            #         datos_AA['densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
-                    
-            #     elif datos_AA['Sample ID'].iloc[idato] == 'RMN High': # Tubo correspondiente a referencia (RMN)
-            #         datos_AA['densidad'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
-                
-            #     else:   # Resto de tubos
-            #         id_temp = df_muestreos['id_muestreo'][df_muestreos['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
-                    
-            #         if len(id_temp) > 0:
-            #             indice                                             = id_temp.iloc[0]
-            #             salinidad                                          = df_datos_fisicos['salinidad_ctd'][df_datos_fisicos['muestreo']==indice]
-        
-            #             datos_corregidos['muestreo'].iloc[idato]           = indice
-            #             datos_corregidos['presion_ctd'].iloc[idato]        = df_muestreos['presion_ctd'][df_muestreos['id_muestreo']==indice].iloc[0]
-            #             datos_corregidos['salida_mar'].iloc[idato]         = df_muestreos['salida_mar'][df_muestreos['id_muestreo']==indice].iloc[0]
-            #             datos_corregidos['botella'].iloc[idato]            = df_muestreos['botella'][df_muestreos['id_muestreo']==indice].iloc[0]
-            #             datos_corregidos['fecha_muestreo'].iloc[idato]     = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice].iloc[0]
-                                            
-            #             datos_corregidos['id_disc_biogeoquim'].iloc[idato] = df_datos_biogeoquimicos['id_disc_biogeoquim'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
-            #             datos_corregidos['ph'].iloc[idato]                 = df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]                              
-            #             datos_corregidos['alcalinidad'].iloc[idato]        = df_datos_biogeoquimicos['alcalinidad'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
-            #             datos_corregidos['oxigeno_ctd'].iloc[idato]        = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
-            #             datos_corregidos['oxigeno_wk'].iloc[idato]         = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
-                            
-            #             datos_corregidos['estacion'].iloc[idato]           =  df_muestreos['estacion'][df_muestreos['id_muestreo']==indice].iloc[0]
-                    
-            #             datos_AA['densidad'].iloc[idato]    = (999.1+0.77*((salinidad)-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
-                       
-            # # Asigna el identificador de cada registro al dataframe en el que se guardarán los resultados
-            # datos_corregidos['tubo'] = datos_AA['Sample ID']
-                                 
-            # Aplica la corrección de drift de cada variable
+
+            #### Aplica la corrección de deriva (DRIFT) ####
+
+            # Corrige las concentraciones a partir de los rendimientos de la coumna reductora
+            indices_calibracion = numpy.asarray(datos_AA['Peak Number'][datos_AA['Cup Type']=='CALB']) - 1
+             
+            datos_AA['nitrato_rendimiento'] = numpy.zeros(datos_brutos.shape[0])
+            datos_AA['nitrogeno_total_rendimiento'] = numpy.zeros(datos_brutos.shape[0])
+            factor = ((datos_AA['nitrogeno_total'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_AA['nitrito'].iloc[indices_calibracion[-1]])/(datos_AA['nitrogeno_total'].iloc[indices_calibracion[-1]] + datos_AA['nitrito'].iloc[indices_calibracion[-1]])
+            for idato in range(datos_brutos.shape[0]):
+                datos_AA['nitrato_rendimiento'].iloc[idato] = (datos_AA['nitrogeno_total'].iloc[idato]*factor - datos_AA['nitrito'].iloc[idato])/(rendimiento_columna/100) 
+                datos_AA['nitrogeno_total_rendimiento'].iloc[idato] = datos_AA['nitrato_rendimiento'].iloc[idato] + datos_AA['nitrito'].iloc[idato]
+            
+            datos_brutos['nitrogeno_total_conc'] = datos_brutos['nitrogeno_total_rendimiento']/datos_brutos['DENSIDAD']  
+            datos_brutos['nitrato_conc'] = datos_brutos['nitrato_conc_rendimiento']/datos_brutos['DENSIDAD']  
+            datos_brutos['nitrito_conc'] = datos_brutos['nitrito']/datos_brutos['DENSIDAD']  
+            datos_brutos['silicato_conc'] = datos_brutos['silicato']/datos_brutos['DENSIDAD']  
+            datos_brutos['fosfato_conc'] = datos_brutos['fosfato']/datos_brutos['DENSIDAD']  
+            
+            
+            # Cálculo de la deriva propiamente
             for ivariable in range(len(variables_run)):
-        
-                valores_brutos = datos_AA[variables_run[ivariable]] # Selecciona la variable y convierte a concentraciones
-                densidades     = datos_AA['densidad']
+            #for ivariable in range(1):
                 
-                valores_concentraciones = valores_brutos / densidades
+                variable_concentracion  = variables_run[ivariable] + '_conc'
                 
                 # Concentraciones de las referencias
-                RMN_CE_variable = df_referencias[variables_run[ivariable]][0] 
-                RMN_CI_variable = df_referencias[variables_run[ivariable]][1]     
-        
-                # Encuentra las posiciones de los RMNs
-                posicion_RMN_bajos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN Low']
-                posicion_RMN_altos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN High']
-        
+                RMN_CE_variable = df_referencias[variables_run[ivariable]].iloc[0]
+                RMN_CI_variable = df_referencias[variables_run[ivariable]].iloc[1]  
+                
+                # Concentraciones de las muestras analizadas como referencias
+                RMN_altos       = datos_brutos[variable_concentracion][posicion_RMN_altos]
+                RMN_bajos       = datos_brutos[variable_concentracion][posicion_RMN_bajos]
+            
                 # Predimensiona las rectas a y b
-                posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0],posicion_RMN_bajos[1])
-                recta_at              = numpy.zeros(datos_AA.shape[0])
-                recta_bt              = numpy.zeros(datos_AA.shape[0])
-        
-                RMN_altos = valores_concentraciones[posicion_RMN_altos]
-                RMN_bajos = valores_concentraciones[posicion_RMN_bajos]
-        
+                posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0]-1,posicion_RMN_bajos[1]+1)
+                recta_at              = numpy.zeros(datos_brutos.shape[0])
+                recta_bt              = numpy.zeros(datos_brutos.shape[0])
+                
+                store = numpy.zeros(datos_brutos.shape[0])
+            
                 pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
                 t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos.iloc[0] 
-        
-                variable_drift = numpy.zeros(datos_AA.shape[0])
-        
+            
+                variable_drift = numpy.zeros(datos_brutos.shape[0])
+            
                 # Aplica la corrección basada de dos rectas, descrita en Hassenmueller
                 for idato in range(posiciones_corr_drift[0],posiciones_corr_drift[-1]):
-                    
-                
                     factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
+                    store[idato]    = factor_f
                     recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[0]-RMN_bajos.iloc[-1]) 
                     recta_bt[idato] = RMN_altos.iloc[0] -  factor_f*(RMN_altos.iloc[0]-RMN_altos.iloc[-1]) 
-                    
-                    val_combinado         = ((valores_concentraciones[idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
-        
+            
+                    val_combinado         = ((datos_brutos[variable_concentracion][idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
+            
                     variable_drift[idato] = val_combinado*pte_RMN+t_indep_RMN
-        
+            
                 variable_drift[variable_drift<0] = 0
-        
-                # Almacena los resultados en un dataframe    
+                
                 datos_corregidos[variables_run[ivariable]] = variable_drift
+            
+           #variables_run = ['nitrogeno_total','nitrito','silicato','silicato']          
+                
+
+            # # Aplica la corrección de drift de cada variable
+            # for ivariable in range(len(variables_run)):
+        
+            #     valores_brutos = datos_AA[variables_run[ivariable]] # Selecciona la variable y convierte a concentraciones
+            #     densidades     = datos_AA['densidad']
+                
+            #     valores_concentraciones = valores_brutos / densidades
+                
+            #     # Concentraciones de las referencias
+            #     RMN_CE_variable = df_referencias[variables_run[ivariable]][0] 
+            #     RMN_CI_variable = df_referencias[variables_run[ivariable]][1]     
+        
+            #     # Encuentra las posiciones de los RMNs
+            #     posicion_RMN_bajos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN Low']
+            #     posicion_RMN_altos  = [i for i, e in enumerate(datos_AA['Sample ID']) if e == 'RMN High']
+        
+            #     # Predimensiona las rectas a y b
+            #     posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0],posicion_RMN_bajos[1])
+            #     recta_at              = numpy.zeros(datos_AA.shape[0])
+            #     recta_bt              = numpy.zeros(datos_AA.shape[0])
+        
+            #     RMN_altos = valores_concentraciones[posicion_RMN_altos]
+            #     RMN_bajos = valores_concentraciones[posicion_RMN_bajos]
+        
+            #     pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
+            #     t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos.iloc[0] 
+        
+            #     variable_drift = numpy.zeros(datos_AA.shape[0])
+        
+            #     # Aplica la corrección basada de dos rectas, descrita en Hassenmueller
+            #     for idato in range(posiciones_corr_drift[0],posiciones_corr_drift[-1]):
+                    
+                
+            #         factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
+            #         recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[0]-RMN_bajos.iloc[-1]) 
+            #         recta_bt[idato] = RMN_altos.iloc[0] -  factor_f*(RMN_altos.iloc[0]-RMN_altos.iloc[-1]) 
+                    
+            #         val_combinado         = ((valores_concentraciones[idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
+        
+            #         variable_drift[idato] = val_combinado*pte_RMN+t_indep_RMN
+        
+            #     variable_drift[variable_drift<0] = 0
+        
+            #     # Almacena los resultados en un dataframe    
+            #     datos_corregidos[variables_run[ivariable]] = variable_drift
          
-            # # Calcula el NO3 como diferencia entre el TON y el NO2
-            datos_corregidos['nitrato'] = numpy.zeros(datos_corregidos.shape[0])
-            for idato in range(datos_corregidos.shape[0]):
-                datos_corregidos['nitrato'].iloc[idato] = datos_corregidos['nitrogeno_total'].iloc[idato] - datos_corregidos['nitrito'].iloc[idato]
+            #datos_corregidos = FUNCIONES_INSERCION.correccion_drift(datos_brutos,datos_corregidos,datos_estadillo,datos_referencias,variables_run,rendimiento_columna,temperatura_laboratorio)
+   
+         
+            # # # Calcula el NO3 como diferencia entre el TON y el NO2
+            # datos_corregidos['nitrato'] = numpy.zeros(datos_corregidos.shape[0])
+            # for idato in range(datos_corregidos.shape[0]):
+            #     datos_corregidos['nitrato'].iloc[idato] = datos_corregidos['nitrogeno_total'].iloc[idato] - datos_corregidos['nitrito'].iloc[idato]
             
             if datos_corregidos['muestreo'].isnull().all():
                 texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
