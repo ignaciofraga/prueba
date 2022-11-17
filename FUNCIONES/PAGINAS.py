@@ -2403,7 +2403,7 @@ def procesado_nutrientes():
                 datos_AA['nitrogeno_total_rendimiento'].iloc[idato] = datos_AA['nitrato_rendimiento'].iloc[idato] + datos_AA['nitrito'].iloc[idato]
             
             datos_AA['nitrogeno_total_conc'] = datos_AA['nitrogeno_total_rendimiento']/datos_AA['densidad']  
-            datos_AA['nitrato_conc']         = datos_AA['nitrato_conc_rendimiento']/datos_AA['densidad']  
+            datos_AA['nitrato_conc']         = datos_AA['nitrato_rendimiento']/datos_AA['densidad']  
             datos_AA['nitrito_conc']         = datos_AA['nitrito']/datos_AA['densidad']  
             datos_AA['silicato_conc']        = datos_AA['silicato']/datos_AA['densidad']  
             datos_AA['fosfato_conc']         = datos_AA['fosfato']/datos_AA['densidad']  
