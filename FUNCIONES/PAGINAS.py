@@ -2402,18 +2402,18 @@ def procesado_nutrientes():
                 datos_AA['nitrato_rendimiento'].iloc[idato]         = (datos_AA['nitrogeno_total'].iloc[idato]*factor - datos_AA['nitrito'].iloc[idato])/(rendimiento_columna/100) 
                 datos_AA['nitrogeno_total_rendimiento'].iloc[idato] = datos_AA['nitrato_rendimiento'].iloc[idato] + datos_AA['nitrito'].iloc[idato]
             
-            datos_AA['nitrogeno_total_conc'] = datos_AA['nitrogeno_total_rendimiento']/datos_AA['densidad']  
-            datos_AA['nitrato_conc']         = datos_AA['nitrato_rendimiento']/datos_AA['densidad']  
-            datos_AA['nitrito_conc']         = datos_AA['nitrito']/datos_AA['densidad']  
-            datos_AA['silicato_conc']        = datos_AA['silicato']/datos_AA['densidad']  
-            datos_AA['fosfato_conc']         = datos_AA['fosfato']/datos_AA['densidad']  
+            datos_AA['nitrogeno_total'] = datos_AA['nitrogeno_total_rendimiento']/datos_AA['densidad']  
+            datos_AA['nitrato']         = datos_AA['nitrato_rendimiento']/datos_AA['densidad']  
+            datos_AA['nitrito']         = datos_AA['nitrito']/datos_AA['densidad']  
+            datos_AA['silicato']        = datos_AA['silicato']/datos_AA['densidad']  
+            datos_AA['fosfato']         = datos_AA['fosfato']/datos_AA['densidad']  
             
             
             # Cálculo de la deriva propiamente
             for ivariable in range(len(variables_run)):
             #for ivariable in range(1):
                 
-                variable_concentracion  = variables_run[ivariable] + '_conc'
+                variable_concentracion  = variables_run[ivariable] 
                 
                 # Concentraciones de las referencias
                 RMN_CE_variable = df_referencias[variables_run[ivariable]].iloc[0]
