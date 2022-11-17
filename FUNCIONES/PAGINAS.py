@@ -2395,18 +2395,18 @@ def procesado_nutrientes():
             # Corrige las concentraciones a partir de los rendimientos de la coumna reductora
             indices_calibracion = numpy.asarray(datos_AA['Peak Number'][datos_AA['Cup Type']=='CALB']) - 1
              
-            datos_AA['nitrato_rendimiento'] = numpy.zeros(datos_brutos.shape[0])
-            datos_AA['nitrogeno_total_rendimiento'] = numpy.zeros(datos_brutos.shape[0])
+            datos_AA['nitrato_rendimiento'] = numpy.zeros(datos_AA.shape[0])
+            datos_AA['nitrogeno_total_rendimiento'] = numpy.zeros(datos_AA.shape[0])
             factor = ((datos_AA['nitrogeno_total'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_AA['nitrito'].iloc[indices_calibracion[-1]])/(datos_AA['nitrogeno_total'].iloc[indices_calibracion[-1]] + datos_AA['nitrito'].iloc[indices_calibracion[-1]])
-            for idato in range(datos_brutos.shape[0]):
-                datos_AA['nitrato_rendimiento'].iloc[idato] = (datos_AA['nitrogeno_total'].iloc[idato]*factor - datos_AA['nitrito'].iloc[idato])/(rendimiento_columna/100) 
+            for idato in range(datos_AA.shape[0]):
+                datos_AA['nitrato_rendimiento'].iloc[idato]         = (datos_AA['nitrogeno_total'].iloc[idato]*factor - datos_AA['nitrito'].iloc[idato])/(rendimiento_columna/100) 
                 datos_AA['nitrogeno_total_rendimiento'].iloc[idato] = datos_AA['nitrato_rendimiento'].iloc[idato] + datos_AA['nitrito'].iloc[idato]
             
-            datos_brutos['nitrogeno_total_conc'] = datos_brutos['nitrogeno_total_rendimiento']/datos_brutos['densidad']  
-            datos_brutos['nitrato_conc'] = datos_brutos['nitrato_conc_rendimiento']/datos_brutos['densidad']  
-            datos_brutos['nitrito_conc'] = datos_brutos['nitrito']/datos_brutos['densidad']  
-            datos_brutos['silicato_conc'] = datos_brutos['silicato']/datos_brutos['densidad']  
-            datos_brutos['fosfato_conc'] = datos_brutos['fosfato']/datos_brutos['densidad']  
+            datos_AA['nitrogeno_total_conc'] = datos_AA['nitrogeno_total_rendimiento']/datos_brutos['densidad']  
+            datos_AA['nitrato_conc']         = datos_AA['nitrato_conc_rendimiento']/datos_brutos['densidad']  
+            datos_AA['nitrito_conc']         = datos_AA['nitrito']/datos_brutos['densidad']  
+            datos_AA['silicato_conc']        = datos_AA['silicato']/datos_brutos['densidad']  
+            datos_AA['fosfato_conc']         = datos_AA['fosfato']/datos_brutos['densidad']  
             
             
             # Cálculo de la deriva propiamente
