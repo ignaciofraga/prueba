@@ -2420,20 +2420,20 @@ def procesado_nutrientes():
                 RMN_CI_variable = df_referencias[variables_run[ivariable]].iloc[1]  
                 
                 # Concentraciones de las muestras analizadas como referencias
-                RMN_altos       = datos_brutos[variable_concentracion][posicion_RMN_altos]
-                RMN_bajos       = datos_brutos[variable_concentracion][posicion_RMN_bajos]
+                RMN_altos       = datos_AA[variable_concentracion][posicion_RMN_altos]
+                RMN_bajos       = datos_AA[variable_concentracion][posicion_RMN_bajos]
             
                 # Predimensiona las rectas a y b
                 posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0]-1,posicion_RMN_bajos[1]+1)
-                recta_at              = numpy.zeros(datos_brutos.shape[0])
-                recta_bt              = numpy.zeros(datos_brutos.shape[0])
+                recta_at              = numpy.zeros(datos_AA.shape[0])
+                recta_bt              = numpy.zeros(datos_AA.shape[0])
                 
-                store = numpy.zeros(datos_brutos.shape[0])
+                store = numpy.zeros(datos_AA.shape[0])
             
                 pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
                 t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos.iloc[0] 
             
-                variable_drift = numpy.zeros(datos_brutos.shape[0])
+                variable_drift = numpy.zeros(datos_AA.shape[0])
             
                 # Aplica la corrección basada de dos rectas, descrita en Hassenmueller
                 for idato in range(posiciones_corr_drift[0],posiciones_corr_drift[-1]):
@@ -2442,7 +2442,7 @@ def procesado_nutrientes():
                     recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[0]-RMN_bajos.iloc[-1]) 
                     recta_bt[idato] = RMN_altos.iloc[0] -  factor_f*(RMN_altos.iloc[0]-RMN_altos.iloc[-1]) 
             
-                    val_combinado         = ((datos_brutos[variable_concentracion][idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
+                    val_combinado         = ((datos_AA[variable_concentracion][idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
             
                     variable_drift[idato] = val_combinado*pte_RMN+t_indep_RMN
             
