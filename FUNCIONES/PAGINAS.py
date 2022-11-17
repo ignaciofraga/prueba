@@ -2415,6 +2415,7 @@ def procesado_nutrientes():
                 
                 variable_concentracion  = variables_run[ivariable] 
                 
+                
                 # Concentraciones de las referencias
                 RMN_CE_variable = df_referencias[variables_run[ivariable]].iloc[0]
                 RMN_CI_variable = df_referencias[variables_run[ivariable]].iloc[1]  
