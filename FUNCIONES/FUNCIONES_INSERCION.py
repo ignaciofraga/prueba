@@ -1361,7 +1361,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     ################# GRAFICOS ################
 
     # Representa un gráfico con la variable seleccionada junto a los oxígenos
-    if df_seleccion['ph'].isnull().all():
+    if df_seleccion[variable_seleccionada].isnull().all():
         io_control = 0
         texto_error = "La base de datos no contiene información para la variable, salida y estación seleccionadas"
         st.warning(texto_error, icon="⚠️")
