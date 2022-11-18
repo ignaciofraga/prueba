@@ -1307,7 +1307,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
 
     with col2:
         
-        df_prog_sel               = datos_procesados[datos_procesados['programa']==indice_programa]
+        df_prog_sel               = datos_procesados[datos_procesados['id_programa']==indice_programa]
         anhos_disponibles         = df_prog_sel['año'].unique()
         anho_seleccionado         = st.selectbox('Año',(anhos_disponibles))
         
