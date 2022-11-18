@@ -975,56 +975,56 @@ conn.close()
 
 
 
-####################################################################
-## TABLA CON LAS SALIDAS REALIZADAS (ENFOCADO AL PROGRAMA RADIAL) ##
-####################################################################
+# ####################################################################
+# ## TABLA CON LAS SALIDAS REALIZADAS (ENFOCADO AL PROGRAMA RADIAL) ##
+# ####################################################################
 
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-nombre_tabla = 'salidas_muestreos'
+# nombre_tabla = 'salidas_muestreos'
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-# Crea la tabla de nuevo
-listado_variables = ('(id_salida SERIAL PRIMARY KEY,'
-' nombre_salida text NOT NULL,'
-' programa int NOT NULL,'
-' nombre_programa text NOT NULL,'
-' tipo_salida text,'
-' fecha_salida date NOT NULL,'
-' hora_salida time,'
-' fecha_retorno date NOT NULL,'
-' hora_retorno time,'
-' buque int,'
-' estaciones json,'
-' participantes_comisionados json,'
-' participantes_no_comisionados json,'
-' observaciones text,'
-) 
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_salida SERIAL PRIMARY KEY,'
+# ' nombre_salida text NOT NULL,'
+# ' programa int NOT NULL,'
+# ' nombre_programa text NOT NULL,'
+# ' tipo_salida text,'
+# ' fecha_salida date NOT NULL,'
+# ' hora_salida time,'
+# ' fecha_retorno date NOT NULL,'
+# ' hora_retorno time,'
+# ' buque int,'
+# ' estaciones json,'
+# ' participantes_comisionados json,'
+# ' participantes_no_comisionados json,'
+# ' observaciones text,'
+# ) 
 
-listado_dependencias = ('FOREIGN KEY (programa)'
-  'REFERENCES programas (id_programa)'
-  ' ON UPDATE CASCADE '
-  'ON DELETE CASCADE,'
-  'FOREIGN KEY (buque)'
-  'REFERENCES buques (id_buque)'
-  'ON UPDATE CASCADE ON DELETE CASCADE'
-  )
-
-
-listado_unicidades = (', UNIQUE (programa,fecha_salida))')
-
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+# listado_dependencias = ('FOREIGN KEY (programa)'
+#   'REFERENCES programas (id_programa)'
+#   ' ON UPDATE CASCADE '
+#   'ON DELETE CASCADE,'
+#   'FOREIGN KEY (buque)'
+#   'REFERENCES buques (id_buque)'
+#   'ON UPDATE CASCADE ON DELETE CASCADE'
+#   )
 
 
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# listado_unicidades = (', UNIQUE (programa,fecha_salida))')
+
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+
+
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
 

@@ -1304,7 +1304,7 @@ def entrada_salidas_mar():
         
 
         # tipos de salida en las radiales
-        tipos_radiales = ['Mensual','Semanal']
+        tipos_radiales = ['MENSUAL','SEMANAL']
         
         
         fecha_actual        = datetime.date.today()

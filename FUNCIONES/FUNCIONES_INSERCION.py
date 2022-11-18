@@ -1084,7 +1084,7 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
     
     # Identifica la estación a la que corresponde el archivo
     posicion_separador = nombre_archivo.index('+')
-    nombre_estacion    = nombre_archivo[8:posicion_separador].upper() + 'CO'                
+    nombre_estacion    = nombre_archivo[9:posicion_separador].upper() #+ 'CO'                
     id_estacion        = df_estaciones_radiales['id_estacion'][df_estaciones_radiales['nombre_estacion']==nombre_estacion].iloc[0] 
     
     # Identifica la fecha del muestreo
