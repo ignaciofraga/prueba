@@ -2583,7 +2583,7 @@ def procesado_quimica():
     
                 with col3: 
                     texto_variable = variable_seleccionada + ':'
-                    valor_entrada  = st.number_input(texto_variable,value=vref,key=idato,format = '{:7.4f}')               
+                    valor_entrada  = st.number_input(texto_variable,value=vref,key=idato,format = "%f")               
                     df_seleccion[variable_seleccionada].iloc[idato] = valor_entrada
                     
                 with col4: 
