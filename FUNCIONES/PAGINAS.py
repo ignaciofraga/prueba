@@ -2561,17 +2561,8 @@ def procesado_quimica():
         io_control_calidad = 0
         df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = FUNCIONES_INSERCION.menu_seleccion(df_datos_disponibles,variables_procesado_bd,io_control_calidad)
 
-        # Si ya hay datos previos, mostrar un warning
-        test1 = df_seleccion[variable_seleccionada].notnull().all()
-        
-        test2 = df_seleccion[variable_seleccionada].isnull().all()
-        st.text(test1)
-        st.text(test2)
-        st.text(df_seleccion[variable_seleccionada])
-        
-        
-        
-        if df_seleccion[variable_seleccionada].notnull().all() is False:
+        # Si ya hay datos previos, mostrar un warning        
+        if df_seleccion[variable_seleccionada].notnull().all():
             texto_error = "La base de datos ya contiene información para la salida, estación, cast y variable seleccionadas. Los datos introducidos reemplazarán los existentes."
             st.warning(texto_error, icon="⚠️") 
             
