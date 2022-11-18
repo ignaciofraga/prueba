@@ -2564,7 +2564,7 @@ def procesado_quimica():
         # Si ya hay datos previos, mostrar un warning
         test1 = df_seleccion[variable_seleccionada].notnull().all()
         
-        test2 = df_seleccion[variable_seleccionada].null().all()
+        test2 = df_seleccion[variable_seleccionada].isnull().all()
         st.text(test1)
         st.text(test2)
         st.text(df_seleccion[variable_seleccionada])
