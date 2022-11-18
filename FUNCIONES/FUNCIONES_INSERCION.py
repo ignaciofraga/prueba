@@ -1335,9 +1335,6 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
         
         df_prog_anho_sal_est_sel     = df_prog_anho_sal_sel[df_prog_anho_sal_sel['estacion']==indice_estacion]
     
-    st.text(df_prog_anho_sal_sel['estacion'])    
-    st.text(df_prog_anho_sal_est_sel)
-    
     col1, col2,col3 = st.columns(3,gap="small")
     with col1: 
         
@@ -1353,56 +1350,49 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     # Selecciona los datos correspondientes a la estación y salida seleccionada
     df_seleccion               = datos_procesados[(datos_procesados["programa"] == indice_programa) & (datos_procesados["año"] == anho_seleccionado) & (datos_procesados["estacion"] == indice_estacion) & (datos_procesados["salida_mar"] == indice_salida) & (datos_procesados["num_cast"] == cast_seleccionado)]
     
-    st.text(df_prog_anho_sal_est_sel)
-    
-    lista = [indice_programa,anho_seleccionado,indice_estacion,indice_salida,cast_seleccionado]
-    st.text(lista)
-
     # Recupera los datos disponibles de la misma estación, para la misma variable
     listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
     df_disponible_bd           = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos_estacion)]
     
     df_disponible_bd            = df_disponible_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
     df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bd, on="id_muestreo")
-   
-    # Determina los meses que marcan el rango de busqueda
-    df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
-    st.text(df_seleccion)
-    # fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0][0] - datetime.timedelta(days=meses_offset*30)
-    # fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1][0] + datetime.timedelta(days=meses_offset*30)  
-    fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0] - datetime.timedelta(days=meses_offset*30)
-    fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1] + datetime.timedelta(days=meses_offset*30)  
 
-
-    if fecha_minima.year < fecha_maxima.year:
-        listado_meses_1 = numpy.arange(fecha_minima.month,13)
-        listado_meses_2 = numpy.arange(1,fecha_maxima.month+1)
-        listado_meses   = numpy.concatenate((listado_meses_1,listado_meses_2))
-    
-    else:
-        listado_meses   = numpy.arange(fecha_minima.month,fecha_maxima.month+1)
- 
-    listado_meses = listado_meses.tolist()
-   
-    
-    # Busca los datos de la base de datos dentro del rango de meses seleccionados
-    df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
-    for idato in range(df_disponible_bd.shape[0]):
-        if (df_disponible_bd['fecha_muestreo'].iloc[idato]).month in listado_meses:
-            df_disponible_bd['io_fecha'].iloc[idato] = 1
-            
-    df_rango_temporal = df_disponible_bd[df_disponible_bd['io_fecha']==1]
-
-    ################# GRAFICOS ################
-
-    # Representa un gráfico con la variable seleccionada junto a los oxígenos
+    # comprueba si hay datos de la variable a analizar en la salida seleccionada
     if df_seleccion[variable_seleccionada].isnull().all():
         io_control = 0
         texto_error = "La base de datos no contiene información para la variable, salida y estación seleccionadas"
         st.warning(texto_error, icon="⚠️")
-        
+
     else:
-        io_control = 1
+
+        # Determina los meses que marcan el rango de busqueda
+        df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
+        fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0] - datetime.timedelta(days=meses_offset*30)
+        fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1] + datetime.timedelta(days=meses_offset*30)  
+    
+    
+        if fecha_minima.year < fecha_maxima.year:
+            listado_meses_1 = numpy.arange(fecha_minima.month,13)
+            listado_meses_2 = numpy.arange(1,fecha_maxima.month+1)
+            listado_meses   = numpy.concatenate((listado_meses_1,listado_meses_2))
+        
+        else:
+            listado_meses   = numpy.arange(fecha_minima.month,fecha_maxima.month+1)
+     
+        listado_meses = listado_meses.tolist()
+       
+        
+        # Busca los datos de la base de datos dentro del rango de meses seleccionados
+        df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
+        for idato in range(df_disponible_bd.shape[0]):
+            if (df_disponible_bd['fecha_muestreo'].iloc[idato]).month in listado_meses:
+                df_disponible_bd['io_fecha'].iloc[idato] = 1
+                
+        df_rango_temporal = df_disponible_bd[df_disponible_bd['io_fecha']==1]
+    
+        ################# GRAFICOS ################
+    
+        # Representa un gráfico con la variable seleccionada junto a los oxígenos
     
         fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.05, 'hspace':0}, width_ratios=[3, 1])
        
@@ -1447,7 +1437,6 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     
         st.pyplot(fig)
  
-    if io_control == 1:    
         # Gráficos particulares para cada variable
         if variable_seleccionada == 'fosfato':
     
@@ -1554,8 +1543,8 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
                     ax.annotate(nombre_muestreos[ipunto], (df_seleccion['silicato'].iloc[ipunto], df_seleccion['alcalinidad'].iloc[ipunto]))
                
                 st.pyplot(fig)
-        
-        
+    
+    
         ################# FORMULARIOS CALIDAD ################        
     
         # Formulario para asignar banderas de calidad
@@ -1583,8 +1572,8 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
        
                 for idato in range(df_seleccion.shape[0]):
     
-                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables[indice_variable] + ' = %s, ' + listado_variables[indice_variable] +  '_qf = %s WHERE id_disc_biogeoquim = %s;'
-                    cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['id_disc_biogeoquim'].iloc[idato])))
+                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables[indice_variable] + ' = %s, ' + listado_variables[indice_variable] +  '_qf = %s, cc_nutrientes = %s WHERE id_disc_biogeoquim = %s;'
+                    cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(2),int(df_seleccion['id_disc_biogeoquim'].iloc[idato])))
                     conn.commit() 
     
                 cursor.close()
@@ -1592,7 +1581,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     
             texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
             st.success(texto_exito)
-       
+   
 
 
 
