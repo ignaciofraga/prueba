@@ -2264,7 +2264,7 @@ def consulta_botellas():
         
         
 ###############################################################################
-##################### PÁGINA DE CONSULTA DE DATOS DE BOTELLAS #################
+############ PÁGINA DE PROCESADO DE INFORMACION DE NUTRIENTES #################
 ###############################################################################    
 
 
@@ -2481,7 +2481,7 @@ def procesado_nutrientes():
                 # Mantén sólo las filas del dataframe con valores no nulos
                 datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]    
              
-                FUNCIONES_INSERCION.control_calidad_nutrientes(datos_muestras,variables_procesado,direccion_host,base_datos,usuario,contrasena,puerto)
+                FUNCIONES_INSERCION.control_calidad_biogeoquimica(datos_muestras,variables_procesado,direccion_host,base_datos,usuario,contrasena,puerto)
 
         
     # control de calidad de salidas previamente disponibles
@@ -2498,12 +2498,92 @@ def procesado_nutrientes():
         
         
         # procesa ese dataframe
-        FUNCIONES_INSERCION.control_calidad_nutrientes(df_datos_disponibles,variables_procesado,direccion_host,base_datos,usuario,contrasena,puerto)
+        FUNCIONES_INSERCION.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,direccion_host,base_datos,usuario,contrasena,puerto)
 
         
 
             
             
-            
-            
+###############################################################################
+################## PÁGINA DE PROCESADO DE INFORMACION QUIMICA #################
+###############################################################################    
+
+
+def procesado_quimica():
+        
+    st.subheader('Procesado de variables químicas')
+    
+    # Recupera los datos de conexión
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port
+    
+    # Recupera tablas con informacion utilizada en el procesado
+    conn                    = init_connection()
+    df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+    df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+    df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+    df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
+    conn.close()     
+ 
+    # Combina la información de muestreos y salidas en un único dataframe 
+    df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
+    df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
+                         
+    # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
+    acciones     = ['Añadir datos de laboratorio', 'Realizar control de calidad de datos disponibles']
+    tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
+ 
+    #variables_procesado    = ['pH','Alcalinidad','Oxígeno']    
+    variables_procesado_bd = ['ph','alcalinidad','oxigeno_wk']
+ 
+    # Añade salidas del AA
+    if tipo_accion == acciones[0]:
+        
+        # compón un dataframe con la información de muestreo y datos biogeoquímicos
+        df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
+        df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
+        
+        # Añade columna con información del año
+        df_datos_disponibles['año']                = numpy.zeros(df_datos_disponibles.shape[0],dtype=int)
+        for idato in range(df_datos_disponibles.shape[0]):
+            df_datos_disponibles['año'].iloc[idato] = (df_datos_disponibles['fecha_muestreo'].iloc[idato]).year
+                
+        # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
+        df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = FUNCIONES_INSERCION.menu_seleccion(df_datos_disponibles,variables_procesado_bd)
+
+        for idato in range(df_seleccion.shape[0]):
+
+            col1, col2,col3,col4 = st.columns(4,gap="small")
+            with col1: 
+                
+                texto_botella = 'Botella:' + str(int(df_seleccion['botella'].iloc[idato]))
+                st.text(texto_botella)
+                
+            with col2: 
+                
+                if df_seleccion['prof_referencia'].iloc[idato] is not None:
+                    texto_profunidad = 'Profundidad (m):' + str(int(df_seleccion['prof_referencia'].iloc[idato]))
+                
+                else:
+                    texto_profunidad = 'Presion CTD (db):' + str(round(df_seleccion['presion_ctd'].iloc[idato]))
+                st.text(texto_profunidad)
+
+            with col3: 
+                
+                df_seleccion[variable_seleccionada].iloc[idato] = st.number_input('Intervalo meses:',value=1)               
+                    
+            with col4: 
+                
+                qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']))
+                indice_qf_seleccionado = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
+                
+                variable_seleccionada_cc = variable_seleccionada + '_qf'
+                df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado)
+
+        # Añade columna con información del año
+        st.text(df_seleccion[variable_seleccionada])        
             

@@ -1272,30 +1272,25 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
     return mensaje_error,datos_botellas,io_par,io_fluor,io_O2
 
 
-######################################################################
-######## FUNCION PARA LEER DATOS DE BOTELLAs (ARCHIVOS .BTL)  ########
-######################################################################
-def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host,base_datos,usuario,contrasena,puerto):
+
+
+
+
+#################################################################################
+######## FUNCION PARA DESPLEGAR MENUS DE SELECCION DE SALIDA Y VARIABLE  ########
+#################################################################################
+def menu_seleccion(datos_procesados,listado_variables):
 
     import streamlit as st
-    import matplotlib.pyplot as plt
-    from FUNCIONES.FUNCIONES_AUXILIARES import init_connection    
+    from FUNCIONES.FUNCIONES_AUXILIARES import init_connection 
 
     # Recupera los datos disponibles en la base de datos
     conn                      = init_connection()
-    df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-    df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-    df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
     df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
     df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
     df_programas              = psql.read_sql('SELECT * FROM programas', conn)
-    conn.close()
-
-    id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'].iloc[0]
-
+    conn.close()    
     
-    ### CONTROL DE CALIDAD DE LOS DATOS
-
     # Despliega menús de selección de la variable, salida y la estación a controlar                
     col1, col2 = st.columns(2,gap="small")
     with col1: 
@@ -1343,13 +1338,43 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
         
     with col2: 
         variable_seleccionada     = st.selectbox('Variable',(listado_variables))
-        indice_variable           = listado_variables.index(variable_seleccionada)
+
     with col3:  
         meses_offset              = st.number_input('Intervalo meses:',value=1)
     
     # Selecciona los datos correspondientes a la estación y salida seleccionada
     df_seleccion               = datos_procesados[(datos_procesados["programa"] == indice_programa) & (datos_procesados["año"] == anho_seleccionado) & (datos_procesados["estacion"] == indice_estacion) & (datos_procesados["salida_mar"] == indice_salida) & (datos_procesados["num_cast"] == cast_seleccionado)]
     
+    return df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset
+
+
+
+
+
+###############################################################################
+###### FUNCION PARA REALIZAR CONTROL DE CALDIAD DE DATOS BIOGEOQUIMICOS #######
+###############################################################################
+def control_calidad_biogeoquimica(datos_procesados,listado_variables,direccion_host,base_datos,usuario,contrasena,puerto):
+
+    import streamlit as st
+    import matplotlib.pyplot as plt
+    from FUNCIONES.FUNCIONES_AUXILIARES import init_connection    
+
+    # Recupera los datos disponibles en la base de datos
+    conn                      = init_connection()
+    df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+    df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+    df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
+    conn.close()
+
+    id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'].iloc[0]
+
+    
+    ### CONTROL DE CALIDAD DE LOS DATOS
+
+    # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
+    df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = menu_seleccion(datos_procesados,listado_variables)
+
     # Recupera los datos disponibles de la misma estación, para la misma variable
     listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
     df_disponible_bd           = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos_estacion)]
@@ -1359,7 +1384,6 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
 
     # comprueba si hay datos de la variable a analizar en la salida seleccionada
     if df_seleccion[variable_seleccionada].isnull().all():
-        io_control = 0
         texto_error = "La base de datos no contiene información para la variable, salida y estación seleccionadas"
         st.warning(texto_error, icon="⚠️")
 
@@ -1396,8 +1420,8 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     
         fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.05, 'hspace':0}, width_ratios=[3, 1])
        
-        ax.plot(df_disponible_bd[listado_variables[indice_variable]],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0',label='DATO PREVIO(OK)')
-        ax.plot(df_rango_temporal[listado_variables[indice_variable]],df_rango_temporal['presion_ctd'],'.',color='#404040',label='DATO PREVIO(INTERVALO)')
+        ax.plot(df_disponible_bd[variable_seleccionada],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0',label='DATO PREVIO(OK)')
+        ax.plot(df_rango_temporal[variable_seleccionada],df_rango_temporal['presion_ctd'],'.',color='#404040',label='DATO PREVIO(INTERVALO)')
            
         ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r',label='PROCESADO' )
         texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
@@ -1414,9 +1438,9 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
                 nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
        
-        qf_variable_seleccionada = listado_variables[indice_variable] + '_qf'
+        qf_variable_seleccionada = variable_seleccionada + '_qf'
         datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
-        ax.plot(datos_malos[listado_variables[indice_variable]],datos_malos['presion_ctd'],'.',color='#00CCCC',label='DATO PREVIO(MALO)')    
+        ax.plot(datos_malos[variable_seleccionada],datos_malos['presion_ctd'],'.',color='#00CCCC',label='DATO PREVIO(MALO)')    
         ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
         
         io_plot = 0
@@ -1572,7 +1596,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
        
                 for idato in range(df_seleccion.shape[0]):
     
-                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + listado_variables[indice_variable] + ' = %s, ' + listado_variables[indice_variable] +  '_qf = %s, cc_nutrientes = %s WHERE id_disc_biogeoquim = %s;'
+                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, cc_nutrientes = %s WHERE id_disc_biogeoquim = %s;'
                     cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(2),int(df_seleccion['id_disc_biogeoquim'].iloc[idato])))
                     conn.commit() 
     
@@ -1582,6 +1606,15 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
             texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
             st.success(texto_exito)
    
+
+
+
+
+
+
+
+
+
 
 
 

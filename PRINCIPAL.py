@@ -45,7 +45,8 @@ if FUNCIONES_AUXILIARES.log_in() is True:
                         "DESCARGA DATOS DE MUESTREOS": PAGINAS.consulta_estadillos,
                         "INTRODUCE DATOS NUTRIENTES": PAGINAS.entrada_datos,
                         "CONSULTA DATOS BOTELLAS":PAGINAS.consulta_botellas,
-                        "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes
+                        "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes,
+                        "PROCESADO QUIMICA":PAGINAS.procesado_quimica
                         }
 
             
