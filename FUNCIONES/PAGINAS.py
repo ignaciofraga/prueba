@@ -2592,9 +2592,9 @@ def procesado_quimica():
                     variable_seleccionada_cc = variable_seleccionada + '_qf'
                     df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado)
     
-            st.form_submit_button("Asignar los índices seleccionados")  
+        st.form_submit_button("Asignar los índices seleccionados")  
     
-            # Añade columna con información del año
-            st.text(df_seleccion[variable_seleccionada])   
+        # Añade columna con información del año
+        st.text(df_seleccion[variable_seleccionada])   
         
   
