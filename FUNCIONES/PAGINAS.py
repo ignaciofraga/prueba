@@ -2490,7 +2490,13 @@ def procesado_nutrientes():
         # compón un dataframe con la información de muestreo y datos biogeoquímicos
         df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
         df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
-                
+        
+        # Añade columna con información del año
+        df_datos_disponibles['año']                = numpy.zeros(df_datos_disponibles.shape[0],dtype=int)
+        for idato in range(df_datos_disponibles.shape[0]):
+            df_datos_disponibles['año'].iloc[idato] = (df_datos_disponibles['fecha_muestreo'].iloc[idato]).year
+        
+        
         # procesa ese dataframe
         FUNCIONES_INSERCION.control_calidad_nutrientes(df_datos_disponibles,variables_procesado,direccion_host,base_datos,usuario,contrasena,puerto)
 
