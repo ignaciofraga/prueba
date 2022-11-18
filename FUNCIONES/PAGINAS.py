@@ -2526,7 +2526,8 @@ def procesado_quimica():
     df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
     df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
     df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-    df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
+    df_indices_calidad      = psql.read_sql('SELECT * FROM indices_calidad', conn)
+    df_metodo_ph            = psql.read_sql('SELECT * FROM metodo_pH', conn)
     conn.close()     
  
     # Combina la información de muestreos y salidas en un único dataframe 
@@ -2570,8 +2571,15 @@ def procesado_quimica():
 
         with st.form("Formulario", clear_on_submit=False):
 
+            # Si los datos a introducir son de pH, especificar si la medida es con reactivo purificado o no purificado            
+            if variable_seleccionada == 'ph':
+
+                tipo_analisis     = st.radio('Selecciona tipo de análisis realizado ',df_metodo_ph['metodo_pH'],horizontal=True,key = 2*df_seleccion.shape[0],index = 0)
+                id_tipo_analisis  = df_metodo_ph['id_metodo'][df_metodo_ph['metodo_pH']==tipo_analisis].iloc[0] 
+                
+
             for idato in range(df_seleccion.shape[0]):
-    
+              
                 col1, col2,col3,col4 = st.columns(4,gap="small")
                 with col1: 
                     
@@ -2600,7 +2608,7 @@ def procesado_quimica():
                     variable_seleccionada_cc = variable_seleccionada + '_qf'
                     df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado)
     
-            io_envio = st.form_submit_button("Asignar valores y comparar con datos disponibles")  
+            io_envio = st.form_submit_button("Asignar valores e índices de calidad definidos")  
     
             if io_envio:
                 
@@ -2610,11 +2618,21 @@ def procesado_quimica():
                     conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()  
            
-                    for idato in range(df_seleccion.shape[0]):
-        
+                    # Diferente instrucción si es pH (hay que especificar el tipo de medida)
+                    if variable_seleccionada == 'ph': 
+                        instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, ph_metodo = %s WHERE id_disc_biogeoquim = %s;'
+                        for idato in range(df_seleccion.shape[0]):
+            
+                            cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(id_tipo_analisis),int(df_seleccion['id_disc_biogeoquim'].iloc[idato])))
+                            conn.commit()             
+                            
+                    else:
                         instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE id_disc_biogeoquim = %s;'
-                        cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(df_seleccion['id_disc_biogeoquim'].iloc[idato])))
-                        conn.commit() 
+
+                        for idato in range(df_seleccion.shape[0]):
+            
+                            cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(df_seleccion['id_disc_biogeoquim'].iloc[idato])))
+                            conn.commit() 
         
                     cursor.close()
                     conn.close()   
