@@ -2395,8 +2395,8 @@ def procesado_nutrientes():
 
                     else:
                         datos_AA['io_disponible']           = 0
-                        texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
-                        st.warning(texto_error, icon="⚠️") 
+                        # texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
+                        # st.warning(texto_error, icon="⚠️") 
                        
             # Asigna el identificador de cada registro al dataframe en el que se guardarán los resultados
             datos_corregidos['tubo'] = datos_AA['Sample ID']
