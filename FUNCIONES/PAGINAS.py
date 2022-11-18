@@ -2560,6 +2560,8 @@ def procesado_quimica():
         # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
         df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = FUNCIONES_INSERCION.menu_seleccion(df_datos_disponibles,variables_procesado_bd)
 
+
+
         vref = df_referencia[variable_seleccionada][0]
 
         with st.form("Formulario", clear_on_submit=False):
@@ -2583,7 +2585,7 @@ def procesado_quimica():
     
                 with col3: 
                     texto_variable = variable_seleccionada + ':'
-                    valor_entrada  = st.number_input(texto_variable,value=vref,key=idato,format = "%f")               
+                    valor_entrada  = st.number_input(texto_variable,value=df_referencia[variable_seleccionada][0],key=idato,format = "%f")               
                     df_seleccion[variable_seleccionada].iloc[idato] = valor_entrada
                     
                 with col4: 
