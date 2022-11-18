@@ -2583,12 +2583,12 @@ def procesado_quimica():
     
                 with col3: 
                     texto_variable = variable_seleccionada + ':'
-                    valor_entrada  = st.number_input(texto_variable,value=vref,key=idato)               
+                    valor_entrada  = st.number_input(texto_variable,value=vref,key=idato,,format = '7.4f')               
                     df_seleccion[variable_seleccionada].iloc[idato] = valor_entrada
                     
                 with col4: 
                     
-                    qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']),key=(df_seleccion.shape[0] + 1 + idato),format = '7.4f')
+                    qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']),key=(df_seleccion.shape[0] + 1 + idato))
                     indice_qf_seleccionado = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
                     
                     variable_seleccionada_cc = variable_seleccionada + '_qf'
