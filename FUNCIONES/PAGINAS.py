@@ -2344,7 +2344,7 @@ def procesado_nutrientes():
             datos_corregidos['botella']            = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['id_disc_biogeoquim'] = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['num_cast']           = numpy.zeros(datos_AA.shape[0],dtype=int)
-            datos_corregidos['id_programa']        = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['programa']           = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['año']                = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['fecha_muestreo']     = None 
         
@@ -2386,7 +2386,7 @@ def procesado_nutrientes():
                         datos_corregidos['oxigeno_wk'].iloc[idato]         = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
                             
                         datos_corregidos['estacion'].iloc[idato]           =  df_muestreos['estacion'][df_muestreos['id_muestreo']==indice].iloc[0]
-                        datos_corregidos['id_programa'].iloc[idato]        =  df_muestreos['programa'][df_muestreos['id_muestreo']==indice].iloc[0]
+                        datos_corregidos['programa'].iloc[idato]        =  df_muestreos['programa'][df_muestreos['id_muestreo']==indice].iloc[0]
                         datos_corregidos['año'].iloc[idato]                =  (datos_corregidos['fecha_muestreo'].iloc[idato]).year      
                     
                         datos_AA['densidad'].iloc[idato]    = (999.1+0.77*((salinidad)-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
