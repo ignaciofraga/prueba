@@ -2539,9 +2539,14 @@ def procesado_quimica():
  
     #variables_procesado    = ['pH','Alcalinidad','Oxígeno']    
     variables_procesado_bd = ['ph','alcalinidad','oxigeno_wk']
- 
+    
+    # Define unos valores de referencia 
+    df_referencia = pandas.DataFrame(columns = ['ph', 'alcalinidad', 'oxigeno_wk'],index = [0])
+    df_referencia.loc[0] = [8.1,200.0,200.0]
+    
     # Añade salidas del AA
     if tipo_accion == acciones[0]:
+        
         
         # compón un dataframe con la información de muestreo y datos biogeoquímicos
         df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
@@ -2555,35 +2560,41 @@ def procesado_quimica():
         # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
         df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = FUNCIONES_INSERCION.menu_seleccion(df_datos_disponibles,variables_procesado_bd)
 
-        for idato in range(df_seleccion.shape[0]):
+        with st.form("Formulario", clear_on_submit=False):
 
-            col1, col2,col3,col4 = st.columns(4,gap="small")
-            with col1: 
-                
-                texto_botella = 'Botella:' + str(int(df_seleccion['botella'].iloc[idato]))
-                st.text(texto_botella)
-                
-            with col2: 
-                
-                if df_seleccion['prof_referencia'].iloc[idato] is not None:
-                    texto_profunidad = 'Profundidad (m):' + str(int(df_seleccion['prof_referencia'].iloc[idato]))
-                
-                else:
-                    texto_profunidad = 'Presion CTD (db):' + str(round(df_seleccion['presion_ctd'].iloc[idato]))
-                st.text(texto_profunidad)
-
-            with col3: 
-                
-                df_seleccion[variable_seleccionada].iloc[idato] = st.number_input('Intervalo meses:',value=1)               
+            for idato in range(df_seleccion.shape[0]):
+    
+                col1, col2,col3,col4 = st.columns(4,gap="small")
+                with col1: 
                     
-            with col4: 
-                
-                qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']))
-                indice_qf_seleccionado = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
-                
-                variable_seleccionada_cc = variable_seleccionada + '_qf'
-                df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado)
-
-        # Añade columna con información del año
-        st.text(df_seleccion[variable_seleccionada])        
-            
+                    texto_botella = 'Botella:' + str(int(df_seleccion['botella'].iloc[idato]))
+                    st.text(texto_botella)
+                    
+                with col2: 
+                    
+                    if df_seleccion['prof_referencia'].iloc[idato] is not None:
+                        texto_profunidad = 'Profundidad (m):' + str(int(df_seleccion['prof_referencia'].iloc[idato]))
+                    
+                    else:
+                        texto_profunidad = 'Presion CTD (db):' + str(round(df_seleccion['presion_ctd'].iloc[idato]))
+                    st.text(texto_profunidad)
+    
+                with col3: 
+                    texto_variable = variable_seleccionada + ':'
+                    valor_entrada  = st.number_input(texto_variable,value=df_referencia[variable_seleccionada][0])               
+                    df_seleccion[variable_seleccionada].iloc[idato] = valor_entrada
+                    
+                with col4: 
+                    
+                    qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']))
+                    indice_qf_seleccionado = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
+                    
+                    variable_seleccionada_cc = variable_seleccionada + '_qf'
+                    df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado)
+    
+            st.form_submit_button("Asignar los índices seleccionados")  
+    
+            # Añade columna con información del año
+            st.text(df_seleccion[variable_seleccionada])   
+        
+  
