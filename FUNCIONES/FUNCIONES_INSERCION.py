@@ -1558,15 +1558,15 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             az.plot(df_rango_temporal['nitrato'],df_rango_temporal['ph'],'.',color='#404040')
             az.set(xlabel='Nitrato (\u03BCmol/kg)')
             az.set(ylabel='pH')
-            
+            az.yaxis.tick_right()
+            az.yaxis.set_label_position("right")            
             
             if df_seleccion['ph'].isnull().all():    
                 
                 ### GRAFICO NITRATO vs pH
                 
                 az.plot(df_seleccion['nitrato'],df_seleccion['ph'],'.r' )
-                az.yaxis.tick_right()
-                az.yaxis.set_label_position("right")
+
             
                 # Añade el nombre de cada punto
                 nombre_muestreos = [None]*df_seleccion.shape[0]
@@ -1647,7 +1647,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 cursor.close()
                 conn.close()   
     
-            texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
+            texto_exito = 'Datos de salida ' + salida_seleccionada + ' añadidos o modificados correctamente'
             st.success(texto_exito)
    
 
