@@ -1350,6 +1350,9 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     
     # Selecciona los datos correspondientes a la estación y salida seleccionada
     df_seleccion               = datos_procesados[(datos_procesados["programa"] == indice_programa) & (datos_procesados["año"] == anho_seleccionado) & (datos_procesados["estacion"] == indice_estacion) & (datos_procesados["salida_mar"] == indice_salida) & (datos_procesados["num_cast"] == cast_seleccionado)]
+    
+    st.text(df_prog_anho_sal_est_sel)
+    
     lista = [indice_programa,anho_seleccionado,indice_estacion,indice_salida,cast_seleccionado]
     st.text(lista)
 
