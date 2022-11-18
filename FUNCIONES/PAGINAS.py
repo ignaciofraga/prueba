@@ -2573,11 +2573,9 @@ def procesado_quimica():
 
             # Si los datos a introducir son de pH, especificar si la medida es con reactivo purificado o no purificado            
             if variable_seleccionada == 'ph':
-
-                st.text(df_metodo_ph)                
-
+           
                 listado_metodos   = df_metodo_ph['metodo_ph'].tolist()                
-                tipo_analisis     = st.radio('Selecciona el tipo de análisis realizado',listado_metodos,horizontal=True,key = 2*df_seleccion.shape[0],index = 0)
+                tipo_analisis     = st.radio('Selecciona el tipo de análisis realizado',listado_metodos,horizontal=True,key = 5*df_seleccion.shape[0],index = 0)
                 id_tipo_analisis  = df_metodo_ph['id_metodo'][df_metodo_ph['metodo_ph']==tipo_analisis].iloc[0] 
                 
 
