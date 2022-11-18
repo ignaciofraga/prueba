@@ -2558,11 +2558,15 @@ def procesado_quimica():
             df_datos_disponibles['año'].iloc[idato] = (df_datos_disponibles['fecha_muestreo'].iloc[idato]).year
                 
         # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
-        df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = FUNCIONES_INSERCION.menu_seleccion(df_datos_disponibles,variables_procesado_bd)
+        io_control_calidad = 0
+        df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = FUNCIONES_INSERCION.menu_seleccion(df_datos_disponibles,variables_procesado_bd,io_control_calidad)
 
-
-
-        vref = df_referencia[variable_seleccionada][0]
+        # Si ya hay datos previos, mostrar un warning
+        if df_seleccion[variable_seleccionada].notnull().all() is False:
+            texto_error = "La base de datos ya contiene información para la salida, estación, cast y variable seleccionadas. Los datos introducidos reemplazarán los existentes."
+            st.warning(texto_error, icon="⚠️") 
+            
+        df_seleccion    = df_seleccion.sort_values('botella')
 
         with st.form("Formulario", clear_on_submit=False):
 
@@ -2596,9 +2600,29 @@ def procesado_quimica():
                     variable_seleccionada_cc = variable_seleccionada + '_qf'
                     df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado)
     
-            st.form_submit_button("Asignar los índices seleccionados")  
+            io_envio = st.form_submit_button("Asignar valores y comparar con datos disponibles")  
     
-        # Añade columna con información del año
-        st.text(df_seleccion[variable_seleccionada])   
+            if io_envio:
+                
+                with st.spinner('Actualizando la base de datos'):
+               
+                    # Introducir los valores en la base de datos
+                    conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                    cursor = conn.cursor()  
+           
+                    for idato in range(df_seleccion.shape[0]):
+        
+                        instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE id_disc_biogeoquim = %s;'
+                        cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(df_seleccion['id_disc_biogeoquim'].iloc[idato])))
+                        conn.commit() 
+        
+                    cursor.close()
+                    conn.close()   
+        
+                texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
+                st.success(texto_exito)
+       
+
+
         
   

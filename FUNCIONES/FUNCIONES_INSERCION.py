@@ -1279,7 +1279,7 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
 #################################################################################
 ######## FUNCION PARA DESPLEGAR MENUS DE SELECCION DE SALIDA Y VARIABLE  ########
 #################################################################################
-def menu_seleccion(datos_procesados,listado_variables):
+def menu_seleccion(datos_procesados,listado_variables,io_control_calidad):
 
     import streamlit as st
     from FUNCIONES.FUNCIONES_AUXILIARES import init_connection 
@@ -1330,7 +1330,12 @@ def menu_seleccion(datos_procesados,listado_variables):
         
         df_prog_anho_sal_est_sel     = df_prog_anho_sal_sel[df_prog_anho_sal_sel['estacion']==indice_estacion]
     
-    col1, col2,col3 = st.columns(3,gap="small")
+    # Un poco diferente según se utilice el menú para control de calidad (con rango de meses) o no (sin él)
+    if io_control_calidad == 1:
+        col1, col2,col3 = st.columns(3,gap="small")
+    else:
+        col1, col2      = st.columns(2,gap="small")
+    
     with col1: 
         
         listado_casts_estaciones  = df_prog_anho_sal_est_sel['num_cast'].unique() 
@@ -1339,8 +1344,9 @@ def menu_seleccion(datos_procesados,listado_variables):
     with col2: 
         variable_seleccionada     = st.selectbox('Variable',(listado_variables))
 
-    with col3:  
-        meses_offset              = st.number_input('Intervalo meses:',value=1)
+    if io_control_calidad == 1: 
+        with col3:  
+            meses_offset              = st.number_input('Intervalo meses:',value=1)
     
     # Selecciona los datos correspondientes a la estación y salida seleccionada
     df_seleccion               = datos_procesados[(datos_procesados["programa"] == indice_programa) & (datos_procesados["año"] == anho_seleccionado) & (datos_procesados["estacion"] == indice_estacion) & (datos_procesados["salida_mar"] == indice_salida) & (datos_procesados["num_cast"] == cast_seleccionado)]
@@ -1373,7 +1379,8 @@ def control_calidad_biogeoquimica(datos_procesados,listado_variables,direccion_h
     ### CONTROL DE CALIDAD DE LOS DATOS
 
     # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
-    df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = menu_seleccion(datos_procesados,listado_variables)
+    io_control_calidad = 1
+    df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = menu_seleccion(datos_procesados,listado_variables,io_control_calidad)
 
     # Recupera los datos disponibles de la misma estación, para la misma variable
     listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
