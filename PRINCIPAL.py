@@ -38,14 +38,14 @@ if FUNCIONES_AUXILIARES.log_in() is True:
         #                 }
             
             
-        if st.session_state["usuario"] == 'COAC - Laboratorio Química':
+        # if st.session_state["usuario"] == 'COAC - Laboratorio Química':
         
-            paginas = {"INICIO": PAGINAS.principal,
-                        "PROCESOS EN CURSO": PAGINAS.actualiza_procesos, 
-                        "CONSULTA DATOS BOTELLAS":PAGINAS.consulta_botellas,
-                        "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes,
-                        "PROCESADO QUIMICA":PAGINAS.procesado_quimica
-                        }
+        #     paginas = {"INICIO": PAGINAS.principal,
+        #                 "PROCESOS EN CURSO": PAGINAS.actualiza_procesos, 
+        #                 "CONSULTA DATOS BOTELLAS":PAGINAS.consulta_botellas,
+        #                 "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes,
+        #                 "PROCESADO QUIMICA":PAGINAS.procesado_quimica
+        #                 }
 
             
         # if st.session_state["usuario"] == 'COAC - Supervisión Nutrientes':
