@@ -2588,7 +2588,7 @@ def procesado_quimica():
                     
                 with col4: 
                     
-                    qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']),key=(df_seleccion.shape[0] + 1 + idato))
+                    qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']),key=(df_seleccion.shape[0] + 1 + idato),format = '7.4f')
                     indice_qf_seleccionado = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
                     
                     variable_seleccionada_cc = variable_seleccionada + '_qf'
