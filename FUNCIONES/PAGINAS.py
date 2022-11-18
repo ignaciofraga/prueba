@@ -2284,6 +2284,7 @@ def procesado_nutrientes():
     df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
     df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
     df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+    df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
     conn.close()     
     
     
@@ -2326,6 +2327,11 @@ def procesado_nutrientes():
             datos_AA['densidad']      = numpy.ones(datos_AA.shape[0])
             datos_AA['io_disponible'] = numpy.ones(datos_AA.shape[0])
             
+            # compón un dataframe con la información de muestreo y salidas
+            df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
+            df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
+                    
+            
             # Genera un dataframe en el que se almacenarán los resultados de las correcciones aplicadas. 
             datos_corregidos    = pandas.DataFrame(columns=variables_run)
             # Añade columnas con variables a utilizar en el control de calidad posterior 
@@ -2340,6 +2346,8 @@ def procesado_nutrientes():
             datos_corregidos['botella']            = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['id_disc_biogeoquim'] = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['num_cast']           = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['id_programa']        = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['año']                = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['fecha_muestreo']     = None 
         
             # Encuentra las posiciones de las referencias de sw
@@ -2380,6 +2388,8 @@ def procesado_nutrientes():
                         datos_corregidos['oxigeno_wk'].iloc[idato]         = df_datos_biogeoquimicos['oxigeno_wk'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
                             
                         datos_corregidos['estacion'].iloc[idato]           =  df_muestreos['estacion'][df_muestreos['id_muestreo']==indice].iloc[0]
+                        datos_corregidos['id_programa'].iloc[idato]        =  df_muestreos['programa'][df_muestreos['id_muestreo']==indice].iloc[0]
+                        datos_corregidos['año'].iloc[idato]                =  (datos_corregidos['fecha_muestreo'].iloc[idato]).year      
                     
                         datos_AA['densidad'].iloc[idato]    = (999.1+0.77*((salinidad)-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
 

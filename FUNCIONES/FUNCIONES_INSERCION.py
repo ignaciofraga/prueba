@@ -1288,6 +1288,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
     df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
     df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
+    df_programas              = psql.read_sql('SELECT * FROM programas', conn)
     conn.close()
 
     id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'].iloc[0]
@@ -1299,25 +1300,46 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     col1, col2 = st.columns(2,gap="small")
     with col1: 
         
-        listado_salidas           = datos_procesados['salida_mar'].unique()
+        listado_programas         = datos_procesados['programa'].unique()
+        df_programas_muestreados  = df_programas[df_programas['id_programa'].isin(listado_programas)]
+        programa_seleccionado     = st.selectbox('Programa',(df_programas_muestreados['nombre_programa']))
+        indice_programa           = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0]
+
+    with col2:
+        
+        df_prog_sel               = datos_procesados[datos_procesados['programa']==indice_programa]
+        anhos_disponibles         = df_prog_sel['año'].unique()
+        anho_seleccionado         = st.selectbox('Año',(anhos_disponibles))
+        
+        df_prog_anho_sel          = df_prog_sel[df_prog_sel['año']==anho_seleccionado]
+
+
+    col1, col2 = st.columns(2,gap="small")
+    with col1: 
+
+        
+        listado_salidas           = df_prog_anho_sel['salida_mar'].unique()
         df_salidas_muestreadas    = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
         salida_seleccionada       = st.selectbox('Salida',(df_salidas_muestreadas['nombre_salida']))
         indice_salida             = df_salidas['id_salida'][df_salidas['nombre_salida']==salida_seleccionada].iloc[0]
 
+        df_prog_anho_sal_sel      = df_prog_anho_sel[df_prog_anho_sel['salida_mar']==indice_salida]
+
     with col2:
 
-        df_datos_salida_seleccionada = datos_procesados[datos_procesados['salida_mar']==indice_salida]
-        listado_id_estaciones        = df_datos_salida_seleccionada['estacion'].unique() 
+      
+        listado_id_estaciones        = df_prog_anho_sal_sel['estacion'].unique() 
         df_estaciones_disponibles    = df_estaciones[df_estaciones['id_estacion'].isin(listado_id_estaciones)]
 
         estacion_seleccionada        = st.selectbox('Estación',(df_estaciones_disponibles['nombre_estacion']))
         indice_estacion              = df_estaciones_disponibles['id_estacion'][df_estaciones_disponibles['nombre_estacion']==estacion_seleccionada].iloc[0]
         
+        df_prog_anho_sal_est_sel     = df_prog_anho_sal_sel[df_prog_anho_sal_sel['estacion']==indice_salida]
+        
     col1, col2,col3 = st.columns(3,gap="small")
     with col1: 
         
-        df_casts_disponibles      = df_muestreos[df_muestreos['estacion']==indice_estacion]
-        listado_casts_estaciones  = df_casts_disponibles['num_cast'].unique() 
+        listado_casts_estaciones  = df_prog_anho_sal_est_sel['num_cast'].unique() 
         cast_seleccionado         = st.selectbox('Cast',(listado_casts_estaciones))
         
     with col2: 
@@ -1327,7 +1349,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
         meses_offset              = st.number_input('Intervalo meses:',value=1)
     
     # Selecciona los datos correspondientes a la estación y salida seleccionada
-    df_seleccion               = datos_procesados[(datos_procesados["estacion"] == indice_estacion) & (datos_procesados["salida_mar"] == indice_salida) & (datos_procesados["num_cast"] == cast_seleccionado)]
+    df_seleccion               = datos_procesados[(datos_procesados["programa"] == indice_programa) & (datos_procesados["año"] == anho_seleccionado) & (datos_procesados["estacion"] == indice_estacion) & (datos_procesados["salida_mar"] == indice_salida) & (datos_procesados["num_cast"] == cast_seleccionado)]
     
 
     # Recupera los datos disponibles de la misma estación, para la misma variable
