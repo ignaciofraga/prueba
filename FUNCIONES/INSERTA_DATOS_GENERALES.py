@@ -247,16 +247,17 @@ conn.close()
 ### Informacion de los controles de calidad que se pueden realizar ###
 
 indice       = [1,2]
-descripcion  = ['phts25p0_unpur','phts25p0_pur']
+metodo       = ['phts25p0_unpur','phts25p0_pur']
+descripcion  = ['Reactivo NO purificado','Reactivo purificado']
 
-instruccion_sql = '''INSERT INTO metodo_pH (id_metodo,metodo_ph)
-    VALUES (%s,%s) ON CONFLICT (id_metodo) DO NOTHING;''' 
+instruccion_sql = '''INSERT INTO metodo_pH (id_metodo,metodo_ph,descripcion_metodo_ph)
+    VALUES (%s,%s,%s) ON CONFLICT (id_metodo) DO NOTHING;''' 
         
 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
 cursor = conn.cursor()
 for idato in range(len(indice)):
     
-    cursor.execute(instruccion_sql, (int(indice[idato]),descripcion[idato]))
+    cursor.execute(instruccion_sql, (int(indice[idato]),metodo[idato],descripcion[idato]))
     conn.commit()
 cursor.close()
 conn.close()

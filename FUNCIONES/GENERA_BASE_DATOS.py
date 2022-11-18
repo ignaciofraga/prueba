@@ -513,6 +513,7 @@ conn.commit()
 
 listado_variables = ('(id_metodo int PRIMARY KEY,'
 ' metodo_ph text NOT NULL,'
+' descripcion_metodo_ph text NOT NULL,'
 ) 
 
 listado_unicidades = (' UNIQUE (id_metodo))')
