@@ -512,7 +512,7 @@ cursor.execute(instruccion_sql)
 conn.commit()
 
 listado_variables = ('(id_metodo int PRIMARY KEY,'
-' metodo_pH text NOT NULL,'
+' metodo_ph text NOT NULL,'
 ) 
 
 listado_unicidades = (' UNIQUE (id_metodo))')

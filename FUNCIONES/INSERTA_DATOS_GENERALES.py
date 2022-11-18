@@ -249,7 +249,7 @@ conn.close()
 indice       = [1,2]
 descripcion  = ['phts25p0_unpur','phts25p0_pur']
 
-instruccion_sql = '''INSERT INTO metodo_pH (id_metodo,metodo_pH)
+instruccion_sql = '''INSERT INTO metodo_pH (id_metodo,metodo_ph)
     VALUES (%s,%s) ON CONFLICT (id_metodo) DO NOTHING;''' 
         
 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
