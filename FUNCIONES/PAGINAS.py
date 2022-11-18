@@ -2286,8 +2286,11 @@ def procesado_nutrientes():
     df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
     df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
     conn.close()     
-    
-    
+ 
+    # Combina la información de muestreos y salidas en un único dataframe 
+    df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
+    df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
+                         
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
     acciones     = ['Procesar salidas del AA', 'Realizar control de calidad de datos disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
@@ -2326,12 +2329,7 @@ def procesado_nutrientes():
             # Predimensiona columnas en las que guardar información de salinidad y densidad    
             datos_AA['densidad']      = numpy.ones(datos_AA.shape[0])
             datos_AA['io_disponible'] = numpy.ones(datos_AA.shape[0])
-            
-            # compón un dataframe con la información de muestreo y salidas
-            df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
-            df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
-                    
-            
+                        
             # Genera un dataframe en el que se almacenarán los resultados de las correcciones aplicadas. 
             datos_corregidos    = pandas.DataFrame(columns=variables_run)
             # Añade columnas con variables a utilizar en el control de calidad posterior 
@@ -2488,7 +2486,7 @@ def procesado_nutrientes():
         
     # control de calidad de salidas previamente disponibles
     if tipo_accion == acciones[1]: 
- 
+
         # compón un dataframe con la información de muestreo y datos biogeoquímicos
         df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
         df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
