@@ -1313,8 +1313,6 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
         
         df_prog_anho_sel          = df_prog_sel[df_prog_sel['año']==anho_seleccionado]
 
-        st.text(df_prog_anho_sel)
-
     col1, col2 = st.columns(2,gap="small")
     with col1: 
 
@@ -1326,8 +1324,6 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
 
         df_prog_anho_sal_sel      = df_prog_anho_sel[df_prog_anho_sel['salida_mar']==indice_salida]
 
-        st.text(df_prog_anho_sal_sel)
-
     with col2:
 
       
@@ -1338,7 +1334,9 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
         indice_estacion              = df_estaciones_disponibles['id_estacion'][df_estaciones_disponibles['nombre_estacion']==estacion_seleccionada].iloc[0]
         
         df_prog_anho_sal_est_sel     = df_prog_anho_sal_sel[df_prog_anho_sal_sel['estacion']==indice_salida]
-        
+    
+    st.text(df_prog_anho_sal_est_sel)
+    
     col1, col2,col3 = st.columns(3,gap="small")
     with col1: 
         
