@@ -2523,7 +2523,6 @@ def procesado_quimica():
     # Recupera tablas con informacion utilizada en el procesado
     conn                    = init_connection()
     df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-    df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
     df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
     df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
     df_indices_calidad      = psql.read_sql('SELECT * FROM indices_calidad', conn)
@@ -2545,7 +2544,7 @@ def procesado_quimica():
     df_referencia = pandas.DataFrame(columns = ['ph', 'alcalinidad', 'oxigeno_wk'],index = [0])
     df_referencia.loc[0] = [8.1,200.0,200.0]
     
-    # Añade salidas del AA
+    # Añade nuevos datos obtenidos en laboratorio
     if tipo_accion == acciones[0]:
         
         
@@ -2643,5 +2642,20 @@ def procesado_quimica():
        
 
 
+
+    # Realiza control de calidad
+    if tipo_accion == acciones[1]:
         
-  
+        # compón un dataframe con la información de muestreo y datos biogeoquímicos
+        df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
+        df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
+        
+        # Añade columna con información del año
+        df_datos_disponibles['año']                = numpy.zeros(df_datos_disponibles.shape[0],dtype=int)
+        for idato in range(df_datos_disponibles.shape[0]):
+            df_datos_disponibles['año'].iloc[idato] = (df_datos_disponibles['fecha_muestreo'].iloc[idato]).year
+        
+        # procesa ese dataframe
+        FUNCIONES_INSERCION.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado_bd,direccion_host,base_datos,usuario,contrasena,puerto)
+
+          
