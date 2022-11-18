@@ -2560,6 +2560,8 @@ def procesado_quimica():
         # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
         df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = FUNCIONES_INSERCION.menu_seleccion(df_datos_disponibles,variables_procesado_bd)
 
+        vref = df_referencia[variable_seleccionada][0]
+
         with st.form("Formulario", clear_on_submit=False):
 
             for idato in range(df_seleccion.shape[0]):
@@ -2581,7 +2583,7 @@ def procesado_quimica():
     
                 with col3: 
                     texto_variable = variable_seleccionada + ':'
-                    valor_entrada  = st.number_input(texto_variable,value=df_referencia[variable_seleccionada][0])               
+                    valor_entrada  = st.number_input(texto_variable,value=vref)               
                     df_seleccion[variable_seleccionada].iloc[idato] = valor_entrada
                     
                 with col4: 
@@ -2592,7 +2594,7 @@ def procesado_quimica():
                     variable_seleccionada_cc = variable_seleccionada + '_qf'
                     df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado)
     
-        st.form_submit_button("Asignar los índices seleccionados")  
+            st.form_submit_button("Asignar los índices seleccionados")  
     
         # Añade columna con información del año
         st.text(df_seleccion[variable_seleccionada])   
