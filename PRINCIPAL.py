@@ -26,16 +26,16 @@ if FUNCIONES_AUXILIARES.log_in() is True:
     # claúsula para manetener el nombre de usuario y poder identificar qué webs desplegar
     if 'usuario' in st.session_state:
 
-        if st.session_state["usuario"] == 'COAC - Administrador':
+        # if st.session_state["usuario"] == 'COAC - Administrador':
         
-            paginas = {"INICIO": PAGINAS.principal
-                        #"ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
-                        #"INFORMACIÓN DISPONIBLE": PAGINAS.consulta_estado
-                        # "DATOS DE MUESTREOS": PAGINAS.consulta_estadillos,
-                        # "GRÁFICO DE EVOLUCIÓN": PAGINAS.evolucion_analisis,
-                        # "ENTRADA PROCESOS": PAGINAS.entrada_procesos_actuales,
-                        # "ESTADO DEL PROCESADO DE MUESTRAS": PAGINAS.consulta_procesos
-                        }
+        #     paginas = {"INICIO": PAGINAS.principal
+        #                 #"ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
+        #                 #"INFORMACIÓN DISPONIBLE": PAGINAS.consulta_estado
+        #                 # "DATOS DE MUESTREOS": PAGINAS.consulta_estadillos,
+        #                 # "GRÁFICO DE EVOLUCIÓN": PAGINAS.evolucion_analisis,
+        #                 # "ENTRADA PROCESOS": PAGINAS.entrada_procesos_actuales,
+        #                 # "ESTADO DEL PROCESADO DE MUESTRAS": PAGINAS.consulta_procesos
+        #                 }
             
             
         if st.session_state["usuario"] == 'COAC - Laboratorio Química':
@@ -48,18 +48,18 @@ if FUNCIONES_AUXILIARES.log_in() is True:
                         }
 
             
-        if st.session_state["usuario"] == 'COAC - Supervisión Nutrientes':
+        # if st.session_state["usuario"] == 'COAC - Supervisión Nutrientes':
      
-            paginas = {"INICIO": PAGINAS.principal,
-                    "ESTADO DEL PROCESADO DE MUESTRAS": PAGINAS.consulta_procesos, 
-                    "INFORMACIÓN DISPONIBLE": PAGINAS.consulta_estado,
-                    "GRÁFICO DE EVOLUCIÓN": PAGINAS.evolucion_analisis
-                     }           
+        #     paginas = {"INICIO": PAGINAS.principal,
+        #             "ESTADO DEL PROCESADO DE MUESTRAS": PAGINAS.consulta_procesos, 
+        #             "INFORMACIÓN DISPONIBLE": PAGINAS.consulta_estado,
+        #             "GRÁFICO DE EVOLUCIÓN": PAGINAS.evolucion_analisis
+        #              }           
             
-        if st.session_state["usuario"] == 'Usuario externo':
+        # if st.session_state["usuario"] == 'Usuario externo':
             
-            paginas = {"INICIO": PAGINAS.principal,
-                        "ENTRADA ESTADILLOS": PAGINAS.entrada_estadillos}
+        #     paginas = {"INICIO": PAGINAS.principal,
+        #                 "ENTRADA ESTADILLOS": PAGINAS.entrada_estadillos}
             
         if st.session_state["usuario"] == 'COAC - Radiales':
             
