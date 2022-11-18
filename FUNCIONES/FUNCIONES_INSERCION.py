@@ -1350,7 +1350,8 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
     
     # Selecciona los datos correspondientes a la estación y salida seleccionada
     df_seleccion               = datos_procesados[(datos_procesados["programa"] == indice_programa) & (datos_procesados["año"] == anho_seleccionado) & (datos_procesados["estacion"] == indice_estacion) & (datos_procesados["salida_mar"] == indice_salida) & (datos_procesados["num_cast"] == cast_seleccionado)]
-    
+    lista = [indice_programa,anho_seleccionado,indice_estacion,indice_salida,cast_seleccionado]
+    st.text(lista)
 
     # Recupera los datos disponibles de la misma estación, para la misma variable
     listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
