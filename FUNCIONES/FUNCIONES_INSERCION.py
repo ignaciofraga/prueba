@@ -1333,7 +1333,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
         estacion_seleccionada        = st.selectbox('Estación',(df_estaciones_disponibles['nombre_estacion']))
         indice_estacion              = df_estaciones_disponibles['id_estacion'][df_estaciones_disponibles['nombre_estacion']==estacion_seleccionada].iloc[0]
         
-        df_prog_anho_sal_est_sel     = df_prog_anho_sal_sel[df_prog_anho_sal_sel['estacion']==indice_salida]
+        df_prog_anho_sal_est_sel     = df_prog_anho_sal_sel[df_prog_anho_sal_sel['estacion']==indice_estacion]
     
     st.text(df_prog_anho_sal_sel['estacion'])    
     st.text(df_prog_anho_sal_est_sel)
