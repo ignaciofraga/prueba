@@ -1857,7 +1857,7 @@ def entrada_botellas():
         with col1: 
             programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
             df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
-            abreviatura_programa      = df_programas['abreviatura'][['nombre_programa']==programa_seleccionado]            
+            abreviatura_programa      = df_programas['abreviatura'][['nombre_programa']==programa_seleccionado].iloc[0]            
         
         with col2:
             tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
