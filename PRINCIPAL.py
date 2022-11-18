@@ -26,26 +26,26 @@ if FUNCIONES_AUXILIARES.log_in() is True:
     # claúsula para manetener el nombre de usuario y poder identificar qué webs desplegar
     if 'usuario' in st.session_state:
 
-        # if st.session_state["usuario"] == 'COAC - Administrador':
+        if st.session_state["usuario"] == 'COAC - Administrador':
         
-        #     paginas = {"INICIO": PAGINAS.principal
-        #                 #"ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
-        #                 #"INFORMACIÓN DISPONIBLE": PAGINAS.consulta_estado
-        #                 # "DATOS DE MUESTREOS": PAGINAS.consulta_estadillos,
-        #                 # "GRÁFICO DE EVOLUCIÓN": PAGINAS.evolucion_analisis,
-        #                 # "ENTRADA PROCESOS": PAGINAS.entrada_procesos_actuales,
-        #                 # "ESTADO DEL PROCESADO DE MUESTRAS": PAGINAS.consulta_procesos
-        #                 }
+            paginas = {"INICIO": PAGINAS.principal
+                        #"ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
+                        #"INFORMACIÓN DISPONIBLE": PAGINAS.consulta_estado
+                        # "DATOS DE MUESTREOS": PAGINAS.consulta_estadillos,
+                        # "GRÁFICO DE EVOLUCIÓN": PAGINAS.evolucion_analisis,
+                        # "ENTRADA PROCESOS": PAGINAS.entrada_procesos_actuales,
+                        # "ESTADO DEL PROCESADO DE MUESTRAS": PAGINAS.consulta_procesos
+                        }
             
             
-        # if st.session_state["usuario"] == 'COAC - Laboratorio Química':
+        if st.session_state["usuario"] == 'COAC - Laboratorio Química':
         
-        #     paginas = {"INICIO": PAGINAS.principal,
-        #                 "PROCESOS EN CURSO": PAGINAS.actualiza_procesos, 
-        #                 "CONSULTA DATOS BOTELLAS":PAGINAS.consulta_botellas,
-        #                 "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes,
-        #                 "PROCESADO QUIMICA":PAGINAS.procesado_quimica
-        #                 }
+            paginas = {"INICIO": PAGINAS.principal,
+                        "PROCESOS EN CURSO": PAGINAS.actualiza_procesos, 
+                        "CONSULTA DATOS BOTELLAS":PAGINAS.consulta_botellas,
+                        "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes,
+                        "PROCESADO QUIMICA":PAGINAS.procesado_quimica
+                        }
 
             
         # if st.session_state["usuario"] == 'COAC - Supervisión Nutrientes':

@@ -334,21 +334,21 @@ conn.close()
 
 
 
-### Informacion de los usuarios y contraseñas de la aplicacion ###
+# ### Informacion de los usuarios y contraseñas de la aplicacion ###
 
-usuarios       = ['COAC - Administrador','COAC - Laboratorio Química','COAC - Supervisión Nutrientes','COAC - Radiales','Usuario externo']
-passwords      = ['IEO_2022','IEO_2022','IEO_2022','IEO_2022','2022_IEO']
+# usuarios       = ['COAC - Administrador','COAC - Laboratorio Química','COAC - Supervisión Nutrientes','COAC - Radiales','Usuario externo']
+# passwords      = ['IEO_2022','IEO_2022','IEO_2022','IEO_2022','2022_IEO']
 
-instruccion_sql = '''INSERT INTO usuarios_app (nombre_usuario,password)
-    VALUES (%s,%s) ON CONFLICT (nombre_usuario) DO UPDATE SET (password) = ROW(EXCLUDED.password);''' 
+# instruccion_sql = '''INSERT INTO usuarios_app (nombre_usuario,password)
+#     VALUES (%s,%s) ON CONFLICT (nombre_usuario) DO UPDATE SET (password) = ROW(EXCLUDED.password);''' 
         
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
-for idato in range(len(usuarios)):
-    cursor.execute(instruccion_sql, (usuarios[idato],passwords[idato]))
-    conn.commit()
-cursor.close()
-conn.close()
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
+# for idato in range(len(usuarios)):
+#     cursor.execute(instruccion_sql, (usuarios[idato],passwords[idato]))
+#     conn.commit()
+# cursor.close()
+# conn.close()
 
 
 
