@@ -1335,6 +1335,7 @@ def control_calidad_nutrientes(datos_procesados,listado_variables,direccion_host
         
         df_prog_anho_sal_est_sel     = df_prog_anho_sal_sel[df_prog_anho_sal_sel['estacion']==indice_salida]
     
+    st.text(df_prog_anho_sal_sel)    
     st.text(df_prog_anho_sal_est_sel)
     
     col1, col2,col3 = st.columns(3,gap="small")
