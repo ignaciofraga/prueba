@@ -28,9 +28,9 @@ if FUNCIONES_AUXILIARES.log_in() is True:
 
         if st.session_state["usuario"] == 'COAC - Administrador':
         
-            paginas = {"INICIO": PAGINAS.principal,
-                        "ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
-                        "INFORMACIÓN DISPONIBLE": PAGINAS.consulta_estado
+            paginas = {"INICIO": PAGINAS.principal
+                        #"ENTRADA DATOS NUTRIENTES": PAGINAS.entrada_datos,
+                        #"INFORMACIÓN DISPONIBLE": PAGINAS.consulta_estado
                         # "DATOS DE MUESTREOS": PAGINAS.consulta_estadillos,
                         # "GRÁFICO DE EVOLUCIÓN": PAGINAS.evolucion_analisis,
                         # "ENTRADA PROCESOS": PAGINAS.entrada_procesos_actuales,
@@ -38,12 +38,10 @@ if FUNCIONES_AUXILIARES.log_in() is True:
                         }
             
             
-        if st.session_state["usuario"] == 'COAC - Laboratorio Nutrientes':
+        if st.session_state["usuario"] == 'COAC - Laboratorio Química':
         
             paginas = {"INICIO": PAGINAS.principal,
-                        "ACTUALIZA PROCESOS EN CURSO": PAGINAS.actualiza_procesos, 
-                        "DESCARGA DATOS DE MUESTREOS": PAGINAS.consulta_estadillos,
-                        "INTRODUCE DATOS NUTRIENTES": PAGINAS.entrada_datos,
+                        "PROCESOS EN CURSO": PAGINAS.actualiza_procesos, 
                         "CONSULTA DATOS BOTELLAS":PAGINAS.consulta_botellas,
                         "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes,
                         "PROCESADO QUIMICA":PAGINAS.procesado_quimica
