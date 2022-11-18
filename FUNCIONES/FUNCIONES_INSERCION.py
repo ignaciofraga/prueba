@@ -1347,6 +1347,8 @@ def menu_seleccion(datos_procesados,listado_variables,io_control_calidad):
     if io_control_calidad == 1: 
         with col3:  
             meses_offset              = st.number_input('Intervalo meses:',value=1)
+    else:
+        meses_offset = 0
     
     # Selecciona los datos correspondientes a la estación y salida seleccionada
     df_seleccion               = datos_procesados[(datos_procesados["programa"] == indice_programa) & (datos_procesados["año"] == anho_seleccionado) & (datos_procesados["estacion"] == indice_estacion) & (datos_procesados["salida_mar"] == indice_salida) & (datos_procesados["num_cast"] == cast_seleccionado)]
