@@ -2295,8 +2295,9 @@ def procesado_nutrientes():
     acciones     = ['Procesar salidas del AA', 'Realizar control de calidad de datos disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
  
-    variables_procesado = ['nitrogeno_total','nitrato','nitrito','silicato','fosfato']    
- 
+    variables_procesado    = ['Nitrógeno total','Nitrato','Nitrito','Silicato','Fosfato']    
+    variables_procesado_bd = ['nitrogeno_total','nitrato','nitrito','silicato','fosfato']
+    
     # Añade salidas del AA
     if tipo_accion == acciones[0]:
         
@@ -2481,7 +2482,7 @@ def procesado_nutrientes():
                 # Mantén sólo las filas del dataframe con valores no nulos
                 datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]    
              
-                FUNCIONES_INSERCION.control_calidad_biogeoquimica(datos_muestras,variables_procesado,direccion_host,base_datos,usuario,contrasena,puerto)
+                FUNCIONES_INSERCION.control_calidad_biogeoquimica(datos_muestras,variables_procesado,variables_procesado_bd,direccion_host,base_datos,usuario,contrasena,puerto)
 
         
     # control de calidad de salidas previamente disponibles
@@ -2498,7 +2499,7 @@ def procesado_nutrientes():
         
         
         # procesa ese dataframe
-        FUNCIONES_INSERCION.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,direccion_host,base_datos,usuario,contrasena,puerto)
+        FUNCIONES_INSERCION.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,direccion_host,base_datos,usuario,contrasena,puerto)
 
         
 
@@ -2537,7 +2538,7 @@ def procesado_quimica():
     acciones     = ['Añadir datos de laboratorio', 'Realizar control de calidad de datos disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
  
-    #variables_procesado    = ['pH','Alcalinidad','Oxígeno']    
+    variables_procesado    = ['pH','Alcalinidad','Oxígeno (Método Winkler)']    
     variables_procesado_bd = ['ph','alcalinidad','oxigeno_wk']
     
     # Define unos valores de referencia 
@@ -2559,7 +2560,7 @@ def procesado_quimica():
                 
         # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
         io_control_calidad = 0
-        df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = FUNCIONES_INSERCION.menu_seleccion(df_datos_disponibles,variables_procesado_bd,io_control_calidad)
+        df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = FUNCIONES_INSERCION.menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad)
 
         # Si ya hay datos previos, mostrar un warning        
         if df_seleccion[variable_seleccionada].notnull().all():
@@ -2656,6 +2657,6 @@ def procesado_quimica():
             df_datos_disponibles['año'].iloc[idato] = (df_datos_disponibles['fecha_muestreo'].iloc[idato]).year
         
         # procesa ese dataframe
-        FUNCIONES_INSERCION.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado_bd,direccion_host,base_datos,usuario,contrasena,puerto)
+        FUNCIONES_INSERCION.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,direccion_host,base_datos,usuario,contrasena,puerto)
 
           

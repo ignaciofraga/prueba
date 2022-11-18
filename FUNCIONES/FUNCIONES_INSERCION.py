@@ -1279,7 +1279,7 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
 #################################################################################
 ######## FUNCION PARA DESPLEGAR MENUS DE SELECCION DE SALIDA Y VARIABLE  ########
 #################################################################################
-def menu_seleccion(datos_procesados,listado_variables,io_control_calidad):
+def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,io_control_calidad):
 
     import streamlit as st
     from FUNCIONES.FUNCIONES_AUXILIARES import init_connection 
@@ -1344,7 +1344,12 @@ def menu_seleccion(datos_procesados,listado_variables,io_control_calidad):
         cast_seleccionado         = st.selectbox('Cast',(listado_casts_estaciones))
         
     with col2: 
-        variable_seleccionada     = st.selectbox('Variable',(listado_variables))
+
+        variable_seleccionada        = st.selectbox('Variable',(variables_procesado))
+        indice_variable_seleccionada = variables_procesado.index(variable_seleccionada)
+        variable_seleccionada = variables_procesado_bd[indice_variable_seleccionada]
+
+
 
     if io_control_calidad == 1: 
         with col3:  
@@ -1364,7 +1369,7 @@ def menu_seleccion(datos_procesados,listado_variables,io_control_calidad):
 ###############################################################################
 ###### FUNCION PARA REALIZAR CONTROL DE CALDIAD DE DATOS BIOGEOQUIMICOS #######
 ###############################################################################
-def control_calidad_biogeoquimica(datos_procesados,listado_variables,direccion_host,base_datos,usuario,contrasena,puerto):
+def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables_procesado_bd,direccion_host,base_datos,usuario,contrasena,puerto):
 
     import streamlit as st
     import matplotlib.pyplot as plt
@@ -1384,7 +1389,7 @@ def control_calidad_biogeoquimica(datos_procesados,listado_variables,direccion_h
 
     # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
     io_control_calidad = 1
-    df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = menu_seleccion(datos_procesados,listado_variables,io_control_calidad)
+    df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,io_control_calidad)
 
     # Recupera los datos disponibles de la misma estación, para la misma variable
     listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
@@ -1427,14 +1432,24 @@ def control_calidad_biogeoquimica(datos_procesados,listado_variables,direccion_h
     
         ################# GRAFICOS ################
     
-        # Representa un gráfico con la variable seleccionada junto a los oxígenos
-    
+        ### GRAFICO CON LA VARIABLE ANALIZADA EN FUNCION DE LA PROFUNDIDAD Y OXIGENO   
+        # Representa un gráfico con la variable seleccionada junto a los oxígenos   
         fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.05, 'hspace':0}, width_ratios=[3, 1])
-       
+ 
+        ### DATOS DISPONIBLES PREVIAMENTE ###
+        # Representa los datos disponibles de un color
         ax.plot(df_disponible_bd[variable_seleccionada],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0',label='DATO PREVIO(OK)')
+        # Representa los datos dentro del intervalo de meses en otro color
         ax.plot(df_rango_temporal[variable_seleccionada],df_rango_temporal['presion_ctd'],'.',color='#404040',label='DATO PREVIO(INTERVALO)')
-           
+        # Representa los datos con QF malos en un tercer color   
+        qf_variable_seleccionada = variable_seleccionada + '_qf'
+        datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
+        ax.plot(datos_malos[variable_seleccionada],datos_malos['presion_ctd'],'.',color='#00CCCC',label='DATO PREVIO(MALO)')    
+
+        ### DATOS PROCESADOS ###        
         ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r',label='PROCESADO' )
+        
+        ### FORMATO,ETIQUETAS Y NOMBRES DE EJES ###
         texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
         ax.set(xlabel=texto_eje)
         ax.set(ylabel='Presion (db)')
@@ -1449,9 +1464,6 @@ def control_calidad_biogeoquimica(datos_procesados,listado_variables,direccion_h
                 nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
        
-        qf_variable_seleccionada = variable_seleccionada + '_qf'
-        datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
-        ax.plot(datos_malos[variable_seleccionada],datos_malos['presion_ctd'],'.',color='#00CCCC',label='DATO PREVIO(MALO)')    
         ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
         
         io_plot = 0
@@ -1472,10 +1484,17 @@ def control_calidad_biogeoquimica(datos_procesados,listado_variables,direccion_h
     
         st.pyplot(fig)
  
-        # Gráficos particulares para cada variable
+    
+ 
+        ### GRAFICOS ESPECIFICOS PARA LAS POSIBLES VARIABLES        
+
+        
+
         if variable_seleccionada == 'fosfato':
     
+            ### GRAFICO FOSFATO vs NITRATO 
             fig, ax = plt.subplots()       
+            
             ax.plot(df_disponible_bd['nitrato'],df_disponible_bd['fosfato'],'.',color='#C0C0C0')
             ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color='#404040')
             ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
@@ -1499,12 +1518,19 @@ def control_calidad_biogeoquimica(datos_procesados,listado_variables,direccion_h
            
             st.pyplot(fig)
         
+        
+        
         elif variable_seleccionada == 'nitrato':
+    
+                    
     
             if df_seleccion['ph'].isnull().all():         
                 fig, ax = plt.subplots()      
             else:
                 fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
+    
+    
+            ### GRAFICO FOSFATO vs NITRATO
     
             ax.plot(df_disponible_bd['nitrato'],df_disponible_bd['fosfato'],'.',color='#C0C0C0')
             ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color='#404040')
@@ -1532,7 +1558,12 @@ def control_calidad_biogeoquimica(datos_procesados,listado_variables,direccion_h
             az.plot(df_rango_temporal['nitrato'],df_rango_temporal['ph'],'.',color='#404040')
             az.set(xlabel='Nitrato (\u03BCmol/kg)')
             az.set(ylabel='pH')
+            
+            
             if df_seleccion['ph'].isnull().all():    
+                
+                ### GRAFICO NITRATO vs pH
+                
                 az.plot(df_seleccion['nitrato'],df_seleccion['ph'],'.r' )
                 az.yaxis.tick_right()
                 az.yaxis.set_label_position("right")
@@ -1554,6 +1585,8 @@ def control_calidad_biogeoquimica(datos_procesados,listado_variables,direccion_h
         elif variable_seleccionada == 'silicato':
     
             if df_seleccion['silicato'].isnull().all() is False:         
+    
+                ### GRAFICO SILICATO vs ALCALINIDAD            
     
                 fig, ax = plt.subplots()       
                 ax.plot(df_disponible_bd['silicato'],df_disponible_bd['alcalinidad'],'.',color='#C0C0C0')
