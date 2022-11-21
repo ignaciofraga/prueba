@@ -2171,7 +2171,7 @@ def entrada_condiciones_ambientales():
              humedad_relativa = st.number_input('Humedad relativa(%):',value=int(humedad_relativa_defecto),min_value=0)
              max_clorofila    = st.number_input('Max.Clorofila(m):',value=float(max_clorofila_defecto),min_value=float(0),step=0.5)
              
-        submit = st.form_submit_button("Enviar")                    
+        submit = st.form_submit_button("Añadir o modificar datos")                    
 
         if submit is True:
             
@@ -2180,7 +2180,7 @@ def entrada_condiciones_ambientales():
                     
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
             cursor = conn.cursor()
-            cursor.execute(instruccion_sql, (id_salida,id_estacion_elegida,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila))
+            cursor.execute(instruccion_sql, (int(id_salida),int(id_estacion_elegida),hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila))
             conn.commit()
             cursor.close()
             conn.close()
