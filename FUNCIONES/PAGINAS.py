@@ -1683,7 +1683,7 @@ def entrada_condiciones_ambientales():
         st.text(df_condiciones_salida_seleccionada)
         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_condiciones_salida_seleccionada)
         gridOptions = gb.build()
-        st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+        st_aggrid.AgGrid(df_condiciones_salida_seleccionada,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
                
 
     # Extrae las estaciones visitadas en la salida seleccionada
