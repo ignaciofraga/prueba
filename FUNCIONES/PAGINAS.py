@@ -1378,9 +1378,9 @@ def entrada_salidas_mar():
                    
                     
             with col2:                                       
-                citometria = st.checkbox('Citometría (bact.flag.)', value=True)
+                citometria = st.checkbox('Citometría', value=True)
                 if citometria:
-                    json_variables = json_variables + ['Citometría (bact.flag.)']
+                    json_variables = json_variables + ['Citometría']
                                         
                 ciliados = st.checkbox('Ciliados', value=True)
                 if ciliados:
@@ -1431,7 +1431,7 @@ def entrada_salidas_mar():
                 if poc:
                     json_variables = json_variables + ['POC']
                                     
-                ppl = st.checkbox('PPL', value=True)
+                ppl = st.checkbox('PPL', value=False)
                 if ppl:
                     json_variables = json_variables + ['PPL']
                     
