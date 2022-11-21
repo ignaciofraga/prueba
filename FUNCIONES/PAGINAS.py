@@ -2006,7 +2006,7 @@ def entrada_condiciones_ambientales():
     beaufort_vmin   = [0,2,6,12,20,29,39,50,62,75,89,103,118]
     beaufort_vmax   = [2,6,12,20,29,39,50,62,75,89,103,118,500]
 
-    mareas          = ['Bajamar','Media','Pleamar']
+    mareas          = ['Baja','Media','Pleamar']
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host = st.secrets["postgres"].host
@@ -2099,6 +2099,7 @@ def entrada_condiciones_ambientales():
             indice_marea_defecto        = mareas.index(df_condicion_introducida['marea'].iloc[0])
         else:
             indice_marea_defecto        = 0
+            
         prof_secchi_defecto             = df_condicion_introducida['prof_secchi'].iloc[0]
         max_clorofila_defecto           = df_condicion_introducida['max_clorofila'].iloc[0]
         humedad_relativa_defecto        = df_condicion_introducida['humedad_relativa'].iloc[0]
