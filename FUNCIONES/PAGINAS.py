@@ -1569,7 +1569,8 @@ def entrada_salidas_mar():
         # Añade una columna con el nombre del buque utilizado
         df_salidas_radiales['Buque'] = None
         for isalida in range(df_salidas_radiales.shape[0]):
-            df_salidas_radiales['Buque'].iloc[isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]][0]
+            df_salidas_radiales['Buque'].iloc[isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]]
+            st.text(df_salidas_radiales['Buque'].iloc[isalida])
         
         # Elimina las columnas que no interesa mostrar
         df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','buque'])
