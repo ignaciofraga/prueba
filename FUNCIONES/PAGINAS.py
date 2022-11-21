@@ -1598,6 +1598,30 @@ def entrada_salidas_mar():
         st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
 
 
+        # Botón para descargar las salidas disponibles
+        nombre_archivo =  'DATOS_SALIDAS.xlsx'
+    
+        output = BytesIO()
+        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+        df_salidas_radiales.to_excel(writer, index=False, sheet_name='DATOS')
+        workbook = writer.book
+        worksheet = writer.sheets['DATOS']
+        writer.save()
+        df_salidas_radiales = output.getvalue()
+    
+        st.download_button(
+            label="DESCARGA EXCEL CON LAS SALIDAS REALIZADAS",
+            data=df_salidas_radiales,
+            file_name=nombre_archivo,
+            help= 'Descarga un archivo .csv con los datos solicitados',
+            mime="application/vnd.ms-excel"
+        )
+        
+        
+               
+
+
+
         # Modifica una salida
         st.subheader('Modifica salida al mar')
         
