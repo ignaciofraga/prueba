@@ -1507,6 +1507,12 @@ def entrada_salidas_mar():
         df_personal = psql.read_sql('SELECT * FROM personal_salidas', conn)
         conn.close()
 
+        # Muestra una tabla con el personal ya incluido en la base de datos
+        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_personal)
+        gridOptions = gb.build()
+        st_aggrid.AgGrid(df_personal,gridOptions=gridOptions,enable_enterprise_modules=True,height=250,allow_unsafe_jscode=True,reload_data=True)    
+
+
         # Despliega un formulario para introducir los datos
         with st.form("Formulario seleccion"):
                    
