@@ -1670,6 +1670,10 @@ def entrada_salidas_mar():
         # Recupera las variables muestreadas en la salida seleccionada
         json_variables              = df_salidas_seleccion['variables_muestreadas'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
        
+        st.text(json_variables)
+        if 'Oxigenos' in json_variables:
+            st.text('marca')
+             
         # Despliega un formulario para modificar los datos de la salida 
         with st.form("Formulario seleccion"):
                    
