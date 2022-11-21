@@ -1446,22 +1446,22 @@ def entrada_salidas_mar():
             col1, col2, col3, col4= st.columns(4,gap="small")
             
             with col1:
-                oxigenos_continuo = st.checkbox('Oxigenos', value=True)
+                oxigenos_continuo = st.checkbox('Oxigenos (Continuo)', value=True)
                 if oxigenos_continuo:
                     json_variables = json_variables + ['Oxigenos (Continuo)']  
             
             with col2:
-                clorofilas_continuo = st.checkbox('Clorofilas', value=True)
+                clorofilas_continuo = st.checkbox('Clorofilas (Continuo)', value=True)
                 if clorofilas_continuo:
                     json_variables = json_variables + ['Clorofilas (Continuo)'] 
                     
             with col3:
-                cdom_continuo = st.checkbox('CDOM', value=True)
+                cdom_continuo = st.checkbox('CDOM (Continuo)', value=True)
                 if cdom_continuo:
                     json_variables = json_variables + ['CDOM (Continuo)'] 
             
             with col4:
-                ph_continuo = st.checkbox('pH', value=True)
+                ph_continuo = st.checkbox('pH (Continuo)', value=True)
                 if ph_continuo:
                     json_variables = json_variables + ['pH (Continuo)']
             
