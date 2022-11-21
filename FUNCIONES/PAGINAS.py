@@ -1677,9 +1677,10 @@ def entrada_condiciones_ambientales():
     # Aviso de que ya hay información de esa salida y muestra la información    
     df_condiciones_salida_seleccionada = df_condiciones[(df_condiciones['salida']==id_salida)]
     if df_condiciones_salida_seleccionada.shape[0] > 0:
-        texto_error = 'Ya existen datos correspondientes a la estación y salida seleccionada.'
+        texto_error = 'HOLA Ya existen datos correspondientes a la estación y salida seleccionada.'
         st.warning(texto_error, icon="⚠️")       
 
+        st.text(df_condiciones_salida_seleccionada)
         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_condiciones_salida_seleccionada)
         gridOptions = gb.build()
         st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
