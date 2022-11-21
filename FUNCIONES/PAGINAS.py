@@ -1673,7 +1673,6 @@ def entrada_salidas_mar():
         # Despliega un formulario para modificar los datos de la salida 
         with st.form("Formulario seleccion"):
                    
-            st.text(json_variables)
             col1, col2,col3= st.columns(3,gap="small")
             
             with col1:
