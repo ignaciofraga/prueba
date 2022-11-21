@@ -1682,6 +1682,7 @@ def entrada_salidas_mar():
         estaciones_previas             = datos_salida_seleccionada['estaciones'].iloc[0]
         observaciones_previas          = datos_salida_seleccionada['observaciones'].iloc[0]
 
+        st.text('variables previas')
         st.text(json_variables_previas)
 
         # Recupera el personal de la salida seleccionada
