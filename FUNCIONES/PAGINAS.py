@@ -1668,12 +1668,8 @@ def entrada_salidas_mar():
         fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
     
         # Recupera las variables muestreadas en la salida seleccionada
-        json_variables              = df_salidas_seleccion['variables_muestreadas'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
-       
-        st.text(json_variables)
-        if 'Oxigenos' in json_variables:
-            st.text('marca')
-             
+        json_variables_previas      = df_salidas_seleccion['variables_muestreadas'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+                    
         # Despliega un formulario para modificar los datos de la salida 
         with st.form("Formulario seleccion"):
                    
@@ -1713,41 +1709,37 @@ def entrada_salidas_mar():
 
             json_variables = []
             col1, col2, col3, col4= st.columns(4,gap="small")
-         
-            st.text(json_variables)
-            if 'Oxigenos' in json_variables:
-                st.text('marca')
-             
+        
             with col1:
-                if 'Oxigenos' in json_variables:
+                if 'Oxigenos' in json_variables_previas:
                     oxigenos = st.checkbox('Oxigenos', value=True)
                 else:
                     oxigenos = st.checkbox('Oxigenos', value=False)                    
                 if oxigenos:
                     json_variables = json_variables + ['Oxigenos']
                     
-                if 'Alcalinidad' in json_variables:
+                if 'Alcalinidad' in json_variables_previas:
                     alcalinidad = st.checkbox('Alcalinidad', value=True)
                 else:
                     alcalinidad = st.checkbox('Alcalinidad', value=False)                    
                 if alcalinidad:
                     json_variables = json_variables + ['Alcalinidad']
 
-                if 'pH' in json_variables:                    
+                if 'pH' in json_variables_previas:                    
                     ph = st.checkbox('pH', value=True)
                 else:
                     ph = st.checkbox('pH', value=False)                
                 if ph:
                     json_variables = json_variables + ['pH']
                     
-                if 'Nutrientes (A)' in json_variables:                 
+                if 'Nutrientes (A)' in json_variables_previas:                 
                     nut_a = st.checkbox('Nutrientes (A)', value=True)
                 else:
                     nut_a = st.checkbox('Nutrientes (A)', value=False)                    
                 if nut_a:
                     json_variables = json_variables + ['Nutrientes (A)']
                     
-                if 'Nutrientes (B)' in json_variables:                 
+                if 'Nutrientes (B)' in json_variables_previas:                 
                     nut_b = st.checkbox('Nutrientes (B)', value=True)
                 else:
                     nut_b = st.checkbox('Nutrientes (B)', value=False)                     
@@ -1756,35 +1748,35 @@ def entrada_salidas_mar():
                    
                     
             with col2:                                       
-                if 'Citometria' in json_variables:   
+                if 'Citometria' in json_variables_previas:   
                     citometria = st.checkbox('Citometria', value=True)
                 else:
                     citometria = st.checkbox('Citometria', value=False)                    
                 if citometria:
                     json_variables = json_variables + ['Citometría']
 
-                if 'Ciliados' in json_variables:                                         
+                if 'Ciliados' in json_variables_previas:                                         
                     ciliados = st.checkbox('Ciliados', value=True)
                 else:
                     ciliados = st.checkbox('Ciliados', value=False)                    
                 if ciliados:
                     json_variables = json_variables + ['Ciliados']
 
-                if 'Zoop. (meso)' in json_variables:                     
+                if 'Zoop. (meso)' in json_variables_previas:                     
                     zoop_meso = st.checkbox('Zoop. (meso)', value=True)
                 else:
                     zoop_meso = st.checkbox('Zoop. (meso)', value=False)                    
                 if zoop_meso:
                     json_variables = json_variables + ['Zoop. (meso)']
 
-                if 'Zoop. (micro)' in json_variables:                     
+                if 'Zoop. (micro)' in json_variables_previas:                     
                     zoop_micro = st.checkbox('Zoop. (micro)', value=True)
                 else:
                     zoop_micro = st.checkbox('Zoop. (micro)', value=False)                    
                 if zoop_micro:
                     json_variables = json_variables + ['Zoop. (micro)']   
                    
-                if 'Zoop. (ictio)' in json_variables: 
+                if 'Zoop. (ictio)' in json_variables_previas: 
                     zoop_ictio = st.checkbox('Zoop. (ictio)', value=True)
                 else:
                     zoop_ictio = st.checkbox('Zoop. (ictio)', value=False)                    
@@ -1793,35 +1785,35 @@ def entrada_salidas_mar():
 
 
             with col3:
-                if 'Clorofilas' in json_variables: 
+                if 'Clorofilas' in json_variables_previas: 
                     colorofilas = st.checkbox('Clorofilas', value=True)
                 else:
                     colorofilas = st.checkbox('Clorofilas', value=False)                    
                 if colorofilas:
                     json_variables = json_variables + ['Clorofilas'] 
 
-                if 'Prod.Primaria' in json_variables: 
+                if 'Prod.Primaria' in json_variables_previas: 
                     prod_prim = st.checkbox('Prod.Primaria', value=True)
                 else:
                     prod_prim = st.checkbox('Prod.Primaria', value=False)                    
                 if prod_prim:
                     json_variables = json_variables + ['Prod.Primaria']
                                         
-                if 'Flow Cam' in json_variables:                     
+                if 'Flow Cam' in json_variables_previas:                     
                     flow_cam = st.checkbox('Flow Cam', value=True)
                 else:
                     flow_cam = st.checkbox('Flow Cam', value=False)
                 if flow_cam:
                     json_variables = json_variables + ['Flow Cam'] 
                     
-                if 'ADN' in json_variables:                    
+                if 'ADN' in json_variables_previas:                    
                     adn = st.checkbox('ADN', value=True)
                 else:
                     adn = st.checkbox('ADN', value=False)                    
                 if adn:
                     json_variables = json_variables + ['ADN'] 
 
-                if 'DOM' in json_variables:                     
+                if 'DOM' in json_variables_previas:                     
                     dom = st.checkbox('DOM', value=True)
                 else:
                     dom = st.checkbox('DOM', value=False)                
@@ -1830,21 +1822,21 @@ def entrada_salidas_mar():
             
             
             with col4:
-                if 'TOC' in json_variables:                 
+                if 'TOC' in json_variables_previas:                 
                     toc = st.checkbox('TOC', value=True)
                 else:
                     toc = st.checkbox('TOC', value=False)                    
                 if toc:
                     json_variables = json_variables + ['TOC']
                     
-                if 'POC' in json_variables:    
+                if 'POC' in json_variables_previas:    
                     poc = st.checkbox('POC', value=True)
                 else:
                     poc = st.checkbox('POC', value=False)                    
                 if poc:
                     json_variables = json_variables + ['POC']
 
-                if 'PPL' in json_variables:                                    
+                if 'PPL' in json_variables_previas:                                    
                     ppl = st.checkbox('PPL', value=True)
                 else:
                     ppl = st.checkbox('PPL', value=False)                    
