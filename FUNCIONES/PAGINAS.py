@@ -1652,14 +1652,16 @@ def entrada_condiciones_ambientales():
     puerto         = st.secrets["postgres"].port
     
     # Recupera la tabla de las salidas realizadas 
-    conn          = init_connection()
-    df_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-    df_programas  = psql.read_sql('SELECT * FROM programas', conn)
-    df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+    conn            = init_connection()
+    df_salidas      = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    df_programas    = psql.read_sql('SELECT * FROM programas', conn)
+    df_estaciones   = psql.read_sql('SELECT * FROM estaciones', conn)
+    df_condiciones  = psql.read_sql('SELECT * FROM condiciones_ambientales_muestreos', conn)
     conn.close()
     
     id_radiales            = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
 
+   
     df_salidas_radiales    = df_salidas[df_salidas['programa']==id_radiales] 
     df_estaciones_radiales = df_estaciones[df_estaciones['programa']==id_radiales]
     
@@ -1672,10 +1674,26 @@ def entrada_condiciones_ambientales():
     salida                 = st.selectbox('Salida',(df_salidas_radiales['nombre_salida']))   
     id_salida              = df_salidas_radiales['id_salida'][df_salidas_radiales['nombre_salida']==salida].iloc[0]
 
+    # Aviso de que ya hay información de esa salida y muestra la información    
+    df_condiciones_salida_seleccionada = df_condiciones[(df_condiciones['salida']==id_salida)]
+    if df_condiciones_salida_seleccionada.shape[0] > 0:
+        texto_error = 'Ya existen datos correspondientes a la estación y salida seleccionada.'
+        st.warning(texto_error, icon="⚠️")       
+
+        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_condiciones_salida_seleccionada)
+        gridOptions = gb.build()
+        st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+               
+
     # Extrae las estaciones visitadas en la salida seleccionada
     listado_estaciones = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida].iloc[0] 
 
     if listado_estaciones is not None:
+        
+        # Aviso de que ya hay información de esa salida y muestra la información
+        texto_error = 'Ya existen datos correspondientes a la estación y salida seleccionada.'
+        st.warning(texto_error, icon="⚠️") 
+        
                 
         # Vectores con los valores de las variables que tienen opciones concretas
         seleccion_SN = ['Si','No']
@@ -1696,15 +1714,15 @@ def entrada_condiciones_ambientales():
         id_estacion_elegida = int(df_estaciones_radiales['id_estacion'][df_estaciones_radiales['nombre_estacion']==estacion_elegida].values[0])
     
         # recupera los datos disponibles en la base de datos para asignar valores por defecto
-        conn                     = init_connection()
-        df_condiciones           = psql.read_sql('SELECT * FROM condiciones_ambientales_muestreos', conn)
         df_condicion_introducida = df_condiciones[(df_condiciones['salida']==id_salida) & (df_condiciones['estacion']==id_estacion_elegida)]               
-        conn.close()
+
         
         if df_condicion_introducida.shape[0] == 1:
             
             texto_error = 'Ya existen datos correspondientes a la estación y salida seleccionada.'
             st.warning(texto_error, icon="⚠️") 
+            
+
         
             # Asigna como valores por defecto los que ya estaban en la base de datos
             hora_llegada_defecto            = df_condicion_introducida['hora_llegada'][0]
