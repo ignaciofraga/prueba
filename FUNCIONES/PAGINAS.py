@@ -1364,8 +1364,8 @@ def entrada_salidas_mar():
                 if alcalinidad:
                     json_variables = json_variables + ['Alcalinidad']
                     
-                alcalinidad = st.checkbox('pH', value=True)
-                if oxigenos:
+                ph = st.checkbox('pH', value=True)
+                if ph:
                     json_variables = json_variables + ['pH']
                     
                 nut_a = st.checkbox('Nutrientes (A)', value=True)
@@ -1669,12 +1669,7 @@ def entrada_salidas_mar():
     
         # Recupera las variables muestreadas en la salida seleccionada
         json_variables              = df_salidas_seleccion['variables_muestreadas'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
-        st.text(json_variables)
-        if 'Oxigenos' in json_variables:
-            st.text('lista')
-        
-
-
+       
         # Despliega un formulario para modificar los datos de la salida 
         with st.form("Formulario seleccion"):
                    
@@ -1709,98 +1704,155 @@ def entrada_salidas_mar():
             json_estaciones         = json.dumps(estaciones_muestreadas)
 
 
-            # # Selecciona las variables muestreadas
-            # st.subheader('Variables muestreadas')
+            # Selecciona las variables muestreadas
+            st.subheader('Variables muestreadas')
 
-            # json_variables = []
-            # col1, col2, col3, col4= st.columns(4,gap="small")
-            
-            # with col1:
-            #     oxigenos = st.checkbox('Oxigenos', value=True)
-            #     if oxigenos:
-            #         json_variables = json_variables + ['Oxigenos']
+            json_variables = []
+            col1, col2, col3, col4= st.columns(4,gap="small")
+         
+         #    st.text(json_variables)
+         # if 'Oxigenos' in json_variables:
+         #     st.text('lista')
+             
+            with col1:
+                if 'Oxigenos' in json_variables:
+                    oxigenos = st.checkbox('Oxigenos', value=True)
+                else:
+                    oxigenos = st.checkbox('Oxigenos', value=False)                    
+                if oxigenos:
+                    json_variables = json_variables + ['Oxigenos']
                     
-            #     alcalinidad = st.checkbox('Alcalinidad', value=True)
-            #     if alcalinidad:
-            #         json_variables = json_variables + ['Alcalinidad']
+                if 'Alcalinidad' in json_variables:
+                    alcalinidad = st.checkbox('Alcalinidad', value=True)
+                else:
+                    alcalinidad = st.checkbox('Alcalinidad', value=False)                    
+                if alcalinidad:
+                    json_variables = json_variables + ['Alcalinidad']
+
+                if 'pH' in json_variables:                    
+                    ph = st.checkbox('pH', value=True)
+                else:
+                    ph = st.checkbox('pH', value=False)                
+                if ph:
+                    json_variables = json_variables + ['pH']
                     
-            #     alcalinidad = st.checkbox('pH', value=True)
-            #     if oxigenos:
-            #         json_variables = json_variables + ['pH']
+                if 'Nutrientes (A)' in json_variables:                 
+                    nut_a = st.checkbox('Nutrientes (A)', value=True)
+                else:
+                    nut_a = st.checkbox('Nutrientes (A)', value=False)                    
+                if nut_a:
+                    json_variables = json_variables + ['Nutrientes (A)']
                     
-            #     nut_a = st.checkbox('Nutrientes (A)', value=True)
-            #     if nut_a:
-            #         json_variables = json_variables + ['Nutrientes (A)']
-                    
-            #     nut_b = st.checkbox('Nutrientes (B)', value=True)
-            #     if nut_b:
-            #         json_variables = json_variables + ['Nutrientes (B)']
+                if 'Nutrientes (B)' in json_variables:                 
+                    nut_b = st.checkbox('Nutrientes (B)', value=True)
+                else:
+                    nut_b = st.checkbox('Nutrientes (B)', value=False)                     
+                if nut_b:
+                    json_variables = json_variables + ['Nutrientes (B)']
                    
                     
-            # with col2:                                       
-            #     citometria = st.checkbox('Citometria', value=True)
-            #     if citometria:
-            #         json_variables = json_variables + ['Citometría']
+            with col2:                                       
+                if 'Citometria' in json_variables:   
+                    citometria = st.checkbox('Citometria', value=True)
+                else:
+                    citometria = st.checkbox('Citometria', value=False)                    
+                if citometria:
+                    json_variables = json_variables + ['Citometría']
+
+                if 'Ciliados' in json_variables:                                         
+                    ciliados = st.checkbox('Ciliados', value=True)
+                else:
+                    ciliados = st.checkbox('Ciliados', value=False)                    
+                if ciliados:
+                    json_variables = json_variables + ['Ciliados']
+
+                if 'Zoop. (meso)' in json_variables:                     
+                    zoop_meso = st.checkbox('Zoop. (meso)', value=True)
+                else:
+                    zoop_meso = st.checkbox('Zoop. (meso)', value=False)                    
+                if zoop_meso:
+                    json_variables = json_variables + ['Zoop. (meso)']
+
+                if 'Zoop. (micro)' in json_variables:                     
+                    zoop_micro = st.checkbox('Zoop. (micro)', value=True)
+                else:
+                    zoop_micro = st.checkbox('Zoop. (micro)', value=False)                    
+                if zoop_micro:
+                    json_variables = json_variables + ['Zoop. (micro)']   
+                   
+                if 'Zoop. (ictio)' in json_variables: 
+                    zoop_ictio = st.checkbox('Zoop. (ictio)', value=True)
+                else:
+                    zoop_ictio = st.checkbox('Zoop. (ictio)', value=False)                    
+                if zoop_ictio:
+                    json_variables = json_variables + ['Zoop. (ictio)']   
+
+
+            with col3:
+                if 'Clorofilas' in json_variables: 
+                    colorofilas = st.checkbox('Clorofilas', value=True)
+                else:
+                    colorofilas = st.checkbox('Clorofilas', value=False)                    
+                if colorofilas:
+                    json_variables = json_variables + ['Clorofilas'] 
+
+                if 'Prod.Primaria' in json_variables: 
+                    prod_prim = st.checkbox('Prod.Primaria', value=True)
+                else:
+                    prod_prim = st.checkbox('Prod.Primaria', value=False)                    
+                if prod_prim:
+                    json_variables = json_variables + ['Prod.Primaria']
                                         
-            #     ciliados = st.checkbox('Ciliados', value=True)
-            #     if ciliados:
-            #         json_variables = json_variables + ['Ciliados']
+                if 'Flow Cam' in json_variables:                     
+                    flow_cam = st.checkbox('Flow Cam', value=True)
+                else:
+                    flow_cam = st.checkbox('Flow Cam', value=False)
+                if flow_cam:
+                    json_variables = json_variables + ['Flow Cam'] 
                     
-            #     zoop_meso = st.checkbox('Zoop. (meso)', value=True)
-            #     if zoop_meso:
-            #         json_variables = json_variables + ['Zoop. (meso)']
-                    
-            #     zoop_micro = st.checkbox('Zoop. (micro)', value=True)
-            #     if zoop_micro:
-            #         json_variables = json_variables + ['Zoop. (micro)']   
-                    
-            #     zoop_ictio = st.checkbox('Zoop. (ictio)', value=False)
-            #     if zoop_ictio:
-            #         json_variables = json_variables + ['Zoop. (ictio)']   
+                if 'ADN' in json_variables:                    
+                    adn = st.checkbox('ADN', value=True)
+                else:
+                    adn = st.checkbox('ADN', value=False)                    
+                if adn:
+                    json_variables = json_variables + ['ADN'] 
 
-
-            # with col3:
-            #     colorofilas = st.checkbox('Clorofilas', value=True)
-            #     if colorofilas:
-            #         json_variables = json_variables + ['Clorofilas'] 
-
-            #     prod_prim = st.checkbox('Prod.Primaria', value=True)
-            #     if prod_prim:
-            #         json_variables = json_variables + ['Prod.Primaria']
-                                        
-            #     flow_cam = st.checkbox('Flow Cam', value=True)
-            #     if flow_cam:
-            #         json_variables = json_variables + ['Flow Cam'] 
-                    
-            #     adn = st.checkbox('ADN', value=True)
-            #     if adn:
-            #         json_variables = json_variables + ['ADN'] 
-                    
-            #     dom = st.checkbox('DOM', value=True)
-            #     if dom:
-            #         json_variables = json_variables + ['DOM']
+                if 'DOM' in json_variables:                     
+                    dom = st.checkbox('DOM', value=True)
+                else:
+                    dom = st.checkbox('DOM', value=False)                
+                if dom:
+                    json_variables = json_variables + ['DOM']
             
             
-            # with col4:
-                
-            #     toc = st.checkbox('TOC', value=True)
-            #     if toc:
-            #         json_variables = json_variables + ['TOC']
+            with col4:
+                if 'TOC' in json_variables:                 
+                    toc = st.checkbox('TOC', value=True)
+                else:
+                    toc = st.checkbox('TOC', value=False)                    
+                if toc:
+                    json_variables = json_variables + ['TOC']
                     
-            #     poc = st.checkbox('POC', value=True)
-            #     if poc:
-            #         json_variables = json_variables + ['POC']
-                                    
-            #     ppl = st.checkbox('PPL', value=False)
-            #     if ppl:
-            #         json_variables = json_variables + ['PPL']
+                if 'POC' in json_variables:    
+                    poc = st.checkbox('POC', value=True)
+                else:
+                    poc = st.checkbox('POC', value=False)                    
+                if poc:
+                    json_variables = json_variables + ['POC']
+
+                if 'PPL' in json_variables:                                    
+                    ppl = st.checkbox('PPL', value=True)
+                else:
+                    ppl = st.checkbox('PPL', value=False)                    
+                if ppl:
+                    json_variables = json_variables + ['PPL']
                     
-            #     otros = st.text_input('Otros:')
-            #     if otros:
-            #         json_variables = json_variables + [otros]
+                otros = st.text_input('Otros:')
+                if otros:
+                    json_variables = json_variables + [otros]
                     
                     
-            # json_variables         = json.dumps(json_variables)
+            json_variables         = json.dumps(json_variables)
 
 
 
