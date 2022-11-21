@@ -1673,8 +1673,7 @@ def entrada_salidas_mar():
         if 'Oxigenos' in json_variables:
             st.text('lista')
         
-        listado_variables           = json.loads(json_variables)
-        st.text(listado_variables)
+
 
         # Despliega un formulario para modificar los datos de la salida 
         with st.form("Formulario seleccion"):
