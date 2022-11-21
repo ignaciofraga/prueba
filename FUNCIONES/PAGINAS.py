@@ -1684,11 +1684,9 @@ def entrada_condiciones_ambientales():
         for idato in range(df_condiciones_salida_seleccionada.shape[0]):
             df_tabla['estacion'].iloc[idato] =  df_estaciones['nombre_estacion'][df_estaciones['id_estacion'] == df_tabla['estacion'].iloc[idato]] 
 
-
-        st.text(df_condiciones_salida_seleccionada)
-        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_condiciones_salida_seleccionada)
+        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_tabla)
         gridOptions = gb.build()
-        st_aggrid.AgGrid(df_condiciones_salida_seleccionada,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+        st_aggrid.AgGrid(df_tabla,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
                
 
     # Extrae las estaciones visitadas en la salida seleccionada
