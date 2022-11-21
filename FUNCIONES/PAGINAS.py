@@ -1707,13 +1707,22 @@ def entrada_salidas_mar():
                 hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto_final)
 
 
-            personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'],default=personal_comisionado_previo)
+            if len(personal_comisionado_previo)> 0:
+                personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'],default=personal_comisionado_previo)
+            else:
+                personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])                
             json_comisionados       = json.dumps(personal_comisionado)
 
-            personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'],default=personal_no_comisionado_previo)
+            if len(personal_no_comisionado_previo) > 0:            
+                personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'],default=personal_no_comisionado_previo)
+            else:
+                personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])                
             json_no_comisionados    = json.dumps(personal_no_comisionado)
             
-            estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'],default=estaciones_previas)
+            if len(estaciones_previas):
+                estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'],default=estaciones_previas)
+            else:                
+                estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
             json_estaciones         = json.dumps(estaciones_muestreadas)
 
 
