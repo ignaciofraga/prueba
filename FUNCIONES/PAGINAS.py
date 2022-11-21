@@ -1380,7 +1380,7 @@ def entrada_salidas_mar():
             with col2:                                       
                 citometria = st.checkbox('Citometria', value=True)
                 if citometria:
-                    json_variables = json_variables + ['Citometría']
+                    json_variables = json_variables + ['Citometria']
                                         
                 ciliados = st.checkbox('Ciliados', value=True)
                 if ciliados:
@@ -1662,14 +1662,33 @@ def entrada_salidas_mar():
     
         salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
     
-        # Recupera el identificador de la salida seleccionada
-        id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
     
-        fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
     
-        # Recupera las variables muestreadas en la salida seleccionada
-        json_variables_previas      = df_salidas_seleccion['variables_muestreadas'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+        # Recupera propiedades de la salida seleccionada
+        datos_salida_seleccionada  = df_salidas[df_salidas['nombre_salida']==salida]
+        
+        id_salida                      = datos_salida_seleccionada['id_salida'].iloc[0]
+        fecha_salida                   = datos_salida_seleccionada['fecha_salida'].iloc[0] 
+        json_variables_previas         = datos_salida_seleccionada['variables_muestreadas'].iloc[0]
+        personal_comisionado_previo    = datos_salida_seleccionada['participantes_comisionados'].iloc[0]
+        personal_no_comisionado_previo = datos_salida_seleccionada['participantes_no_comisionados'].iloc[0]           
+        estaciones_previas             = datos_salida_seleccionada['estaciones'].iloc[0]
+        # fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+    
+        # # Recupera las variables muestreadas en la salida seleccionada
+        # json_variables_previas      = df_salidas_seleccion['variables_muestreadas'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+                            
+        
+        
+        # id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+    
+        # fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+    
+        # # Recupera las variables muestreadas en la salida seleccionada
+        # json_variables_previas      = df_salidas_seleccion['variables_muestreadas'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
                     
+        # Recupera el personal de la salida seleccionada
+        
         # Despliega un formulario para modificar los datos de la salida 
         with st.form("Formulario seleccion"):
                    
@@ -1693,13 +1712,13 @@ def entrada_salidas_mar():
                 hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto_final)
 
 
-            personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])
+            personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'],default=personal_comisionado_previo)
             json_comisionados       = json.dumps(personal_comisionado)
 
-            personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])
+            personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'],default=personal_no_comisionado_previo)
             json_no_comisionados    = json.dumps(personal_no_comisionado)
             
-            estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
+            estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'],default=estaciones_previas)
             json_estaciones         = json.dumps(estaciones_muestreadas)
 
 
