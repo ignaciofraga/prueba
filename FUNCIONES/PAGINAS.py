@@ -2089,7 +2089,7 @@ def entrada_condiciones_ambientales():
             indice_mar_fondo_defecto        = seleccion_SN.index(df_condicion_introducida['mar_fondo'].iloc[0])
         else:
             indice_mar_fondo_defecto    = 0
-        if df_condicion_introducida['mar_direccion'].iloc[0] is not None
+        if df_condicion_introducida['mar_direccion'].iloc[0] is not None:
             indice_mar_direccion_defecto    = direcciones.index(df_condicion_introducida['mar_direccion'].iloc[0])
         else:
             indice_mar_direccion_defecto = 0
