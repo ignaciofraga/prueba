@@ -2168,7 +2168,7 @@ def entrada_condiciones_ambientales():
         with col4:
              temp_aire        = st.number_input('Temperatura del aire(ºC):',value=float(temp_aire_defecto),min_value=float(0),step=0.1)
              marea            = st.selectbox('Marea:',(mareas),index = indice_marea_defecto)
-             humedad_relativa = st.number_input('Humedad relativa(%):',value=humedad_relativa_defecto,min_value=0)
+             humedad_relativa = st.number_input('Humedad relativa(%):',value=int(humedad_relativa_defecto),min_value=0)
              max_clorofila    = st.number_input('Max.Clorofila(m):',value=float(max_clorofila_defecto),min_value=float(0),step=0.5)
              
         submit = st.form_submit_button("Enviar")                    
