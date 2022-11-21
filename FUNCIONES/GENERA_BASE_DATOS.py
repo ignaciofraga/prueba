@@ -1003,6 +1003,7 @@ conn.close()
 # ' estaciones json,'
 # ' participantes_comisionados json,'
 # ' participantes_no_comisionados json,'
+# ' variables_muestreadas json,'
 # ' observaciones text,'
 # ) 
 

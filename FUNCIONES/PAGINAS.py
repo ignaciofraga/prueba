@@ -1347,8 +1347,92 @@ def entrada_salidas_mar():
             
             estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
             json_estaciones         = json.dumps(estaciones_muestreadas)
+            
+            
+            # Selecciona las variables muestreadas
+            st.subheader('Variables muestreadas')
 
-
+            json_variables = []
+            col1, col2, col3, col4, col5, col6= st.columns(6,gap="small")
+            with col1:
+                oxigenos = st.checkbox('Oxígenos', value=True)
+                if oxigenos:
+                    json_variables = json_variables + ['Oxígenos']
+                    
+                alcalinidad = st.checkbox('Alcalinidad', value=True)
+                if alcalinidad:
+                    json_variables = json_variables + ['Alcalinidad']
+                    
+                alcalinidad = st.checkbox('pH', value=True)
+                if oxigenos:
+                    json_variables = json_variables + ['pH']
+                    
+            with col2:
+                nut_a = st.checkbox('Nutrientes(A)', value=True)
+                if nut_a:
+                    json_variables = json_variables + ['Nutrientes(A)']
+                    
+                nut_b = st.checkbox('Nutrientes(B)', value=True)
+                if nut_b:
+                    json_variables = json_variables + ['Nutrientes(B)']
+                    
+                toc = st.checkbox('TOC', value=True)
+                if toc:
+                    json_variables = json_variables + ['TOC']
+                    
+            with col3:
+                citometria_bact = st.checkbox('Citometría (bacterias)', value=True)
+                if citometria_bact:
+                    json_variables = json_variables + ['Citometría (bacterias)']
+                    
+                poc = st.checkbox('POC', value=True)
+                if poc:
+                    json_variables = json_variables + ['POC']
+                    
+                colorofilas = st.checkbox('Clorofilas', value=True)
+                if colorofilas:
+                    json_variables = json_variables + ['Clorofilas'] 
+                    
+            with col4:
+                prod_prim = st.checkbox('Prod.Primaria', value=True)
+                if prod_prim:
+                    json_variables = json_variables + ['Prod.Primaria']
+                    
+                ciliados = st.checkbox('Ciliados', value=True)
+                if ciliados:
+                    json_variables = json_variables + ['Ciliados']
+                    
+                flow_cam = st.checkbox('Flow Cam', value=True)
+                if flow_cam:
+                    json_variables = json_variables + ['Flow Cam'] 
+                    
+            with col5:
+                citometria_flag = st.checkbox('Citometría (flagelados)', value=True)
+                if citometria_flag:
+                    json_variables = json_variables + ['Citometría (flagelados)']
+                    
+                zoop_meso = st.checkbox('Zoop. (meso)', value=True)
+                if zoop_meso:
+                    json_variables = json_variables + ['Zoop. (meso)']
+                    
+                zoop_micro = st.checkbox('Zoop. (micro)', value=True)
+                if zoop_micro:
+                    json_variables = json_variables + ['Zoop. (micro)']     
+            
+            with col6:
+                adn = st.checkbox('ADN', value=True)
+                if adn:
+                    json_variables = json_variables + ['ADN']
+                    
+                dom = st.checkbox('DOM', value=True)
+                if dom:
+                    json_variables = json_variables + ['DOM']
+                    
+                ppl = st.checkbox('PPL', value=True)
+                if ppl:
+                    json_variables = json_variables + ['PPL']
+                    
+            json_variables         = json.dumps(json_variables)
 
             observaciones = st.text_input('Observaciones', value="")
 
@@ -1383,12 +1467,12 @@ def entrada_salidas_mar():
     
                     if io_incluido == 0:                     
                         
-                        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones,estaciones)
-                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes_comisionados,EXCLUDED.participantes_no_comisionados,EXCLUDED.observaciones,EXCLUDED.estaciones);''' 
+                        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones,estaciones,variables_muestreadas)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones,estaciones,variables_muestreadas) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes_comisionados,EXCLUDED.participantes_no_comisionados,EXCLUDED.observaciones,EXCLUDED.estaciones,EXCLUDED.variables_muestreadas);''' 
                                 
                         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                         cursor = conn.cursor()
-                        cursor.execute(instruccion_sql, (nombre_salida,3,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_comisionados,json_no_comisionados,observaciones,json_estaciones))
+                        cursor.execute(instruccion_sql, (nombre_salida,3,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_comisionados,json_no_comisionados,observaciones,json_estaciones,json_variables))
                         conn.commit()
                         cursor.close()
                         conn.close()
