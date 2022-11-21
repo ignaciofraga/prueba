@@ -1673,20 +1673,8 @@ def entrada_salidas_mar():
         personal_comisionado_previo    = datos_salida_seleccionada['participantes_comisionados'].iloc[0]
         personal_no_comisionado_previo = datos_salida_seleccionada['participantes_no_comisionados'].iloc[0]           
         estaciones_previas             = datos_salida_seleccionada['estaciones'].iloc[0]
-        # fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
-    
-        # # Recupera las variables muestreadas en la salida seleccionada
-        # json_variables_previas      = df_salidas_seleccion['variables_muestreadas'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
-                            
-        
-        
-        # id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
-    
-        # fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
-    
-        # # Recupera las variables muestreadas en la salida seleccionada
-        # json_variables_previas      = df_salidas_seleccion['variables_muestreadas'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
-                    
+        observaciones_previas          = datos_salida_seleccionada['observaciones'].iloc[0]
+
         # Recupera el personal de la salida seleccionada
         
         # Despliega un formulario para modificar los datos de la salida 
@@ -1868,14 +1856,7 @@ def entrada_salidas_mar():
                     
             json_variables         = json.dumps(json_variables)
 
-
-
-
-
-
-
-
-            observaciones = st.text_input('Observaciones', value="")
+            observaciones = st.text_input('Observaciones', value=observaciones_previas)
     
             submit = st.form_submit_button("Actualizar salida")
     
