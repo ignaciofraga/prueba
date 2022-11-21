@@ -1700,8 +1700,8 @@ def entrada_condiciones_ambientales():
                
 
     # Extrae las estaciones visitadas en la salida seleccionada
-    #listado_estaciones = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida].iloc[0] 
-    listado_estaciones = df_condiciones_salida_seleccionada['estaciones'].unique()
+    listado_estaciones = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida].iloc[0] 
+    #listado_estaciones = df_condiciones_salida_seleccionada['estaciones'].unique()
 
 
     # Selecciona la estación de la que se quiere introducir datos (entre todas las disponibles)
