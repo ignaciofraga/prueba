@@ -1351,6 +1351,8 @@ def entrada_salidas_mar():
             
             # Selecciona las variables muestreadas
             st.subheader('Variables muestreadas')
+            
+            st.markdown('BOTELLAS')
 
             json_variables = []
             col1, col2, col3, col4= st.columns(4,gap="small")
@@ -1439,6 +1441,30 @@ def entrada_salidas_mar():
                 if otros:
                     json_variables = json_variables + [otros]
                     
+                    
+            st.markdown('CONTINUO')
+            col1, col2, col3, col4= st.columns(4,gap="small")
+            
+            with col1:
+                oxigenos_continuo = st.checkbox('Oxigenos', value=True)
+                if oxigenos_continuo:
+                    json_variables = json_variables + ['Oxigenos (Continuo)']  
+            
+            with col2:
+                clorofilas_continuo = st.checkbox('Clorofilas', value=True)
+                if clorofilas_continuo:
+                    json_variables = json_variables + ['Clorofilas (Continuo)'] 
+                    
+            with col3:
+                cdom_continuo = st.checkbox('CDOM', value=True)
+                if cdom_continuo:
+                    json_variables = json_variables + ['CDOM (Continuo)'] 
+            
+            with col4:
+                ph_continuo = st.checkbox('pH', value=True)
+                if ph_continuo:
+                    json_variables = json_variables + ['pH (Continuo)']
+            
                     
             json_variables         = json.dumps(json_variables)
 
