@@ -1571,7 +1571,6 @@ def entrada_salidas_mar():
         for isalida in range(df_salidas_radiales.shape[0]):
             buque                                      = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]]
             df_salidas_radiales['Buque'].iloc[isalida] = buque[0]
-            st.text(df_salidas_radiales['Buque'].iloc[isalida])
         
         # Elimina las columnas que no interesa mostrar
         df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','buque'])
