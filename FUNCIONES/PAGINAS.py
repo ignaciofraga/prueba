@@ -1670,7 +1670,7 @@ def entrada_salidas_mar():
         # Recupera las variables muestreadas en la salida seleccionada
         json_variables              = df_salidas_seleccion['variables_muestreadas'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
         st.text(json_variables)
-        if 'Oxigeno' in json_variables:
+        if 'Oxigenos' in json_variables:
             st.text('lista')
         
         listado_variables           = json.loads(json_variables)
