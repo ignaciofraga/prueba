@@ -1377,39 +1377,14 @@ def entrada_salidas_mar():
                     json_variables = json_variables + ['Nutrientes (B)']
                    
                     
-            with col2:                   
-                toc = st.checkbox('TOC', value=True)
-                if toc:
-                    json_variables = json_variables + ['TOC']
-                    
-                citometria_bact = st.checkbox('Cito. (bacterias)', value=True)
-                if citometria_bact:
-                    json_variables = json_variables + ['Cito. (bacterias)']
-                    
-                poc = st.checkbox('POC', value=True)
-                if poc:
-                    json_variables = json_variables + ['POC']
-                    
-                colorofilas = st.checkbox('Clorofilas', value=True)
-                if colorofilas:
-                    json_variables = json_variables + ['Clorofilas'] 
-
-                prod_prim = st.checkbox('Prod.Primaria', value=True)
-                if prod_prim:
-                    json_variables = json_variables + ['Prod.Primaria']
-                    
-            with col3:                    
+            with col2:                                       
+                citometria = st.checkbox('Citometría (bact.flag.)', value=True)
+                if citometria:
+                    json_variables = json_variables + ['Citometría (bact.flag.)']
+                                        
                 ciliados = st.checkbox('Ciliados', value=True)
                 if ciliados:
                     json_variables = json_variables + ['Ciliados']
-                    
-                flow_cam = st.checkbox('Flow Cam', value=True)
-                if flow_cam:
-                    json_variables = json_variables + ['Flow Cam'] 
-                    
-                citometria_flag = st.checkbox('Cito. (flagelados)', value=True)
-                if citometria_flag:
-                    json_variables = json_variables + ['Cito. (flagelados)']
                     
                 zoop_meso = st.checkbox('Zoop. (meso)', value=True)
                 if zoop_meso:
@@ -1417,20 +1392,52 @@ def entrada_salidas_mar():
                     
                 zoop_micro = st.checkbox('Zoop. (micro)', value=True)
                 if zoop_micro:
-                    json_variables = json_variables + ['Zoop. (micro)']     
-            
-            with col4:
+                    json_variables = json_variables + ['Zoop. (micro)']   
+                    
+                zoop_ictio = st.checkbox('Zoop. (ictio)', value=False)
+                if zoop_ictio:
+                    json_variables = json_variables + ['Zoop. (ictio)']   
+
+
+            with col3:
+                colorofilas = st.checkbox('Clorofilas', value=True)
+                if colorofilas:
+                    json_variables = json_variables + ['Clorofilas'] 
+
+                prod_prim = st.checkbox('Prod.Primaria', value=True)
+                if prod_prim:
+                    json_variables = json_variables + ['Prod.Primaria']
+                                        
+                flow_cam = st.checkbox('Flow Cam', value=True)
+                if flow_cam:
+                    json_variables = json_variables + ['Flow Cam'] 
+                    
                 adn = st.checkbox('ADN', value=True)
                 if adn:
-                    json_variables = json_variables + ['ADN']
+                    json_variables = json_variables + ['ADN'] 
                     
                 dom = st.checkbox('DOM', value=True)
                 if dom:
                     json_variables = json_variables + ['DOM']
+            
+            
+            with col4:
+                
+                toc = st.checkbox('TOC', value=True)
+                if toc:
+                    json_variables = json_variables + ['TOC']
                     
+                poc = st.checkbox('POC', value=True)
+                if poc:
+                    json_variables = json_variables + ['POC']
+                                    
                 ppl = st.checkbox('PPL', value=True)
                 if ppl:
                     json_variables = json_variables + ['PPL']
+                    
+                otros = st.text_input('Otros:')
+                if otros:
+                    json_variables = json_variables + [otros]
                     
                     
             json_variables         = json.dumps(json_variables)
