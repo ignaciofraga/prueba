@@ -1714,11 +1714,7 @@ def entrada_condiciones_ambientales():
     
     if df_condicion_introducida.shape[0] == 1:
         
-        texto_error = 'Ya existen datos correspondientes a la estación y salida seleccionada.'
-        st.warning(texto_error, icon="⚠️") 
-        
-
-    
+           
         # Asigna como valores por defecto los que ya estaban en la base de datos
         hora_llegada_defecto            = df_condicion_introducida['hora_llegada'][0]
         profundidad_defecto             = df_condicion_introducida['profundidad'][0]
