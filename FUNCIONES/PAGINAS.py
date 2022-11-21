@@ -1684,6 +1684,9 @@ def entrada_salidas_mar():
 
         st.text('variables previas')
         st.text(json_variables_previas)
+        if json_variables_previas is None:
+            json_variables_previas = [None]    
+        
 
         # Recupera el personal de la salida seleccionada
         
