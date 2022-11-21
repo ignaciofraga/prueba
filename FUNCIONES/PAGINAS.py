@@ -2225,7 +2225,7 @@ def entrada_condiciones_ambientales():
     
         output = BytesIO()
         writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-        df_salidas_radiales.to_excel(writer, index=False, sheet_name='DATOS')
+        df_salidas_seleccion.to_excel(writer, index=False, sheet_name='DATOS')
         workbook = writer.book
         worksheet = writer.sheets['DATOS']
         writer.save()
