@@ -1272,7 +1272,7 @@ def entrada_salidas_mar():
     puerto         = st.secrets["postgres"].port
     
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    entradas     = ['Añadir salida al mar', 'Añadir personal participante','Consultar o modificar salidas realizadas']
+    entradas     = ['Añadir salida al mar', 'Rersonal participante','Consultar o modificar salidas realizadas']
     tipo_entrada = st.sidebar.radio("Indicar la consulta a realizar",entradas)
     
 
@@ -1529,7 +1529,6 @@ def entrada_salidas_mar():
 
         st.subheader('Personal participante')
         
-        st.markdown('Personal incluido en la base de datos')
         # Recupera la tabla con el personal ya introducido, como un dataframe
         conn = init_connection()
         df_personal = psql.read_sql('SELECT * FROM personal_salidas', conn)
@@ -1540,7 +1539,7 @@ def entrada_salidas_mar():
         gridOptions = gb.build()
         st_aggrid.AgGrid(df_personal,gridOptions=gridOptions,enable_enterprise_modules=True,height=250,allow_unsafe_jscode=True,reload_data=True)    
 
-        st.markdown('Añadir personal')
+        st.subheader('Añadir personal participante')
         # Despliega un formulario para introducir los datos
         with st.form("Formulario seleccion"):
                    
