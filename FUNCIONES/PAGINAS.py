@@ -1446,24 +1446,25 @@ def entrada_salidas_mar():
             col1, col2, col3, col4= st.columns(4,gap="small")
             
             with col1:
-                oxigenos_continuo = st.checkbox('Oxigenos (Continuo)', value=True)
+                oxigenos_continuo = st.checkbox('Oxigeno (Cont.)', value=True)
                 if oxigenos_continuo:
-                    json_variables = json_variables + ['Oxigenos (Continuo)']  
-            
+                    json_variables = json_variables + ['Oxigeno (Cont.)']  
+
             with col2:
-                clorofilas_continuo = st.checkbox('Clorofilas (Continuo)', value=True)
-                if clorofilas_continuo:
-                    json_variables = json_variables + ['Clorofilas (Continuo)'] 
-                    
+                ph_continuo = st.checkbox('pH (Cont.)', value=True)
+                if ph_continuo:
+                    json_variables = json_variables + ['pH (Cont.)']            
+
             with col3:
-                cdom_continuo = st.checkbox('CDOM (Continuo)', value=True)
+                cdom_continuo = st.checkbox('CDOM (Cont.)', value=False)
                 if cdom_continuo:
-                    json_variables = json_variables + ['CDOM (Continuo)'] 
+                    json_variables = json_variables + ['CDOM (Cont.)'] 
             
             with col4:
-                ph_continuo = st.checkbox('pH (Continuo)', value=True)
-                if ph_continuo:
-                    json_variables = json_variables + ['pH (Continuo)']
+                clorofilas_continuo = st.checkbox('Clorofila (Cont.)', value=False)
+                if clorofilas_continuo:
+                    json_variables = json_variables + ['Clorofila (Cont.)'] 
+                    
             
                     
             json_variables         = json.dumps(json_variables)
@@ -1783,6 +1784,8 @@ def entrada_salidas_mar():
             # Selecciona las variables muestreadas
             st.subheader('Variables muestreadas')
 
+            st.markdown('BOTELLAS')
+
             json_variables = []
             col1, col2, col3, col4= st.columns(4,gap="small")
         
@@ -1922,6 +1925,41 @@ def entrada_salidas_mar():
                 otros = st.text_input('Otros:')
                 if otros:
                     json_variables = json_variables + [otros]
+
+            st.markdown('CONTINUO')
+            col1, col2, col3, col4= st.columns(4,gap="small")
+            
+            with col1:
+                if 'Oxigeno (Cont.)' in json_variables_previas:
+                    oxigenos_continuo = st.checkbox('Oxigeno (Cont.)', value=True)
+                else:
+                    oxigenos_continuo = st.checkbox('Oxigeno (Cont.)', value=False)
+                if oxigenos_continuo:
+                    json_variables = json_variables + ['Oxigeno (Cont.)']  
+
+            with col2:
+                if 'pH (Cont.)' in json_variables_previas:
+                    ph_continuo = st.checkbox('pH (Cont.)', value=True)
+                else:
+                    ph_continuo = st.checkbox('pH (Cont.)', value=False)
+                if ph_continuo:
+                    json_variables = json_variables + ['pH (Cont.)']            
+
+            with col3:
+                if 'CDOM (Cont.)' in json_variables_previas:
+                    cdom_continuo = st.checkbox('CDOM (Cont.)', value=True)
+                else:
+                    cdom_continuo = st.checkbox('CDOM (Cont.)', value=False)                    
+                if cdom_continuo:
+                    json_variables = json_variables + ['CDOM (Cont.)'] 
+            
+            with col4:
+                if 'Clorofila (Cont.)' in json_variables_previas:
+                    clorofilas_continuo = st.checkbox('Clorofila (Cont.)', value=True)
+                else:
+                    clorofilas_continuo = st.checkbox('Clorofila (Cont.)', value=False)
+                if clorofilas_continuo:
+                    json_variables = json_variables + ['Clorofila (Cont.)'] 
                     
                     
             json_variables         = json.dumps(json_variables)
