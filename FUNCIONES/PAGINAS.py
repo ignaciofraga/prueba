@@ -1356,9 +1356,9 @@ def entrada_salidas_mar():
             col1, col2, col3, col4= st.columns(4,gap="small")
             
             with col1:
-                oxigenos = st.checkbox('Oxígenos', value=True)
+                oxigenos = st.checkbox('Oxigenos', value=True)
                 if oxigenos:
-                    json_variables = json_variables + ['Oxígenos']
+                    json_variables = json_variables + ['Oxigenos']
                     
                 alcalinidad = st.checkbox('Alcalinidad', value=True)
                 if alcalinidad:
@@ -1378,7 +1378,7 @@ def entrada_salidas_mar():
                    
                     
             with col2:                                       
-                citometria = st.checkbox('Citometría', value=True)
+                citometria = st.checkbox('Citometria', value=True)
                 if citometria:
                     json_variables = json_variables + ['Citometría']
                                         
@@ -1667,6 +1667,10 @@ def entrada_salidas_mar():
     
         fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
     
+        # Recupera las variables muestreadas en la salida seleccionada
+        json_variables              = df_salidas_seleccion['variables_muestreadas'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+        listado_variables           = json.loads(json_variables)
+        st.text(listado_variables)
 
         # Despliega un formulario para modificar los datos de la salida 
         with st.form("Formulario seleccion"):
@@ -1700,6 +1704,107 @@ def entrada_salidas_mar():
             
             estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
             json_estaciones         = json.dumps(estaciones_muestreadas)
+
+
+            # # Selecciona las variables muestreadas
+            # st.subheader('Variables muestreadas')
+
+            # json_variables = []
+            # col1, col2, col3, col4= st.columns(4,gap="small")
+            
+            # with col1:
+            #     oxigenos = st.checkbox('Oxigenos', value=True)
+            #     if oxigenos:
+            #         json_variables = json_variables + ['Oxigenos']
+                    
+            #     alcalinidad = st.checkbox('Alcalinidad', value=True)
+            #     if alcalinidad:
+            #         json_variables = json_variables + ['Alcalinidad']
+                    
+            #     alcalinidad = st.checkbox('pH', value=True)
+            #     if oxigenos:
+            #         json_variables = json_variables + ['pH']
+                    
+            #     nut_a = st.checkbox('Nutrientes (A)', value=True)
+            #     if nut_a:
+            #         json_variables = json_variables + ['Nutrientes (A)']
+                    
+            #     nut_b = st.checkbox('Nutrientes (B)', value=True)
+            #     if nut_b:
+            #         json_variables = json_variables + ['Nutrientes (B)']
+                   
+                    
+            # with col2:                                       
+            #     citometria = st.checkbox('Citometria', value=True)
+            #     if citometria:
+            #         json_variables = json_variables + ['Citometría']
+                                        
+            #     ciliados = st.checkbox('Ciliados', value=True)
+            #     if ciliados:
+            #         json_variables = json_variables + ['Ciliados']
+                    
+            #     zoop_meso = st.checkbox('Zoop. (meso)', value=True)
+            #     if zoop_meso:
+            #         json_variables = json_variables + ['Zoop. (meso)']
+                    
+            #     zoop_micro = st.checkbox('Zoop. (micro)', value=True)
+            #     if zoop_micro:
+            #         json_variables = json_variables + ['Zoop. (micro)']   
+                    
+            #     zoop_ictio = st.checkbox('Zoop. (ictio)', value=False)
+            #     if zoop_ictio:
+            #         json_variables = json_variables + ['Zoop. (ictio)']   
+
+
+            # with col3:
+            #     colorofilas = st.checkbox('Clorofilas', value=True)
+            #     if colorofilas:
+            #         json_variables = json_variables + ['Clorofilas'] 
+
+            #     prod_prim = st.checkbox('Prod.Primaria', value=True)
+            #     if prod_prim:
+            #         json_variables = json_variables + ['Prod.Primaria']
+                                        
+            #     flow_cam = st.checkbox('Flow Cam', value=True)
+            #     if flow_cam:
+            #         json_variables = json_variables + ['Flow Cam'] 
+                    
+            #     adn = st.checkbox('ADN', value=True)
+            #     if adn:
+            #         json_variables = json_variables + ['ADN'] 
+                    
+            #     dom = st.checkbox('DOM', value=True)
+            #     if dom:
+            #         json_variables = json_variables + ['DOM']
+            
+            
+            # with col4:
+                
+            #     toc = st.checkbox('TOC', value=True)
+            #     if toc:
+            #         json_variables = json_variables + ['TOC']
+                    
+            #     poc = st.checkbox('POC', value=True)
+            #     if poc:
+            #         json_variables = json_variables + ['POC']
+                                    
+            #     ppl = st.checkbox('PPL', value=False)
+            #     if ppl:
+            #         json_variables = json_variables + ['PPL']
+                    
+            #     otros = st.text_input('Otros:')
+            #     if otros:
+            #         json_variables = json_variables + [otros]
+                    
+                    
+            # json_variables         = json.dumps(json_variables)
+
+
+
+
+
+
+
 
             observaciones = st.text_input('Observaciones', value="")
     
