@@ -1996,26 +1996,6 @@ def entrada_salidas_mar():
 
 def entrada_condiciones_ambientales():
     
-    st.subheader('Condiciones ambientales')
-    
-    # Vectores con los valores de las variables que tienen opciones concretas
-    seleccion_SN = ['Si','No']
-    direcciones  = ['N','NW','W','SW','S','SE','E','NE'] 
-
-    # beaufort_nombre = ['Calma (0)','Ventolina (1)','Brisa muy débil (2)','Brisa Ligera (3)','Brisa moderada (4)','Brisa fresca (5)','Brisa fuerte (6)','Viento fuerte (7)','Viento duro (8)','Muy duro (9)','Temporal (10)','Borrasca (11)','Huracán (12)']
-    # beaufort_vmin   = [0,2,6,12,20,29,39,50,62,75,89,103,118]
-    # beaufort_vmax   = [2,6,12,20,29,39,50,62,75,89,103,118,500]
-    
-    beaufort_nombre = ['Calma (0)','Ventolina (1)','Flojito (2)','Flojo (3)','Moderada (4)','Fresquito (5)','Fresco (6)','Frescachón (7)','Temporal (8)','Temporal fuerte (9)']
-    beaufort_vmin   = [0  ,0.2, 1.5, 3.3, 5.4, 7.90, 10.70 ,13.8, 17.1, 20.7 ]
-    beaufort_vmax   = [0.2,1.5, 3.3, 5.4, 7.9, 10.7, 13.80, 17.1, 20.7, 24.5 ]
-
-    douglas_nombre = ['Mar rizada (1)','Marejadilla (2)', 'Marejada (3)', 'Fuerte marejada (4)', 'Gruesa (5)', 'Muy Gruesa (6)']
-    douglas_hmin   = [0  , 0.1 , 0.50 , 1.25, 2.5, 4]
-    douglas_hmax   = [0.1, 0.5 , 1.25 , 2.50, 4.0, 6]
-
-
-    mareas          = ['Baja','Media','Pleamar']
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host = st.secrets["postgres"].host
@@ -2042,163 +2022,223 @@ def entrada_condiciones_ambientales():
     for idato in range(df_salidas_radiales.shape[0]):
         df_salidas_radiales['fecha_salida'].iloc[idato]  =  df_salidas_radiales['fecha_salida'].iloc[idato].strftime("%Y-%m-%d")
    
-    # Selecciona la salida de la que se quiere introducir datos
-    df_salidas_radiales    = df_salidas_radiales.sort_values('fecha_salida',ascending=False)
-    salida                 = st.selectbox('Salida',(df_salidas_radiales['nombre_salida']))   
-    id_salida              = df_salidas_radiales['id_salida'][df_salidas_radiales['nombre_salida']==salida].iloc[0]
-
-    # Aviso de que ya hay información de esa salida y muestra la información    
-    df_condiciones_salida_seleccionada = df_condiciones[(df_condiciones['salida']==id_salida)]
-    if df_condiciones_salida_seleccionada.shape[0] > 0:
-        texto_error = 'Ya existen datos correspondientes a la salida seleccionada.'
-        st.warning(texto_error, icon="⚠️")       
-
-        df_tabla             = df_condiciones_salida_seleccionada.drop(columns=['id_condicion','salida'])
-        for idato in range(df_condiciones_salida_seleccionada.shape[0]):
-            df_tabla['estacion'].iloc[idato] =  df_estaciones['nombre_estacion'][df_estaciones['id_estacion'] == df_tabla['estacion'].iloc[idato]] 
-
-        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_tabla)
-        gridOptions = gb.build()
-        st_aggrid.AgGrid(df_tabla,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
-               
-
-    # Extrae las estaciones visitadas en la salida seleccionada
-    listado_estaciones = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida].iloc[0] 
-
-    # Selecciona la estación de la que se quiere introducir datos (entre todas las disponibles)
-    estacion_elegida    = st.selectbox('Estacion',(listado_estaciones))
-    id_estacion_elegida = int(df_estaciones_radiales['id_estacion'][df_estaciones_radiales['nombre_estacion']==estacion_elegida].values[0])
-
-    # recupera los datos disponibles en la base de datos para asignar valores por defecto
-    df_condicion_introducida = df_condiciones[(df_condiciones['salida']==id_salida) & (df_condiciones['estacion']==id_estacion_elegida)]               
-
     
-    if df_condicion_introducida.shape[0] == 1:
+    # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
+    entradas     = ['Añade o modifica condiciones ambientales', 'Descarga datos de condiciones ambientales']
+    tipo_entrada = st.sidebar.radio("Indicar la consulta a realizar",entradas)
+    
+
+    # Añade o modifica datos 
+    if tipo_entrada == entradas[0]:
         
-           
-        # Asigna como valores por defecto los que ya estaban en la base de datos
-        hora_llegada_defecto            = df_condicion_introducida['hora_llegada'].iloc[0]
-        profundidad_defecto             = df_condicion_introducida['profundidad'].iloc[0]
-        nubosidad_defecto               = df_condicion_introducida['nubosidad'].iloc[0]
+        st.subheader('Entrada de datos de condiciones ambientales')
         
-        if df_condicion_introducida['lluvia'].iloc[0] is not None:
-            indice_lluvia_defecto           = seleccion_SN.index(df_condicion_introducida['lluvia'].iloc[0])
-        else:
-            indice_lluvia_defecto       = 0
-        velocidad_viento_defecto        = df_condicion_introducida['velocidad_viento'].iloc[0]
-        if df_condicion_introducida['direccion_viento'].iloc[0] is not None:
-            indice_direccion_viento_defecto = direcciones.index(df_condicion_introducida['direccion_viento'].iloc[0])
-        else:
-            indice_direccion_viento_defecto = 0
-        pres_atmosferica_defecto        = df_condicion_introducida['pres_atmosferica'].iloc[0]
-        altura_ola_defecto              = df_condicion_introducida['altura_ola'].iloc[0]
-        if df_condicion_introducida['mar_fondo'].iloc[0] is not None:
-            indice_mar_fondo_defecto        = seleccion_SN.index(df_condicion_introducida['mar_fondo'].iloc[0])
-        else:
-            indice_mar_fondo_defecto    = 0
-        if df_condicion_introducida['mar_direccion'].iloc[0] is not None:
-            indice_mar_direccion_defecto    = direcciones.index(df_condicion_introducida['mar_direccion'].iloc[0])
-        else:
-            indice_mar_direccion_defecto = 0
-        temp_aire_defecto               = df_condicion_introducida['temp_aire'].iloc[0]
+        # Vectores con los valores de las variables que tienen opciones concretas
+        seleccion_SN = ['Si','No']
+        direcciones  = ['N','NW','W','SW','S','SE','E','NE'] 
+    
+        # beaufort_nombre = ['Calma (0)','Ventolina (1)','Brisa muy débil (2)','Brisa Ligera (3)','Brisa moderada (4)','Brisa fresca (5)','Brisa fuerte (6)','Viento fuerte (7)','Viento duro (8)','Muy duro (9)','Temporal (10)','Borrasca (11)','Huracán (12)']
+        # beaufort_vmin   = [0,2,6,12,20,29,39,50,62,75,89,103,118]
+        # beaufort_vmax   = [2,6,12,20,29,39,50,62,75,89,103,118,500]
         
-        if df_condicion_introducida['marea'].iloc[0] is not None:
-            indice_marea_defecto        = mareas.index(df_condicion_introducida['marea'].iloc[0])
-        else:
-            indice_marea_defecto        = 0
-            
-        prof_secchi_defecto             = df_condicion_introducida['prof_secchi'].iloc[0]
-        max_clorofila_defecto           = df_condicion_introducida['max_clorofila'].iloc[0]
-        humedad_relativa_defecto        = df_condicion_introducida['humedad_relativa'].iloc[0]
+        beaufort_nombre = ['Calma (0)','Ventolina (1)','Flojito (2)','Flojo (3)','Moderada (4)','Fresquito (5)','Fresco (6)','Frescachón (7)','Temporal (8)','Temporal fuerte (9)']
+        beaufort_vmin   = [0  ,0.2, 1.5, 3.3, 5.4, 7.90, 10.70 ,13.8, 17.1, 20.7 ]
+        beaufort_vmax   = [0.2,1.5, 3.3, 5.4, 7.9, 10.7, 13.80, 17.1, 20.7, 24.5 ]
+    
+        douglas_nombre = ['Mar rizada (1)','Marejadilla (2)', 'Marejada (3)', 'Fuerte marejada (4)', 'Gruesa (5)', 'Muy Gruesa (6)']
+        douglas_hmin   = [0  , 0.1 , 0.50 , 1.25, 2.5, 4]
+        douglas_hmax   = [0.1, 0.5 , 1.25 , 2.50, 4.0, 6]
+    
+        mareas          = ['Baja','Media','Pleamar']
         
-        io_previo                       = 1
-        
-    else:
-        hora_llegada_defecto            = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
-        profundidad_defecto             = 0
-        nubosidad_defecto               = 0
-        indice_lluvia_defecto           = 0
-        velocidad_viento_defecto        = 0
-        indice_direccion_viento_defecto = 0
-        pres_atmosferica_defecto        = 1022
-        altura_ola_defecto              = 0
-        indice_mar_fondo_defecto        = 0
-        indice_mar_direccion_defecto    = 0
-        temp_aire_defecto               = 15
-        indice_marea_defecto            = 0
-        prof_secchi_defecto             = 0
-        max_clorofila_defecto           = 0
-        humedad_relativa_defecto        = 50
-        
-        io_previo                       = 0
+ 
+        # Selecciona la salida de la que se quiere introducir datos
+        df_salidas_radiales    = df_salidas_radiales.sort_values('fecha_salida',ascending=False)
+        salida                 = st.selectbox('Salida',(df_salidas_radiales['nombre_salida']))   
+        id_salida              = df_salidas_radiales['id_salida'][df_salidas_radiales['nombre_salida']==salida].iloc[0]
+    
+        # Aviso de que ya hay información de esa salida y muestra la información    
+        df_condiciones_salida_seleccionada = df_condiciones[(df_condiciones['salida']==id_salida)]
+        if df_condiciones_salida_seleccionada.shape[0] > 0:
+            texto_error = 'Ya existen datos correspondientes a la salida seleccionada.'
+            st.warning(texto_error, icon="⚠️")       
+    
+            df_tabla             = df_condiciones_salida_seleccionada.drop(columns=['id_condicion','salida'])
+            for idato in range(df_condiciones_salida_seleccionada.shape[0]):
+                df_tabla['estacion'].iloc[idato] =  df_estaciones['nombre_estacion'][df_estaciones['id_estacion'] == df_tabla['estacion'].iloc[idato]] 
+    
+            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_tabla)
+            gridOptions = gb.build()
+            st_aggrid.AgGrid(df_tabla,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
                    
-     
-    with st.form("Formulario seleccion"): 
-           
-        texto_estacion  = 'Estacion ' + estacion_elegida
-        st.write(texto_estacion)
+    
+        # Extrae las estaciones visitadas en la salida seleccionada
+        listado_estaciones = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida].iloc[0] 
+    
+        # Selecciona la estación de la que se quiere introducir datos (entre todas las disponibles)
+        estacion_elegida    = st.selectbox('Estacion',(listado_estaciones))
+        id_estacion_elegida = int(df_estaciones_radiales['id_estacion'][df_estaciones_radiales['nombre_estacion']==estacion_elegida].values[0])
+    
+        # recupera los datos disponibles en la base de datos para asignar valores por defecto
+        df_condicion_introducida = df_condiciones[(df_condiciones['salida']==id_salida) & (df_condiciones['estacion']==id_estacion_elegida)]               
+    
         
-        col1, col2,col3,col4= st.columns(4,gap="small")
-
-        with col1:
-            hora_llegada  = st.time_input('Hora de llegada (UTC)',value=hora_llegada_defecto)
-            profundidad   = st.number_input('Profundidad (m):',format='%i',value=int(profundidad_defecto),min_value=0)
-            prof_secchi   = st.number_input('Prof.Sechi(m):',value=float(prof_secchi_defecto),min_value=float(0),step=0.5)           
-            max_clorofila    = st.number_input('Max.Clorofila(m):',value=float(max_clorofila_defecto),min_value=float(0),step=0.5)
-             
-
+        if df_condicion_introducida.shape[0] == 1:
+            
                
-        with col2:
-            velocidad_viento  = st.number_input('Vel.Viento (m/s):',value=float(velocidad_viento_defecto),min_value=float(0),step =0.5)
-            direccion_viento  = st.selectbox('Dir.Viento:',(direcciones),index = indice_direccion_viento_defecto)
-            for idato_beaufort in range(len(beaufort_nombre)):
-                if velocidad_viento >= beaufort_vmin[idato_beaufort] and velocidad_viento < beaufort_vmax[idato_beaufort]:
-                    indice_prop = idato_beaufort  
-            viento_beaufort  = st.selectbox('Viento Beaufort:',(beaufort_nombre),index=indice_prop)
-            pres_atmosferica  = st.number_input('Presion atm. (mmHg):',format='%i',value=int(pres_atmosferica_defecto),min_value=0)
-
-        with col3:
-             altura_ola  = st.number_input('Altura de ola (m):',value=float(altura_ola_defecto),min_value=float(0),step =0.5)
-             for idato_douglas in range(len(douglas_nombre)):
-                 if altura_ola > douglas_hmin[idato_douglas] and altura_ola <= douglas_hmax[idato_douglas]:
-                     indice_prop = idato_douglas
-             mar_douglas = st.selectbox('Mar Douglas:',(douglas_nombre),index=indice_prop)
-             mar_fondo   = st.selectbox('Mar de fondo:',(seleccion_SN),index = indice_mar_fondo_defecto)
-             mar_direccion = st.selectbox('Dir.Oleaje:',(direcciones),index = indice_mar_direccion_defecto)
-
-
-        with col4:
-             temp_aire        = st.number_input('Temperatura del aire(ºC):',value=float(temp_aire_defecto),min_value=float(0),step=0.1)
-             marea            = st.selectbox('Marea:',(mareas),index = indice_marea_defecto)
-             humedad_relativa = st.number_input('Humedad relativa(%):',value=int(humedad_relativa_defecto),min_value=0)
-             nubosidad        = st.number_input('Nubosidad (%) :',format='%i',value=int(nubosidad_defecto),min_value=0)
-             lluvia           = st.selectbox('LLuvia:',(seleccion_SN),index=indice_lluvia_defecto)
-
-
-        submit = st.form_submit_button("Añadir o modificar datos")                    
-
-        if submit is True:
+            # Asigna como valores por defecto los que ya estaban en la base de datos
+            hora_llegada_defecto            = df_condicion_introducida['hora_llegada'].iloc[0]
+            profundidad_defecto             = df_condicion_introducida['profundidad'].iloc[0]
+            nubosidad_defecto               = df_condicion_introducida['nubosidad'].iloc[0]
             
-            instruccion_sql = '''INSERT INTO condiciones_ambientales_muestreos (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila,mar_douglas)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (salida,estacion) DO UPDATE SET (hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila,mar_douglas) = ROW(EXCLUDED.hora_llegada,EXCLUDED.profundidad,EXCLUDED.nubosidad,EXCLUDED.lluvia,EXCLUDED.velocidad_viento,EXCLUDED.direccion_viento,EXCLUDED.pres_atmosferica,EXCLUDED.viento_beaufort,EXCLUDED.altura_ola,EXCLUDED.mar_fondo,EXCLUDED.mar_direccion,EXCLUDED.humedad_relativa,EXCLUDED.temp_aire,EXCLUDED.marea,EXCLUDED.prof_secchi,EXCLUDED.max_clorofila,EXCLUDED.mar_douglas);''' 
-                    
-            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-            cursor = conn.cursor()
-            cursor.execute(instruccion_sql, (int(id_salida),int(id_estacion_elegida),hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila,mar_douglas))
-            conn.commit()
-            cursor.close()
-            conn.close()
-
-            if io_previo == 0:
-                texto_exito = 'Datos de las estación ' + estacion_elegida + ' durante la salida '  + salida  + ' añadidos correctamente'
-            if io_previo == 1:
-                texto_exito = 'Datos de las estación ' + estacion_elegida + ' durante la salida '  + salida  + ' actualizados correctamente'
+            if df_condicion_introducida['lluvia'].iloc[0] is not None:
+                indice_lluvia_defecto           = seleccion_SN.index(df_condicion_introducida['lluvia'].iloc[0])
+            else:
+                indice_lluvia_defecto       = 0
+            velocidad_viento_defecto        = df_condicion_introducida['velocidad_viento'].iloc[0]
+            if df_condicion_introducida['direccion_viento'].iloc[0] is not None:
+                indice_direccion_viento_defecto = direcciones.index(df_condicion_introducida['direccion_viento'].iloc[0])
+            else:
+                indice_direccion_viento_defecto = 0
+            pres_atmosferica_defecto        = df_condicion_introducida['pres_atmosferica'].iloc[0]
+            altura_ola_defecto              = df_condicion_introducida['altura_ola'].iloc[0]
+            if df_condicion_introducida['mar_fondo'].iloc[0] is not None:
+                indice_mar_fondo_defecto        = seleccion_SN.index(df_condicion_introducida['mar_fondo'].iloc[0])
+            else:
+                indice_mar_fondo_defecto    = 0
+            if df_condicion_introducida['mar_direccion'].iloc[0] is not None:
+                indice_mar_direccion_defecto    = direcciones.index(df_condicion_introducida['mar_direccion'].iloc[0])
+            else:
+                indice_mar_direccion_defecto = 0
+            temp_aire_defecto               = df_condicion_introducida['temp_aire'].iloc[0]
+            
+            if df_condicion_introducida['marea'].iloc[0] is not None:
+                indice_marea_defecto        = mareas.index(df_condicion_introducida['marea'].iloc[0])
+            else:
+                indice_marea_defecto        = 0
                 
-            st.success(texto_exito)                
+            prof_secchi_defecto             = df_condicion_introducida['prof_secchi'].iloc[0]
+            max_clorofila_defecto           = df_condicion_introducida['max_clorofila'].iloc[0]
+            humedad_relativa_defecto        = df_condicion_introducida['humedad_relativa'].iloc[0]
             
+            io_previo                       = 1
+            
+        else:
+            hora_llegada_defecto            = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
+            profundidad_defecto             = 0
+            nubosidad_defecto               = 0
+            indice_lluvia_defecto           = 0
+            velocidad_viento_defecto        = 0
+            indice_direccion_viento_defecto = 0
+            pres_atmosferica_defecto        = 1022
+            altura_ola_defecto              = 0
+            indice_mar_fondo_defecto        = 0
+            indice_mar_direccion_defecto    = 0
+            temp_aire_defecto               = 15
+            indice_marea_defecto            = 0
+            prof_secchi_defecto             = 0
+            max_clorofila_defecto           = 0
+            humedad_relativa_defecto        = 50
+            
+            io_previo                       = 0
+                       
+         
+        with st.form("Formulario seleccion"): 
+               
+            texto_estacion  = 'Estacion ' + estacion_elegida
+            st.write(texto_estacion)
+            
+            col1, col2,col3,col4= st.columns(4,gap="small")
+    
+            with col1:
+                hora_llegada  = st.time_input('Hora de llegada (UTC)',value=hora_llegada_defecto)
+                profundidad   = st.number_input('Profundidad (m):',format='%i',value=int(profundidad_defecto),min_value=0)
+                prof_secchi   = st.number_input('Prof.Sechi(m):',value=float(prof_secchi_defecto),min_value=float(0),step=0.5)           
+                max_clorofila    = st.number_input('Max.Clorofila(m):',value=float(max_clorofila_defecto),min_value=float(0),step=0.5)
+                 
+    
+                   
+            with col2:
+                velocidad_viento  = st.number_input('Vel.Viento (m/s):',value=float(velocidad_viento_defecto),min_value=float(0),step =0.5)
+                direccion_viento  = st.selectbox('Dir.Viento:',(direcciones),index = indice_direccion_viento_defecto)
+                for idato_beaufort in range(len(beaufort_nombre)):
+                    if velocidad_viento >= beaufort_vmin[idato_beaufort] and velocidad_viento < beaufort_vmax[idato_beaufort]:
+                        indice_prop = idato_beaufort  
+                viento_beaufort  = st.selectbox('Viento Beaufort:',(beaufort_nombre),index=indice_prop)
+                pres_atmosferica  = st.number_input('Presion atm. (mmHg):',format='%i',value=int(pres_atmosferica_defecto),min_value=0)
+    
+            with col3:
+                 altura_ola  = st.number_input('Altura de ola (m):',value=float(altura_ola_defecto),min_value=float(0),step =0.5)
+                 for idato_douglas in range(len(douglas_nombre)):
+                     if altura_ola > douglas_hmin[idato_douglas] and altura_ola <= douglas_hmax[idato_douglas]:
+                         indice_prop = idato_douglas
+                 mar_douglas = st.selectbox('Mar Douglas:',(douglas_nombre),index=indice_prop)
+                 mar_fondo   = st.selectbox('Mar de fondo:',(seleccion_SN),index = indice_mar_fondo_defecto)
+                 mar_direccion = st.selectbox('Dir.Oleaje:',(direcciones),index = indice_mar_direccion_defecto)
+    
+    
+            with col4:
+                 temp_aire        = st.number_input('Temperatura del aire(ºC):',value=float(temp_aire_defecto),min_value=float(0),step=0.1)
+                 marea            = st.selectbox('Marea:',(mareas),index = indice_marea_defecto)
+                 humedad_relativa = st.number_input('Humedad relativa(%):',value=int(humedad_relativa_defecto),min_value=0)
+                 nubosidad        = st.number_input('Nubosidad (%) :',format='%i',value=int(nubosidad_defecto),min_value=0)
+                 lluvia           = st.selectbox('LLuvia:',(seleccion_SN),index=indice_lluvia_defecto)
+    
+    
+            submit = st.form_submit_button("Añadir o modificar datos")                    
+    
+            if submit is True:
+                
+                instruccion_sql = '''INSERT INTO condiciones_ambientales_muestreos (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila,mar_douglas)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (salida,estacion) DO UPDATE SET (hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila,mar_douglas) = ROW(EXCLUDED.hora_llegada,EXCLUDED.profundidad,EXCLUDED.nubosidad,EXCLUDED.lluvia,EXCLUDED.velocidad_viento,EXCLUDED.direccion_viento,EXCLUDED.pres_atmosferica,EXCLUDED.viento_beaufort,EXCLUDED.altura_ola,EXCLUDED.mar_fondo,EXCLUDED.mar_direccion,EXCLUDED.humedad_relativa,EXCLUDED.temp_aire,EXCLUDED.marea,EXCLUDED.prof_secchi,EXCLUDED.max_clorofila,EXCLUDED.mar_douglas);''' 
+                        
+                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()
+                cursor.execute(instruccion_sql, (int(id_salida),int(id_estacion_elegida),hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila,mar_douglas))
+                conn.commit()
+                cursor.close()
+                conn.close()
+    
+                if io_previo == 0:
+                    texto_exito = 'Datos de las estación ' + estacion_elegida + ' durante la salida '  + salida  + ' añadidos correctamente'
+                if io_previo == 1:
+                    texto_exito = 'Datos de las estación ' + estacion_elegida + ' durante la salida '  + salida  + ' actualizados correctamente'
+                    
+                st.success(texto_exito)                
+                
+    # Descarga datos ambientales
+    if tipo_entrada == entradas[1]:    
 
-
-
+        # Selecciona las salidas de la que se quieren descargar los datos
+        df_salidas_radiales    = df_salidas_radiales.sort_values('fecha_salida',ascending=False)
+        
+        listado_salidas        = st.multiselect('Muestreo',(df_salidas_radiales['nombre_salida'])) 
+        
+        identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
+        for idato in range(len(listado_salidas)):
+            identificadores_salidas[idato] = df_salidas_radiales['id_salida'][df_salidas_radiales['nombre_salida']==listado_salidas[idato]].iloc[0]
+    
+        df_salidas_seleccion = df_salidas_radiales[df_salidas_radiales['id_salida'].isin(identificadores_salidas)]
+            
+        # Botón para descargar las salidas disponibles
+        nombre_archivo =  'DATOS_AMBIENTALES.xlsx'
+    
+        output = BytesIO()
+        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+        df_salidas_radiales.to_excel(writer, index=False, sheet_name='DATOS')
+        workbook = writer.book
+        worksheet = writer.sheets['DATOS']
+        writer.save()
+        df_salidas_seleccion = output.getvalue()
+    
+        st.download_button(
+            label="DESCARGA EXCEL CON LAS SALIDAS REALIZADAS",
+            data=df_salidas_seleccion,
+            file_name=nombre_archivo,
+            help= 'Descarga un archivo .csv con los datos solicitados',
+            mime="application/vnd.ms-excel"
+        )
+        
 
 
 
