@@ -1502,6 +1502,7 @@ def entrada_salidas_mar():
 
         st.subheader('Personal participante')
         
+        st.markdown('Personal incluido en la base de datos')
         # Recupera la tabla con el personal ya introducido, como un dataframe
         conn = init_connection()
         df_personal = psql.read_sql('SELECT * FROM personal_salidas', conn)
@@ -1512,7 +1513,7 @@ def entrada_salidas_mar():
         gridOptions = gb.build()
         st_aggrid.AgGrid(df_personal,gridOptions=gridOptions,enable_enterprise_modules=True,height=250,allow_unsafe_jscode=True,reload_data=True)    
 
-
+        st.markdown('Añadir personal')
         # Despliega un formulario para introducir los datos
         with st.form("Formulario seleccion"):
                    
