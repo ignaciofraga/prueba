@@ -1353,7 +1353,8 @@ def entrada_salidas_mar():
             st.subheader('Variables muestreadas')
 
             json_variables = []
-            col1, col2, col3, col4, col5, col6= st.columns(6,gap="small")
+            col1, col2, col3, col4= st.columns(4,gap="small")
+            
             with col1:
                 oxigenos = st.checkbox('Oxígenos', value=True)
                 if oxigenos:
@@ -1367,23 +1368,23 @@ def entrada_salidas_mar():
                 if oxigenos:
                     json_variables = json_variables + ['pH']
                     
-            with col2:
-                nut_a = st.checkbox('Nutrientes(A)', value=True)
+                nut_a = st.checkbox('Nutrientes (A)', value=True)
                 if nut_a:
-                    json_variables = json_variables + ['Nutrientes(A)']
+                    json_variables = json_variables + ['Nutrientes (A)']
                     
-                nut_b = st.checkbox('Nutrientes(B)', value=True)
+                nut_b = st.checkbox('Nutrientes (B)', value=True)
                 if nut_b:
-                    json_variables = json_variables + ['Nutrientes(B)']
+                    json_variables = json_variables + ['Nutrientes (B)']
+                   
                     
+            with col2:                   
                 toc = st.checkbox('TOC', value=True)
                 if toc:
                     json_variables = json_variables + ['TOC']
                     
-            with col3:
-                citometria_bact = st.checkbox('Citometría (bacterias)', value=True)
+                citometria_bact = st.checkbox('Cito. (bacterias)', value=True)
                 if citometria_bact:
-                    json_variables = json_variables + ['Citometría (bacterias)']
+                    json_variables = json_variables + ['Cito. (bacterias)']
                     
                 poc = st.checkbox('POC', value=True)
                 if poc:
@@ -1392,12 +1393,12 @@ def entrada_salidas_mar():
                 colorofilas = st.checkbox('Clorofilas', value=True)
                 if colorofilas:
                     json_variables = json_variables + ['Clorofilas'] 
-                    
-            with col4:
+
                 prod_prim = st.checkbox('Prod.Primaria', value=True)
                 if prod_prim:
                     json_variables = json_variables + ['Prod.Primaria']
                     
+            with col3:                    
                 ciliados = st.checkbox('Ciliados', value=True)
                 if ciliados:
                     json_variables = json_variables + ['Ciliados']
@@ -1406,10 +1407,9 @@ def entrada_salidas_mar():
                 if flow_cam:
                     json_variables = json_variables + ['Flow Cam'] 
                     
-            with col5:
-                citometria_flag = st.checkbox('Citometría (flagelados)', value=True)
+                citometria_flag = st.checkbox('Cito. (flagelados)', value=True)
                 if citometria_flag:
-                    json_variables = json_variables + ['Citometría (flagelados)']
+                    json_variables = json_variables + ['Cito. (flagelados)']
                     
                 zoop_meso = st.checkbox('Zoop. (meso)', value=True)
                 if zoop_meso:
@@ -1419,7 +1419,7 @@ def entrada_salidas_mar():
                 if zoop_micro:
                     json_variables = json_variables + ['Zoop. (micro)']     
             
-            with col6:
+            with col4:
                 adn = st.checkbox('ADN', value=True)
                 if adn:
                     json_variables = json_variables + ['ADN']
@@ -1431,6 +1431,7 @@ def entrada_salidas_mar():
                 ppl = st.checkbox('PPL', value=True)
                 if ppl:
                     json_variables = json_variables + ['PPL']
+                    
                     
             json_variables         = json.dumps(json_variables)
 
