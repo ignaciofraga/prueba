@@ -2070,21 +2070,21 @@ def entrada_condiciones_ambientales():
         
            
         # Asigna como valores por defecto los que ya estaban en la base de datos
-        hora_llegada_defecto            = df_condicion_introducida['hora_llegada'][0]
-        profundidad_defecto             = df_condicion_introducida['profundidad'][0]
-        nubosidad_defecto               = df_condicion_introducida['nubosidad'][0]
-        indice_lluvia_defecto           = seleccion_SN.index(df_condicion_introducida['lluvia'][0])
-        velocidad_viento_defecto        = df_condicion_introducida['velocidad_viento'][0]
-        indice_direccion_viento_defecto = direcciones.index(df_condicion_introducida['direccion_viento'][0])
-        pres_atmosferica_defecto        = df_condicion_introducida['pres_atmosferica'][0]
-        altura_ola_defecto              = df_condicion_introducida['altura_ola'][0]
-        indice_mar_fondo_defecto        = seleccion_SN.index(df_condicion_introducida['mar_fondo'][0])
-        indice_mar_direccion_defecto    = direcciones.index(df_condicion_introducida['mar_direccion'][0])
-        temp_aire_defecto               = df_condicion_introducida['temp_aire'][0]
-        indice_marea_defecto            = mareas.index(df_condicion_introducida['marea'][0])
-        prof_secchi_defecto             = df_condicion_introducida['prof_secchi'][0]
-        max_clorofila_defecto           = df_condicion_introducida['max_clorofila'][0]
-        humedad_relativa_defecto        = df_condicion_introducida['humedad_relativa'][0]
+        hora_llegada_defecto            = df_condicion_introducida['hora_llegada'].iloc[0]
+        profundidad_defecto             = df_condicion_introducida['profundidad'].iloc[0]
+        nubosidad_defecto               = df_condicion_introducida['nubosidad'].iloc[0]
+        indice_lluvia_defecto           = seleccion_SN.index(df_condicion_introducida['lluvia'].iloc[0])
+        velocidad_viento_defecto        = df_condicion_introducida['velocidad_viento'].iloc[0]
+        indice_direccion_viento_defecto = direcciones.index(df_condicion_introducida['direccion_viento'].iloc[0])
+        pres_atmosferica_defecto        = df_condicion_introducida['pres_atmosferica'].iloc[0]
+        altura_ola_defecto              = df_condicion_introducida['altura_ola'].iloc[0]
+        indice_mar_fondo_defecto        = seleccion_SN.index(df_condicion_introducida['mar_fondo'].iloc[0])
+        indice_mar_direccion_defecto    = direcciones.index(df_condicion_introducida['mar_direccion'].iloc[0])
+        temp_aire_defecto               = df_condicion_introducida['temp_aire'].iloc[0]
+        indice_marea_defecto            = mareas.index(df_condicion_introducida['marea'].iloc[0])
+        prof_secchi_defecto             = df_condicion_introducida['prof_secchi'].iloc[0]
+        max_clorofila_defecto           = df_condicion_introducida['max_clorofila'].iloc[0]
+        humedad_relativa_defecto        = df_condicion_introducida['humedad_relativa'].iloc[0]
         
         io_previo                       = 1
         
