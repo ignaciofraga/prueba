@@ -2220,6 +2220,10 @@ def entrada_condiciones_ambientales():
     
         df_salidas_seleccion = df_condiciones[df_condiciones['salida'].isin(identificadores_salidas)]
             
+        for idato in range(df_salidas_seleccion.shape[0]):
+            df_salidas_seleccion['salida'].iloc[idato]   = df_salidas['nombre_salida'][df_salidas['id_salida']==df_salidas_seleccion['salida'].iloc[idato]].iloc[0]
+            df_salidas_seleccion['estacion'].iloc[idato] = df_estaciones['nombre_estacion'][df_estaciones['id_estacion']==df_salidas_seleccion['estacion'].iloc[idato]].iloc[0]
+            
         # Botón para descargar las salidas disponibles
         nombre_archivo =  'DATOS_AMBIENTALES.xlsx'
     
