@@ -1710,9 +1710,9 @@ def entrada_salidas_mar():
             json_variables = []
             col1, col2, col3, col4= st.columns(4,gap="small")
          
-         #    st.text(json_variables)
-         # if 'Oxigenos' in json_variables:
-         #     st.text('lista')
+            st.text(json_variables)
+            if 'Oxigenos' in json_variables:
+                st.text('marca')
              
             with col1:
                 if 'Oxigenos' in json_variables:
