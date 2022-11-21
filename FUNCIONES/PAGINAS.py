@@ -1682,8 +1682,7 @@ def entrada_salidas_mar():
         estaciones_previas             = datos_salida_seleccionada['estaciones'].iloc[0]
         observaciones_previas          = datos_salida_seleccionada['observaciones'].iloc[0]
 
-        st.text('variables previas')
-        st.text(json_variables_previas)
+        # Si no hay variables previas, genero una lista con un None para evitar problemas
         if json_variables_previas is None:
             json_variables_previas = [None]    
         
