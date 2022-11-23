@@ -874,9 +874,9 @@ def inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puer
         datos_conjuntos = pandas.concat([tabla_registros_fisica, datos_fisica])
             
         vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
-        datos_conjuntos['id_disc_fisica'] = vector_identificadores
+        datos_conjuntos['muestreo'] = vector_identificadores
         
-        datos_conjuntos.set_index('id_disc_fisica',drop=True,append=False,inplace=True)
+        datos_conjuntos.set_index('muestreo',drop=True,append=False,inplace=True)
         
         # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -923,9 +923,9 @@ def inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrase
     datos_conjuntos = pandas.concat([tabla_registros_biogoquim, datos_biogeoquimica])
         
     vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
-    datos_conjuntos['id_disc_biogeoquim'] = vector_identificadores
+    datos_conjuntos['muestreo'] = vector_identificadores
     
-    datos_conjuntos.set_index('id_disc_biogeoquim',drop=True,append=False,inplace=True)
+    datos_conjuntos.set_index('muestreo',drop=True,append=False,inplace=True)
     
     # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -1641,8 +1641,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
        
                 for idato in range(df_seleccion.shape[0]):
     
-                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, cc_nutrientes = %s WHERE id_disc_biogeoquim = %s;'
-                    cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(2),int(df_seleccion['id_disc_biogeoquim'].iloc[idato])))
+                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, cc_nutrientes = %s WHERE muestreo = %s;'
+                    cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(2),int(df_seleccion['muestreo'].iloc[idato])))
                     conn.commit() 
     
                 cursor.close()

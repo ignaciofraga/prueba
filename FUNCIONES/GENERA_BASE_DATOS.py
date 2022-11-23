@@ -471,58 +471,58 @@ conn.close()
 
 
 
-### TABLAS CON TIPOS DE PROCESADO
+# ### TABLAS CON TIPOS DE PROCESADO
 
-## TABLA CON CONTROL CALIDAD APLICADO A DATO DE NUTRIENTE ##
+# ## TABLA CON CONTROL CALIDAD APLICADO A DATO DE NUTRIENTE ##
 
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-nombre_tabla = 'control_calidad_nutrientes'
+# nombre_tabla = 'control_calidad_nutrientes'
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-listado_variables = ('(id_control int PRIMARY KEY,'
-' tipo_control text NOT NULL,'
-) 
+# listado_variables = ('(id_control int PRIMARY KEY,'
+# ' tipo_control text NOT NULL,'
+# ) 
 
-listado_unicidades = (' UNIQUE (id_control))')
+# listado_unicidades = (' UNIQUE (id_control))')
 
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
 
-## TABLA CON CONTROL CALIDAD APLICADO A DATO DE NUTRIENTE ##
+# ## TABLA CON CONTROL CALIDAD APLICADO A DATO DE NUTRIENTE ##
 
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-nombre_tabla = 'metodo_pH'
+# nombre_tabla = 'metodo_pH'
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-listado_variables = ('(id_metodo int PRIMARY KEY,'
-' metodo_ph text NOT NULL,'
-' descripcion_metodo_ph text NOT NULL,'
-) 
+# listado_variables = ('(id_metodo int PRIMARY KEY,'
+# ' metodo_ph text NOT NULL,'
+# ' descripcion_metodo_ph text NOT NULL,'
+# ) 
 
-listado_unicidades = (' UNIQUE (id_metodo))')
+# listado_unicidades = (' UNIQUE (id_metodo))')
 
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
 
@@ -551,8 +551,7 @@ cursor.execute(instruccion_sql)
 conn.commit()
 
 # Crea la tabla de nuevo
-listado_variables = ('(id_disc_biogeoquim SERIAL PRIMARY KEY,'
-' muestreo int NOT NULL,'
+listado_variables = ('(muestreo int PRIMARY KEY,'
 ' fluorescencia_ctd NUMERIC (7, 4),'
 ' fluorescencia_ctd_qf int DEFAULT 9,'
 ' oxigeno_ctd NUMERIC (4, 1),'
@@ -639,8 +638,7 @@ cursor.execute(instruccion_sql)
 conn.commit()
 
 # Crea la tabla de nuevo
-listado_variables = ('(id_disc_fisica SERIAL PRIMARY KEY,'
-' muestreo int NOT NULL,'
+listado_variables = ('(muestreo int PRIMARY KEY,'
 ' temperatura_ctd NUMERIC (4, 2),'
 ' temperatura_ctd_qf int DEFAULT 9,'
 ' salinidad_ctd NUMERIC (5, 3),'

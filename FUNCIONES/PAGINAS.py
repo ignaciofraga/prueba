@@ -2320,7 +2320,6 @@ def entrada_botellas():
         conn.close()    
         
         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
-        #id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
 
         
         # Despliega menús de selección del programa, tipo de salida, año y fecha               
@@ -2393,10 +2392,7 @@ def entrada_botellas():
             
                         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
                         datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-            
-
-
-            
+             
                         # Inserta datos físicos
                         for idato in range(datos_botellas.shape[0]):
                             if io_par == 1:
@@ -2406,18 +2402,11 @@ def entrada_botellas():
                                 st.text(datos_botellas['temperatura_ctd'].iloc[idato])
                                 st.text(datos_botellas['salinidad_ctd'].iloc[idato])
                                 st.text(datos_botellas['par_ctd'].iloc[idato])
+                                                                
+                                instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf)
+                                      VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf,EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
                                 
-                                instruccion_sql = '''INSERT INTO datos_discretos_fisica (id_disc_fisica,muestreo)
-                                      VALUES (%s,%s) ;''' 
-                                
-                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'].iloc[idato]),int(datos_botellas['id_muestreo_temp'].iloc[idato])))
-
-                                
-                                
-                                # instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf)
-                                #       VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf,EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
-                                
-                                # cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'].iloc[idato]),datos_botellas['temperatura_ctd'].iloc[idato],int(2),datos_botellas['salinidad_ctd'].iloc[idato],int(2),datos_botellas['par_ctd'].iloc[idato],int(2)))
+                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'].iloc[idato]),datos_botellas['temperatura_ctd'].iloc[idato],int(2),datos_botellas['salinidad_ctd'].iloc[idato],int(2),datos_botellas['par_ctd'].iloc[idato],int(2)))
                                 #cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(datos_botellas['temperatura_ctd_qf'][idato]),datos_botellas['salinidad_ctd'][idato],int(datos_botellas['salinidad_ctd_qf'][idato]),datos_botellas['par_ctd'][idato],int(datos_botellas['par_ctd_qf'][idato])))
                                 conn.commit()
                                 
@@ -2832,7 +2821,7 @@ def procesado_nutrientes():
             datos_corregidos['estacion']           = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['salida_mar']         = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['botella']            = numpy.zeros(datos_AA.shape[0],dtype=int)
-            datos_corregidos['id_disc_biogeoquim'] = numpy.zeros(datos_AA.shape[0],dtype=int)
+            datos_corregidos['muestreo']           = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['num_cast']           = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['programa']           = numpy.zeros(datos_AA.shape[0],dtype=int)
             datos_corregidos['año']                = numpy.zeros(datos_AA.shape[0],dtype=int)
@@ -2869,7 +2858,7 @@ def procesado_nutrientes():
                         datos_corregidos['fecha_muestreo'].iloc[idato]     = df_muestreos['fecha_muestreo'][df_muestreos['id_muestreo']==indice].iloc[0]
                         datos_corregidos['num_cast'].iloc[idato]           = df_muestreos['num_cast'][df_muestreos['id_muestreo']==indice].iloc[0]
                                             
-                        datos_corregidos['id_disc_biogeoquim'].iloc[idato] = df_datos_biogeoquimicos['id_disc_biogeoquim'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
+                        datos_corregidos['muestreo'].iloc[idato]           = df_datos_biogeoquimicos['muestreo'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
                         datos_corregidos['ph'].iloc[idato]                 = df_datos_biogeoquimicos['ph'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]                              
                         datos_corregidos['alcalinidad'].iloc[idato]        = df_datos_biogeoquimicos['alcalinidad'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
                         datos_corregidos['oxigeno_ctd'].iloc[idato]        = df_datos_biogeoquimicos['oxigeno_ctd'][df_datos_biogeoquimicos['muestreo']==indice].iloc[0]
@@ -3110,18 +3099,18 @@ def procesado_quimica():
            
                     # Diferente instrucción si es pH (hay que especificar el tipo de medida)
                     if variable_seleccionada == 'ph': 
-                        instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, ph_metodo = %s WHERE id_disc_biogeoquim = %s;'
+                        instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, ph_metodo = %s WHERE muestreo = %s;'
                         for idato in range(df_seleccion.shape[0]):
             
-                            cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(id_tipo_analisis),int(df_seleccion['id_disc_biogeoquim'].iloc[idato])))
+                            cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(id_tipo_analisis),int(df_seleccion['muestreo'].iloc[idato])))
                             conn.commit()             
                             
                     else:
-                        instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE id_disc_biogeoquim = %s;'
+                        instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
 
                         for idato in range(df_seleccion.shape[0]):
             
-                            cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(df_seleccion['id_disc_biogeoquim'].iloc[idato])))
+                            cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(df_seleccion['muestreo'].iloc[idato])))
                             conn.commit() 
         
                     cursor.close()
