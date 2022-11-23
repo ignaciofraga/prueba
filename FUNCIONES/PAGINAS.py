@@ -3083,10 +3083,16 @@ def procesado_quimica():
                     
                 with col4: 
                     
-                    qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']),key=(df_seleccion.shape[0] + 1 + idato))
+                    variable_seleccionada_cc = variable_seleccionada + '_qf'
+                    
+                    if io_valores_prev == 1:
+                        qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']),index=(df_seleccion[variable_seleccionada_cc].iloc[idato]-1),key=(df_seleccion.shape[0] + 1 + idato))                    
+                    else:
+                        qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']),key=(df_seleccion.shape[0] + 1 + idato))
+                    
                     indice_qf_seleccionado = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
                     
-                    variable_seleccionada_cc = variable_seleccionada + '_qf'
+                    
                     df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado)
     
             io_envio = st.form_submit_button("Asignar valores e índices de calidad definidos")  
