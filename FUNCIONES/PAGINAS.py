@@ -3016,7 +3016,8 @@ def procesado_quimica():
     variables_unidades     = [' ','\u03BCmol/kg','\u03BCmol/kg']
     
     # Define unos valores de referencia 
-    df_referencia = pandas.DataFrame(columns = ['ph', 'alcalinidad', 'oxigeno_wk'],index = [0])
+    io_valores_prev      = 0
+    df_referencia        = pandas.DataFrame(columns = ['ph', 'alcalinidad', 'oxigeno_wk'],index = [0])
     df_referencia.loc[0] = [8.1,200.0,200.0]
     
     # Añade nuevos datos obtenidos en laboratorio
@@ -3038,8 +3039,10 @@ def procesado_quimica():
 
         # Si ya hay datos previos, mostrar un warning        
         if df_seleccion[variable_seleccionada].notnull().all():
+            io_valores_prev = 1
             texto_error = "La base de datos ya contiene información para la salida, estación, cast y variable seleccionadas. Los datos introducidos reemplazarán los existentes."
             st.warning(texto_error, icon="⚠️") 
+            
             
         df_seleccion    = df_seleccion.sort_values('botella')
 
@@ -3072,7 +3075,10 @@ def procesado_quimica():
     
                 with col3: 
                     texto_variable = variable_seleccionada + ':'
-                    valor_entrada  = st.number_input(texto_variable,value=df_referencia[variable_seleccionada][0],key=idato,format = "%f")               
+                    if io_valores_prev == 1:
+                        valor_entrada  = st.number_input(texto_variable,value=df_seleccion[variable_seleccionada].iloc[idato],key=idato,format = "%f")                                   
+                    else:
+                        valor_entrada  = st.number_input(texto_variable,value=df_referencia[variable_seleccionada][0],key=idato,format = "%f")               
                     df_seleccion[variable_seleccionada].iloc[idato] = valor_entrada
                     
                 with col4: 
