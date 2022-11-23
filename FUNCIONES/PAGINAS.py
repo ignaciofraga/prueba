@@ -2410,7 +2410,7 @@ def entrada_botellas():
                                 instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd)
                                       VALUES (%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd) = ROW(EXCLUDED.temperatura_ctd);''' 
                                 
-                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'].iloc[idato]),datos_botellas['temperatura_ctd'].iloc[idato]))
+                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'].iloc[idato]),round(datos_botellas['temperatura_ctd'].iloc[idato],2)))
 
                                 
                                 
