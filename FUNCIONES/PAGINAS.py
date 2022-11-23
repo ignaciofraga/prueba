@@ -2394,7 +2394,11 @@ def entrada_botellas():
                         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
                         datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
             
-                        st.text(datos_botellas)
+                        st.text(datos_botellas['id_muestreo_temp'])
+                        st.text(datos_botellas['temperatura_ctd'])
+                        st.text(datos_botellas['salinidad_ctd'])
+                        st.text(datos_botellas['par_ctd'])
+
             
                         # Inserta datos físicos
                         for idato in range(datos_botellas.shape[0]):
