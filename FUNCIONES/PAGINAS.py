@@ -2769,6 +2769,7 @@ def procesado_nutrientes():
  
     variables_procesado    = ['Nitrógeno total','Nitrato','Nitrito','Silicato','Fosfato']    
     variables_procesado_bd = ['nitrogeno_total','nitrato','nitrito','silicato','fosfato']
+    variables_unidades     = ['\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg']
     
     # Añade salidas del AA
     if tipo_accion == acciones[0]:
@@ -2954,7 +2955,7 @@ def procesado_nutrientes():
                 # Mantén sólo las filas del dataframe con valores no nulos
                 datos_muestras = datos_corregidos[datos_corregidos['muestreo'].isnull() == False]    
              
-                FUNCIONES_INSERCION.control_calidad_biogeoquimica(datos_muestras,variables_procesado,variables_procesado_bd,direccion_host,base_datos,usuario,contrasena,puerto)
+                FUNCIONES_INSERCION.control_calidad_biogeoquimica(datos_muestras,variables_procesado,variables_procesado_bd,variables_unidades,direccion_host,base_datos,usuario,contrasena,puerto)
 
         
     # control de calidad de salidas previamente disponibles
@@ -3012,6 +3013,7 @@ def procesado_quimica():
  
     variables_procesado    = ['pH','Alcalinidad','Oxígeno (Método Winkler)']    
     variables_procesado_bd = ['ph','alcalinidad','oxigeno_wk']
+    variables_unidades     = [' ','\u03BCmol/kg','\u03BCmol/kg']
     
     # Define unos valores de referencia 
     df_referencia = pandas.DataFrame(columns = ['ph', 'alcalinidad', 'oxigeno_wk'],index = [0])
@@ -3129,6 +3131,6 @@ def procesado_quimica():
             df_datos_disponibles['año'].iloc[idato] = (df_datos_disponibles['fecha_muestreo'].iloc[idato]).year
         
         # procesa ese dataframe
-        FUNCIONES_INSERCION.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,direccion_host,base_datos,usuario,contrasena,puerto)
+        FUNCIONES_INSERCION.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades,direccion_host,base_datos,usuario,contrasena,puerto)
 
           

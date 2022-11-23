@@ -1370,7 +1370,7 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
 ###############################################################################
 ###### FUNCION PARA REALIZAR CONTROL DE CALDIAD DE DATOS BIOGEOQUIMICOS #######
 ###############################################################################
-def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables_procesado_bd,direccion_host,base_datos,usuario,contrasena,puerto):
+def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables_procesado_bd,variables_unidades,direccion_host,base_datos,usuario,contrasena,puerto):
 
     import streamlit as st
     import matplotlib.pyplot as plt
@@ -1391,6 +1391,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
     io_control_calidad = 1
     df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,io_control_calidad)
+    indice_variable = variables_procesado_bd.index(variable_seleccionada)
 
     # Recupera los datos disponibles de la misma estación, para la misma variable
     listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
@@ -1451,7 +1452,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r',label='PROCESADO' )
         
         ### FORMATO,ETIQUETAS Y NOMBRES DE EJES ###
-        texto_eje = variable_seleccionada + '(\u03BCmol/kg)'
+        texto_eje = variables_procesado[indice_variable] + '(' + variables_unidades[indice_variable] + ')'
         ax.set(xlabel=texto_eje)
         ax.set(ylabel='Presion (db)')
         ax.invert_yaxis()
