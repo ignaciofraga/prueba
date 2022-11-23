@@ -3087,6 +3087,7 @@ def procesado_quimica():
                     
                     if io_valores_prev == 1:
                         indice_calidad_inicial = numpy.where(df_indices_calidad["indice"] ==df_seleccion[variable_seleccionada_cc].iloc[idato] )
+                        st.text(indice_calidad_inicial)
                         qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']),index=indice_calidad_inicial,key=(df_seleccion.shape[0] + 1 + idato))                    
                     else:
                         qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']),key=(df_seleccion.shape[0] + 1 + idato))
