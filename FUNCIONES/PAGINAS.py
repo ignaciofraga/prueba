@@ -2394,15 +2394,21 @@ def entrada_botellas():
                         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
                         datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
             
-                        st.text(datos_botellas['id_muestreo_temp'])
-                        st.text(datos_botellas['temperatura_ctd'])
-                        st.text(datos_botellas['salinidad_ctd'])
-                        st.text(datos_botellas['par_ctd'])
+
 
             
                         # Inserta datos físicos
                         for idato in range(datos_botellas.shape[0]):
                             if io_par == 1:
+                                
+                                st.text(idato)
+                                st.text(datos_botellas['id_muestreo_temp'].iloc[idato])
+                                st.text(datos_botellas['temperatura_ctd'].iloc[idato])
+                                st.text(datos_botellas['salinidad_ctd'].iloc[idato])
+                                st.text(datos_botellas['par_ctd'].iloc[idato])
+                                
+                                
+                                
                                 instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf)
                                       VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf,EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
                                 
