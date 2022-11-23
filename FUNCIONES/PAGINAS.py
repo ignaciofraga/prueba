@@ -2407,10 +2407,10 @@ def entrada_botellas():
                                 st.text(datos_botellas['salinidad_ctd'].iloc[idato])
                                 st.text(datos_botellas['par_ctd'].iloc[idato])
                                 
-                                instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo)
-                                      VALUES (%s) ;''' 
+                                instruccion_sql = '''INSERT INTO datos_discretos_fisica (id_disc_fisica,muestreo)
+                                      VALUES (%s,%s) ;''' 
                                 
-                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'].iloc[idato])))
+                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'].iloc[idato]),int(datos_botellas['id_muestreo_temp'].iloc[idato])))
 
                                 
                                 
