@@ -2120,6 +2120,7 @@ def entrada_condiciones_ambientales():
             prof_secchi_defecto             = df_condicion_introducida['prof_secchi'].iloc[0]
             max_clorofila_defecto           = df_condicion_introducida['max_clorofila'].iloc[0]
             humedad_relativa_defecto        = df_condicion_introducida['humedad_relativa'].iloc[0]
+            temp_superficie_defecto         = df_condicion_introducida['temp_superficie'].iloc[0]
             
             io_previo                       = 1
             
@@ -2139,6 +2140,7 @@ def entrada_condiciones_ambientales():
             prof_secchi_defecto             = 0
             max_clorofila_defecto           = 0
             humedad_relativa_defecto        = 50
+            temp_superficie_defecto         = 16
             
             io_previo                       = 0
                        
@@ -2153,11 +2155,9 @@ def entrada_condiciones_ambientales():
             with col1:
                 hora_llegada  = st.time_input('Hora de llegada (UTC)',value=hora_llegada_defecto)
                 profundidad   = st.number_input('Profundidad (m):',format='%i',value=int(profundidad_defecto),min_value=0)
-                prof_secchi   = st.number_input('Prof.Sechi(m):',value=float(prof_secchi_defecto),min_value=float(0),step=0.5)           
-                max_clorofila    = st.number_input('Max.Clorofila(m):',value=float(max_clorofila_defecto),min_value=float(0),step=0.5)
-                 
-    
-                   
+                nubosidad        = st.number_input('Nubosidad (%) :',format='%i',value=int(nubosidad_defecto),min_value=0)
+                lluvia           = st.selectbox('LLuvia:',(seleccion_SN),index=indice_lluvia_defecto)
+                                       
             with col2:
                 velocidad_viento  = st.number_input('Vel.Viento (m/s):',value=float(velocidad_viento_defecto),min_value=float(0),step =0.5)
                 direccion_viento  = st.selectbox('Dir.Viento:',(direcciones),index = indice_direccion_viento_defecto)
@@ -2175,26 +2175,28 @@ def entrada_condiciones_ambientales():
                  mar_douglas = st.selectbox('Mar Douglas:',(douglas_nombre),index=indice_prop)
                  mar_fondo   = st.selectbox('Mar de fondo:',(seleccion_SN),index = indice_mar_fondo_defecto)
                  mar_direccion = st.selectbox('Dir.Oleaje:',(direcciones),index = indice_mar_direccion_defecto)
+                 temp_superf      = st.number_input('Temperatura superficie (ºC):',value=temp_superficie_defecto,min_value=0)
     
     
             with col4:
                  temp_aire        = st.number_input('Temperatura del aire(ºC):',value=float(temp_aire_defecto),min_value=float(0),step=0.1)
                  marea            = st.selectbox('Marea:',(mareas),index = indice_marea_defecto)
-                 humedad_relativa = st.number_input('Humedad relativa(%):',value=int(humedad_relativa_defecto),min_value=0)
-                 nubosidad        = st.number_input('Nubosidad (%) :',format='%i',value=int(nubosidad_defecto),min_value=0)
-                 lluvia           = st.selectbox('LLuvia:',(seleccion_SN),index=indice_lluvia_defecto)
-    
+                 humedad_relativa = st.number_input('Humedad relativa (%):',value=int(humedad_relativa_defecto),min_value=0)
+                 prof_secchi   = st.number_input('Prof.Sechi(m):',value=float(prof_secchi_defecto),min_value=float(0),step=0.5)           
+                 max_clorofila    = st.number_input('Max.Clorofila(m):',value=float(max_clorofila_defecto),min_value=float(0),step=0.5)
+
+
     
             submit = st.form_submit_button("Añadir o modificar datos")                    
     
             if submit is True:
                 
-                instruccion_sql = '''INSERT INTO condiciones_ambientales_muestreos (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila,mar_douglas)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (salida,estacion) DO UPDATE SET (hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila,mar_douglas) = ROW(EXCLUDED.hora_llegada,EXCLUDED.profundidad,EXCLUDED.nubosidad,EXCLUDED.lluvia,EXCLUDED.velocidad_viento,EXCLUDED.direccion_viento,EXCLUDED.pres_atmosferica,EXCLUDED.viento_beaufort,EXCLUDED.altura_ola,EXCLUDED.mar_fondo,EXCLUDED.mar_direccion,EXCLUDED.humedad_relativa,EXCLUDED.temp_aire,EXCLUDED.marea,EXCLUDED.prof_secchi,EXCLUDED.max_clorofila,EXCLUDED.mar_douglas);''' 
+                instruccion_sql = '''INSERT INTO condiciones_ambientales_muestreos (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila,mar_douglas,temp_superf)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (salida,estacion) DO UPDATE SET (hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila,mar_douglas,temp_superf) = ROW(EXCLUDED.hora_llegada,EXCLUDED.profundidad,EXCLUDED.nubosidad,EXCLUDED.lluvia,EXCLUDED.velocidad_viento,EXCLUDED.direccion_viento,EXCLUDED.pres_atmosferica,EXCLUDED.viento_beaufort,EXCLUDED.altura_ola,EXCLUDED.mar_fondo,EXCLUDED.mar_direccion,EXCLUDED.humedad_relativa,EXCLUDED.temp_aire,EXCLUDED.marea,EXCLUDED.prof_secchi,EXCLUDED.max_clorofila,EXCLUDED.mar_douglas,EXCLUDED.temp_superf);''' 
                         
                 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                 cursor = conn.cursor()
-                cursor.execute(instruccion_sql, (int(id_salida),int(id_estacion_elegida),hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila,mar_douglas))
+                cursor.execute(instruccion_sql, (int(id_salida),int(id_estacion_elegida),hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_direccion,humedad_relativa,temp_aire,marea,prof_secchi,max_clorofila,mar_douglas,temp_superf))
                 conn.commit()
                 cursor.close()
                 conn.close()

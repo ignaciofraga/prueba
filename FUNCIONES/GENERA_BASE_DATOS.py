@@ -1065,7 +1065,7 @@ conn.close()
 # ' prof_secchi NUMERIC (4, 1),'
 # ' max_clorofila NUMERIC (4, 1),'
 # ' humedad_relativa int,'
-
+# ' temp_superficie NUMERIC (3, 1),'
 # ) 
 
 # listado_dependencias = ('FOREIGN KEY (salida)'
