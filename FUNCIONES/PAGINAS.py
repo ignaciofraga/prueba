@@ -2397,12 +2397,6 @@ def entrada_botellas():
                         for idato in range(datos_botellas.shape[0]):
                             if io_par == 1:
                                 
-                                st.text(idato)
-                                st.text(datos_botellas['id_muestreo_temp'].iloc[idato])
-                                st.text(datos_botellas['temperatura_ctd'].iloc[idato])
-                                st.text(datos_botellas['salinidad_ctd'].iloc[idato])
-                                st.text(datos_botellas['par_ctd'].iloc[idato])
-                                                                
                                 instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf)
                                       VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf,par_ctd,par_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf,EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
                                 
@@ -2422,7 +2416,7 @@ def entrada_botellas():
                                 instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,fluorescencia_ctd,fluorescencia_ctd_qf)
                                       VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (fluorescencia_ctd,fluorescencia_ctd_qf) = ROW(EXCLUDED.fluorescencia_ctd,EXCLUDED.fluorescencia_ctd_qf);''' 
                                         
-                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['fluorescencia_ctd'][idato],int(datos_botellas['fluorescencia_ctd'][idato])))
+                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['fluorescencia_ctd'][idato],int(datos_botellas['fluorescencia_ctd_qf'][idato])))
                                 conn.commit()           
                  
                             if io_O2 == 1:                

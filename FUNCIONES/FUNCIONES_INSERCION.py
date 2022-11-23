@@ -1226,18 +1226,18 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
                        columns =['botella', 'salinidad_ctd','temperatura_ctd','presion_ctd'])
         
         # Añade columnas con el QF de T y S
-        datos_botellas['temperatura_ctd_qf'] = 2
-        datos_botellas['salinidad_ctd_qf']   = 2
+        datos_botellas['temperatura_ctd_qf'] = 1
+        datos_botellas['salinidad_ctd_qf']   = 1
         
         if io_par == 1:
             datos_botellas['par_ctd']              =  datos_PAR
-            datos_botellas['par_ctd_qf']           = 2
+            datos_botellas['par_ctd_qf']           = 1
         if io_fluor == 1:
             datos_botellas['fluorescencia_ctd']    =  datos_fluor
-            datos_botellas['fluorescencia_ctd_qf'] = 2
+            datos_botellas['fluorescencia_ctd_qf'] = 1
         if io_O2 == 1:
             datos_botellas['oxigeno_ctd']          =  datos_O2
-            datos_botellas['oxigeno_ctd_qf']       = 2
+            datos_botellas['oxigeno_ctd_qf']       = 1
             
             
         # Añade una columna con la profundidad de referencia
