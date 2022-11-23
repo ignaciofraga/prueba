@@ -3008,7 +3008,7 @@ def procesado_quimica():
     df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
                          
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    acciones     = ['Añadir datos de laboratorio', 'Realizar control de calidad de datos disponibles']
+    acciones     = ['Añadir o modificar datos de laboratorio', 'Realizar control de calidad de datos disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
  
     variables_procesado    = ['pH','Alcalinidad','Oxígeno (Método Winkler)']    
