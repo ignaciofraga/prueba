@@ -2175,7 +2175,7 @@ def entrada_condiciones_ambientales():
                  mar_douglas = st.selectbox('Mar Douglas:',(douglas_nombre),index=indice_prop)
                  mar_fondo   = st.selectbox('Mar de fondo:',(seleccion_SN),index = indice_mar_fondo_defecto)
                  mar_direccion = st.selectbox('Dir.Oleaje:',(direcciones),index = indice_mar_direccion_defecto)
-                 temp_superf      = st.number_input('Temperatura superficie (ºC):',value=temp_superficie_defecto,min_value=0)
+                 temp_superf   = st.number_input('Temperatura superficie (ºC):',value=float(temp_superficie_defecto),min_value=float(0),step=0.1)
     
     
             with col4:
