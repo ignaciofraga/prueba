@@ -1380,6 +1380,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     conn                      = init_connection()
     df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
     df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+    df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
     df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
     conn.close()
 
@@ -1395,10 +1396,15 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
 
     # Recupera los datos disponibles de la misma estación, para la misma variable
     listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
-    df_disponible_bd           = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos_estacion)]
-    
-    df_disponible_bd            = df_disponible_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
-    df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bd, on="id_muestreo")
+    df_disponible_bgq_bd        = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos_estacion)]   
+    df_disponible_bgq_bd        = df_disponible_bgq_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
+    df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bgq_bd, on="id_muestreo")
+
+    df_disponible_fis_bd        = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos_estacion)]   
+    df_disponible_fis_bd        = df_disponible_fis_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
+    df_disponible_bd            = pandas.merge(df_disponible_bd, df_disponible_fis_bd, on="id_muestreo")
+
+
 
     # comprueba si hay datos de la variable a analizar en la salida seleccionada
     if df_seleccion[variable_seleccionada].isnull().all():
