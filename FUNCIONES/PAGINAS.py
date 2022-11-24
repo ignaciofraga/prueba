@@ -1144,11 +1144,14 @@ def actualiza_procesos():
         df_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
         conn.close()
         
+        # Listado tareas
+        procesos = ['Análisis de muestras en laboratorio','Post-Procesado y control de calidad']
+        
         # Despliega un formulario para seleccionar el proyecto o campaña terminado
         with st.form("Formulario seleccion"):
                    
            
-            col1, col2= st.columns(2,gap="small")
+            col1, col2, col3= st.columns(3,gap="small")
             
             with col1:
                 
@@ -1161,8 +1164,48 @@ def actualiza_procesos():
             with col2:               
                 anho_procesado            = st.selectbox('Año ',(df_programa_seleccionado['año']))
                 id_proceso                = df_programa_seleccionado['id_proceso'][df_programa_seleccionado['año']==anho_procesado]
+ 
+            with col3:               
+                tipo_proceso              = st.selectbox('Tipo de proceso terminado ',(procesos))
+                id_tipo_proceso           = procesos.index(tipo_proceso)
         
+            col1, col2= st.columns(2,gap="small")
+            
+            with col1:        
         
+                fecha_actualiza  = st.date_input('Fecha de finalización ',max_value=fecha_actual,value=fecha_actual)
+
+            with col2:        
+        
+                correo_contacto  = st.text_input('Correo de contacto del responsable ', value="")
+        
+                if id_tipo_proceso == 0:
+                    campo_fecha    = 'fecha_analisis_laboratorio'
+                    campo_contacto = 'contacto_analisis_laboratorio'
+                else:
+                    campo_fecha    = 'fecha_post_procesado'                    
+                    campo_contacto = 'contacto_analisis_laboratorio'
+                    
+                submit = st.form_submit_button("Enviar")
+    
+                if submit == True:
+                    
+                    fecha_actual = datetime.date.today()
+                    
+                    conn = init_connection()
+                    cursor = conn.cursor() 
+                    instruccion_sql = "UPDATE estado_procesos SET " + campo_fecha + " = %s," + campo_contacto + " = %s WHERE id_proceso = %s;"
+                    cursor.execute(instruccion_sql, (fecha_actualiza,correo_contacto,int(id_proceso)))                
+                    conn.commit() 
+                    cursor.close()
+                    conn.close()  
+                    
+                    texto_exito = 'Estado del procesado de ' + programa_seleccionado + ' ' + str(anho_procesado) + ' actualizado correctamente'
+                    st.success(texto_exito)
+                    
+                    st.experimental_rerun()
+
+
     
 ###############################################################################
 #################### PÁGINA DE PROCESOS EN CURSO ##############################
