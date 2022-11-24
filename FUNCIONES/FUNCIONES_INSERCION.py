@@ -1470,7 +1470,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
  
         ### DATOS DISPONIBLES PREVIAMENTE ###
         # Representa los datos disponibles de un color
-        ax.plot(df_disponible_bd[variable_seleccionada],df_disponible_bd['presion_ctd'],'.',color='#C0C0C0',label='DATO PREVIO(OK)')
+        ax.plot(df_datos_buenos[variable_seleccionada],df_datos_buenos['presion_ctd'],'.',color='#C0C0C0',label='DATO PREVIO(OK)')
         # Representa los datos dentro del intervalo de meses en otro color
         ax.plot(df_rango_temporal[variable_seleccionada],df_rango_temporal['presion_ctd'],'.',color='#404040',label='DATO PREVIO(INTERVALO)')
         # Representa los datos con QF malos en un tercer color   
