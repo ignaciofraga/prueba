@@ -1304,7 +1304,7 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
     with col2:
         
         df_prog_sel               = datos_procesados[datos_procesados['programa']==indice_programa]
-        df_prog_sel               = df_prog_sel.sort_values('año')
+        df_prog_sel               = df_prog_sel.sort_values('año',ascending=False)
         anhos_disponibles         = df_prog_sel['año'].unique()
         anho_seleccionado         = st.selectbox('Año',(anhos_disponibles))
         
@@ -1316,7 +1316,7 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
         
         listado_salidas           = df_prog_anho_sel['salida_mar'].unique()
         df_salidas_muestreadas    = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
-        df_salidas_muestreadas    = df_salidas_muestreadas.sort_values('fecha_salida')
+        df_salidas_muestreadas    = df_salidas_muestreadas.sort_values('fecha_salida',ascending=False)
         salida_seleccionada       = st.selectbox('Salida',(df_salidas_muestreadas['nombre_salida']))
         indice_salida             = df_salidas['id_salida'][df_salidas['nombre_salida']==salida_seleccionada].iloc[0]
 
