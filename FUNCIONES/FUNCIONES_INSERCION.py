@@ -1438,6 +1438,16 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 
         df_rango_temporal = df_disponible_bd[df_disponible_bd['io_fecha']==1]
     
+        # Rangos
+        min_val = min(df_disponible_bd[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
+        max_val = max(df_disponible_bd[variable_seleccionada].max(),df_seleccion[variable_seleccionada].max())
+  
+        
+        st.text()
+        vmin_rango  = st.number_input('Valor mínimo gráfico:',value=min_val)
+        vmax_rango  = st.number_input('Valor máximo gráfico:',value=max_val)        
+
+    
         ################# GRAFICOS ################
     
         ### GRAFICO CON LA VARIABLE ANALIZADA EN FUNCION DE LA PROFUNDIDAD Y OXIGENO   
@@ -1462,6 +1472,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         ax.set(xlabel=texto_eje)
         ax.set(ylabel='Presion (db)')
         ax.invert_yaxis()
+        ax.set_xlim([vmin_rango, vmax_rango])
         rango_profs = ax.get_ylim()
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
@@ -1490,12 +1501,6 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             az.set_ylim(rango_profs)
             az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
     
-        # Rangos
-        min_val = min(df_disponible_bd[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
-        max_val = max(df_disponible_bd[variable_seleccionada].max(),df_seleccion[variable_seleccionada].max())
-  
-        st.text(min_val)
-        st.text(max_val)
 
         st.pyplot(fig)
  
