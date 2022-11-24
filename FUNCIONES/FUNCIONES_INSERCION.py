@@ -1491,12 +1491,12 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
     
         # Rangos
-        min_val = min[min(df_disponible_bd[variable_seleccionada]),min(df_seleccion[variable_seleccionada])]
-        max_val = max[max(df_disponible_bd[variable_seleccionada]),max(df_seleccion[variable_seleccionada])]
+        min_val = min[df_disponible_bd[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min()]
+        max_val = max[df_disponible_bd[variable_seleccionada].max(),df_seleccion[variable_seleccionada].max()]
   
         st.text(min_val)
         st.text(max_val)
-  
+
         st.pyplot(fig)
  
     
