@@ -1151,7 +1151,7 @@ def actualiza_procesos():
         with st.form("Formulario seleccion"):
                    
            
-            col1, col2, col3= st.columns(3,gap="small")
+            col1, col2= st.columns(2,gap="small")
             
             with col1:
                 
@@ -1165,9 +1165,8 @@ def actualiza_procesos():
                 anho_procesado            = st.selectbox('Año ',(df_programa_seleccionado['año']))
                 id_proceso                = df_programa_seleccionado['id_proceso'][df_programa_seleccionado['año']==anho_procesado]
  
-            with col3:               
-                tipo_proceso              = st.selectbox('Tipo de proceso terminado ',(procesos))
-                id_tipo_proceso           = procesos.index(tipo_proceso)
+            tipo_proceso              = st.selectbox('Tipo de proceso terminado ',(procesos))
+            id_tipo_proceso           = procesos.index(tipo_proceso)
         
             col1, col2= st.columns(2,gap="small")
             
