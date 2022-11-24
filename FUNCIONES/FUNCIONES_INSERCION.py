@@ -1385,6 +1385,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     conn.close()
 
     id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'].iloc[0]
+    id_dato_bueno             = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Bueno'].iloc[0]
+    id_dato_dudoso            = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Dudoso'].iloc[0]
 
     
     ### CONTROL DE CALIDAD DE LOS DATOS
@@ -1393,6 +1395,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     io_control_calidad = 1
     df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,io_control_calidad)
     indice_variable = variables_procesado_bd.index(variable_seleccionada)
+
+    qf_variable_seleccionada = variable_seleccionada + '_qf'
 
     # Recupera los datos disponibles de la misma estación, para la misma variable
     listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
@@ -1429,14 +1433,17 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
      
         listado_meses = listado_meses.tolist()
        
+        df_disponible_bd
+        
+        df_datos_buenos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_bueno]
         
         # Busca los datos de la base de datos dentro del rango de meses seleccionados
-        df_disponible_bd['io_fecha'] = numpy.zeros(df_disponible_bd.shape[0],dtype=int)
-        for idato in range(df_disponible_bd.shape[0]):
-            if (df_disponible_bd['fecha_muestreo'].iloc[idato]).month in listado_meses:
-                df_disponible_bd['io_fecha'].iloc[idato] = 1
+        df_datos_buenos['io_fecha'] = numpy.zeros(df_datos_buenos.shape[0],dtype=int)
+        for idato in range(df_datos_buenos.shape[0]):
+            if (df_datos_buenos['fecha_muestreo'].iloc[idato]).month in listado_meses:
+                df_datos_buenos['io_fecha'].iloc[idato] = 1
                 
-        df_rango_temporal = df_disponible_bd[df_disponible_bd['io_fecha']==1]
+        df_rango_temporal = df_datos_buenos[df_datos_buenos['io_fecha']==1]
     
         # Rangos
         min_val = min(df_disponible_bd[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
@@ -1465,7 +1472,6 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         # Representa los datos dentro del intervalo de meses en otro color
         ax.plot(df_rango_temporal[variable_seleccionada],df_rango_temporal['presion_ctd'],'.',color='#404040',label='DATO PREVIO(INTERVALO)')
         # Representa los datos con QF malos en un tercer color   
-        qf_variable_seleccionada = variable_seleccionada + '_qf'
         datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
         ax.plot(datos_malos[variable_seleccionada],datos_malos['presion_ctd'],'.',color='#00CCCC',label='DATO PREVIO(MALO)')    
 
