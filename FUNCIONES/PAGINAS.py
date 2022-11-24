@@ -2510,6 +2510,8 @@ def entrada_botellas():
         df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
         df_datos_disponibles  = pandas.merge(df_datos_disponibles, df_datos_fisicos, on="muestreo")
         
+        st.text(df_datos_disponibles)
+        
         # Añade columna con información del año
         df_datos_disponibles['año']                = numpy.zeros(df_datos_disponibles.shape[0],dtype=int)
         for idato in range(df_datos_disponibles.shape[0]):
