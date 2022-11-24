@@ -2511,6 +2511,7 @@ def entrada_botellas():
         df_datos_disponibles  = pandas.merge(df_datos_disponibles, df_datos_fisicos, on="muestreo")
         
         st.text(df_datos_disponibles)
+        st.text(df_datos_disponibles['programa'])
         
         # Añade columna con información del año
         df_datos_disponibles['año']                = numpy.zeros(df_datos_disponibles.shape[0],dtype=int)
