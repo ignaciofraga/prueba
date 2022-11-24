@@ -2493,26 +2493,29 @@ def entrada_botellas():
     
         st.subheader('Control de calidad de datos procedentes de botellas')    
     
-        # Recupera las tablas a utilizar como dataframes
-        conn                      = init_connection()
-        df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-        df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-        df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
-        conn.close()
-    
         # Define las variables a utilizar
         variables_procesado    = ['Temperatura','Salinidad','PAR','Fluorescencia','O2(CTD)']    
         variables_procesado_bd = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
         variables_unidades     = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
     
+    
+        # Recupera las tablas a utilizar como dataframes
+        conn                      = init_connection()
+        df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+        df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+        df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+        df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        conn.close()
+     
+        # Combina la información de muestreos y salidas en un único dataframe 
+        df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
+        df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
+                         
         # compón un dataframe con la información de muestreo y datos biogeoquímicos
         df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
         df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
         df_datos_disponibles  = pandas.merge(df_datos_disponibles, df_datos_fisicos, on="muestreo")
-        
-        st.text(df_datos_disponibles)
-
-        
+         
         # Añade columna con información del año
         df_datos_disponibles['año']                = numpy.zeros(df_datos_disponibles.shape[0],dtype=int)
         for idato in range(df_datos_disponibles.shape[0]):
