@@ -1433,9 +1433,11 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
      
         listado_meses = listado_meses.tolist()
        
-        df_disponible_bd
+        st.text(df_disponible_bd.shape[0])
         
         df_datos_buenos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_bueno]
+
+        st.text(df_datos_buenos.shape[0])
         
         # Busca los datos de la base de datos dentro del rango de meses seleccionados
         df_datos_buenos['io_fecha'] = numpy.zeros(df_datos_buenos.shape[0],dtype=int)
