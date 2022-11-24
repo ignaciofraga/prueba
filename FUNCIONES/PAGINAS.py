@@ -2534,11 +2534,11 @@ def entrada_botellas():
             if indice_variable <=2: # Datos fisicos
                 df_temp         = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos)]
                 tabla_actualiza = 'datos_discretos_fisica'
-                identificador   = 'id_disc_fisica'
+                identificador   = 'muestreo'
             else:                    # Datos biogeoquimicos
                 df_temp         = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos)]        
                 tabla_actualiza = 'datos_discretos_biogeoquimica'
-                identificador   = 'id_disc_biogeoquim'
+                identificador   = 'muestreo'
     
             # Une los dataframes con los datos del muestreo y de las variables, para tener los datos de profundidad, botella....
             df_muestreos_estacion = df_muestreos_estacion.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
