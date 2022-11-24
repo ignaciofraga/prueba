@@ -1446,10 +1446,10 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         st.text('')
         st.text('')
         st.text('')
-        col1, col2 = st.columns(2,gap="small")
-        with col1:
-            vmin_rango  = st.number_input('Valor mínimo gráfico:',value=min_val)
+        col1, col2, col3, col4 = st.columns(4,gap="small")
         with col2:
+            vmin_rango  = st.number_input('Valor mínimo gráfico:',value=min_val)
+        with col3:
             vmax_rango  = st.number_input('Valor máximo gráfico:',value=max_val)        
 
     
