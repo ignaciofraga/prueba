@@ -1587,7 +1587,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         if variable_seleccionada == 'fosfato':
     
             ### GRAFICO FOSFATO vs NITRATO 
-            fig, ax = plt.subplots()       
+            fig2, ax = plt.subplots()       
             
             # if io_buenos:
             #     ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
@@ -1625,7 +1625,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                     nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
                 ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
            
-            st.pyplot(fig)
+            st.pyplot(fig2)
         
         
 
