@@ -1450,25 +1450,25 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         
         with st.expander("Ajustar estilo del gráfico",expanded=False):
         
-            st.write("Selecciona los datos a mostrar")    
+            st.write("Selecciona los datos a mostrar según su bandera de calidad")    
         
             # Selecciona mostrar o no datos malos y dudosos
             col1, col2, col3, col4 = st.columns(4,gap="small")
             with col1:
-                io_buenos   = st.checkbox('Datos buenos', value=True)
-                io_malos    = st.checkbox('Datos malos', value=False) 
+                io_buenos   = st.checkbox('Buenos', value=True)
+                io_malos    = st.checkbox('Malos', value=False) 
             with col2:
                 color_buenos = st.color_picker('Color', '#C0C0C0',label_visibility="collapsed")
                 color_malos  = st.color_picker('Color', '#00CCCC',label_visibility="collapsed")
             with col3:
-                io_rango      = st.checkbox('Datos rango temporal', value=True)
-                io_dudosos    = st.checkbox('Datos dudosos', value=False)
+                io_rango      = st.checkbox('Buenos(intervalo)', value=True)
+                io_dudosos    = st.checkbox('Dudosos', value=False)
             with col4:
                 color_rango   = st.color_picker('Color', '#404040',label_visibility="collapsed")
                 color_dudosos = st.color_picker('Color', '#00f900',label_visibility="collapsed")
             
             
-            st.write("Selecciona el rango de los valores mostrados")  
+            st.write("Selecciona el rango del gráfio")  
             
             # Selecciona el rango del gráfico
             min_val = min(df_datos_buenos[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
