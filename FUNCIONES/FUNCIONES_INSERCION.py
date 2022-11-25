@@ -1538,8 +1538,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             
             
             az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
-            #az.xaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.3f}"))
-            ax.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+            az.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
         st.pyplot(fig)
  
     
