@@ -1447,42 +1447,45 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         for isepara in range(4):
             st.text(' ')
         
-        # Selecciona mostrar o no datos malos y dudosos
-        col1, col2, col3, col4 = st.columns(4,gap="small")
-        with col1:
-            io_buenos   = st.checkbox('Datos buenos', value=True)
-            io_malos    = st.checkbox('Datos malos', value=False) 
-        with col2:
-            color_buenos = st.color_picker('Color', '#C0C0C0',label_visibility="collapsed")
-            color_malos  = st.color_picker('Color', '#00CCCC',label_visibility="collapsed")
-        with col3:
-            io_rango      = st.checkbox('Datos rango temporal', value=True)
-            io_dudosos    = st.checkbox('Datos dudosos', value=False)
-        with col4:
-            color_rango   = st.color_picker('Color', '#404040',label_visibility="collapsed")
-            color_dudosos = st.color_picker('Color', '#00f900',label_visibility="collapsed")
         
+        with st.expander("Formato y estilo del gráfico",expanded=False):
         
-        
-        # Selecciona el rango del gráfico
-        min_val = min(df_datos_buenos[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
-        max_val = max(df_disponible_bd[variable_seleccionada].max(),df_seleccion[variable_seleccionada].max())
-        if io_malos:
-            df_datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
-            min_val = min(min_val,df_datos_malos[variable_seleccionada].min())
-        if io_dudosos:
-            df_datos_dudosos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_dudoso]
-            min_val = min(min_val,df_datos_dudosos[variable_seleccionada].min())            
-        
-        rango   = (max_val-min_val)
-        min_val = round(min_val - 0.025*rango,2)
-        max_val = round(max_val + 0.025*rango,2)
-        
-        col1, col2, col3, col4 = st.columns(4,gap="small")
-        with col2:
-            vmin_rango  = st.number_input('Valor mínimo gráfico:',value=min_val)
-        with col3:
-            vmax_rango  = st.number_input('Valor máximo gráfico:',value=max_val)        
+            # Selecciona mostrar o no datos malos y dudosos
+            col1, col2, col3, col4 = st.columns(4,gap="small")
+            with col1:
+                io_buenos   = st.checkbox('Datos buenos', value=True)
+                io_malos    = st.checkbox('Datos malos', value=False) 
+            with col2:
+                color_buenos = st.color_picker('Color', '#C0C0C0',label_visibility="collapsed")
+                color_malos  = st.color_picker('Color', '#00CCCC',label_visibility="collapsed")
+            with col3:
+                io_rango      = st.checkbox('Datos rango temporal', value=True)
+                io_dudosos    = st.checkbox('Datos dudosos', value=False)
+            with col4:
+                color_rango   = st.color_picker('Color', '#404040',label_visibility="collapsed")
+                color_dudosos = st.color_picker('Color', '#00f900',label_visibility="collapsed")
+            
+            
+            
+            # Selecciona el rango del gráfico
+            min_val = min(df_datos_buenos[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
+            max_val = max(df_disponible_bd[variable_seleccionada].max(),df_seleccion[variable_seleccionada].max())
+            if io_malos:
+                df_datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
+                min_val = min(min_val,df_datos_malos[variable_seleccionada].min())
+            if io_dudosos:
+                df_datos_dudosos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_dudoso]
+                min_val = min(min_val,df_datos_dudosos[variable_seleccionada].min())            
+            
+            rango   = (max_val-min_val)
+            min_val = round(min_val - 0.025*rango,2)
+            max_val = round(max_val + 0.025*rango,2)
+            
+            col1, col2, col3, col4 = st.columns(4,gap="small")
+            with col2:
+                vmin_rango  = st.number_input('Valor mínimo gráfico:',value=min_val)
+            with col3:
+                vmax_rango  = st.number_input('Valor máximo gráfico:',value=max_val)        
             
 
     
