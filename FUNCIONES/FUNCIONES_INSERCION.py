@@ -1589,20 +1589,20 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             ### GRAFICO FOSFATO vs NITRATO 
             fig, ax = plt.subplots()       
             
-            if io_buenos:
-                ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
+            # if io_buenos:
+            #     ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
             
-            # Representa los datos dentro del intervalo de meses en otro color
-            if io_rango:
-                ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
+            # # Representa los datos dentro del intervalo de meses en otro color
+            # if io_rango:
+            #     ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
             
-            # Representa los datos con QF malos si se seleccionó esta opción   
-            if io_malos:
-                ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
+            # # Representa los datos con QF malos si se seleccionó esta opción   
+            # if io_malos:
+            #     ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
 
-            # Representa los datos con QF dudoso si se seleccionó esta opción   
-            if io_dudosos:
-                ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
+            # # Representa los datos con QF dudoso si se seleccionó esta opción   
+            # if io_dudosos:
+            #     ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
                                   
             ax.plot(df_disponible_bd['nitrato'],df_disponible_bd['fosfato'],'.',color='#C0C0C0')
 
