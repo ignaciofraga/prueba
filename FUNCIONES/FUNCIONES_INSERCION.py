@@ -1506,7 +1506,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         ax.set(xlabel=texto_eje)
         ax.set(ylabel='Presion (db)')
         ax.invert_yaxis()
-        ax.set_xlim([vmin_rango, vmax_rango])
+        #ax.set_xlim([vmin_rango, vmax_rango])
         rango_profs = ax.get_ylim()
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
@@ -1518,11 +1518,10 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
        
         # Ajusta el rango de las x 
-        rango_valores = ax.get_xlim()
         num_intervalos = 5
-        val_intervalo  =  (math.ceil(rango_valores[-1]) - math.floor(rango_valores[0]))/num_intervalos
-        ax.set_xlim([math.floor(rango_valores[0]),math.ceil(rango_valores[-1])])
-        ax.set_xticks(numpy.arange(math.floor(rango_valores[0]),math.ceil(rango_valores[-1])+val_intervalo,val_intervalo))
+        val_intervalo  =  (vmax_rango - vmin_rango)/num_intervalos
+        ax.set_xlim([vmin_rango, vmax_rango])
+        ax.set_xticks(numpy.arange(vmin_rango,vmax_rango+val_intervalo,val_intervalo))
         ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))       
         
         # Añade la leyenda
