@@ -1448,7 +1448,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             st.text(' ')
         
         
-        with st.expander("Formato y estilo del gráfico",expanded=False):
+        with st.expander("Ajustar estilo del gráfico",expanded=False):
+        
+            st.write("Selecciona los datos a mostrar")    
         
             # Selecciona mostrar o no datos malos y dudosos
             col1, col2, col3, col4 = st.columns(4,gap="small")
@@ -1466,6 +1468,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 color_dudosos = st.color_picker('Color', '#00f900',label_visibility="collapsed")
             
             
+            st.write("Selecciona el rango de los valores mostrados")  
             
             # Selecciona el rango del gráfico
             min_val = min(df_datos_buenos[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
