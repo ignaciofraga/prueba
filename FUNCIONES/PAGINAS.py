@@ -2504,7 +2504,7 @@ def entrada_botellas():
         df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
         df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
         df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
-        df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         conn.close()
      
         # Combina la información de muestreos y salidas en un único dataframe 
@@ -2518,6 +2518,9 @@ def entrada_botellas():
          
         # Añade columna con información del año
         df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
+        
+        # Borra los dataframes que ya no hagan falta para ahorrar memoria
+        del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos,df_salidas)
         
         # procesa ese dataframe
         FUNCIONES_INSERCION.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades,direccion_host,base_datos,usuario,contrasena,puerto)
@@ -3056,7 +3059,10 @@ def procesado_quimica():
         
         # Añade columna con información del año
         df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
-        
+
+        # Borra los dataframes que ya no hagan falta para ahorrar memoria
+        del(df_datos_biogeoquimicos,df_muestreos)
+
         # procesa ese dataframe
         FUNCIONES_INSERCION.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades,direccion_host,base_datos,usuario,contrasena,puerto)
 

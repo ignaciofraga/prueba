@@ -1442,14 +1442,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         df_datos_buenos['mes']  = pandas.DatetimeIndex(df_datos_buenos['fecha_muestreo']).month
         df_rango_temporal       = df_datos_buenos[df_datos_buenos['mes'].isin(listado_meses)]
         
-        # df_datos_buenos['io_fecha'] = numpy.zeros(df_datos_buenos.shape[0],dtype=int)
-        # for idato in range(df_datos_buenos.shape[0]):
-        #     if (df_datos_buenos['fecha_muestreo'].iloc[idato]).month in listado_meses:
-        #         df_datos_buenos['io_fecha'].iloc[idato] = 1
-                
-        # df_rango_temporal = df_datos_buenos[df_datos_buenos['io_fecha']==1]
-    
-  
+     
         # Líneas para separar un poco la parte gráfica de la de entrada de datos        
         st.text('')
         st.text('')
