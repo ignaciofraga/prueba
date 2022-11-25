@@ -1522,7 +1522,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         val_intervalo  =  (vmax_rango - vmin_rango)/num_intervalos
         ax.set_xlim([vmin_rango, vmax_rango])
         ax.set_xticks(numpy.arange(vmin_rango,vmax_rango+val_intervalo,val_intervalo))
-        ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))       
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))   
+        ax.set_xticks(rotation = 45)
         
         # Añade la leyenda
         ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
