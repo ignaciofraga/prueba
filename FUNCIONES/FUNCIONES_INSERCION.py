@@ -1456,13 +1456,13 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         # Selecciona mostrar o no datos malos y dudosos
         col1, col2, col3, col4 = st.columns(4,gap="small")
         with col1:
-            io_malos    = st.checkbox('Mostrar valores malos', value=False) 
+            io_malos    = st.checkbox('Datos malos', value=False) 
         with col2:
-            color_malos = st.color_picker('Selecciona color para valores malos', '#00CCCC',label_visibility="visible")
+            color_malos = st.color_picker('Color', '#00CCCC')
         with col3:
-            io_dudosos    = st.checkbox('Mostrar valores dudosos', value=False)
+            io_dudosos    = st.checkbox('Datos dudosos', value=False)
         with col4:
-            color_dudosos = st.color_picker('Selecciona color para valores dudosos', '#00f900',label_visibility="visible")
+            color_dudosos = st.color_picker('Color', '#00f900')
         
         # Selecciona el rango del gráfico
         min_val = min(df_datos_buenos[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
