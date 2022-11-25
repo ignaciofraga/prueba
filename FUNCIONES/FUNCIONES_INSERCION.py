@@ -1539,7 +1539,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             st.text(math.ceil(rango_oxigenos[-1]))
             st.text(math.floor(rango_oxigenos[0]))
             az.set_xlim([math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])])
-            az.set_xticks(numpy.arange(math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1]),3))
+            az.set_xticks(numpy.append(numpy.arange(math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1]),3),math.ceil(rango_oxigenos[-1])))
             
             
 
