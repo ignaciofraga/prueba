@@ -16,7 +16,7 @@ from sqlalchemy import create_engine
 import json
 import re
 
-
+from matplotlib.ticker import FormatStrFormatter
 
 pandas.options.mode.chained_assignment = None
 
@@ -1522,13 +1522,10 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         io_plot = 0
         if not df_seleccion['oxigeno_ctd'].isnull().all(): 
             az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#006633',label='OXIMETRO')
-#            az.set_xticks(numpy.arange(df_seleccion['oxigeno_ctd'].min(), df_seleccion['oxigeno_ctd'].max(), 2))
-            #az.set_xticks([df_seleccion['oxigeno_ctd'].min(),df_seleccion['oxigeno_ctd'].max()])
             io_plot = 1
                 
         if not df_seleccion['oxigeno_wk'].isnull().all(): 
             az.plot(df_seleccion['oxigeno_wk'],df_seleccion['presion_ctd'],'.',color='#00CC66',label='WINKLER')
-            az.set_xticks(numpy.arange(df_seleccion['oxigeno_wk'].min(), df_seleccion['oxigeno_wk'].max(), 2))
             io_plot = 1
             
         if io_plot == 1:
@@ -1537,13 +1534,12 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             az.invert_yaxis()
             az.set_ylim(rango_profs)
             
-            rango_oxigenos = az.get_xlim()
-            az.set_xticks(rango_oxigenos)
+            az.set_xticks(az.get_xlim())
             
             
             az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
-    
-
+            #az.xaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.3f}"))
+            ax.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
         st.pyplot(fig)
  
     
