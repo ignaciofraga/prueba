@@ -1538,7 +1538,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             # az.set_xticks(numpy.arange(rango_oxigenos[0],rango_oxigenos[-1],3))
             # az.set_xlim([rango_oxigenos[0], rango_oxigenos[-1]])
             
-
+            rango_oxigenos = az.get_xlim()
+            st.text(rango_oxigenos)
             az.set_xticks(az.get_xlim())
 
             az.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
