@@ -1517,6 +1517,15 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
        
+        # Ajusta el rango de las x 
+        rango_valores = ax.get_xlim()
+        num_intervalos = 5
+        val_intervalo  =  (math.ceil(rango_valores[-1]) - math.floor(rango_valores[0]))/num_intervalos
+        ax.set_xlim([math.floor(rango_valores[0]),math.ceil(rango_valores[-1])])
+        ax.set_xticks(numpy.arange(math.floor(rango_valores[0]),math.ceil(rango_valores[-1])+val_intervalo,val_intervalo))
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))       
+        
+        # Añade la leyenda
         ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
         
         io_plot = 0
@@ -1534,18 +1543,15 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             az.invert_yaxis()
             az.set_ylim(rango_profs)
             
+            # Ajusta el rango de las x
             rango_oxigenos = az.get_xlim()
-            
             num_intervalos = 2
             val_intervalo  =  (math.ceil(rango_oxigenos[-1]) - math.floor(rango_oxigenos[0]))/num_intervalos
-  
             az.set_xlim([math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])])
             az.set_xticks(numpy.arange(math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])+val_intervalo,val_intervalo))
-            
-            
-            az.xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+            az.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
           
-            
+            # Añade la leyenda
             az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
 
             
