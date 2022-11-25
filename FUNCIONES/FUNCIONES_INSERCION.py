@@ -1448,7 +1448,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             st.text(' ')
         
         
-        with st.expander("Ajustar estilo del gráfico",expanded=False):
+        with st.expander("Ajustar estilo de gráficos",expanded=False):
         
             st.write("Selecciona los datos a mostrar según su bandera de calidad")    
         
@@ -1467,12 +1467,13 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 color_rango   = st.color_picker('Color', '#404040',label_visibility="collapsed")
                 color_dudosos = st.color_picker('Color', '#00f900',label_visibility="collapsed")
             
+        with st.expander("Ajustar rango del gráfico",expanded=False):            
             
             st.write("Selecciona el rango del gráfico")  
             
             # Selecciona el rango del gráfico
             min_val = min(df_datos_buenos[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
-            max_val = max(df_disponible_bd[variable_seleccionada].max(),df_seleccion[variable_seleccionada].max())
+            max_val = max(df_datos_buenos[variable_seleccionada].max(),df_seleccion[variable_seleccionada].max())
             if io_malos:
                 df_datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
                 min_val = min(min_val,df_datos_malos[variable_seleccionada].min())
@@ -1585,6 +1586,31 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         
 
         if variable_seleccionada == 'fosfato':
+            
+            with st.expander("Ajustar rango del gráfico",expanded=False):            
+                
+                st.write("Selecciona el rango del gráfico")  
+                
+                # Selecciona los rangos del gráfico
+                min_val_x = 0.95*min(df_disponible_bd['nitrato'].min(),df_seleccion['nitrato'].min())
+                max_val_x = 1.05*max(df_disponible_bd['nitrato'].max(),df_seleccion['nitrato'].max())
+                   
+                col1, col2, col3, col4 = st.columns(4,gap="small")
+                with col2:
+                    vmin_rango_x  = st.number_input('Valor mínimo eje x:',value=min_val_x)
+                with col3:
+                    vmax_rango_x  = st.number_input('Valor máximo eje x:',value=max_val_x)  
+ 
+                min_val_y = 0.95*min(df_disponible_bd['fosfato'].min(),df_seleccion['fosfato'].min())
+                max_val_y = 1.05*max(df_disponible_bd['fosfato'].max(),df_seleccion['fosfato'].max())
+                   
+                col1, col2, col3, col4 = st.columns(4,gap="small")
+                with col2:
+                    vmin_rango_y  = st.number_input('Valor mínimo eje y:',value=min_val_y)
+                with col3:
+                    vmax_rango_y  = st.number_input('Valor máximo eje y:',value=max_val_y) 
+            
+            
     
             ### GRAFICO FOSFATO vs NITRATO 
             fig, ax = plt.subplots()       
@@ -1610,10 +1636,13 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             ax.set(ylabel='Fosfato (\u03BCmol/kg)')
     
 
-            # Reduce el tamaño y ajusta el formato de los ejes
+            # Reduce el tamaño y ajusta el rango y formato de los ejes
             ax.tick_params(axis='both', which='major', labelsize=8)
+            ax.set_xlim([vmin_rango_x, vmax_rango_x])
+            ax.set_ylim([vmin_rango_y, vmax_rango_y])
             ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
             ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+    
     
     
             # Añade el nombre de cada punto
@@ -1636,10 +1665,58 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         
         elif variable_seleccionada == 'nitrato':
     
+            with st.expander("Ajustar rango del gráfico NITRATO vs FOSFATO",expanded=False):            
+                
+                st.write("Selecciona el rango del gráfico")  
+                
+                # Selecciona los rangos del gráfico
+                min_val_x = 0.95*min(df_disponible_bd['nitrato'].min(),df_seleccion['nitrato'].min())
+                max_val_x = 1.05*max(df_disponible_bd['nitrato'].max(),df_seleccion['nitrato'].max())
+                   
+                col1, col2, col3, col4 = st.columns(4,gap="small")
+                with col2:
+                    vmin_rango_x  = st.number_input('Valor mínimo nitrato:',value=min_val_x)
+                with col3:
+                    vmax_rango_x  = st.number_input('Valor máximo nitrato:',value=max_val_x)  
+ 
+                min_val_y = 0.95*min(df_disponible_bd['fosfato'].min(),df_seleccion['fosfato'].min())
+                max_val_y = 1.05*max(df_disponible_bd['fosfato'].max(),df_seleccion['fosfato'].max())
+                   
+                col1, col2, col3, col4 = st.columns(4,gap="small")
+                with col2:
+                    vmin_rango_y  = st.number_input('Valor mínimo fosfato:',value=min_val_y)
+                with col3:
+                    vmax_rango_y  = st.number_input('Valor máximo fosfato:',value=max_val_y)         
+
+   
                     
             if df_seleccion['ph'].isnull().all():         
                 fig, ax = plt.subplots()      
             else:
+                
+                with st.expander("Ajustar rango del gráfico NITRATO vs ph",expanded=False):            
+                    
+                    st.write("Selecciona el rango del gráfico")  
+                    
+                    # Selecciona los rangos del gráfico
+                    min_val_x_g2 = 0.95*min(df_disponible_bd['nitrato'].min(),df_seleccion['nitrato'].min())
+                    max_val_x_g2 = 1.05*max(df_disponible_bd['nitrato'].max(),df_seleccion['nitrato'].max())
+                       
+                    col1, col2, col3, col4 = st.columns(4,gap="small")
+                    with col2:
+                        vmin_rango_x_g2  = st.number_input('Valor mínimo nitrato:',value=min_val_x_g2)
+                    with col3:
+                        vmax_rango_x_g2  = st.number_input('Valor máximo nitrato:',value=max_val_x_g2)  
+     
+                    min_val_y_g2 = 0.95*min(df_disponible_bd['ph'].min(),df_seleccion['ph'].min())
+                    max_val_y_g2 = 1.05*max(df_disponible_bd['ph'].max(),df_seleccion['ph'].max())
+                       
+                    col1, col2, col3, col4 = st.columns(4,gap="small")
+                    with col2:
+                        vmin_rango_y_g2  = st.number_input('Valor mínimo pH:',value=min_val_y_g2)
+                    with col3:
+                        vmax_rango_y_g2  = st.number_input('Valor máximo pH:',value=max_val_y_g2) 
+
                 fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
     
             ### GRAFICO FOSFATO vs NITRATO
@@ -1666,7 +1743,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             # Reduce el tamaño y ajusta el formato de los ejes
             ax.tick_params(axis='both', which='major', labelsize=8)
             ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
-            ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+            ax.set_xlim([vmin_rango_x, vmax_rango_x])
+            ax.set_ylim([vmin_rango_y, vmax_rango_y])
     
             # Añade el nombre de cada punto
             nombre_muestreos = [None]*df_seleccion.shape[0]
@@ -1707,7 +1786,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 
                 az.tick_params(axis='both', which='major', labelsize=8)
                 az.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
-                az.yaxis.set_major_formatter(FormatStrFormatter('%.3f')) 
+                az.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+                az.set_xlim([vmin_rango_x_g2, vmax_rango_x_g2])
+                az.set_ylim([vmin_rango_y_g2, vmax_rango_y_g2])
             
             
                 # Añade el nombre de cada punto
@@ -1723,12 +1804,40 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             st.pyplot(fig)
       
         
+      
+        
+      
+        
+        
         # Gráficos particulares para cada variable
         elif variable_seleccionada == 'silicato':
     
             if df_seleccion['silicato'].isnull().all() is False:         
     
-                ### GRAFICO SILICATO vs ALCALINIDAD            
+                ### GRAFICO SILICATO vs ALCALINIDAD  
+                
+                with st.expander("Ajustar rango del gráfico SILICATO vs ALCALINIDAD",expanded=False):            
+                    
+                    st.write("Selecciona el rango del gráfico")  
+                    
+                    # Selecciona los rangos del gráfico
+                    min_val_x = 0.95*min(df_disponible_bd['silicato'].min(),df_seleccion['silicato'].min())
+                    max_val_x = 1.05*max(df_disponible_bd['silicato'].max(),df_seleccion['silicato'].max())
+                       
+                    col1, col2, col3, col4 = st.columns(4,gap="small")
+                    with col2:
+                        vmin_rango_x  = st.number_input('Valor mínimo silicato:',value=min_val_x)
+                    with col3:
+                        vmax_rango_x  = st.number_input('Valor máximo silicato:',value=max_val_x)  
+     
+                    min_val_y = 0.95*min(df_disponible_bd['alcalinidad'].min(),df_seleccion['alcalinidad'].min())
+                    max_val_y = 1.05*max(df_disponible_bd['alcalinidad'].max(),df_seleccion['alcalinidad'].max())
+                       
+                    col1, col2, col3, col4 = st.columns(4,gap="small")
+                    with col2:
+                        vmin_rango_y  = st.number_input('Valor mínimo alcalinidad:',value=min_val_y)
+                    with col3:
+                        vmax_rango_y  = st.number_input('Valor máximo alcalinidad:',value=max_val_y)   
     
                 fig, ax = plt.subplots()       
                 
@@ -1756,7 +1865,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 
                 ax.tick_params(axis='both', which='major', labelsize=8)
                 ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
-                ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f')) 
+                ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+                ax.set_xlim([vmin_rango_x, vmax_rango_x])
+                ax.set_ylim([vmin_rango_y, vmax_rango_y])
         
                 # Añade el nombre de cada punto
                 nombre_muestreos = [None]*df_seleccion.shape[0]
