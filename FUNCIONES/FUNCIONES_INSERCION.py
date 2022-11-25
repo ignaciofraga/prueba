@@ -1469,6 +1469,10 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             df_datos_dudosos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_dudoso]
             min_val = min(min_val,df_datos_dudosos[variable_seleccionada].min())            
         
+        rango   = (max_val-min_val)
+        min_val = min_val - 0.05*rango
+        max_val = max_val + 0.05*rango
+        
         col1, col2, col3, col4 = st.columns(4,gap="small")
         with col2:
             vmin_rango  = st.number_input('Valor mínimo gráfico:',value=min_val)
@@ -1522,9 +1526,6 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         val_intervalo  =  (vmax_rango - vmin_rango)/num_intervalos
         ax.set_xlim([vmin_rango, vmax_rango])
         ax.set_xticks(numpy.arange(vmin_rango,vmax_rango,val_intervalo))
-        st.text(vmax_rango)
-        test = numpy.arange(vmin_rango,vmax_rango+val_intervalo,val_intervalo)
-        st.text(test)
         ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))   
         ax.tick_params(axis='both', which='major', labelsize=8)
 
