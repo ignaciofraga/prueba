@@ -1536,7 +1536,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             
             rango_oxigenos = az.get_xlim()
             
-            num_intervalos = 3
+            num_intervalos = 2
             val_intervalo  =  (math.ceil(rango_oxigenos[-1]) - math.floor(rango_oxigenos[0]))/num_intervalos
   
             az.set_xlim([math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])])
