@@ -1447,19 +1447,37 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 
         df_rango_temporal = df_datos_buenos[df_datos_buenos['io_fecha']==1]
     
-        # Rangos
-        min_val = min(df_disponible_bd[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
-        max_val = max(df_disponible_bd[variable_seleccionada].max(),df_seleccion[variable_seleccionada].max())
   
+        # Líneas para separar un poco la parte gráfica de la de entrada de datos        
+        st.text('')
+        st.text('')
+        st.text('')
         
-        st.text('')
-        st.text('')
-        st.text('')
+        # Selecciona mostrar o no datos malos y dudosos
+        col1, col2, col3, col4 = st.columns(4,gap="small")
+        with col1:
+            io_malos    = st.checkbox('Mostrar valores malos', value=False) 
+            color_malos = st.color_picker('Selecciona color para valores malos', '#00CCCC')
+        with col3:
+            io_dudosos    = st.checkbox('Mostrar valores dudosos', value=False)
+            color_dudosos = st.color_picker('Selecciona color para valores dudosos', '#00f900')
+        
+        # Selecciona el rango del gráfico
+        min_val = min(df_datos_buenos[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
+        max_val = max(df_disponible_bd[variable_seleccionada].max(),df_seleccion[variable_seleccionada].max())
+        if io_malos:
+            df_datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
+            min_val = min(min_val,df_datos_malos[variable_seleccionada].min())
+        if io_dudosos:
+            df_datos_dudosos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_dudoso]
+            min_val = min(min_val,df_datos_dudosos[variable_seleccionada].min())            
+        
         col1, col2, col3, col4 = st.columns(4,gap="small")
         with col2:
             vmin_rango  = st.number_input('Valor mínimo gráfico:',value=min_val)
         with col3:
             vmax_rango  = st.number_input('Valor máximo gráfico:',value=max_val)        
+            
 
     
         ################# GRAFICOS ################
@@ -1470,12 +1488,18 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
  
         ### DATOS DISPONIBLES PREVIAMENTE ###
         # Representa los datos disponibles de un color
-        ax.plot(df_datos_buenos[variable_seleccionada],df_datos_buenos['presion_ctd'],'.',color='#C0C0C0',label='DATO PREVIO(OK)')
+        ax.plot(df_datos_buenos[variable_seleccionada],df_datos_buenos['presion_ctd'],'.',color='#C0C0C0',label='BUENO')
         # Representa los datos dentro del intervalo de meses en otro color
-        ax.plot(df_rango_temporal[variable_seleccionada],df_rango_temporal['presion_ctd'],'.',color='#404040',label='DATO PREVIO(INTERVALO)')
-        # Representa los datos con QF malos en un tercer color   
-        datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
-        ax.plot(datos_malos[variable_seleccionada],datos_malos['presion_ctd'],'.',color='#00CCCC',label='DATO PREVIO(MALO)')    
+        ax.plot(df_rango_temporal[variable_seleccionada],df_rango_temporal['presion_ctd'],'.',color='#404040',label='BUENO (INTERVALO)')
+        
+        # Representa los datos con QF malos si se seleccionó esta opción   
+        if io_malos:
+            ax.plot(df_datos_malos[variable_seleccionada],df_datos_malos['presion_ctd'],'.',color=color_malos,label='MALO')    
+
+        # Representa los datos con QF dudoso si se seleccionó esta opción   
+        if io_dudosos:
+            ax.plot(df_datos_dudosos[variable_seleccionada],df_datos_dudosos['presion_ctd'],'.',color=color_dudosos,label='DUDOSO')    
+
 
         ### DATOS PROCESADOS ###        
         ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r',label='PROCESADO' )
