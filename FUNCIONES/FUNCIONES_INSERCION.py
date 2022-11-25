@@ -1481,7 +1481,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     
         ### GRAFICO CON LA VARIABLE ANALIZADA EN FUNCION DE LA PROFUNDIDAD Y OXIGENO   
         # Representa un gráfico con la variable seleccionada junto a los oxígenos   
-        fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.15, 'hspace':0}, width_ratios=[3, 1])
+        fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.2, 'hspace':0}, width_ratios=[3, 1])
  
         ### DATOS DISPONIBLES PREVIAMENTE ###
         # Representa los datos disponibles de un color
