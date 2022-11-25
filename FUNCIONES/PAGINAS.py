@@ -2861,6 +2861,8 @@ def procesado_nutrientes():
             datos_corregidos['fosfato'][datos_corregidos['fosfato']<0] = 0
             
 
+            st.text(datos_corregidos['nitrogeno_total'])
+
             if datos_corregidos['muestreo'].isnull().all():
                 texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
                 st.warning(texto_error, icon="⚠️") 
