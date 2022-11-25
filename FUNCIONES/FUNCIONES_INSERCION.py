@@ -1408,6 +1408,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     df_disponible_fis_bd        = df_disponible_fis_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
     df_disponible_bd            = pandas.merge(df_disponible_bd, df_disponible_fis_bd, on="id_muestreo")
 
+    # Borra los dataframes que ya no hagan falta para ahorrar memoria
+    del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos,df_disponible_bgq_bd,df_disponible_fis_bd)
 
 
     # comprueba si hay datos de la variable a analizar en la salida seleccionada
@@ -1433,11 +1435,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
      
         listado_meses = listado_meses.tolist()
        
-        st.text(df_disponible_bd.shape[0])
-        
+        # Genera un dataframe sólo con los datos "buenos"        
         df_datos_buenos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_bueno]
-
-        st.text(df_datos_buenos.shape[0])
         
         # Busca los datos de la base de datos dentro del rango de meses seleccionados
         df_datos_buenos['io_fecha'] = numpy.zeros(df_datos_buenos.shape[0],dtype=int)
