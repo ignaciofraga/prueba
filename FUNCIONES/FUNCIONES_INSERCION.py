@@ -1528,9 +1528,15 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         # tix_x          = numpy.around(numpy.arange(vmin_rango,vmax_rango+val_intervalo,val_intervalo),2)
         # ax.set_xticks(tix_x)
         # st.text(tix_x)
+
+        custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
+        ax.set_yticks(custom_ticks)
+        ax.set_yticklabels(custom_ticks)
+
+
         ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))   
         ax.tick_params(axis='both', which='major', labelsize=8)
-        ax.xaxis.set_major_locator(plt.MaxNLocator(3))
+
 
         
         # Añade la leyenda
