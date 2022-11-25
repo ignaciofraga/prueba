@@ -1458,7 +1458,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         with col1:
             io_malos    = st.checkbox('Datos malos', value=False) 
         with col2:
-            color_malos = st.color_picker('Color', '#00CCCC')
+            color_malos = st.color_picker('Color', '#00CCCC',label_visibility="hidden")
         with col3:
             io_dudosos    = st.checkbox('Datos dudosos', value=False)
         with col4:
