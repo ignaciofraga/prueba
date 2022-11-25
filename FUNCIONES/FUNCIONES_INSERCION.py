@@ -1587,24 +1587,24 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         if variable_seleccionada == 'fosfato':
     
             ### GRAFICO FOSFATO vs NITRATO 
-            fig2, ax = plt.subplots()       
+            fig, ax = plt.subplots()       
             
-            # if io_buenos:
-            #     ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
+            if io_buenos:
+                ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
             
-            # # Representa los datos dentro del intervalo de meses en otro color
-            # if io_rango:
-            #     ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
+            # Representa los datos dentro del intervalo de meses en otro color
+            if io_rango:
+                ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
             
-            # # Representa los datos con QF malos si se seleccionó esta opción   
-            # if io_malos:
-            #     ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
+            # Representa los datos con QF malos si se seleccionó esta opción   
+            if io_malos:
+                ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
 
-            # # Representa los datos con QF dudoso si se seleccionó esta opción   
-            # if io_dudosos:
-            #     ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
+            # Representa los datos con QF dudoso si se seleccionó esta opción   
+            if io_dudosos:
+                ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
                                   
-            ax.plot(df_disponible_bd['nitrato'],df_disponible_bd['fosfato'],'.',color='#C0C0C0')
+            ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
 
             ax.set(xlabel='Nitrato (\u03BCmol/kg)')
             ax.set(ylabel='Fosfato (\u03BCmol/kg)')
@@ -1616,16 +1616,16 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
     
     
-            # # Añade el nombre de cada punto
-            # nombre_muestreos = [None]*df_seleccion.shape[0]
-            # for ipunto in range(df_seleccion.shape[0]):
-            #     if df_seleccion['botella'].iloc[ipunto] is None:
-            #         nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-            #     else:
-            #         nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
-            #     ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
+            # Añade el nombre de cada punto
+            nombre_muestreos = [None]*df_seleccion.shape[0]
+            for ipunto in range(df_seleccion.shape[0]):
+                if df_seleccion['botella'].iloc[ipunto] is None:
+                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+                else:
+                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
            
-            st.pyplot(fig2)
+            st.pyplot(fig)
         
         
 
