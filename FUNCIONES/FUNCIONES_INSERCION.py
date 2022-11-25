@@ -139,6 +139,8 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
                                                     "R_CLOR":"r_clor","R_CLOR_FLAG_W":"r_clor_qf","R_PER":"r_per","R_PER_FLAG_W":"r_per_qf","CO3_TMP":"co3_temp"
                                                     })    
     
+    datos_radiales['nitrogeno_total']    = datos_radiales['nitrato'] + datos_radiales['nitrito']
+    datos_radiales['nitrogeno_total_qf'] = 1
     
     # Añade una columan con el QF de la temperatura, igual al de la salinidad
     datos_radiales['temperatura_ctd_qf'] = datos_radiales['salinidad_ctd_qf'] 
@@ -1411,6 +1413,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     # Borra los dataframes que ya no hagan falta para ahorrar memoria
     del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos,df_disponible_bgq_bd,df_disponible_fis_bd)
 
+
+    st.text(datos_procesados['nitrogeno_total'])
 
     # comprueba si hay datos de la variable a analizar en la salida seleccionada
     if df_seleccion[variable_seleccionada].isnull().all():
