@@ -1524,7 +1524,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         ax.set_xticks(numpy.arange(vmin_rango,vmax_rango+val_intervalo,val_intervalo))
         ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))   
         ax.tick_params(axis='both', which='major', labelsize=8)
-        #ax.tick_params(axis='both', which='minor', labelsize=8)
+
         
         # Añade la leyenda
         ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
@@ -1551,6 +1551,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             az.set_xlim([math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])])
             az.set_xticks(numpy.arange(math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])+val_intervalo,val_intervalo))
             az.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+            az.tick_params(axis='both', which='major', labelsize=8)
           
             # Añade la leyenda
             az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
