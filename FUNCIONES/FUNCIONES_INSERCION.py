@@ -1540,7 +1540,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             val_intervalo  =  (math.ceil(rango_oxigenos[-1]) - math.floor(rango_oxigenos[0]))/num_intervalos
   
             az.set_xlim([math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])])
-            az.set_xticks(numpy.arange(math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])+val_intervalo,num_intervalos))
+            az.set_xticks(numpy.arange(math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])+val_intervalo,val_intervalo))
             
             
             az.xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
