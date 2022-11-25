@@ -1525,7 +1525,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         num_intervalos = 5
         val_intervalo  =  (vmax_rango - vmin_rango)/num_intervalos
         ax.set_xlim([vmin_rango, vmax_rango])
-        tix_x          = round(numpy.arange(vmin_rango,vmax_rango+val_intervalo,val_intervalo),2)
+        tix_x          = numpy.around(numpy.arange(vmin_rango,vmax_rango+val_intervalo,val_intervalo),2)
         ax.set_xticks(tix_x)
         st.text(tix_x)
         ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))   
