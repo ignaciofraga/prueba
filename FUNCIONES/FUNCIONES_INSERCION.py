@@ -1533,7 +1533,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             az.yaxis.set_visible(False)
             az.invert_yaxis()
             az.set_ylim(rango_profs)
-            az.set_yticks(numpy.arange(df_seleccion['oxigeno_wk'].min(), df_seleccion['oxigeno_wk'].max(), 2))
+            az.set_xticks(numpy.arange(df_seleccion['oxigeno_wk'].min(), df_seleccion['oxigeno_wk'].max(), 2))
             az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
     
 
