@@ -1467,7 +1467,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 color_rango   = st.color_picker('Color', '#404040',label_visibility="collapsed")
                 color_dudosos = st.color_picker('Color', '#00f900',label_visibility="collapsed")
             
-        with st.expander("Ajustar rango del gráfico",expanded=False):            
+        texto_rango = 'Ajustar rango del gráfico ' + variable_seleccionada.upper() + ' vs PROFUNDIDAD'
+        with st.expander(texto_rango,expanded=False):            
             
             st.write("Selecciona el rango del gráfico")  
             
@@ -1587,7 +1588,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
 
         if variable_seleccionada == 'fosfato':
             
-            with st.expander("Ajustar rango del gráfico",expanded=False):            
+            with st.expander("Ajustar rango del gráfico FOSFATO vs NITRATO",expanded=False):            
                 
                 st.write("Selecciona el rango del gráfico")  
                 
