@@ -1522,7 +1522,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         io_plot = 0
         if not df_seleccion['oxigeno_ctd'].isnull().all(): 
             az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#006633',label='OXIMETRO')
-            az.set_xticks(numpy.arange(df_seleccion['oxigeno_ctd'].min(), df_seleccion['oxigeno_ctd'].max(), 2))
+#            az.set_xticks(numpy.arange(df_seleccion['oxigeno_ctd'].min(), df_seleccion['oxigeno_ctd'].max(), 2))
+            az.set_xticks([df_seleccion['oxigeno_ctd'].min(),df_seleccion['oxigeno_ctd'].max()])
             io_plot = 1
                 
         if not df_seleccion['oxigeno_wk'].isnull().all(): 
