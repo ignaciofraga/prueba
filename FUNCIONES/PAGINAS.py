@@ -2517,9 +2517,10 @@ def entrada_botellas():
         df_datos_disponibles  = pandas.merge(df_datos_disponibles, df_datos_fisicos, on="muestreo")
          
         # Añade columna con información del año
-        df_datos_disponibles['año']                = numpy.zeros(df_datos_disponibles.shape[0],dtype=int)
-        for idato in range(df_datos_disponibles.shape[0]):
-            df_datos_disponibles['año'].iloc[idato] = (df_datos_disponibles['fecha_muestreo'].iloc[idato]).year
+        # df_datos_disponibles['año']                = numpy.zeros(df_datos_disponibles.shape[0],dtype=int)
+        # for idato in range(df_datos_disponibles.shape[0]):
+        #     df_datos_disponibles['año'].iloc[idato] = (df_datos_disponibles['fecha_muestreo'].iloc[idato]).year
+        df_datos_disponibles['año'] = df_datos_disponibles['fecha_muestreo'].dt.year
         
         # procesa ese dataframe
         FUNCIONES_INSERCION.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades,direccion_host,base_datos,usuario,contrasena,puerto)
