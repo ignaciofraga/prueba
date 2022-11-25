@@ -1468,7 +1468,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 color_dudosos = st.color_picker('Color', '#00f900',label_visibility="collapsed")
             
             
-            st.write("Selecciona el rango del gráfio")  
+            st.write("Selecciona el rango del gráfico")  
             
             # Selecciona el rango del gráfico
             min_val = min(df_datos_buenos[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
@@ -1589,17 +1589,32 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             ### GRAFICO FOSFATO vs NITRATO 
             fig, ax = plt.subplots()       
             
+            if io_buenos:
+                ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
+            
+            # Representa los datos dentro del intervalo de meses en otro color
+            if io_rango:
+                ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
+            
+            # Representa los datos con QF malos si se seleccionó esta opción   
+            if io_malos:
+                ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
+
+            # Representa los datos con QF dudoso si se seleccionó esta opción   
+            if io_dudosos:
+                ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
+                                  
             ax.plot(df_disponible_bd['nitrato'],df_disponible_bd['fosfato'],'.',color='#C0C0C0')
-            ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color='#404040')
-            ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
-            
-            datos_malos = df_disponible_bd[df_disponible_bd['fosfato_qf']==id_dato_malo]
-            ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
-            datos_malos = df_disponible_bd[df_disponible_bd['nitrato_qf']==id_dato_malo]
-            ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
-            
+
             ax.set(xlabel='Nitrato (\u03BCmol/kg)')
             ax.set(ylabel='Fosfato (\u03BCmol/kg)')
+    
+
+            # Reduce el tamaño y ajusta el formato de los ejes
+            ax.tick_params(axis='both', which='major', labelsize=8)
+            ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+    
     
             # Añade el nombre de cada punto
             nombre_muestreos = [None]*df_seleccion.shape[0]
@@ -1613,30 +1628,45 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             st.pyplot(fig)
         
         
+
+
+
+
+
         
         elif variable_seleccionada == 'nitrato':
     
                     
-    
             if df_seleccion['ph'].isnull().all():         
                 fig, ax = plt.subplots()      
             else:
                 fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
     
-    
             ### GRAFICO FOSFATO vs NITRATO
-    
-            ax.plot(df_disponible_bd['nitrato'],df_disponible_bd['fosfato'],'.',color='#C0C0C0')
-            ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color='#404040')
-            ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
+            if io_buenos:
+                ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
             
-            datos_malos = df_disponible_bd[df_disponible_bd['fosfato_qf']==id_dato_malo]
-            ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
-            datos_malos = df_disponible_bd[df_disponible_bd['nitrato_qf']==id_dato_malo]
-            ax.plot(datos_malos['nitrato'],datos_malos['fosfato'],'.',color='#00CCCC')
+            # Representa los datos dentro del intervalo de meses en otro color
+            if io_rango:
+                ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
+            
+            # Representa los datos con QF malos si se seleccionó esta opción   
+            if io_malos:
+                ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
+
+            # Representa los datos con QF dudoso si se seleccionó esta opción   
+            if io_dudosos:
+                ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
+  
+            ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
             
             ax.set(xlabel='Nitrato (\u03BCmol/kg)')
             ax.set(ylabel='Fosfato (\u03BCmol/kg)')
+            
+            # Reduce el tamaño y ajusta el formato de los ejes
+            ax.tick_params(axis='both', which='major', labelsize=8)
+            ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
     
             # Añade el nombre de cada punto
             nombre_muestreos = [None]*df_seleccion.shape[0]
@@ -1647,20 +1677,38 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                     nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
                 ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
     
-    
-            az.plot(df_disponible_bd['nitrato'],df_disponible_bd['ph'],'.',color='#C0C0C0')
-            az.plot(df_rango_temporal['nitrato'],df_rango_temporal['ph'],'.',color='#404040')
-            az.set(xlabel='Nitrato (\u03BCmol/kg)')
-            az.set(ylabel='pH')
-            az.yaxis.tick_right()
-            az.yaxis.set_label_position("right")            
             
-            if df_seleccion['ph'].isnull().all():    
-                
+            if df_seleccion['ph'].isnull().all() is False: 
                 ### GRAFICO NITRATO vs pH
+            
+                if io_buenos:
+                    az.plot(df_datos_buenos['nitrato'],df_datos_buenos['pH'],'.',color=color_buenos,label='BUENO')
                 
-                az.plot(df_seleccion['nitrato'],df_seleccion['ph'],'.r' )
-
+                # Representa los datos dentro del intervalo de meses en otro color
+                if io_rango:
+                    az.plot(df_rango_temporal['nitrato'],df_rango_temporal['pH'],'.',color=color_rango,label='BUENO (INTERVALO)')
+                
+                # Representa los datos con QF malos si se seleccionó esta opción   
+                if io_malos:
+                    az.plot(df_datos_malos['nitrato'],df_datos_malos['pH'],'.',color=color_malos,label='MALO')    
+    
+                # Representa los datos con QF dudoso si se seleccionó esta opción   
+                if io_dudosos:
+                    az.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['pH'],'.',color=color_dudosos,label='DUDOSO')    
+                                      
+        
+                az.plot(df_disponible_bd['nitrato'],df_disponible_bd['ph'],'.',color='#C0C0C0')
+     
+        
+                az.set(xlabel='Nitrato (\u03BCmol/kg)')
+                az.set(ylabel='pH')
+                az.yaxis.tick_right()
+                az.yaxis.set_label_position("right") 
+                
+                az.tick_params(axis='both', which='major', labelsize=8)
+                az.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+                az.yaxis.set_major_formatter(FormatStrFormatter('%.3f')) 
+            
             
                 # Añade el nombre de cada punto
                 nombre_muestreos = [None]*df_seleccion.shape[0]
@@ -1683,17 +1731,32 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 ### GRAFICO SILICATO vs ALCALINIDAD            
     
                 fig, ax = plt.subplots()       
-                ax.plot(df_disponible_bd['silicato'],df_disponible_bd['alcalinidad'],'.',color='#C0C0C0')
-                ax.plot(df_rango_temporal['silicato'],df_rango_temporal['alcalinidad'],'.',color='#404040')
+                
+                if io_buenos:
+                    ax.plot(df_datos_buenos['silicato'],df_datos_buenos['alcalinidad'],'.',color=color_buenos,label='BUENO')
+                
+                # Representa los datos dentro del intervalo de meses en otro color
+                if io_rango:
+                    ax.plot(df_rango_temporal['silicato'],df_rango_temporal['alcalinidad'],'.',color=color_rango,label='BUENO (INTERVALO)')
+                
+                # Representa los datos con QF malos si se seleccionó esta opción   
+                if io_malos:
+                    ax.plot(df_datos_malos['silicato'],df_datos_malos['alcalinidad'],'.',color=color_malos,label='MALO')    
+    
+                # Representa los datos con QF dudoso si se seleccionó esta opción   
+                if io_dudosos:
+                    ax.plot(df_datos_dudosos['silicato'],df_datos_dudosos['alcalinidad'],'.',color=color_dudosos,label='DUDOSO')    
+                                
+                
                 ax.plot(df_seleccion['silicato'],df_seleccion['alcalinidad'],'.r' )
                 
-                datos_malos = df_disponible_bd[df_disponible_bd['silicato_qf']==id_dato_malo]
-                ax.plot(datos_malos['silicato'],datos_malos['alcalinidad'],'.',color='#00CCCC')
-                datos_malos = df_disponible_bd[df_disponible_bd['alcalinidad_qf']==id_dato_malo]
-                ax.plot(datos_malos['silicato'],datos_malos['alcalinidad_qf'],'.',color='#00CCCC')
                 
                 ax.set(xlabel='Silicato (\u03BCmol/kg)')
                 ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')
+                
+                ax.tick_params(axis='both', which='major', labelsize=8)
+                ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+                ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f')) 
         
                 # Añade el nombre de cada punto
                 nombre_muestreos = [None]*df_seleccion.shape[0]
