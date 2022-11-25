@@ -1616,14 +1616,14 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
     
     
-            # Añade el nombre de cada punto
-            nombre_muestreos = [None]*df_seleccion.shape[0]
-            for ipunto in range(df_seleccion.shape[0]):
-                if df_seleccion['botella'].iloc[ipunto] is None:
-                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-                else:
-                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
-                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
+            # # Añade el nombre de cada punto
+            # nombre_muestreos = [None]*df_seleccion.shape[0]
+            # for ipunto in range(df_seleccion.shape[0]):
+            #     if df_seleccion['botella'].iloc[ipunto] is None:
+            #         nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+            #     else:
+            #         nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+            #     ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
            
             st.pyplot(fig2)
         
