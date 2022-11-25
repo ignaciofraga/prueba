@@ -1444,20 +1444,25 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         
      
         # Líneas para separar un poco la parte gráfica de la de entrada de datos        
-        st.text('')
-        st.text('')
-        st.text('')
+        for isepara in range(4):
+            st.text(' ')
         
         # Selecciona mostrar o no datos malos y dudosos
         col1, col2, col3, col4 = st.columns(4,gap="small")
         with col1:
+            io_buenos   = st.checkbox('Datos buenos', value=True)
             io_malos    = st.checkbox('Datos malos', value=False) 
         with col2:
-            color_malos = st.color_picker('Color', '#00CCCC',label_visibility="collapsed")
+            color_buenos = st.color_picker('Color', '#C0C0C0',label_visibility="collapsed")
+            color_malos  = st.color_picker('Color', '#00CCCC',label_visibility="collapsed")
         with col3:
+            io_rango      = st.checkbox('Datos rango temporal', value=True)
             io_dudosos    = st.checkbox('Datos dudosos', value=False)
         with col4:
+            color_rango   = st.color_picker('Color', '#404040',label_visibility="collapsed")
             color_dudosos = st.color_picker('Color', '#00f900',label_visibility="collapsed")
+        
+        
         
         # Selecciona el rango del gráfico
         min_val = min(df_datos_buenos[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
@@ -1489,9 +1494,12 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
  
         ### DATOS DISPONIBLES PREVIAMENTE ###
         # Representa los datos disponibles de un color
-        ax.plot(df_datos_buenos[variable_seleccionada],df_datos_buenos['presion_ctd'],'.',color='#C0C0C0',label='BUENO')
+        if io_buenos:
+            ax.plot(df_datos_buenos[variable_seleccionada],df_datos_buenos['presion_ctd'],'.',color=color_buenos,label='BUENO')
+        
         # Representa los datos dentro del intervalo de meses en otro color
-        ax.plot(df_rango_temporal[variable_seleccionada],df_rango_temporal['presion_ctd'],'.',color='#404040',label='BUENO (INTERVALO)')
+        if io_rango:
+            ax.plot(df_rango_temporal[variable_seleccionada],df_rango_temporal['presion_ctd'],'.',color=color_rango,label='BUENO (INTERVALO)')
         
         # Representa los datos con QF malos si se seleccionó esta opción   
         if io_malos:
@@ -1522,24 +1530,15 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
        
         # Ajusta el rango de las x 
-        # num_intervalos = 5
-        # val_intervalo  =  round((vmax_rango - vmin_rango)/num_intervalos,2)
-        # ax.set_xlim([vmin_rango, vmax_rango])
-        # tix_x          = numpy.around(numpy.arange(vmin_rango,vmax_rango+val_intervalo,val_intervalo),2)
-        # ax.set_xticks(tix_x)
-        # st.text(tix_x)
-
         custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
         ax.set_xticks(custom_ticks)
         ax.set_xticklabels(custom_ticks)
         ax.set_xlim([vmin_rango, vmax_rango])
-
-
         ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))   
+
+        # Reduce el tamaño de los ejes
         ax.tick_params(axis='both', which='major', labelsize=8)
 
-
-        
         # Añade la leyenda
         ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
         
