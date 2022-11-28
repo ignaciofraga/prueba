@@ -2860,8 +2860,8 @@ def procesado_nutrientes():
             datos_corregidos['silicato'][datos_corregidos['silicato']<0] = 0
             datos_corregidos['fosfato'][datos_corregidos['fosfato']<0] = 0
             
-
-            st.text(datos_corregidos['nitrogeno_total'])
+            for idato in range(datos_corregidos.shape[0]):
+                st.text(datos_corregidos['nitrogeno_total'].iloc[idato])
 
             if datos_corregidos['muestreo'].isnull().all():
                 texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
