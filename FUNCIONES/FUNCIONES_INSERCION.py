@@ -1415,12 +1415,12 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     df_disponible_fis_bd        = df_disponible_fis_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
     df_disponible_bd            = pandas.merge(df_disponible_bd, df_disponible_fis_bd, on="id_muestreo")
 
-    for idato in range(df_disponible_bd.shape[0]):
-        st.text(df_disponible_bd['nitrogeno_total'].iloc[idato])
-        st.text(df_disponible_bd['nitrogeno_total_qf'].iloc[idato])     
+    # for idato in range(df_disponible_bd.shape[0]):
+    #     st.text(df_disponible_bd['nitrogeno_total'].iloc[idato])
+    #     st.text(df_disponible_bd['nitrogeno_total_qf'].iloc[idato])     
 
-    # Borra los dataframes que ya no hagan falta para ahorrar memoria
-    del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos,df_disponible_bgq_bd,df_disponible_fis_bd)
+    # # Borra los dataframes que ya no hagan falta para ahorrar memoria
+    # del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos,df_disponible_bgq_bd,df_disponible_fis_bd)
 
     # comprueba si hay datos de la variable a analizar en la salida seleccionada
     if df_seleccion[variable_seleccionada].isnull().all():
