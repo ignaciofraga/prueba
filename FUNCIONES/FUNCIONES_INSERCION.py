@@ -1450,6 +1450,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         df_datos_buenos['mes']  = pandas.DatetimeIndex(df_datos_buenos['fecha_muestreo']).month
         df_rango_temporal       = df_datos_buenos[df_datos_buenos['mes'].isin(listado_meses)]
         
+        df_datos_buenos            = df_datos_buenos.replace(numpy.nan, None)
      
         # Líneas para separar un poco la parte gráfica de la de entrada de datos        
         for isepara in range(4):
