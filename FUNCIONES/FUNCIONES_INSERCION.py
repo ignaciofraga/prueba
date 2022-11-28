@@ -1389,6 +1389,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     # Reemplaza los nan por None
     df_datos_biogeoquimicos   = df_datos_biogeoquimicos.replace(numpy.nan, None)
     df_datos_fisicos          = df_datos_fisicos.replace(numpy.nan, None)
+    
 
     id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'].iloc[0]
     id_dato_bueno             = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Bueno'].iloc[0]
