@@ -1450,9 +1450,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         df_datos_buenos['mes']  = pandas.DatetimeIndex(df_datos_buenos['fecha_muestreo']).month
         df_rango_temporal       = df_datos_buenos[df_datos_buenos['mes'].isin(listado_meses)]
         
-        
-        df_datos_buenos            = df_datos_buenos.replace(numpy.nan, None)
-     
+             
         # Líneas para separar un poco la parte gráfica de la de entrada de datos        
         for isepara in range(4):
             st.text(' ')
@@ -1481,6 +1479,10 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         with st.expander(texto_rango,expanded=False):            
             
             st.write("Selecciona el rango del gráfico")  
+            
+            for idato in range(df_datos_buenos.shape[0]):
+                st.text(df_datos_buenos['nitrogeno_total'].iloc[idato])
+                st.text(df_datos_buenos['nitrogeno_total_qf'].iloc[idato])           
             
             # Selecciona el rango del gráfico
             st.text('datos')
