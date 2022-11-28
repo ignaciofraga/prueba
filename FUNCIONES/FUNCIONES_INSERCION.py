@@ -1413,9 +1413,6 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     # Borra los dataframes que ya no hagan falta para ahorrar memoria
     del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos,df_disponible_bgq_bd,df_disponible_fis_bd)
 
-
-    st.text(datos_procesados['nitrogeno_total'])
-
     # comprueba si hay datos de la variable a analizar en la salida seleccionada
     if df_seleccion[variable_seleccionada].isnull().all():
         texto_error = "La base de datos no contiene información para la variable, salida y estación seleccionadas"
@@ -1485,7 +1482,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             if io_dudosos:
                 df_datos_dudosos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_dudoso]
                 min_val = min(min_val,df_datos_dudosos[variable_seleccionada].min())            
-            
+            st.text('datos')
+            st.text(max_val)
             rango   = (max_val-min_val)
             min_val = max(0,round(min_val - 0.025*rango,2))
             max_val = round(max_val + 0.025*rango,2)
