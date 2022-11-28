@@ -1415,6 +1415,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     df_disponible_fis_bd        = df_disponible_fis_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
     df_disponible_bd            = pandas.merge(df_disponible_bd, df_disponible_fis_bd, on="id_muestreo")
 
+    df_disponible_bd            = df_disponible_bd.replace(numpy.nan, None)
+
     # Borra los dataframes que ya no hagan falta para ahorrar memoria
     del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos,df_disponible_bgq_bd,df_disponible_fis_bd)
 
