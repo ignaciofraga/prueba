@@ -1479,9 +1479,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             st.write("Selecciona el rango del gráfico")  
             
             # Selecciona el rango del gráfico
-            # st.text('datos')
-            # st.text(df_datos_buenos[variable_seleccionada].dropna().max())
-            # st.text(numpy.nanmax(df_seleccion[variable_seleccionada].values))
+            st.text('datos')
+            st.text(df_datos_buenos[variable_seleccionada].dropna().max())
+            st.text(df_seleccion[variable_seleccionada].dropna().max())
             # min_val = min(df_datos_buenos[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
             # max_val = max(df_datos_buenos[variable_seleccionada].max(),df_seleccion[variable_seleccionada].max())
             min_val = min(df_datos_buenos[variable_seleccionada].dropna().min(),df_seleccion[variable_seleccionada].dropna().min())
