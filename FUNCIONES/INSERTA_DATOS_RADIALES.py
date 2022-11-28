@@ -45,7 +45,7 @@ from os.path import isfile, join
 listado_archivos = [f for f in listdir(directorio_datos) if isfile(join(directorio_datos, f))]
 
 for iarchivo in range(len(listado_archivos)):
-#for iarchivo in range(1):
+#for iarchivo in range(3,5):
 
     nombre_archivo = directorio_datos + '/' + listado_archivos[iarchivo]
     
@@ -81,12 +81,12 @@ for iarchivo in range(len(listado_archivos)):
     FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_radiales_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
 
 
-    # # Actualiza estado
-    # print('Actualizando el estado de los procesos')
-    # FUNCIONES_INSERCION.actualiza_estado(datos_radiales_corregido,fecha_actualizacion,id_programa,programa_muestreo,itipo_informacion,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
+#     # # Actualiza estado
+#     # print('Actualizando el estado de los procesos')
+#     # FUNCIONES_INSERCION.actualiza_estado(datos_radiales_corregido,fecha_actualizacion,id_programa,programa_muestreo,itipo_informacion,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
 
-    # print('Procesado del año ', nombre_archivo[-9:-5], ' terminado')
+#     # print('Procesado del año ', nombre_archivo[-9:-5], ' terminado')
     
-print('Fin del procesado de todos los datos disponibles')
+# print('Fin del procesado de todos los datos disponibles')
   
     
