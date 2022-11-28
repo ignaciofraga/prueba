@@ -1455,7 +1455,11 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         for isepara in range(4):
             st.text(' ')
         
-        
+ 
+        for idato in range(df_datos_buenos.shape[0]):
+            st.text(df_datos_buenos['nitrogeno_total'].iloc[idato])
+            st.text(df_datos_buenos['nitrogeno_total_qf'].iloc[idato])          
+ 
         with st.expander("Ajustar estilo de gráficos",expanded=False):
         
             st.write("Selecciona los datos a mostrar según su bandera de calidad")    
@@ -1479,11 +1483,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         with st.expander(texto_rango,expanded=False):            
             
             st.write("Selecciona el rango del gráfico")  
-            
-            for idato in range(df_datos_buenos.shape[0]):
-                st.text(df_datos_buenos['nitrogeno_total'].iloc[idato])
-                st.text(df_datos_buenos['nitrogeno_total_qf'].iloc[idato])           
-            
+                   
             # Selecciona el rango del gráfico
             st.text('datos')
             st.text(df_datos_buenos[variable_seleccionada].dropna().max())
