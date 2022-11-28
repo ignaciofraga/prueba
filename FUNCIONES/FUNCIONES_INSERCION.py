@@ -1460,219 +1460,219 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             st.text(df_datos_buenos['nitrogeno_total'].iloc[idato])
             st.text(df_datos_buenos['nitrogeno_total_qf'].iloc[idato])          
  
-        with st.expander("Ajustar estilo de gráficos",expanded=False):
+        # with st.expander("Ajustar estilo de gráficos",expanded=False):
         
-            st.write("Selecciona los datos a mostrar según su bandera de calidad")    
+        #     st.write("Selecciona los datos a mostrar según su bandera de calidad")    
         
-            # Selecciona mostrar o no datos malos y dudosos
-            col1, col2, col3, col4 = st.columns(4,gap="small")
-            with col1:
-                io_buenos   = st.checkbox('Buenos', value=True)
-                io_malos    = st.checkbox('Malos', value=False) 
-            with col2:
-                color_buenos = st.color_picker('Color', '#C0C0C0',label_visibility="collapsed")
-                color_malos  = st.color_picker('Color', '#00CCCC',label_visibility="collapsed")
-            with col3:
-                io_rango      = st.checkbox('Buenos(intervalo)', value=True)
-                io_dudosos    = st.checkbox('Dudosos', value=False)
-            with col4:
-                color_rango   = st.color_picker('Color', '#404040',label_visibility="collapsed")
-                color_dudosos = st.color_picker('Color', '#00f900',label_visibility="collapsed")
+        #     # Selecciona mostrar o no datos malos y dudosos
+        #     col1, col2, col3, col4 = st.columns(4,gap="small")
+        #     with col1:
+        #         io_buenos   = st.checkbox('Buenos', value=True)
+        #         io_malos    = st.checkbox('Malos', value=False) 
+        #     with col2:
+        #         color_buenos = st.color_picker('Color', '#C0C0C0',label_visibility="collapsed")
+        #         color_malos  = st.color_picker('Color', '#00CCCC',label_visibility="collapsed")
+        #     with col3:
+        #         io_rango      = st.checkbox('Buenos(intervalo)', value=True)
+        #         io_dudosos    = st.checkbox('Dudosos', value=False)
+        #     with col4:
+        #         color_rango   = st.color_picker('Color', '#404040',label_visibility="collapsed")
+        #         color_dudosos = st.color_picker('Color', '#00f900',label_visibility="collapsed")
             
-        texto_rango = 'Ajustar rango del gráfico ' + variable_seleccionada.upper() + ' vs PROFUNDIDAD'
-        with st.expander(texto_rango,expanded=False):            
+        # texto_rango = 'Ajustar rango del gráfico ' + variable_seleccionada.upper() + ' vs PROFUNDIDAD'
+        # with st.expander(texto_rango,expanded=False):            
             
-            st.write("Selecciona el rango del gráfico")  
+        #     st.write("Selecciona el rango del gráfico")  
                    
-            # Selecciona el rango del gráfico
-            st.text('datos')
-            st.text(df_datos_buenos[variable_seleccionada].dropna().max())
-            st.text(df_seleccion[variable_seleccionada].dropna().max())
-            # min_val = min(df_datos_buenos[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
-            # max_val = max(df_datos_buenos[variable_seleccionada].max(),df_seleccion[variable_seleccionada].max())
-            min_val = min(df_datos_buenos[variable_seleccionada].dropna().min(),df_seleccion[variable_seleccionada].dropna().min())
-            max_val = max(df_datos_buenos[variable_seleccionada].dropna().max(),df_seleccion[variable_seleccionada].dropna().max())
-            if io_malos:
-                df_datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
-                min_val = min(min_val,df_datos_malos[variable_seleccionada].min())
-            if io_dudosos:
-                df_datos_dudosos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_dudoso]
-                min_val = min(min_val,df_datos_dudosos[variable_seleccionada].min())            
+        #     # Selecciona el rango del gráfico
+        #     st.text('datos')
+        #     st.text(df_datos_buenos[variable_seleccionada].dropna().max())
+        #     st.text(df_seleccion[variable_seleccionada].dropna().max())
+        #     # min_val = min(df_datos_buenos[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
+        #     # max_val = max(df_datos_buenos[variable_seleccionada].max(),df_seleccion[variable_seleccionada].max())
+        #     min_val = min(df_datos_buenos[variable_seleccionada].dropna().min(),df_seleccion[variable_seleccionada].dropna().min())
+        #     max_val = max(df_datos_buenos[variable_seleccionada].dropna().max(),df_seleccion[variable_seleccionada].dropna().max())
+        #     if io_malos:
+        #         df_datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
+        #         min_val = min(min_val,df_datos_malos[variable_seleccionada].min())
+        #     if io_dudosos:
+        #         df_datos_dudosos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_dudoso]
+        #         min_val = min(min_val,df_datos_dudosos[variable_seleccionada].min())            
 
-            rango   = (max_val-min_val)
-            min_val = max(0,round(min_val - 0.025*rango,2))
-            max_val = round(max_val + 0.025*rango,2)
+        #     rango   = (max_val-min_val)
+        #     min_val = max(0,round(min_val - 0.025*rango,2))
+        #     max_val = round(max_val + 0.025*rango,2)
             
-            col1, col2, col3, col4 = st.columns(4,gap="small")
-            with col2:
-                vmin_rango  = st.number_input('Valor mínimo gráfico:',value=min_val)
-            with col3:
-                vmax_rango  = st.number_input('Valor máximo gráfico:',value=max_val)        
+        #     col1, col2, col3, col4 = st.columns(4,gap="small")
+        #     with col2:
+        #         vmin_rango  = st.number_input('Valor mínimo gráfico:',value=min_val)
+        #     with col3:
+        #         vmax_rango  = st.number_input('Valor máximo gráfico:',value=max_val)        
             
-#np.nanmax(df.iloc[:, 1].values)
+
     
-        ################# GRAFICOS ################
+        # ################# GRAFICOS ################
     
-        ### GRAFICO CON LA VARIABLE ANALIZADA EN FUNCION DE LA PROFUNDIDAD Y OXIGENO   
-        # Representa un gráfico con la variable seleccionada junto a los oxígenos   
-        fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.2, 'hspace':0}, width_ratios=[3, 1])
+        # ### GRAFICO CON LA VARIABLE ANALIZADA EN FUNCION DE LA PROFUNDIDAD Y OXIGENO   
+        # # Representa un gráfico con la variable seleccionada junto a los oxígenos   
+        # fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.2, 'hspace':0}, width_ratios=[3, 1])
  
-        ### DATOS DISPONIBLES PREVIAMENTE ###
-        # Representa los datos disponibles de un color
-        if io_buenos:
-            ax.plot(df_datos_buenos[variable_seleccionada],df_datos_buenos['presion_ctd'],'.',color=color_buenos,label='BUENO')
+        # ### DATOS DISPONIBLES PREVIAMENTE ###
+        # # Representa los datos disponibles de un color
+        # if io_buenos:
+        #     ax.plot(df_datos_buenos[variable_seleccionada],df_datos_buenos['presion_ctd'],'.',color=color_buenos,label='BUENO')
         
-        # Representa los datos dentro del intervalo de meses en otro color
-        if io_rango:
-            ax.plot(df_rango_temporal[variable_seleccionada],df_rango_temporal['presion_ctd'],'.',color=color_rango,label='BUENO (INTERVALO)')
+        # # Representa los datos dentro del intervalo de meses en otro color
+        # if io_rango:
+        #     ax.plot(df_rango_temporal[variable_seleccionada],df_rango_temporal['presion_ctd'],'.',color=color_rango,label='BUENO (INTERVALO)')
         
-        # Representa los datos con QF malos si se seleccionó esta opción   
-        if io_malos:
-            ax.plot(df_datos_malos[variable_seleccionada],df_datos_malos['presion_ctd'],'.',color=color_malos,label='MALO')    
+        # # Representa los datos con QF malos si se seleccionó esta opción   
+        # if io_malos:
+        #     ax.plot(df_datos_malos[variable_seleccionada],df_datos_malos['presion_ctd'],'.',color=color_malos,label='MALO')    
 
-        # Representa los datos con QF dudoso si se seleccionó esta opción   
-        if io_dudosos:
-            ax.plot(df_datos_dudosos[variable_seleccionada],df_datos_dudosos['presion_ctd'],'.',color=color_dudosos,label='DUDOSO')    
+        # # Representa los datos con QF dudoso si se seleccionó esta opción   
+        # if io_dudosos:
+        #     ax.plot(df_datos_dudosos[variable_seleccionada],df_datos_dudosos['presion_ctd'],'.',color=color_dudosos,label='DUDOSO')    
 
 
-        ### DATOS PROCESADOS ###        
-        ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r',label='PROCESADO' )
+        # ### DATOS PROCESADOS ###        
+        # ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r',label='PROCESADO' )
         
-        ### FORMATO,ETIQUETAS Y NOMBRES DE EJES ###
-        texto_eje = variables_procesado[indice_variable] + '(' + variables_unidades[indice_variable] + ')'
-        ax.set(xlabel=texto_eje)
-        ax.set(ylabel='Presion (db)')
-        ax.invert_yaxis()
-        #ax.set_xlim([vmin_rango, vmax_rango])
-        rango_profs = ax.get_ylim()
-        # Añade el nombre de cada punto
-        nombre_muestreos = [None]*df_seleccion.shape[0]
-        for ipunto in range(df_seleccion.shape[0]):
-            if df_seleccion['botella'].iloc[ipunto] is None:
-                nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-            else:
-                nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
-            ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
+        # ### FORMATO,ETIQUETAS Y NOMBRES DE EJES ###
+        # texto_eje = variables_procesado[indice_variable] + '(' + variables_unidades[indice_variable] + ')'
+        # ax.set(xlabel=texto_eje)
+        # ax.set(ylabel='Presion (db)')
+        # ax.invert_yaxis()
+        # #ax.set_xlim([vmin_rango, vmax_rango])
+        # rango_profs = ax.get_ylim()
+        # # Añade el nombre de cada punto
+        # nombre_muestreos = [None]*df_seleccion.shape[0]
+        # for ipunto in range(df_seleccion.shape[0]):
+        #     if df_seleccion['botella'].iloc[ipunto] is None:
+        #         nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+        #     else:
+        #         nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+        #     ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
        
-        # Ajusta el rango de las x 
-        custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
-        ax.set_xticks(custom_ticks)
-        ax.set_xticklabels(custom_ticks)
-        ax.set_xlim([vmin_rango, vmax_rango])
-        ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))   
+        # # Ajusta el rango de las x 
+        # custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
+        # ax.set_xticks(custom_ticks)
+        # ax.set_xticklabels(custom_ticks)
+        # ax.set_xlim([vmin_rango, vmax_rango])
+        # ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))   
 
-        # Reduce el tamaño de los ejes
-        ax.tick_params(axis='both', which='major', labelsize=8)
+        # # Reduce el tamaño de los ejes
+        # ax.tick_params(axis='both', which='major', labelsize=8)
 
-        # Añade la leyenda
-        ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
+        # # Añade la leyenda
+        # ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
         
-        io_plot = 0
-        if not df_seleccion['oxigeno_ctd'].isnull().all(): 
-            az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#006633',label='OXIMETRO')
-            io_plot = 1
+        # io_plot = 0
+        # if not df_seleccion['oxigeno_ctd'].isnull().all(): 
+        #     az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#006633',label='OXIMETRO')
+        #     io_plot = 1
                 
-        if not df_seleccion['oxigeno_wk'].isnull().all(): 
-            az.plot(df_seleccion['oxigeno_wk'],df_seleccion['presion_ctd'],'.',color='#00CC66',label='WINKLER')
-            io_plot = 1
+        # if not df_seleccion['oxigeno_wk'].isnull().all(): 
+        #     az.plot(df_seleccion['oxigeno_wk'],df_seleccion['presion_ctd'],'.',color='#00CC66',label='WINKLER')
+        #     io_plot = 1
             
-        if io_plot == 1:
-            az.set(xlabel='Oxigeno (\u03BCmol/kg)')
-            az.yaxis.set_visible(False)
-            az.invert_yaxis()
-            az.set_ylim(rango_profs)
+        # if io_plot == 1:
+        #     az.set(xlabel='Oxigeno (\u03BCmol/kg)')
+        #     az.yaxis.set_visible(False)
+        #     az.invert_yaxis()
+        #     az.set_ylim(rango_profs)
             
-            # Ajusta el rango de las x
-            rango_oxigenos = az.get_xlim()
-            num_intervalos = 2
-            val_intervalo  =  (math.ceil(rango_oxigenos[-1]) - math.floor(rango_oxigenos[0]))/num_intervalos
-            az.set_xlim([math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])])
-            az.set_xticks(numpy.arange(math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])+val_intervalo,val_intervalo))
-            az.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
-            az.tick_params(axis='both', which='major', labelsize=8)
+        #     # Ajusta el rango de las x
+        #     rango_oxigenos = az.get_xlim()
+        #     num_intervalos = 2
+        #     val_intervalo  =  (math.ceil(rango_oxigenos[-1]) - math.floor(rango_oxigenos[0]))/num_intervalos
+        #     az.set_xlim([math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])])
+        #     az.set_xticks(numpy.arange(math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])+val_intervalo,val_intervalo))
+        #     az.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+        #     az.tick_params(axis='both', which='major', labelsize=8)
           
-            # Añade la leyenda
-            az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
+        #     # Añade la leyenda
+        #     az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
 
             
-        st.pyplot(fig)
+        # st.pyplot(fig)
  
     
  
-        ### GRAFICOS ESPECIFICOS PARA LAS POSIBLES VARIABLES        
+        # ### GRAFICOS ESPECIFICOS PARA LAS POSIBLES VARIABLES        
 
         
 
-        if variable_seleccionada == 'fosfato':
+        # if variable_seleccionada == 'fosfato':
             
-            with st.expander("Ajustar rango del gráfico FOSFATO vs NITRATO",expanded=False):            
+        #     with st.expander("Ajustar rango del gráfico FOSFATO vs NITRATO",expanded=False):            
                 
-                st.write("Selecciona el rango del gráfico")  
+        #         st.write("Selecciona el rango del gráfico")  
                 
-                # Selecciona los rangos del gráfico
-                min_val_x = 0.95*min(df_disponible_bd['nitrato'].min(),df_seleccion['nitrato'].min())
-                max_val_x = 1.05*max(df_disponible_bd['nitrato'].max(),df_seleccion['nitrato'].max())
+        #         # Selecciona los rangos del gráfico
+        #         min_val_x = 0.95*min(df_disponible_bd['nitrato'].min(),df_seleccion['nitrato'].min())
+        #         max_val_x = 1.05*max(df_disponible_bd['nitrato'].max(),df_seleccion['nitrato'].max())
                    
-                col1, col2, col3, col4 = st.columns(4,gap="small")
-                with col2:
-                    vmin_rango_x  = st.number_input('Valor mínimo eje x:',value=min_val_x)
-                with col3:
-                    vmax_rango_x  = st.number_input('Valor máximo eje x:',value=max_val_x)  
+        #         col1, col2, col3, col4 = st.columns(4,gap="small")
+        #         with col2:
+        #             vmin_rango_x  = st.number_input('Valor mínimo eje x:',value=min_val_x)
+        #         with col3:
+        #             vmax_rango_x  = st.number_input('Valor máximo eje x:',value=max_val_x)  
  
-                min_val_y = 0.95*min(df_disponible_bd['fosfato'].min(),df_seleccion['fosfato'].min())
-                max_val_y = 1.05*max(df_disponible_bd['fosfato'].max(),df_seleccion['fosfato'].max())
+        #         min_val_y = 0.95*min(df_disponible_bd['fosfato'].min(),df_seleccion['fosfato'].min())
+        #         max_val_y = 1.05*max(df_disponible_bd['fosfato'].max(),df_seleccion['fosfato'].max())
                    
-                col1, col2, col3, col4 = st.columns(4,gap="small")
-                with col2:
-                    vmin_rango_y  = st.number_input('Valor mínimo eje y:',value=min_val_y)
-                with col3:
-                    vmax_rango_y  = st.number_input('Valor máximo eje y:',value=max_val_y) 
+        #         col1, col2, col3, col4 = st.columns(4,gap="small")
+        #         with col2:
+        #             vmin_rango_y  = st.number_input('Valor mínimo eje y:',value=min_val_y)
+        #         with col3:
+        #             vmax_rango_y  = st.number_input('Valor máximo eje y:',value=max_val_y) 
             
             
     
-            ### GRAFICO FOSFATO vs NITRATO 
-            fig, ax = plt.subplots()       
+        #     ### GRAFICO FOSFATO vs NITRATO 
+        #     fig, ax = plt.subplots()       
             
-            if io_buenos:
-                ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
+        #     if io_buenos:
+        #         ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
             
-            # Representa los datos dentro del intervalo de meses en otro color
-            if io_rango:
-                ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
+        #     # Representa los datos dentro del intervalo de meses en otro color
+        #     if io_rango:
+        #         ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
             
-            # Representa los datos con QF malos si se seleccionó esta opción   
-            if io_malos:
-                ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
+        #     # Representa los datos con QF malos si se seleccionó esta opción   
+        #     if io_malos:
+        #         ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
 
-            # Representa los datos con QF dudoso si se seleccionó esta opción   
-            if io_dudosos:
-                ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
+        #     # Representa los datos con QF dudoso si se seleccionó esta opción   
+        #     if io_dudosos:
+        #         ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
                                   
-            ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
+        #     ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
 
-            ax.set(xlabel='Nitrato (\u03BCmol/kg)')
-            ax.set(ylabel='Fosfato (\u03BCmol/kg)')
+        #     ax.set(xlabel='Nitrato (\u03BCmol/kg)')
+        #     ax.set(ylabel='Fosfato (\u03BCmol/kg)')
     
 
-            # Reduce el tamaño y ajusta el rango y formato de los ejes
-            ax.tick_params(axis='both', which='major', labelsize=8)
-            ax.set_xlim([vmin_rango_x, vmax_rango_x])
-            ax.set_ylim([vmin_rango_y, vmax_rango_y])
-            ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
-            ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+        #     # Reduce el tamaño y ajusta el rango y formato de los ejes
+        #     ax.tick_params(axis='both', which='major', labelsize=8)
+        #     ax.set_xlim([vmin_rango_x, vmax_rango_x])
+        #     ax.set_ylim([vmin_rango_y, vmax_rango_y])
+        #     ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+        #     ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
     
     
     
-            # Añade el nombre de cada punto
-            nombre_muestreos = [None]*df_seleccion.shape[0]
-            for ipunto in range(df_seleccion.shape[0]):
-                if df_seleccion['botella'].iloc[ipunto] is None:
-                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-                else:
-                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
-                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
+        #     # Añade el nombre de cada punto
+        #     nombre_muestreos = [None]*df_seleccion.shape[0]
+        #     for ipunto in range(df_seleccion.shape[0]):
+        #         if df_seleccion['botella'].iloc[ipunto] is None:
+        #             nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+        #         else:
+        #             nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+        #         ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
            
-            st.pyplot(fig)
+        #     st.pyplot(fig)
         
         
 
@@ -1681,145 +1681,145 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
 
 
         
-        elif variable_seleccionada == 'nitrato':
+        # elif variable_seleccionada == 'nitrato':
     
-            with st.expander("Ajustar rango del gráfico NITRATO vs FOSFATO",expanded=False):            
+        #     with st.expander("Ajustar rango del gráfico NITRATO vs FOSFATO",expanded=False):            
                 
-                st.write("Selecciona el rango del gráfico")  
+        #         st.write("Selecciona el rango del gráfico")  
                 
-                # Selecciona los rangos del gráfico
-                min_val_x = 0.95*min(df_disponible_bd['nitrato'].min(),df_seleccion['nitrato'].min())
-                max_val_x = 1.05*max(df_disponible_bd['nitrato'].max(),df_seleccion['nitrato'].max())
+        #         # Selecciona los rangos del gráfico
+        #         min_val_x = 0.95*min(df_disponible_bd['nitrato'].min(),df_seleccion['nitrato'].min())
+        #         max_val_x = 1.05*max(df_disponible_bd['nitrato'].max(),df_seleccion['nitrato'].max())
                    
-                col1, col2, col3, col4 = st.columns(4,gap="small")
-                with col2:
-                    vmin_rango_x  = st.number_input('Valor mínimo nitrato:',value=min_val_x)
-                with col3:
-                    vmax_rango_x  = st.number_input('Valor máximo nitrato:',value=max_val_x)  
+        #         col1, col2, col3, col4 = st.columns(4,gap="small")
+        #         with col2:
+        #             vmin_rango_x  = st.number_input('Valor mínimo nitrato:',value=min_val_x)
+        #         with col3:
+        #             vmax_rango_x  = st.number_input('Valor máximo nitrato:',value=max_val_x)  
  
-                min_val_y = 0.95*min(df_disponible_bd['fosfato'].min(),df_seleccion['fosfato'].min())
-                max_val_y = 1.05*max(df_disponible_bd['fosfato'].max(),df_seleccion['fosfato'].max())
+        #         min_val_y = 0.95*min(df_disponible_bd['fosfato'].min(),df_seleccion['fosfato'].min())
+        #         max_val_y = 1.05*max(df_disponible_bd['fosfato'].max(),df_seleccion['fosfato'].max())
                    
-                col1, col2, col3, col4 = st.columns(4,gap="small")
-                with col2:
-                    vmin_rango_y  = st.number_input('Valor mínimo fosfato:',value=min_val_y)
-                with col3:
-                    vmax_rango_y  = st.number_input('Valor máximo fosfato:',value=max_val_y)         
+        #         col1, col2, col3, col4 = st.columns(4,gap="small")
+        #         with col2:
+        #             vmin_rango_y  = st.number_input('Valor mínimo fosfato:',value=min_val_y)
+        #         with col3:
+        #             vmax_rango_y  = st.number_input('Valor máximo fosfato:',value=max_val_y)         
 
    
                     
-            if df_seleccion['ph'].isnull().all():         
-                fig, ax = plt.subplots()      
-            else:
+        #     if df_seleccion['ph'].isnull().all():         
+        #         fig, ax = plt.subplots()      
+        #     else:
                 
-                with st.expander("Ajustar rango del gráfico NITRATO vs ph",expanded=False):            
+        #         with st.expander("Ajustar rango del gráfico NITRATO vs ph",expanded=False):            
                     
-                    st.write("Selecciona el rango del gráfico")  
+        #             st.write("Selecciona el rango del gráfico")  
                     
-                    # Selecciona los rangos del gráfico
-                    min_val_x_g2 = 0.95*min(df_disponible_bd['nitrato'].min(),df_seleccion['nitrato'].min())
-                    max_val_x_g2 = 1.05*max(df_disponible_bd['nitrato'].max(),df_seleccion['nitrato'].max())
+        #             # Selecciona los rangos del gráfico
+        #             min_val_x_g2 = 0.95*min(df_disponible_bd['nitrato'].min(),df_seleccion['nitrato'].min())
+        #             max_val_x_g2 = 1.05*max(df_disponible_bd['nitrato'].max(),df_seleccion['nitrato'].max())
                        
-                    col1, col2, col3, col4 = st.columns(4,gap="small")
-                    with col2:
-                        vmin_rango_x_g2  = st.number_input('Valor mínimo nitrato:',value=min_val_x_g2)
-                    with col3:
-                        vmax_rango_x_g2  = st.number_input('Valor máximo nitrato:',value=max_val_x_g2)  
+        #             col1, col2, col3, col4 = st.columns(4,gap="small")
+        #             with col2:
+        #                 vmin_rango_x_g2  = st.number_input('Valor mínimo nitrato:',value=min_val_x_g2)
+        #             with col3:
+        #                 vmax_rango_x_g2  = st.number_input('Valor máximo nitrato:',value=max_val_x_g2)  
      
-                    min_val_y_g2 = 0.95*min(df_disponible_bd['ph'].min(),df_seleccion['ph'].min())
-                    max_val_y_g2 = 1.05*max(df_disponible_bd['ph'].max(),df_seleccion['ph'].max())
+        #             min_val_y_g2 = 0.95*min(df_disponible_bd['ph'].min(),df_seleccion['ph'].min())
+        #             max_val_y_g2 = 1.05*max(df_disponible_bd['ph'].max(),df_seleccion['ph'].max())
                        
-                    col1, col2, col3, col4 = st.columns(4,gap="small")
-                    with col2:
-                        vmin_rango_y_g2  = st.number_input('Valor mínimo pH:',value=min_val_y_g2)
-                    with col3:
-                        vmax_rango_y_g2  = st.number_input('Valor máximo pH:',value=max_val_y_g2) 
+        #             col1, col2, col3, col4 = st.columns(4,gap="small")
+        #             with col2:
+        #                 vmin_rango_y_g2  = st.number_input('Valor mínimo pH:',value=min_val_y_g2)
+        #             with col3:
+        #                 vmax_rango_y_g2  = st.number_input('Valor máximo pH:',value=max_val_y_g2) 
 
-                fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
+        #         fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
     
-            ### GRAFICO FOSFATO vs NITRATO
-            if io_buenos:
-                ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
+        #     ### GRAFICO FOSFATO vs NITRATO
+        #     if io_buenos:
+        #         ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
             
-            # Representa los datos dentro del intervalo de meses en otro color
-            if io_rango:
-                ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
+        #     # Representa los datos dentro del intervalo de meses en otro color
+        #     if io_rango:
+        #         ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
             
-            # Representa los datos con QF malos si se seleccionó esta opción   
-            if io_malos:
-                ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
+        #     # Representa los datos con QF malos si se seleccionó esta opción   
+        #     if io_malos:
+        #         ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
 
-            # Representa los datos con QF dudoso si se seleccionó esta opción   
-            if io_dudosos:
-                ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
+        #     # Representa los datos con QF dudoso si se seleccionó esta opción   
+        #     if io_dudosos:
+        #         ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
   
-            ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
+        #     ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
             
-            ax.set(xlabel='Nitrato (\u03BCmol/kg)')
-            ax.set(ylabel='Fosfato (\u03BCmol/kg)')
+        #     ax.set(xlabel='Nitrato (\u03BCmol/kg)')
+        #     ax.set(ylabel='Fosfato (\u03BCmol/kg)')
             
-            # Reduce el tamaño y ajusta el formato de los ejes
-            ax.tick_params(axis='both', which='major', labelsize=8)
-            ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
-            ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
-            ax.set_xlim([vmin_rango_x, vmax_rango_x])
-            ax.set_ylim([vmin_rango_y, vmax_rango_y])
+        #     # Reduce el tamaño y ajusta el formato de los ejes
+        #     ax.tick_params(axis='both', which='major', labelsize=8)
+        #     ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+        #     ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+        #     ax.set_xlim([vmin_rango_x, vmax_rango_x])
+        #     ax.set_ylim([vmin_rango_y, vmax_rango_y])
     
-            # Añade el nombre de cada punto
-            nombre_muestreos = [None]*df_seleccion.shape[0]
-            for ipunto in range(df_seleccion.shape[0]):
-                if df_seleccion['botella'].iloc[ipunto] is None:
-                    nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-                else:
-                    nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
-                ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
+        #     # Añade el nombre de cada punto
+        #     nombre_muestreos = [None]*df_seleccion.shape[0]
+        #     for ipunto in range(df_seleccion.shape[0]):
+        #         if df_seleccion['botella'].iloc[ipunto] is None:
+        #             nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+        #         else:
+        #             nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+        #         ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
     
             
-            if df_seleccion['ph'].isnull().all() is False: 
-                ### GRAFICO NITRATO vs pH
+        #     if df_seleccion['ph'].isnull().all() is False: 
+        #         ### GRAFICO NITRATO vs pH
             
-                if io_buenos:
-                    az.plot(df_datos_buenos['nitrato'],df_datos_buenos['pH'],'.',color=color_buenos,label='BUENO')
+        #         if io_buenos:
+        #             az.plot(df_datos_buenos['nitrato'],df_datos_buenos['pH'],'.',color=color_buenos,label='BUENO')
                 
-                # Representa los datos dentro del intervalo de meses en otro color
-                if io_rango:
-                    az.plot(df_rango_temporal['nitrato'],df_rango_temporal['pH'],'.',color=color_rango,label='BUENO (INTERVALO)')
+        #         # Representa los datos dentro del intervalo de meses en otro color
+        #         if io_rango:
+        #             az.plot(df_rango_temporal['nitrato'],df_rango_temporal['pH'],'.',color=color_rango,label='BUENO (INTERVALO)')
                 
-                # Representa los datos con QF malos si se seleccionó esta opción   
-                if io_malos:
-                    az.plot(df_datos_malos['nitrato'],df_datos_malos['pH'],'.',color=color_malos,label='MALO')    
+        #         # Representa los datos con QF malos si se seleccionó esta opción   
+        #         if io_malos:
+        #             az.plot(df_datos_malos['nitrato'],df_datos_malos['pH'],'.',color=color_malos,label='MALO')    
     
-                # Representa los datos con QF dudoso si se seleccionó esta opción   
-                if io_dudosos:
-                    az.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['pH'],'.',color=color_dudosos,label='DUDOSO')    
+        #         # Representa los datos con QF dudoso si se seleccionó esta opción   
+        #         if io_dudosos:
+        #             az.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['pH'],'.',color=color_dudosos,label='DUDOSO')    
                                       
         
-                az.plot(df_disponible_bd['nitrato'],df_disponible_bd['ph'],'.',color='#C0C0C0')
+        #         az.plot(df_disponible_bd['nitrato'],df_disponible_bd['ph'],'.',color='#C0C0C0')
      
         
-                az.set(xlabel='Nitrato (\u03BCmol/kg)')
-                az.set(ylabel='pH')
-                az.yaxis.tick_right()
-                az.yaxis.set_label_position("right") 
+        #         az.set(xlabel='Nitrato (\u03BCmol/kg)')
+        #         az.set(ylabel='pH')
+        #         az.yaxis.tick_right()
+        #         az.yaxis.set_label_position("right") 
                 
-                az.tick_params(axis='both', which='major', labelsize=8)
-                az.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
-                az.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-                az.set_xlim([vmin_rango_x_g2, vmax_rango_x_g2])
-                az.set_ylim([vmin_rango_y_g2, vmax_rango_y_g2])
+        #         az.tick_params(axis='both', which='major', labelsize=8)
+        #         az.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+        #         az.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+        #         az.set_xlim([vmin_rango_x_g2, vmax_rango_x_g2])
+        #         az.set_ylim([vmin_rango_y_g2, vmax_rango_y_g2])
             
             
-                # Añade el nombre de cada punto
-                nombre_muestreos = [None]*df_seleccion.shape[0]
-                for ipunto in range(df_seleccion.shape[0]):
-                    if df_seleccion['botella'].iloc[ipunto] is None:
-                        nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-                    else:
-                        nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
-                    az.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['ph'].iloc[ipunto]))
+        #         # Añade el nombre de cada punto
+        #         nombre_muestreos = [None]*df_seleccion.shape[0]
+        #         for ipunto in range(df_seleccion.shape[0]):
+        #             if df_seleccion['botella'].iloc[ipunto] is None:
+        #                 nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+        #             else:
+        #                 nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+        #             az.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['ph'].iloc[ipunto]))
          
     
-            st.pyplot(fig)
+        #     st.pyplot(fig)
       
         
       
@@ -1827,114 +1827,114 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
       
         
         
-        # Gráficos particulares para cada variable
-        elif variable_seleccionada == 'silicato':
+        # # Gráficos particulares para cada variable
+        # elif variable_seleccionada == 'silicato':
     
-            if df_seleccion['silicato'].isnull().all() is False:         
+        #     if df_seleccion['silicato'].isnull().all() is False:         
     
-                ### GRAFICO SILICATO vs ALCALINIDAD  
+        #         ### GRAFICO SILICATO vs ALCALINIDAD  
                 
-                with st.expander("Ajustar rango del gráfico SILICATO vs ALCALINIDAD",expanded=False):            
+        #         with st.expander("Ajustar rango del gráfico SILICATO vs ALCALINIDAD",expanded=False):            
                     
-                    st.write("Selecciona el rango del gráfico")  
+        #             st.write("Selecciona el rango del gráfico")  
                     
-                    # Selecciona los rangos del gráfico
-                    min_val_x = 0.95*min(df_disponible_bd['silicato'].min(),df_seleccion['silicato'].min())
-                    max_val_x = 1.05*max(df_disponible_bd['silicato'].max(),df_seleccion['silicato'].max())
+        #             # Selecciona los rangos del gráfico
+        #             min_val_x = 0.95*min(df_disponible_bd['silicato'].min(),df_seleccion['silicato'].min())
+        #             max_val_x = 1.05*max(df_disponible_bd['silicato'].max(),df_seleccion['silicato'].max())
                        
-                    col1, col2, col3, col4 = st.columns(4,gap="small")
-                    with col2:
-                        vmin_rango_x  = st.number_input('Valor mínimo silicato:',value=min_val_x)
-                    with col3:
-                        vmax_rango_x  = st.number_input('Valor máximo silicato:',value=max_val_x)  
+        #             col1, col2, col3, col4 = st.columns(4,gap="small")
+        #             with col2:
+        #                 vmin_rango_x  = st.number_input('Valor mínimo silicato:',value=min_val_x)
+        #             with col3:
+        #                 vmax_rango_x  = st.number_input('Valor máximo silicato:',value=max_val_x)  
      
-                    min_val_y = 0.95*min(df_disponible_bd['alcalinidad'].min(),df_seleccion['alcalinidad'].min())
-                    max_val_y = 1.05*max(df_disponible_bd['alcalinidad'].max(),df_seleccion['alcalinidad'].max())
+        #             min_val_y = 0.95*min(df_disponible_bd['alcalinidad'].min(),df_seleccion['alcalinidad'].min())
+        #             max_val_y = 1.05*max(df_disponible_bd['alcalinidad'].max(),df_seleccion['alcalinidad'].max())
                        
-                    col1, col2, col3, col4 = st.columns(4,gap="small")
-                    with col2:
-                        vmin_rango_y  = st.number_input('Valor mínimo alcalinidad:',value=min_val_y)
-                    with col3:
-                        vmax_rango_y  = st.number_input('Valor máximo alcalinidad:',value=max_val_y)   
+        #             col1, col2, col3, col4 = st.columns(4,gap="small")
+        #             with col2:
+        #                 vmin_rango_y  = st.number_input('Valor mínimo alcalinidad:',value=min_val_y)
+        #             with col3:
+        #                 vmax_rango_y  = st.number_input('Valor máximo alcalinidad:',value=max_val_y)   
     
-                fig, ax = plt.subplots()       
+        #         fig, ax = plt.subplots()       
                 
-                if io_buenos:
-                    ax.plot(df_datos_buenos['silicato'],df_datos_buenos['alcalinidad'],'.',color=color_buenos,label='BUENO')
+        #         if io_buenos:
+        #             ax.plot(df_datos_buenos['silicato'],df_datos_buenos['alcalinidad'],'.',color=color_buenos,label='BUENO')
                 
-                # Representa los datos dentro del intervalo de meses en otro color
-                if io_rango:
-                    ax.plot(df_rango_temporal['silicato'],df_rango_temporal['alcalinidad'],'.',color=color_rango,label='BUENO (INTERVALO)')
+        #         # Representa los datos dentro del intervalo de meses en otro color
+        #         if io_rango:
+        #             ax.plot(df_rango_temporal['silicato'],df_rango_temporal['alcalinidad'],'.',color=color_rango,label='BUENO (INTERVALO)')
                 
-                # Representa los datos con QF malos si se seleccionó esta opción   
-                if io_malos:
-                    ax.plot(df_datos_malos['silicato'],df_datos_malos['alcalinidad'],'.',color=color_malos,label='MALO')    
+        #         # Representa los datos con QF malos si se seleccionó esta opción   
+        #         if io_malos:
+        #             ax.plot(df_datos_malos['silicato'],df_datos_malos['alcalinidad'],'.',color=color_malos,label='MALO')    
     
-                # Representa los datos con QF dudoso si se seleccionó esta opción   
-                if io_dudosos:
-                    ax.plot(df_datos_dudosos['silicato'],df_datos_dudosos['alcalinidad'],'.',color=color_dudosos,label='DUDOSO')    
+        #         # Representa los datos con QF dudoso si se seleccionó esta opción   
+        #         if io_dudosos:
+        #             ax.plot(df_datos_dudosos['silicato'],df_datos_dudosos['alcalinidad'],'.',color=color_dudosos,label='DUDOSO')    
                                 
                 
-                ax.plot(df_seleccion['silicato'],df_seleccion['alcalinidad'],'.r' )
+        #         ax.plot(df_seleccion['silicato'],df_seleccion['alcalinidad'],'.r' )
                 
                 
-                ax.set(xlabel='Silicato (\u03BCmol/kg)')
-                ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')
+        #         ax.set(xlabel='Silicato (\u03BCmol/kg)')
+        #         ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')
                 
-                ax.tick_params(axis='both', which='major', labelsize=8)
-                ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
-                ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
-                ax.set_xlim([vmin_rango_x, vmax_rango_x])
-                ax.set_ylim([vmin_rango_y, vmax_rango_y])
+        #         ax.tick_params(axis='both', which='major', labelsize=8)
+        #         ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+        #         ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+        #         ax.set_xlim([vmin_rango_x, vmax_rango_x])
+        #         ax.set_ylim([vmin_rango_y, vmax_rango_y])
         
-                # Añade el nombre de cada punto
-                nombre_muestreos = [None]*df_seleccion.shape[0]
-                for ipunto in range(df_seleccion.shape[0]):
-                    if df_seleccion['botella'].iloc[ipunto] is None:
-                        nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-                    else:
-                        nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
-                    ax.annotate(nombre_muestreos[ipunto], (df_seleccion['silicato'].iloc[ipunto], df_seleccion['alcalinidad'].iloc[ipunto]))
+        #         # Añade el nombre de cada punto
+        #         nombre_muestreos = [None]*df_seleccion.shape[0]
+        #         for ipunto in range(df_seleccion.shape[0]):
+        #             if df_seleccion['botella'].iloc[ipunto] is None:
+        #                 nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+        #             else:
+        #                 nombre_muestreos[ipunto] = 'Bot.' + str(df_seleccion['botella'].iloc[ipunto])
+        #             ax.annotate(nombre_muestreos[ipunto], (df_seleccion['silicato'].iloc[ipunto], df_seleccion['alcalinidad'].iloc[ipunto]))
                
-                st.pyplot(fig)
+        #         st.pyplot(fig)
     
     
-        ################# FORMULARIOS CALIDAD ################        
+        # ################# FORMULARIOS CALIDAD ################        
     
-        # Formulario para asignar banderas de calidad
-        with st.form("Formulario", clear_on_submit=False):
+        # # Formulario para asignar banderas de calidad
+        # with st.form("Formulario", clear_on_submit=False):
                       
-            indice_validacion = df_indices_calidad['indice'].tolist()
-            texto_indice      = df_indices_calidad['descripcion'].tolist()
-            qf_asignado       = numpy.zeros(df_seleccion.shape[0])
+        #     indice_validacion = df_indices_calidad['indice'].tolist()
+        #     texto_indice      = df_indices_calidad['descripcion'].tolist()
+        #     qf_asignado       = numpy.zeros(df_seleccion.shape[0])
            
-            for idato in range(df_seleccion.shape[0]):
+        #     for idato in range(df_seleccion.shape[0]):
                
-                enunciado          = 'QF del muestreo ' + nombre_muestreos[idato]
-                valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
-                qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
+        #         enunciado          = 'QF del muestreo ' + nombre_muestreos[idato]
+        #         valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
+        #         qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
            
-            io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
+        #     io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
     
-        if io_envio:
+        # if io_envio:
     
-            with st.spinner('Actualizando la base de datos'):
+        #     with st.spinner('Actualizando la base de datos'):
            
-                # Introducir los valores en la base de datos
-                conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                cursor = conn.cursor()  
+        #         # Introducir los valores en la base de datos
+        #         conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        #         cursor = conn.cursor()  
        
-                for idato in range(df_seleccion.shape[0]):
+        #         for idato in range(df_seleccion.shape[0]):
     
-                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, cc_nutrientes = %s WHERE muestreo = %s;'
-                    cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(2),int(df_seleccion['muestreo'].iloc[idato])))
-                    conn.commit() 
+        #             instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, cc_nutrientes = %s WHERE muestreo = %s;'
+        #             cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(2),int(df_seleccion['muestreo'].iloc[idato])))
+        #             conn.commit() 
     
-                cursor.close()
-                conn.close()   
+        #         cursor.close()
+        #         conn.close()   
     
-            texto_exito = 'Datos de salida ' + salida_seleccionada + ' añadidos o modificados correctamente'
-            st.success(texto_exito)
+        #     texto_exito = 'Datos de salida ' + salida_seleccionada + ' añadidos o modificados correctamente'
+        #     st.success(texto_exito)
    
 
 
