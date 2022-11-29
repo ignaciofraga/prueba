@@ -63,7 +63,7 @@ if FUNCIONES_AUXILIARES.log_in() is True:
             
         if st.session_state["usuario"] == 'COAC - Radiales':
             
-            paginas = {"INICIO": PAGINAS.principal,
+            paginas = {"INICIO": PAGINAS.principal_radiales,
                         "SALIDAS AL MAR": PAGINAS.entrada_salidas_mar,
                         "CONDICIONES AMBIENTALES":PAGINAS.entrada_condiciones_ambientales,
                         "DATOS BOTELLAS":PAGINAS.entrada_botellas}
