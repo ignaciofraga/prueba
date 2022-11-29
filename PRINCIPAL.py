@@ -17,7 +17,7 @@ logo_IEO_reducido     = 'DATOS/IMAGENES/ieo.ico'
 
 # Encabezado  
 imagen_logo   = Image.open(logo_IEO_reducido)
-st.set_page_config(page_title="IEO NUTRIENTES", layout="wide",page_icon=logo_IEO_reducido) 
+st.set_page_config(page_title="IEO-COAC", layout="wide",page_icon=logo_IEO_reducido) 
 
 # Si el usuario está autorizado, despliega las webs a las que tiene acceso
 # if FUNCIONES_AUXILIARES.check_password() is True:
