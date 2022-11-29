@@ -2025,6 +2025,238 @@ def correccion_drift(datos_brutos,datos_corregidos,datos_estadillo,datos_referen
         return datos_corregidos
     
     
+
+###############################################################################
+##################### PÁGINA DE CONSULTA DE DATOS DE BOTELLAS #################
+###############################################################################    
+
+
+def consulta_botellas():
+    
+    import streamlit as st
+    from FUNCIONES.FUNCIONES_AUXILIARES import init_connection 
+    from io import BytesIO
+        
+    st.subheader('Consulta los datos de botellas disponibles') 
+
+    # Recupera tablas con informacion utilizada en el procesado
+    conn                    = init_connection()
+    df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    df_programas            = psql.read_sql('SELECT * FROM programas', conn)
+    df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+    df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+    df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+    df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
+    conn.close()    
+    
+    id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+    
+    # Despliega menús de selección del programa, tipo de salida, año y fecha               
+    col1, col2, col3= st.columns(3,gap="small")
+ 
+    with col1: 
+        programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
+        df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
+        
+    
+    with col2:
+        tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
+        df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+    
+        indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+        df_salidas_seleccion['id_temp'] = indices_dataframe
+        df_salidas_seleccion.set_index('id_temp',drop=True,append=False,inplace=True)
+        
+        # Define los años con salidas asociadas
+        df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
+        for idato in range(df_salidas_seleccion.shape[0]):
+            df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+        df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
+        
+        listado_anhos              = df_salidas_seleccion['año'].unique()
+    
+    with col3:
+        anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
+        df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+
+    # A partir del programa y año elegido, selecciona uno o varios muestreos   
+    listado_salidas                 = st.multiselect('Muestreo',(df_salidas_seleccion['nombre_salida']))   
+  
+    ### SELECCION DE VARIABLES
+  
+    listado_variables =['muestreo']  
+  
+    # Selecciona las variables a exportar
+    with st.expander("Variables físicas",expanded=False):
+    
+        st.write("Selecciona las variables físicas a exportar")    
+    
+        # Selecciona mostrar o no datos malos y dudosos
+        col1, col2, col3, col4 = st.columns(4,gap="small")
+        with col1:
+            io_temperatura   = st.checkbox('Temperatura(CTD)', value=True)
+            if io_temperatura:
+                listado_variables = listado_variables + ['temperatura_ctd'] + ['temperatura_ctd_qf']
+        with col2:
+            io_salinidad     = st.checkbox('Salinidad(CTD)', value=True)
+            if io_salinidad:
+                listado_variables = listado_variables + ['salinidad_ctd'] + ['salinidad_ctd_qf']
+        with col3:
+            io_par           = st.checkbox('PAR(CTD)', value=True)
+            if io_par:
+                listado_variables = listado_variables + ['par_ctd'] + ['par_ctd_qf']
+        with col4:
+            io_turbidez      = st.checkbox('Turbidez(CTD)', value=False)
+            if io_turbidez:
+                listado_variables = listado_variables + ['turbidez_ctd'] + ['turbidez_ctd_qf']
+                
+    # Recorta el dataframe de datos físicos con las variables seleccionadas
+    df_datos_fisicos_seleccion = df_datos_fisicos.loc[:, listado_variables]
+                
+    listado_variables =['muestreo']
+                
+    with st.expander("Variables biogeoquímicas",expanded=False):
+    
+        st.write("Selecciona las variables biogeoquímicas a exportar")    
+    
+        # Selecciona mostrar o no datos malos y dudosos
+        col1, col2, col3 = st.columns(3,gap="small")
+        with col1:
+            io_fluorescencia   = st.checkbox('Fluorescencia(CTD)', value=True)
+            if io_fluorescencia:
+                listado_variables = listado_variables + ['fluorescencia_ctd'] + ['fluorescencia_ctd_qf']
+ 
+            io_oxigeno_ctd   = st.checkbox('Oxígeno(CTD)', value=True)
+            if io_oxigeno_ctd:
+                listado_variables = listado_variables + ['oxigeno_ctd'] + ['oxigeno_ctd_qf']
+
+            io_oxigeno_wk   = st.checkbox('Oxígeno(Winkler)', value=True)
+            if io_oxigeno_wk:
+                listado_variables = listado_variables + ['oxigeno_wk'] + ['oxigeno_wk_qf']  
+                
+            io_ph      = st.checkbox('pH', value=True)
+            if io_ph:
+                listado_variables = listado_variables + ['ph'] + ['ph_qf'] + ['ph_metodo']               
+
+            io_alcalinidad           = st.checkbox('Alcalinidad', value=True)
+            if io_alcalinidad:
+                 listado_variables = listado_variables + ['alcalinidad'] + ['alcalinidad_qf']  
+                             
+                
+        with col2:
+            io_nitrogeno_total     = st.checkbox('Nitrógeno total', value=True)
+            if io_nitrogeno_total:
+                listado_variables = listado_variables + ['nitrogeno_total'] + ['nitrogeno_total_qf']
+                
+            io_nitrato   = st.checkbox('Nitrato', value=True)
+            if io_nitrato:
+                listado_variables = listado_variables + ['nitrato'] + ['nitrato_qf']
+  
+            io_nitrito   = st.checkbox('Nitrito', value=True)
+            if io_nitrito:
+                 listado_variables = listado_variables + ['nitrito'] + ['nitrito_qf']
+
+            io_amonio   = st.checkbox('Amonio', value=True)
+            if io_amonio:
+                 listado_variables = listado_variables + ['amonio'] + ['amonio_qf']                 
+                
+            io_fosfato   = st.checkbox('Fosfato', value=True)
+            if io_fosfato:
+                  listado_variables = listado_variables + ['fosfato'] + ['fosfato_qf']                 
+   
+            io_silicato   = st.checkbox('Silicato', value=True)
+            if io_silicato:
+                  listado_variables = listado_variables + ['silicato'] + ['silicato_qf']                  
+                                
+                               
+        with col3:
+            io_tcarb           = st.checkbox('Carbono total', value=False)
+            if io_tcarb:
+                listado_variables = listado_variables + ['tcarbn'] + ['tcarbn_qf']
+                
+            io_doc           = st.checkbox('DOC', value=False)
+            if io_doc:
+                 listado_variables = listado_variables + ['doc'] + ['doc_qf']
+
+            io_cdom           = st.checkbox('CDOM', value=False)
+            if io_cdom:
+                listado_variables = listado_variables + ['cdom'] + ['cdom_qf']            
+                
+            io_clorofila           = st.checkbox('Clorofila (a)', value=False)
+            if io_clorofila:
+                 listado_variables = listado_variables + ['clorofila_a'] + ['clorofila_a_qf']                 
+                
+                
+    # Recorta el dataframe de datos biogeoquimicos con las variables seleccionadas
+    df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos.loc[:, listado_variables]
+                
+  
+    # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
+  
+    
+    if len(listado_salidas) > 0:  
+  
+        identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
+        for idato in range(len(listado_salidas)):
+            identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
+    
+        # Elimina las columnas que no interesan en los dataframes a utilizar
+        #df_salidas_seleccion        = df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
+        df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
+        df_muestreos                = df_muestreos.drop(columns=['configuracion_perfilador','configuracion_superficie'])
+
+        # conserva los datos de las salidas seleccionadas
+        df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
+    
+        # Recupera los muestreos correspondientes a las salidas seleccionadas
+        df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
+        df_muestreos_seleccionados  = pandas.merge(df_salidas_seleccion, df_muestreos, on="id_salida")
+                              
+        # Asocia las coordenadas y nombre de estación de cada muestreo
+        df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
+        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
+        
+        # Asocia las propiedades físicas de cada muestreo
+        df_datos_fisicos            = df_datos_fisicos_seleccion.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
+        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos, on="id_muestreo")
+    
+        # Asocia las propiedades biogeoquimicas de cada muestreo
+        df_datos_biogeoquimicos     = df_datos_biogeoquimicos_seleccion.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
+        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos, on="id_muestreo")
+    
+        # Elimina las columnas que no interesan
+        df_exporta                  = df_muestreos_seleccionados.drop(columns=['id_salida','estacion','programa','profundidades_referencia','id_muestreo'])
+    
+        # Mueve os identificadores de muestreo al final del dataframe
+        listado_cols = df_exporta.columns.tolist()
+        listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud')))    
+        listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud')))
+        listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
+        listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
+        df_exporta = df_exporta[listado_cols]
+    
+        # Ordena los valores por fechas
+        df_exporta = df_exporta.sort_values('fecha_muestreo')
+    
+        ## Botón para exportar los resultados
+        nombre_archivo =  'DATOS_BOTELLAS.xlsx'
+    
+        output = BytesIO()
+        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+        df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
+        workbook = writer.book
+        worksheet = writer.sheets['DATOS']
+        writer.save()
+        datos_exporta = output.getvalue()
+    
+        st.download_button(
+            label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
+            data=datos_exporta,
+            file_name=nombre_archivo,
+            help= 'Descarga un archivo .csv con los datos solicitados',
+            mime="application/vnd.ms-excel"
+        )
+
     
 
 

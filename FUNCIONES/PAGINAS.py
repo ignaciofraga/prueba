@@ -2363,7 +2363,7 @@ def entrada_botellas():
     puerto           = st.secrets["postgres"].port
     
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    acciones     = ['Añadir datos de botellas', 'Realizar control de calidad de datos de botellas']
+    acciones     = ['Añadir datos de botellas', 'Realizar control de calidad de datos de botellas','Consultar datos procedentes de botellas']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
     
 
@@ -2543,8 +2543,10 @@ def entrada_botellas():
         FUNCIONES_INSERCION.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades,direccion_host,base_datos,usuario,contrasena,puerto)
 
 
+    # Consulta datos de botellas
+    if tipo_accion==acciones[2]:
 
-
+        FUNCIONES_INSERCION.consulta_botellas()
 
 
 
