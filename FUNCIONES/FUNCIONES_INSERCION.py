@@ -2197,7 +2197,7 @@ def consulta_botellas():
         conn.close()     
                
         df_metodos_ph                      = df_metodos_ph.rename(columns={"id_metodo": "ph_metodo"})
-        df_datos_biogeoquimicos_seleccion  = pandas.merge(df_datos_biogeoquimicos_seleccion, df_metodos_ph, on="id_salida")
+        df_datos_biogeoquimicos_seleccion  = pandas.merge(df_datos_biogeoquimicos_seleccion, df_metodos_ph, on="ph_metodo")
         df_datos_biogeoquimicos_seleccion  = df_datos_biogeoquimicos_seleccion.drop(columns=['ph_metodo','metodo_ph'])
         df_datos_biogeoquimicos_seleccion  = df_datos_biogeoquimicos_seleccion.rename(columns={"descripcion_metodo_ph": "metodo_pH"})        
         
