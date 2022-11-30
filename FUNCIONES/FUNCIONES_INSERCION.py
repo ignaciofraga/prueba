@@ -2274,9 +2274,27 @@ def consulta_botellas():
             mime="application/vnd.ms-excel"
         )
 
+  
+
+        archivo_metadatos     = 'DATOS/Metadatos y control de calidad.pdf'
+        with open(archivo_metadatos, "rb") as pdf_file:
+            PDFbyte = pdf_file.read()
+        
+        st.download_button(label="DESCARGA METADATOS ",
+                            data=PDFbyte,
+                            file_name="test.pdf",
+                            mime='application/octet-stream')
     
 
-
+        # with open(archivo_instrucciones, "rb") as fp:
+        #     st.download_button(
+        #         label="DESCARGAR PLANTILLA E INSTRUCCIONES",
+        #         data=fp,
+        #         file_name="PLANTILLA.zip",
+        #         mime="application/zip"
+        #     )
+            
+            
 
 # VERSIONES ANTERIORES; 
 
