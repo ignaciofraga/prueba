@@ -2166,7 +2166,10 @@ def consulta_botellas():
    
             io_silicato   = st.checkbox('Silicato', value=True)
             if io_silicato:
-                  listado_variables = listado_variables + ['silicato'] + ['silicato_qf']                  
+                  listado_variables = listado_variables + ['silicato'] + ['silicato_qf'] 
+                  
+            if io_silicato or io_fosfato or io_amonio or io_nitrito or io_nitrato or io_nitrogeno_total:
+                listado_variables = listado_variables + ['cc_nutrientes'] 
                                 
                                
         with col3:
