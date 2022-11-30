@@ -2201,7 +2201,9 @@ def consulta_botellas():
         df_datos_biogeoquimicos_seleccion  = df_datos_biogeoquimicos_seleccion.drop(columns=['ph_metodo','metodo_ph'])
         df_datos_biogeoquimicos_seleccion  = df_datos_biogeoquimicos_seleccion.rename(columns={"descripcion_metodo_ph": "metodo_pH"})        
         
-
+        listado_columnas = df_datos_biogeoquimicos_seleccion.columns.tolist()
+        listado_columnas.insert(listado_columnas.index('ph_qf')+1,listado_columnas.pop(listado_columnas.index('metodo_pH')))
+        df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos_seleccion[listado_columnas]
     
     
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
