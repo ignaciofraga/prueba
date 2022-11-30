@@ -2195,10 +2195,15 @@ def consulta_botellas():
         conn                    = init_connection()
         df_metodos_ph           = psql.read_sql('SELECT * FROM metodo_pH', conn)
         conn.close()     
+               
+        df_metodos_ph                      = df_metodos_ph.rename(columns={"id_metodo": "ph_metodo"})
+        df_datos_biogeoquimicos_seleccion  = pandas.merge(df_datos_biogeoquimicos_seleccion, df_metodos_ph, on="id_salida")
+        df_datos_biogeoquimicos_seleccion  = df_datos_biogeoquimicos_seleccion.drop(columns=['ph_metodo','metodo_ph'])
+        df_datos_biogeoquimicos_seleccion  = df_datos_biogeoquimicos_seleccion.rename(columns={"descripcion_metodo_ph": "metodo_pH"})        
         
-        for imetodo in range(df_metodos_ph.shape[0]):
-            df_datos_biogeoquimicos_seleccion[df_datos_biogeoquimicos_seleccion['ph_metodo']==df_metodos_ph['id_metodo'].iloc[idato]]=df_metodos_ph['descripcion_metodo_ph'].iloc[idato]
-  
+
+    
+    
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
      
     if len(listado_salidas) > 0:  
