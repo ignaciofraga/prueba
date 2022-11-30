@@ -2255,7 +2255,7 @@ def consulta_botellas():
         listado_columnas = [s.replace('_ctd', '(CTD)') for s in listado_columnas] # cambia CTD
         listado_columnas = [x[0].upper()+x[1:-1]+x[-1] for x in listado_columnas] # Mayúsculas
         listado_columnas = [s.replace('_wk', '(WINKLER)') for s in listado_columnas] # Winkler
-        listado_columnas = [s.replace('_qf', ' QF') for s in listado_columnas] # QFLags
+        #listado_columnas = [s.replace('_qf', ' QF') for s in listado_columnas] # QFLags
         st.text(listado_columnas)
         df_exporta       = df_exporta[listado_columnas]
     
