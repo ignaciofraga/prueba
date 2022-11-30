@@ -35,7 +35,7 @@ direccion_host = '193.146.155.99'
 # Parámetros
 nombre_programa = 'RADIAL CORUÑA'
 
-anho = 2022
+anho = 2021
 ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
 tipo_salida   = 'MENSUAL' 
 
@@ -55,7 +55,8 @@ listado_salidas = glob(ruta_datos, recursive = True)
 
 # Mantén sólo la parte de fechas
 for idato in range(len(listado_salidas)):
-
+#for idato in range(1):
+    
     fecha_salida_texto = listado_salidas[idato][-14:-6]
 
     fecha_salida       = datetime.datetime.strptime(fecha_salida_texto, '%y_%m_%d').date()
@@ -140,7 +141,7 @@ for idato in range(len(listado_salidas)):
             datos_botellas = FUNCIONES_INSERCION.evalua_salidas(datos_botellas,id_programa,nombre_programa,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
             
             # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-            datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
 
             # Inserta datos físicos

@@ -2248,6 +2248,16 @@ def consulta_botellas():
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
         df_exporta = df_exporta[listado_cols]
+        
+        # Ajusta los nombres de la columnas
+        listado_columnas = df_exporta.columns.tolist()
+        listado_columnas = [s.replace('_ctd', '(CTD)') for s in listado_columnas] # cambia CTD
+        listado_columnas = [x[0].upper()+x[1:-1]+x[-1] for x in listado_columnas] # Mayúsculas
+        listado_columnas = [s.replace('_wk', '(WINKLER)') for s in listado_columnas] # Winkler
+        listado_columnas = [s.replace('_qf', ' QF') for s in listado_columnas] # QFLags
+        df_exporta       = df_exporta[listado_columnas]
+    
+
     
         # Ordena los valores por fechas
         df_exporta = df_exporta.sort_values('fecha_muestreo')
