@@ -2190,10 +2190,17 @@ def consulta_botellas():
     # Recorta el dataframe de datos biogeoquimicos con las variables seleccionadas
     df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos.loc[:, listado_variables]
                 
+    # Si se exportan datos de pH, corregir la informacion del método utilizado
+    if io_ph:
+        conn                    = init_connection()
+        df_metodos_ph           = psql.read_sql('SELECT * FROM metodo_pH', conn)
+        conn.close()     
+        
+        for imetodo in range(df_metodos_ph.shape[0]):
+            df_datos_biogeoquimicos_seleccion[df_datos_biogeoquimicos_seleccion['ph_metodo']==df_metodos_ph['id_metodo'].iloc[idato]]=df_metodos_ph['descripcion_metodo_ph'].iloc[idato]
   
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
-  
-    
+     
     if len(listado_salidas) > 0:  
   
         identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
@@ -2225,7 +2232,7 @@ def consulta_botellas():
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos, on="id_muestreo")
     
         # Elimina las columnas que no interesan
-        df_exporta                  = df_muestreos_seleccionados.drop(columns=['id_salida','estacion','programa','profundidades_referencia','id_muestreo'])
+        df_exporta                  = df_muestreos_seleccionados.drop(columns=['id_salida','estacion','programa','profundidades_referencia','id_muestreo','variables_muestreadas'])
     
         # Mueve os identificadores de muestreo al final del dataframe
         listado_cols = df_exporta.columns.tolist()
