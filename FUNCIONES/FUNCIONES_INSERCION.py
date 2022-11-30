@@ -2280,21 +2280,13 @@ def consulta_botellas():
         with open(archivo_metadatos, "rb") as pdf_file:
             PDFbyte = pdf_file.read()
         
-        st.download_button(label="DESCARGA METADATOS ",
+        st.download_button(label="DESCARGA METADATOS",
                             data=PDFbyte,
-                            file_name="test.pdf",
+                            file_name="METADATOS.pdf",
+                            help= 'Descarga un archivo .pdf con información de los datos y el control de calidad realizado',
                             mime='application/octet-stream')
     
 
-        # with open(archivo_instrucciones, "rb") as fp:
-        #     st.download_button(
-        #         label="DESCARGAR PLANTILLA E INSTRUCCIONES",
-        #         data=fp,
-        #         file_name="PLANTILLA.zip",
-        #         mime="application/zip"
-        #     )
-            
-            
 
 # VERSIONES ANTERIORES; 
 
