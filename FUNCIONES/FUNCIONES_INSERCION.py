@@ -107,19 +107,22 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
 
     for idato in range(datos_radiales.shape[0]):
         if datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato] != 9 and  datos_radiales['PHTS25P0_PUR_FLAG_W'][idato] == 9:
-            datos_radiales['ph'][idato] =  datos_radiales['PHTS25P0_UNPUR'][idato]
-            datos_radiales['ph_qf']     = datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato]
-            datos_radiales['ph_metodo'] = 1
+            datos_radiales['ph'][idato]        =  datos_radiales['PHTS25P0_UNPUR'][idato]
+            datos_radiales['ph_qf'][idato]     = datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato]
+            datos_radiales['ph_metodo'][idato] = 1
         elif datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato] == 9 and  datos_radiales['PHTS25P0_PUR_FLAG_W'][idato] != 9:
-            datos_radiales['ph'][idato] =  datos_radiales['PHTS25P0_PUR'][idato]
-            datos_radiales['ph_qf']     = datos_radiales['PHTS25P0_PUR_FLAG_W'][idato]
-            datos_radiales['ph_metodo'] = 2
+            datos_radiales['ph'][idato]        =  datos_radiales['PHTS25P0_PUR'][idato]
+            datos_radiales['ph_qf'][idato]     = datos_radiales['PHTS25P0_PUR_FLAG_W'][idato]
+            datos_radiales['ph_metodo'][idato] = 2
         else: 
-            datos_radiales['ph'][idato] =  None
-            datos_radiales['ph_qf']     = 9
-            datos_radiales['ph_metodo'] = None
+            datos_radiales['ph'][idato]        =  None
+            datos_radiales['ph_qf'][idato]     = 9
+            datos_radiales['ph_metodo'][idato] = None
             
               
+    for idato in range(datos_radiales.shape[0]):
+        if datos_radiales['ph'][idato] is None:
+            datos_radiales['ph_metodo'][idato] = None
     
         
     # Asigna el valor del cast. Si es un texto no asigna valor
