@@ -1326,12 +1326,12 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
     indices_calibracion = numpy.asarray(datos_entrada['Peak Number'][datos_entrada['Cup Type']=='CALB']) - 1
        
     # Corrige las concentraciones a partir de los rendimientos de la coumna reductora
-    datos_entrada['NO3_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
-    datos_entrada['TON_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
+    datos_entrada['nitrato_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
+    datos_entrada['nitrogeno_total_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
     factor = ((datos_entrada['TON'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_entrada['NO2'].iloc[indices_calibracion[-1]])/(datos_entrada['TON'].iloc[indices_calibracion[-1]] + datos_entrada['NO2'].iloc[indices_calibracion[-1]])
     for idato in range(datos_entrada.shape[0]):
-        datos_entrada['NO3_rendimiento'].iloc[idato] = (datos_entrada['TON'].iloc[idato]*factor - datos_entrada['NO2'].iloc[idato])/(rendimiento_columna/100) 
-        datos_entrada['TON_rendimiento'].iloc[idato] = datos_entrada['NO3_rendimiento'].iloc[idato] + datos_entrada['NO2'].iloc[idato]
+        datos_entrada['nitrato_rendimiento'].iloc[idato] = (datos_entrada['nitrogeno_total'].iloc[idato]*factor - datos_entrada['NO2'].iloc[idato])/(rendimiento_columna/100) 
+        datos_entrada['nitrogeno_total_rendimiento'].iloc[idato] = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['NO2'].iloc[idato]
     
     
     # Pasa las concentraciones a mol/kg
@@ -1347,11 +1347,11 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
             datos_entrada['DENSIDAD'].iloc[idato] = (999.1+0.77*((datos_entrada['salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
                    
                     
-    datos_entrada['TON_CONC'] = datos_entrada['TON_rendimiento']/datos_entrada['DENSIDAD']  
-    datos_entrada['NO3_CONC'] = datos_entrada['NO3_rendimiento']/datos_entrada['DENSIDAD']  
-    datos_entrada['NO2_CONC'] = datos_entrada['NO2']/datos_entrada['DENSIDAD']  
-    datos_entrada['SiO2_CONC'] = datos_entrada['SiO2']/datos_entrada['DENSIDAD']  
-    datos_entrada['PO4_CONC'] = datos_entrada['PO4']/datos_entrada['DENSIDAD']  
+    datos_entrada['nitrogeno_total_CONC'] = datos_entrada['nitrogeno_total_rendimiento']/datos_entrada['DENSIDAD']  
+    datos_entrada['nitrato_CONC'] = datos_entrada['nitrato_rendimiento']/datos_entrada['DENSIDAD']  
+    datos_entrada['nitrito_CONC'] = datos_entrada['nitrito']/datos_entrada['DENSIDAD']  
+    datos_entrada['silicato_CONC'] = datos_entrada['silicato']/datos_entrada['DENSIDAD']  
+    datos_entrada['fosfato_CONC'] = datos_entrada['fosfato']/datos_entrada['DENSIDAD']  
     
     
     ####  APLICA LA CORRECCIÓN DE DERIVA ####
