@@ -619,6 +619,8 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
 
 def comprueba_estado(nombre_programa,anho_proceso):
 
+    st.text(nombre_programa)
+    st.text(anho_proceso)
 
     # Consulta a la base de datos las fechas de cada proceso
     conn = init_connection()
