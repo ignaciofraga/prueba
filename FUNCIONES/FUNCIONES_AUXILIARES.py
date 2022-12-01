@@ -474,6 +474,10 @@ def consulta_botellas():
                             mime='application/octet-stream')
     
 
+
+
+
+
 ###############################################################################
 ##################### FUNCION PARA INSERTAR DATOS DISCRETOS  ##################
 ############################################################################### 
@@ -511,6 +515,8 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
         io_valores_prev = 1
         texto_error = "La base de datos ya contiene información para la salida, estación, cast y variable seleccionadas. Los datos introducidos reemplazarán los existentes."
         st.warning(texto_error, icon="⚠️") 
+    else:
+        io_valores_prev = 0        
         
         
     df_seleccion    = df_seleccion.sort_values('botella')
@@ -595,7 +601,11 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
                 cursor.close()
                 conn.close()   
     
-            texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
+            if io_valores_prev == 1:        
+                texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' actualizados correctamente'
+            else:
+                texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
+
             st.success(texto_exito)
    
 

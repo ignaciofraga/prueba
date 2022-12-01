@@ -753,12 +753,19 @@ def inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrase
 ###############################################################################
 ###### FUNCION PARA REALIZAR CONTROL DE CALDIAD DE DATOS BIOGEOQUIMICOS #######
 ###############################################################################
-def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables_procesado_bd,variables_unidades,direccion_host,base_datos,usuario,contrasena,puerto):
+def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables_procesado_bd,variables_unidades):
 
     import streamlit as st
     import matplotlib.pyplot as plt
     from FUNCIONES.FUNCIONES_AUXILIARES import menu_seleccion   
     from FUNCIONES.FUNCIONES_AUXILIARES import init_connection 
+
+    # Recupera los datos de conexión
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port
 
     # Recupera los datos disponibles en la base de datos
     conn                      = init_connection()
