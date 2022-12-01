@@ -2541,10 +2541,7 @@ def procesado_nutrientes():
                 datos_corregidos['año']                = numpy.zeros(datos_corregidos.shape[0],dtype=int)
                 for idato in range(datos_corregidos.shape[0]):
                     datos_corregidos['año'].iloc[idato] = (datos_corregidos['fecha_muestreo'].iloc[idato]).year
-                
-                st.text(datos_corregidos.columns.tolist())
-                st.text(datos_corregidos)
-                
+                                
                 # Realiza control de calidad
                 FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_corregidos,variables_procesado,variables_procesado_bd,variables_unidades)
 
