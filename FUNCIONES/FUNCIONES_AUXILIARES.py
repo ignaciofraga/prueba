@@ -223,9 +223,7 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
 
 
 def consulta_botellas():
-    
-
-        
+           
     st.subheader('Consulta los datos de botellas disponibles') 
 
     # Recupera tablas con informacion utilizada en el procesado
@@ -475,3 +473,130 @@ def consulta_botellas():
                             help= 'Descarga un archivo .pdf con información de los datos y el control de calidad realizado',
                             mime='application/octet-stream')
     
+
+###############################################################################
+##################### FUNCION PARA INSERTAR DATOS DISCRETOS  ##################
+############################################################################### 
+
+def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_procesado,variables_procesado_bd,df_referencia):
+
+    # Recupera los datos de conexión
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port    
+
+    # Recupera tablas con informacion utilizada en el procesado
+    conn                    = init_connection()
+    df_indices_calidad      = psql.read_sql('SELECT * FROM indices_calidad', conn)
+    df_metodo_ph            = psql.read_sql('SELECT * FROM metodo_pH', conn)
+    conn.close()     
+   
+    # compón un dataframe con la información de muestreo y datos biogeoquímicos
+    df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
+    df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
+    
+    # Añade columna con información del año
+    df_datos_disponibles['año']                = numpy.zeros(df_datos_disponibles.shape[0],dtype=int)
+    for idato in range(df_datos_disponibles.shape[0]):
+        df_datos_disponibles['año'].iloc[idato] = (df_datos_disponibles['fecha_muestreo'].iloc[idato]).year
+            
+    # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
+    io_control_calidad = 0
+    df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad)
+
+    # Si ya hay datos previos, mostrar un warning        
+    if df_seleccion[variable_seleccionada].notnull().all():
+        io_valores_prev = 1
+        texto_error = "La base de datos ya contiene información para la salida, estación, cast y variable seleccionadas. Los datos introducidos reemplazarán los existentes."
+        st.warning(texto_error, icon="⚠️") 
+        
+        
+    df_seleccion    = df_seleccion.sort_values('botella')
+
+    with st.form("Formulario", clear_on_submit=False):
+
+        # Si los datos a introducir son de pH, especificar si la medida es con reactivo purificado o no purificado            
+        if variable_seleccionada == 'ph':
+       
+            listado_metodos   = df_metodo_ph['descripcion_metodo_ph'].tolist()                
+            tipo_analisis     = st.radio('Selecciona el tipo de análisis realizado',listado_metodos,horizontal=True,key = 5*df_seleccion.shape[0],index = 0)
+            id_tipo_analisis  = df_metodo_ph['id_metodo'][df_metodo_ph['descripcion_metodo_ph']==tipo_analisis].iloc[0] 
+            
+
+        for idato in range(df_seleccion.shape[0]):
+          
+            col1, col2,col3,col4 = st.columns(4,gap="small")
+            with col1: 
+                
+                texto_botella = 'Botella:' + str(int(df_seleccion['botella'].iloc[idato]))
+                st.text(texto_botella)
+                
+            with col2: 
+                
+                if df_seleccion['prof_referencia'].iloc[idato] is not None:
+                    texto_profunidad = 'Profundidad (m):' + str(int(df_seleccion['prof_referencia'].iloc[idato]))
+                
+                else:
+                    texto_profunidad = 'Presion CTD (db):' + str(round(df_seleccion['presion_ctd'].iloc[idato]))
+                st.text(texto_profunidad)
+
+            with col3: 
+                texto_variable = variable_seleccionada + ':'
+                if io_valores_prev == 1:
+                    valor_entrada  = st.number_input(texto_variable,value=df_seleccion[variable_seleccionada].iloc[idato],key=idato,format = "%f")                                   
+                else:
+                    valor_entrada  = st.number_input(texto_variable,value=df_referencia[variable_seleccionada][0],key=idato,format = "%f")               
+                df_seleccion[variable_seleccionada].iloc[idato] = valor_entrada
+                
+            with col4: 
+                
+                variable_seleccionada_cc = variable_seleccionada + '_qf'
+                
+                if io_valores_prev == 1:
+                    indice_calidad_inicial = numpy.where(df_indices_calidad["indice"] ==df_seleccion[variable_seleccionada_cc].iloc[idato])[0][0]
+                    listado_indices        = df_indices_calidad['descripcion']
+                    qf_seleccionado        = st.selectbox('Índice calidad',(listado_indices),index=int(indice_calidad_inicial),key=(df_seleccion.shape[0] + 1 + idato))                    
+                else:
+                    qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']),key=(df_seleccion.shape[0] + 1 + idato))
+                
+                indice_qf_seleccionado = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
+                
+                
+                df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado)
+
+        io_envio = st.form_submit_button("Asignar valores e índices de calidad definidos")  
+
+        if io_envio:
+            
+            with st.spinner('Actualizando la base de datos'):
+           
+                # Introducir los valores en la base de datos
+                conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()  
+       
+                # Diferente instrucción si es pH (hay que especificar el tipo de medida)
+                if variable_seleccionada == 'ph': 
+                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, ph_metodo = %s WHERE muestreo = %s;'
+                    for idato in range(df_seleccion.shape[0]):
+        
+                        cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(id_tipo_analisis),int(df_seleccion['muestreo'].iloc[idato])))
+                        conn.commit()             
+                        
+                else:
+                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
+
+                    for idato in range(df_seleccion.shape[0]):
+        
+                        cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(df_seleccion['muestreo'].iloc[idato])))
+                        conn.commit() 
+    
+                cursor.close()
+                conn.close()   
+    
+            texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
+            st.success(texto_exito)
+   
+
+
