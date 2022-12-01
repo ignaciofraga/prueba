@@ -2635,7 +2635,7 @@ def procesado_nutrientes():
 
     # Añade resultados del procesado (salidas del AA procesadas en excel) 
     if tipo_accion == acciones[1]:
-
+        st.text('hola')
         
 
         
