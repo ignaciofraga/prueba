@@ -1331,10 +1331,10 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
     # Corrige las concentraciones a partir de los rendimientos de la coumna reductora
     datos_entrada['nitrato_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
     datos_entrada['nitrogeno_total_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
-    factor = ((datos_entrada['nitrogeno_total'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_entrada['NO2'].iloc[indices_calibracion[-1]])/(datos_entrada['TON'].iloc[indices_calibracion[-1]] + datos_entrada['NO2'].iloc[indices_calibracion[-1]])
+    factor = ((datos_entrada['nitrogeno_total'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])/(datos_entrada['nitrogeno_total'].iloc[indices_calibracion[-1]] + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])
     for idato in range(datos_entrada.shape[0]):
-        datos_entrada['nitrato_rendimiento'].iloc[idato] = (datos_entrada['nitrogeno_total'].iloc[idato]*factor - datos_entrada['NO2'].iloc[idato])/(rendimiento_columna/100) 
-        datos_entrada['nitrogeno_total_rendimiento'].iloc[idato] = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['NO2'].iloc[idato]
+        datos_entrada['nitrato_rendimiento'].iloc[idato] = (datos_entrada['nitrogeno_total'].iloc[idato]*factor - datos_entrada['nitrito'].iloc[idato])/(rendimiento_columna/100) 
+        datos_entrada['nitrogeno_total_rendimiento'].iloc[idato] = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['nitrito'].iloc[idato]
     
     
     # Pasa las concentraciones a mol/kg
