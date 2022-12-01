@@ -1340,10 +1340,10 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
     # Pasa las concentraciones a mol/kg
     datos_entrada['DENSIDAD'] = numpy.ones(datos_entrada.shape[0])
     for idato in range(datos_entrada.shape[0]):
-        if datos_entrada['Sample ID'].iloc[idato] == 'RMN Low CE' :
+        if datos_entrada['Sample ID'].iloc[idato] == 'RMN Low' :
             datos_entrada['DENSIDAD'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
             
-        elif datos_entrada['Sample ID'].iloc[idato] == 'RMN High CG':
+        elif datos_entrada['Sample ID'].iloc[idato] == 'RMN High':
             datos_entrada['DENSIDAD'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
             
         else:
@@ -1359,8 +1359,8 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
     
     ####  APLICA LA CORRECCIÓN DE DERIVA ####
     # Encuentra las posiciones de los RMNs
-    posicion_RMN_bajos  = [i for i, e in enumerate(datos_entrada['Sample ID']) if e == 'RMN Low CE']
-    posicion_RMN_altos  = [i for i, e in enumerate(datos_entrada['Sample ID']) if e == 'RMN High CG']
+    posicion_RMN_bajos  = [i for i, e in enumerate(datos_entrada['Sample ID']) if e == 'RMN Low']
+    posicion_RMN_altos  = [i for i, e in enumerate(datos_entrada['Sample ID']) if e == 'RMN High']
     
     for ivariable in range(len(variables_run)):
         
