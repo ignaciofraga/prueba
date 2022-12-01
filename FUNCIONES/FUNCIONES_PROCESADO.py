@@ -757,7 +757,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
 
     import streamlit as st
     import matplotlib.pyplot as plt
-    from FUNCIONES.FUNCIONES_AUXILIARES import init_connection    
+    from FUNCIONES.FUNCIONES_AUXILIARES import menu_seleccion   
+    from FUNCIONES.FUNCIONES_AUXILIARES import init_connection 
 
     # Recupera los datos disponibles en la base de datos
     conn                      = init_connection()
@@ -782,7 +783,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
     io_control_calidad = 1
     df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,io_control_calidad)
-    indice_variable = FUNCIONES_AUXILIARES.variables_procesado_bd.index(variable_seleccionada)
+    indice_variable = variables_procesado_bd.index(variable_seleccionada)
 
     qf_variable_seleccionada = variable_seleccionada + '_qf'
 
