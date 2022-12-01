@@ -509,6 +509,8 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
     # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
     io_control_calidad = 0
     df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad)
+    indice_seleccion = variables_procesado_bd.index(variable_seleccionada)
+    variable_seleccionada_nombre = variables_procesado[indice_seleccion]
 
     # Si ya hay datos previos, mostrar un warning        
     if df_seleccion[variable_seleccionada].notnull().all():
@@ -549,7 +551,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
                 st.text(texto_profunidad)
 
             with col3: 
-                texto_variable = variable_seleccionada + ':'
+                texto_variable = variable_seleccionada_nombre + ':'
                 if io_valores_prev == 1:
                     valor_entrada  = st.number_input(texto_variable,value=df_seleccion[variable_seleccionada].iloc[idato],key=idato,format = "%f")                                   
                 else:
