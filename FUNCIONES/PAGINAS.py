@@ -2536,7 +2536,7 @@ def procesado_nutrientes():
                 st.text(df_datos_disponibles.columns.tolist())
                 
                 st.text(datos_corregidos.columns.tolist())                
-                datos_corregidos      = pandas.merge(datos_corregidos, df_datos_disponibles, on="muestreo")  
+                datos_corregidos      = pandas.merge(datos_corregidos, df_datos_disponibles, on="nombre_muestreo")  
                 
                 # Realiza control de calidad
                 FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_corregidos,variables_procesado,variables_procesado_bd,variables_unidades)
