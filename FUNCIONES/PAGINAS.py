@@ -2704,7 +2704,9 @@ def procesado_quimica():
     # Añade nuevos datos obtenidos en laboratorio
     if tipo_accion == acciones[0]:
         
-        FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_procesado,variables_procesado_bd,df_referencia):
+        st.text('hola')
+        
+        #FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_procesado,variables_procesado_bd,df_referencia):
 
         # # compón un dataframe con la información de muestreo y datos biogeoquímicos
         # df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
