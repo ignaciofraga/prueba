@@ -2533,6 +2533,8 @@ def procesado_nutrientes():
             
                 # Añade información de oxígeno, pH, alcalinidad, profunidad....a las muestras que ya estaban en la base de datos
                 df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_datos_disponibles, on="muestreo")                               
+                df_datos_disponibles  = df_datos_disponibles.drop(columns=['nitrogeno_total','nitrato','nitrito','fosfato','silicato']) # Para evitar duplicidad de columnas
+
                 datos_corregidos      = pandas.merge(datos_corregidos, df_datos_disponibles, on="nombre_muestreo")  
                 
                 # Añade columna con información del año
