@@ -2532,11 +2532,14 @@ def procesado_nutrientes():
                 st.success(texto_exito)
             
                 # Añade información de oxígeno, pH, alcalinidad, profunidad....a las muestras que ya estaban en la base de datos
-                df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_datos_disponibles, on="muestreo")                 
-                st.text(df_datos_disponibles.columns.tolist())
-                
-                st.text(datos_corregidos.columns.tolist())                
+                df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_datos_disponibles, on="muestreo")                               
                 datos_corregidos      = pandas.merge(datos_corregidos, df_datos_disponibles, on="nombre_muestreo")  
+                
+                # Añade columna con información del año
+                datos_corregidos['año']                = numpy.zeros(datos_corregidos.shape[0],dtype=int)
+                for idato in range(datos_corregidos.shape[0]):
+                    datos_corregidos['año'].iloc[idato] = (datos_corregidos['fecha_muestreo'].iloc[idato]).year
+                
                 
                 # Realiza control de calidad
                 FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_corregidos,variables_procesado,variables_procesado_bd,variables_unidades)
