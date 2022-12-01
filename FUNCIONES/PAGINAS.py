@@ -41,7 +41,7 @@ def principal():
 
     logo_IEO_principal    = 'DATOS/IMAGENES/logo-CSIC.jpg'    
 
-    st.title("Servicio de información de nutrientes del C.O de A Coruña")
+    st.title("Plataforma de datos biogeoquímicos del C.O de A Coruña")
 
     # Añade el logo del IEO
     imagen_pagina = Image.open(logo_IEO_principal) 
@@ -2384,6 +2384,11 @@ def entrada_botellas():
 
 
 
+
+
+
+
+
 # ###############################################################################
 # ##################### PÁGINA DE CONSULTA DE DATOS DE BOTELLAS #################
 # ###############################################################################    
@@ -2391,118 +2396,17 @@ def entrada_botellas():
 
 def consulta_botellas():
         
-    st.subheader('Consulta los datos de botellas disponibles') 
+    FUNCIONES_AUXILIARES.consulta_botellas()
 
-    # Recupera tablas con informacion utilizada en el procesado
-    conn                    = init_connection()
-    df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-    df_programas            = psql.read_sql('SELECT * FROM programas', conn)
-    df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-    df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
-    df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-    df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
-    conn.close()    
-    
-    id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
-    
-    # Despliega menús de selección del programa, tipo de salida, año y fecha               
-    col1, col2, col3= st.columns(3,gap="small")
- 
-    with col1: 
-        programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
-        df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
-        
-    
-    with col2:
-        tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
-        df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
-    
-        indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
-        df_salidas_seleccion['id_temp'] = indices_dataframe
-        df_salidas_seleccion.set_index('id_temp',drop=True,append=False,inplace=True)
-        
-        # Define los años con salidas asociadas
-        df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
-        for idato in range(df_salidas_seleccion.shape[0]):
-            df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
-        df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
-        
-        listado_anhos              = df_salidas_seleccion['año'].unique()
-    
-    with col3:
-        anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
-        df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
 
-    # A partir del programa y año elegido, selecciona uno o varios muestreos   
-    listado_salidas                 = st.multiselect('Muestreo',(df_salidas_seleccion['nombre_salida']))   
-  
-    if len(listado_salidas) > 0:  
-  
-        identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
-        for idato in range(len(listado_salidas)):
-            identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
-    
-        # Elimina las columnas que no interesan en los dataframes a utilizar
-        #df_salidas_seleccion        = df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
-        df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
-        df_muestreos                = df_muestreos.drop(columns=['configuracion_perfilador','configuracion_superficie'])
-        df_datos_biogeoquimicos     = df_datos_biogeoquimicos.drop(columns=['r_clor','r_clor_qf','r_per','r_per_qf','co3_temp'])
-    
-        # conserva los datos de las salidas seleccionadas
-        df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
-    
-        # Recupera los muestreos correspondientes a las salidas seleccionadas
-        df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
-        df_muestreos_seleccionados  = pandas.merge(df_salidas_seleccion, df_muestreos, on="id_salida")
-                              
-        # Asocia las coordenadas y nombre de estación de cada muestreo
-        df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
-        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
-        
-        # Asocia las propiedades físicas de cada muestreo
-        df_datos_fisicos            = df_datos_fisicos.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
-        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos, on="id_muestreo")
-    
-        # Asocia las propiedades biogeoquimicas de cada muestreo
-        df_datos_biogeoquimicos     = df_datos_biogeoquimicos.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
-        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos, on="id_muestreo")
-    
-        # Elimina las columnas que no interesan
-        df_exporta                  = df_muestreos_seleccionados.drop(columns=['id_salida','estacion','programa','profundidades_referencia'])
-    
-        # Mueve os identificadores de muestreo al final del dataframe
-        listado_cols = df_exporta.columns.tolist()
-        listado_cols.append(listado_cols.pop(listado_cols.index('id_muestreo')))
-        listado_cols.append(listado_cols.pop(listado_cols.index('id_disc_fisica')))
-        listado_cols.append(listado_cols.pop(listado_cols.index('id_disc_biogeoquim')))
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud')))    
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud')))
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
-        df_exporta = df_exporta[listado_cols]
-    
-        # Ordena los valores por fechas
-        df_exporta = df_exporta.sort_values('fecha_muestreo')
-    
-        ## Botón para exportar los resultados
-        nombre_archivo =  'DATOS_BOTELLAS.xlsx'
-    
-        output = BytesIO()
-        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-        df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
-        workbook = writer.book
-        worksheet = writer.sheets['DATOS']
-        writer.save()
-        datos_exporta = output.getvalue()
-    
-        st.download_button(
-            label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
-            data=datos_exporta,
-            file_name=nombre_archivo,
-            help= 'Descarga un archivo .csv con los datos solicitados',
-            mime="application/vnd.ms-excel"
-        )
-        
+
+
+
+
+
+
+
+
         
         
         
