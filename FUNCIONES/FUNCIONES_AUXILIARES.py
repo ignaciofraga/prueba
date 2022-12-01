@@ -624,7 +624,7 @@ def comprueba_estado(nombre_programa,anho_proceso):
     conn = init_connection()
     cursor = conn.cursor()           
     instruccion_sql = "SELECT * FROM estado_proceso WHERE nombre_programa = %s and año = %s;"   
-    cursor.execute(instruccion_sql, (nombre_programa,anho_proceso)) 
+    cursor.execute(instruccion_sql, (nombre_programa,int(anho_proceso))) 
     datos_bd =cursor.fetchall()         
     cursor.close()
     conn.close()      
