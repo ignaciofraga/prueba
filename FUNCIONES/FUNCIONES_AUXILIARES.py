@@ -617,25 +617,28 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
 ##################### FUNCION PARA INSERTAR DATOS DISCRETOS  ##################
 ############################################################################### 
 
-def comprueba_estado(nombre_programa,anho_proceso):
-
-    st.text(nombre_programa)
-    st.text(anho_proceso)
-
-    id_programa = 3
+def comprueba_estado(id_programa,anho_proceso,fecha_comparacion):
 
     # Consulta a la base de datos las fechas de cada proceso
     conn = init_connection()
     cursor = conn.cursor()           
-#    instruccion_sql = "SELECT * FROM estado_proceso WHERE nombre_programa = %s AND año = %s;"   
-    #cursor.execute(instruccion_sql, (nombre_programa,int(anho_proceso))) 
-    instruccion_sql = 'SELECT programa,nombre_programa,año,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado FROM estado_procesos WHERE programa = ' + str(id_programa) +' AND año = ' + str(anho_proceso) +';'
+    instruccion_sql = 'SELECT fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado FROM estado_procesos WHERE programa = ' + str(id_programa) +' AND año = ' + str(anho_proceso) +';'
     cursor.execute(instruccion_sql) 
     datos_bd =cursor.fetchall()         
     cursor.close()
     conn.close()      
 
-    st.text(datos_bd)
+    fecha_final_muestreo = datos_bd[0]
+    fecha_analisis_laboratorio = datos_bd[1]
+    fecha_post_procesado = datos_bd[2]
+    contacto_muestreo = datos_bd[3]
+    contacto_post_procesado = datos_bd[4]
+    
+    st.text(fecha_final_muestreo)
+    st.text(fecha_analisis_laboratorio)
+    st.text(fecha_post_procesado)
+    st.text(contacto_muestreo)
+    st.text(contacto_post_procesado)
 
         # # Recupera de la base de datos las fechas de análisis y procesado (si están disponibles)
         # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)

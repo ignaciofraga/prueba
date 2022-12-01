@@ -115,7 +115,7 @@ def consulta_estado():
             with col1:
                 nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
             with col2:
-                tiempo_consulta = st.date_input("Selecciona fecha de consulta",datetime.date.today())
+                fecha_consulta = st.date_input("Selecciona fecha de consulta",datetime.date.today())
         
             # Botón de envío para confirmar selección
             submit = st.form_submit_button("Enviar")
@@ -149,7 +149,7 @@ def consulta_estado():
                 for ianho in range(estado_procesos_programa.shape[0]):
                     
                     anho_proceso   = estado_procesos_programa['año'].iloc[ianho]
-                    FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,anho_proceso)
+                    FUNCIONES_AUXILIARES.comprueba_estado(id_programa,anho_proceso,fecha_consulta)
             
             
                 # # Quita del dataframe las columnas con el identificador del programa y el número registro (no interesa mostrarlo en la web)
