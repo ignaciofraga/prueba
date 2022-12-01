@@ -2439,12 +2439,18 @@ def procesado_nutrientes():
     df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
                          
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    acciones     = ['Procesar salidas del AA', 'Añadir resultados procesados' ,'Realizar control de calidad de datos disponibles']
+    acciones     = ['Procesar salidas del AA', 'Añadir o modificar datos procesados' ,'Realizar control de calidad de datos disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
  
+    # Define los vectores con las variables a procesar
     variables_procesado    = ['Nitrógeno total','Nitrato','Nitrito','Silicato','Fosfato']    
     variables_procesado_bd = ['nitrogeno_total','nitrato','nitrito','silicato','fosfato']
     variables_unidades     = ['\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg']
+    
+    
+    # Define unos valores de referencia 
+    df_referencia        = pandas.DataFrame(columns = variables_procesado_bd,index = [0])
+    df_referencia.loc[0] = [0,0,0,0,0]
     
     # Añade salidas del AA
     if tipo_accion == acciones[0]:
@@ -2635,7 +2641,9 @@ def procesado_nutrientes():
 
     # Añade resultados del procesado (salidas del AA procesadas en excel) 
     if tipo_accion == acciones[1]:
-        st.text('hola')
+        
+        FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_procesado,variables_procesado_bd,df_referencia)
+
         
 
         
@@ -2680,7 +2688,7 @@ def procesado_quimica():
     df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
                          
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    acciones     = ['Añadir o modificar datos de laboratorio', 'Realizar control de calidad de datos disponibles']
+    acciones     = ['Añadir o modificar datos procesados', 'Realizar control de calidad de datos disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
  
     variables_procesado    = ['pH','Alcalinidad','Oxígeno (Método Winkler)']    
