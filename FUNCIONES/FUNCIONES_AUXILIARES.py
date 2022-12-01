@@ -625,7 +625,8 @@ def comprueba_estado(nombre_programa,anho_proceso):
     # Consulta a la base de datos las fechas de cada proceso
     conn = init_connection()
     cursor = conn.cursor()           
-    instruccion_sql = "SELECT * FROM estado_proceso WHERE nombre_programa = %s and año = %s;"   
+#    instruccion_sql = "SELECT * FROM estado_proceso WHERE nombre_programa = %s AND año = %s;"   
+    instruccion_sql = "SELECT * FROM estado_proceso WHERE nombre_programa = " + nombre_programa +' AND año = ' + str(anho_proceso) +';'
     cursor.execute(instruccion_sql, (nombre_programa,int(anho_proceso))) 
     datos_bd =cursor.fetchall()         
     cursor.close()
