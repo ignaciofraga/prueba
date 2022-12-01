@@ -2534,7 +2534,7 @@ def procesado_nutrientes():
                 # Añade información de oxígeno, pH, alcalinidad, profunidad....a las muestras que ya estaban en la base de datos
                 df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_datos_disponibles, on="muestreo")                 
                 st.text(df_datos_disponibles.columns.tolist())
-                datos_corregidos.rename(columns={"Sample ID":"muestreo"})
+                
                 st.text(datos_corregidos.columns.tolist())                
                 datos_corregidos      = pandas.merge(datos_corregidos, df_datos_disponibles, on="muestreo")  
                 
