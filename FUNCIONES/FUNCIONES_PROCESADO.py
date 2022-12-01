@@ -1318,16 +1318,12 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
 
 def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_columna,temperatura_laboratorio):
 
-    import streamlit as st
-
     # Predimensiona un dataframe con los resultados de la correccion
     datos_corregidos = pandas.DataFrame(columns=variables_run)    
 
     # Encuentra los índices (picos) correspondientes a la calbración
     indices_calibracion = numpy.asarray(datos_entrada['Peak Number'][datos_entrada['Cup Type']=='CALB']) - 1
-       
-    st.text(datos_entrada.columns.tolist())
-    
+           
     # Corrige las concentraciones a partir de los rendimientos de la coumna reductora
     datos_entrada['nitrato_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
     datos_entrada['nitrogeno_total_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
