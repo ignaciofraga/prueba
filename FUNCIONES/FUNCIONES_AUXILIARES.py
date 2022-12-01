@@ -628,11 +628,11 @@ def comprueba_estado(id_programa,anho_proceso,fecha_comparacion):
     cursor.close()
     conn.close()      
 
-    fecha_final_muestreo = datos_bd[0]
-    fecha_analisis_laboratorio = datos_bd[1]
-    fecha_post_procesado = datos_bd[2]
-    contacto_muestreo = datos_bd[3]
-    contacto_post_procesado = datos_bd[4]
+    fecha_final_muestreo = datos_bd[0][0]
+    fecha_analisis_laboratorio = datos_bd[0][1]
+    fecha_post_procesado = datos_bd[0][2]
+    contacto_muestreo = datos_bd[0][3]
+    contacto_post_procesado = datos_bd[0][4]
     
     st.text(fecha_final_muestreo)
     st.text(fecha_analisis_laboratorio)
