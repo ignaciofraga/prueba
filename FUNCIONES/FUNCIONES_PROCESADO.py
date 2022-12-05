@@ -1086,9 +1086,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                        
                     col1, col2, col3, col4 = st.columns(4,gap="small")
                     with col2:
-                        vmin_rango_x_g2  = st.number_input('Valor mínimo nitrato:',value=min_val_x_g2,key=100)
+                        vmin_rango_x_g2  = st.number_input('Valor mínimo nitrato:',value=min_val_x_g2)
                     with col3:
-                        vmax_rango_x_g2  = st.number_input('Valor máximo nitrato:',value=max_val_x_g2,key=101)  
+                        vmax_rango_x_g2  = st.number_input('Valor máximo nitrato:',value=max_val_x_g2)  
      
                     min_val_y_g2 = 0.95*min(df_disponible_bd['ph'].min(),df_seleccion['ph'].min())
                     max_val_y_g2 = 1.05*max(df_disponible_bd['ph'].max(),df_seleccion['ph'].max())

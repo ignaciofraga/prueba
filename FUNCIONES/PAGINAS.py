@@ -152,16 +152,11 @@ def consulta_estado():
             
                 # Despliega la información en una tabla
                 
-                cellsytle_jscode = st_aggrid.shared.JsCode(
-                """function(params) {
-                if (params.value.includes('No disponible'))
-                {return {'color': 'black', 'backgroundColor': '#CD5C5C'}}
-                if (params.value.includes('Pendiente de análisis'))
-                {return {'color': 'black', 'backgroundColor': '#F4A460'}}
-                if (params.value.includes('Analizado'))
-                {return {'color': 'black', 'backgroundColor': '#87CEEB'}}
-                if (params.value.includes('Post-Procesado'))
-                {return {'color': 'black', 'backgroundColor': '#66CDAA'}}
+                cellsytle_jscode = st_aggrid.shared.JsCode("""function(params) {
+                if (params.value.includes('No disponible')){return {'color': 'black', 'backgroundColor': '#CD5C5C'}}
+                if (params.value.includes('Pendiente de análisis')){return {'color': 'black', 'backgroundColor': '#F4A460'}}
+                if (params.value.includes('Analizado')){return {'color': 'black', 'backgroundColor': '#87CEEB'}}
+                if (params.value.includes('Post-Procesado')){return {'color': 'black', 'backgroundColor': '#66CDAA'}}
                 };""")
                 
                 st.header("Listado de datos")
@@ -170,33 +165,28 @@ def consulta_estado():
             
                 gridOptions = gb.build()
                 
-                data = st_aggrid.AgGrid(
-                    df_estados,
-                    gridOptions=gridOptions,
-                    enable_enterprise_modules=True,
-                    allow_unsafe_jscode=True
-                    )    
+                st_aggrid.AgGrid(df_estados,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
                     
                     
-                # # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
-                # num_valores = numpy.zeros(len(nombre_estados),dtype=int)
-                # for ivalor in range(len(nombre_estados)):
-                #     try:
-                #         num_valores[ivalor] = df_estados['id_estado'].value_counts()[ivalor]
-                #     except:
-                #         pass
-                # porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),0)
+                # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
+                num_valores = numpy.zeros(len(nombre_estados),dtype=int)
+                for ivalor in range(len(nombre_estados)):
+                    try:
+                        num_valores[ivalor] = df_estados['id_estado'].value_counts()[ivalor]
+                    except:
+                        pass
+                porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),0)
                 
-                # # Construye el gráfico
-                # cm              = 1/2.54 # pulgadas a cm
-                # fig, ax1 = plt.subplots(figsize=(8*cm, 8*cm))
-                # #ax1.pie(num_valores, explode=explode_estados, colors=listado_colores,labels=listado_estados, autopct='%1.1f%%', shadow=True, startangle=90)
-                # patches, texts= ax1.pie(num_valores, colors=colores_estados,shadow=True, startangle=90,radius=1.2)
-                # ax1.axis('equal')  # Para representar el pie-chart como un circulo
+                # Construye el gráfico
+                cm              = 1/2.54 # pulgadas a cm
+                fig, ax1 = plt.subplots(figsize=(8*cm, 8*cm))
+                #ax1.pie(num_valores, explode=explode_estados, colors=listado_colores,labels=listado_estados, autopct='%1.1f%%', shadow=True, startangle=90)
+                patches, texts= ax1.pie(num_valores, colors=colores_estados,shadow=True, startangle=90,radius=1.2)
+                ax1.axis('equal')  # Para representar el pie-chart como un circulo
                 
-                # # Representa y ordena la leyenda
-                # etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
-                # plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(-0.1, -0.3),fontsize=8)
+                # Representa y ordena la leyenda
+                etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
+                plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(-0.1, -0.3),fontsize=8)
                 
 
                 
