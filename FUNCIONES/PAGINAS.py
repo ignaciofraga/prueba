@@ -299,8 +299,9 @@ def consulta_estado():
                 for ifecha in range(num_valores.shape[0]):
                     
                     # Etiqueta con el nombre del programa
-                    angulo_giro = 60
-                    ax.text(posicion_x_programa[ifecha], etiqueta_altura[ifecha], etiqueta_nombre[ifecha], ha="center", va="bottom",rotation=angulo_giro)
+                    angulo_giro = 90
+                    if etiqueta_altura[ifecha] > 0:
+                        ax.text(posicion_x_programa[ifecha], etiqueta_altura[ifecha], etiqueta_nombre[ifecha], ha="center", va="bottom",rotation=angulo_giro)
                     
                     # Etiqueta con el valor de cada uno de los estados
                     if valores_programa[ifecha,0] > 0:
