@@ -142,86 +142,47 @@ def consulta_estado():
                 st.warning('No se dispone de información acerca del estado del programa de muestreo seleccionado', icon="⚠️")
             
             else:
-            
-                # # Predimensiona un dataframe con los resultados de la correccion
-                # df_estados = pandas.DataFrame(columns=['Programa','Año','Estado','Fecha Actualización','Contacto'])
-                
-                # for ianho in range(estado_procesos_programa.shape[0]):
-                    
-                #     anho_proceso   = estado_procesos_programa['año'].iloc[ianho]
-                #     iestado,contacto,fecha_actualizacion = FUNCIONES_AUXILIARES.comprueba_estado(id_programa,anho_proceso,fecha_consulta)
-            
-                #     df_estados['Programa'].loc[ianho] = nombre_programa
-            
+                        
                 df_estados = FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,fecha_consulta)
-        
-                st.text(df_estados)
+
+                nombre_estados  = ['No disponible','Pendiente de análisis','Analizado','Post-Procesado']
+                colores_estados = ['#CD5C5C','#F4A460','#87CEEB','#66CDAA','#2E8B57']        
             
-                # # Quita del dataframe las columnas con el identificador del programa y el número registro (no interesa mostrarlo en la web)
-                # estado_procesos_programa = estado_procesos_programa.drop(['id_proceso','programa'], axis = 1)
+                df_estados = df_estados.sort_values('Año')
+            
+                # Despliega la información en una tabla
                 
+                cellsytle_jscode = st_aggrid.shared.JsCode(
+                """function(params) {
+                if (params.value.includes('No disponible'))
+                {return {'color': 'black', 'backgroundColor': '#CD5C5C'}}
+                if (params.value.includes('Pendiente de análisis'))
+                {return {'color': 'black', 'backgroundColor': '#F4A460'}}
+                if (params.value.includes('Analizado'))
+                {return {'color': 'black', 'backgroundColor': '#87CEEB'}}
+                if (params.value.includes('Post-Procesado'))
+                {return {'color': 'black', 'backgroundColor': '#66CDAA'}}
+                };""")
                 
+                st.header("Listado de datos")
+                gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_estados)
+                gb.configure_column("estado", cellStyle=cellsytle_jscode)
+            
+                gridOptions = gb.build()
                 
-                # # Reemplaza los nan por None
-                # estado_procesos_programa = estado_procesos_programa.fillna(numpy.nan).replace([numpy.nan], [None])
-                
-                # # Actualiza el indice del dataframe 
-                # indices_dataframe         = numpy.arange(0,estado_procesos_programa.shape[0],1,dtype=int)
-                # estado_procesos_programa['id_temp'] = indices_dataframe
-                # estado_procesos_programa.set_index('id_temp',drop=True,append=False,inplace=True)
-                
-                
-                # ### Determina el estado de cada proceso, en la fecha seleccionada
-                # estado_procesos_programa['estado']    = ''
-                # estado_procesos_programa['contacto']  = ''
-                # estado_procesos_programa['id_estado'] = 0
-                # estado_procesos_programa['fecha actualizacion'] = [None]*estado_procesos_programa.shape[0]
-                
-                # nombre_estados  = ['No disponible','Pendiente de análisis','Analizado','Post-Procesado']
-                # colores_estados = ['#CD5C5C','#F4A460','#87CEEB','#66CDAA','#2E8B57']
-                
-                # for ianho in range(estado_procesos_programa.shape[0]):
-                
-                #     # Caso 3. Fecha de consulta posterior al post-procesado.
-                #     if pandas.isnull(estado_procesos_programa['fecha_post_procesado'][ianho]) is False:
-                #         if tiempo_consulta >= (estado_procesos_programa['fecha_post_procesado'][ianho]):     
-                #             estado_procesos_programa['id_estado'][ianho] = 3
-                #             estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho] 
-                #             estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_post_procesado'][ianho].strftime("%m/%d/%Y")
-                #     else:
-                        
-                #         # Caso 2. Fecha de consulta posterior al análisis de laboratorio pero anterior a realizar el post-procesado.
-                #         if pandas.isnull(estado_procesos_programa['fecha_analisis_laboratorio'][ianho]) is False:
-                #             if tiempo_consulta >= (estado_procesos_programa['fecha_analisis_laboratorio'][ianho]):  # estado_procesos_programa['fecha_analisis_laboratorio'][ianho] is not None:     
-                #                 estado_procesos_programa['id_estado'][ianho] = 2
-                #                 estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho] 
-                #                 estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_analisis_laboratorio'][ianho].strftime("%m/%d/%Y")
-                #             else:
-                #                 if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
-                #                     estado_procesos_programa['id_estado'][ianho] = 1 
-                #                     estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho]
-                #                     estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_entrada_datos'][ianho].strftime("%m/%d/%Y")
-                                                        
-                        
-                #         else:
-                #             # Caso 1. Fecha de consulta posterior a terminar la campaña pero anterior al análisis en laboratorio, o análisis no disponible. 
-                #             if pandas.isnull(estado_procesos_programa['fecha_entrada_datos'][ianho]) is False:
-                #                 if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
-                #                     estado_procesos_programa['id_estado'][ianho] = 1 
-                #                     estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho]
-                #                     estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_entrada_datos'][ianho].strftime("%m/%d/%Y")
-                                    
-                
-                #     estado_procesos_programa['estado'][ianho] = nombre_estados[estado_procesos_programa['id_estado'][ianho]]
-                                
-                    
+                data = st_aggrid.AgGrid(
+                    df_estados,
+                    gridOptions=gridOptions,
+                    enable_enterprise_modules=True,
+                    allow_unsafe_jscode=True
+                    )    
                     
                     
                 # # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
                 # num_valores = numpy.zeros(len(nombre_estados),dtype=int)
                 # for ivalor in range(len(nombre_estados)):
                 #     try:
-                #         num_valores[ivalor] = estado_procesos_programa['id_estado'].value_counts()[ivalor]
+                #         num_valores[ivalor] = df_estados['id_estado'].value_counts()[ivalor]
                 #     except:
                 #         pass
                 # porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),0)
@@ -237,30 +198,9 @@ def consulta_estado():
                 # etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
                 # plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(-0.1, -0.3),fontsize=8)
                 
+
                 
-                
-                
-                
-                # # Genera un subset del dataframe con los años en los que hay datos, entre los que se seleccionará la fecha a descargar
-                # datos_disponibles = estado_procesos_programa.loc[estado_procesos_programa['id_estado'] >= 2]
-                
-                # # Genera un dataframe con las columnas que se quieran mostrar en la web
-                # datos_visor = estado_procesos_programa.drop(columns=['nombre_programa','fecha_final_muestreo','fecha_analisis_laboratorio','fecha_post_procesado','id_estado','contacto_muestreo','contacto_post_procesado'])
-                # datos_visor = datos_visor[['año','estado','fecha actualizacion','contacto']]
-                
-                # datos_visor = datos_visor.sort_values(by=['año'])
-                
-                # cellsytle_jscode = st_aggrid.shared.JsCode(
-                # """function(params) {
-                # if (params.value.includes('No disponible'))
-                # {return {'color': 'black', 'backgroundColor': '#CD5C5C'}}
-                # if (params.value.includes('Pendiente de análisis'))
-                # {return {'color': 'black', 'backgroundColor': '#F4A460'}}
-                # if (params.value.includes('Analizado'))
-                # {return {'color': 'black', 'backgroundColor': '#87CEEB'}}
-                # if (params.value.includes('Post-Procesado'))
-                # {return {'color': 'black', 'backgroundColor': '#66CDAA'}}
-                # };""")
+
                 
                   
                 # #    if (params.value.includes('Procesado secundario'))
