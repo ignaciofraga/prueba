@@ -681,6 +681,8 @@ def comprueba_estado(id_programa,fecha_comparacion):
         df_estados['Fecha Actualización'].loc[ianho] = fecha_actualizacion    
         df_estados['Contacto'].loc[ianho]            = contacto   
 
+    st.text(df_estados)
+
     return df_estados
 
 
