@@ -840,6 +840,7 @@ conn.close()
 # ' fecha_inicio date,'
 # ' fecha_estimada_fin date,'
 # ' fecha_real_fin date,'
+# ' observaciones text,'
 # ' io_estado int,'
 # ) 
 

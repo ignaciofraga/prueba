@@ -345,174 +345,7 @@ def consulta_estado():
             
             
         
-            
-        
-        
-        
-        
-        
-        
-            # # Recupera la tabla de los programas disponibles como un dataframe
-            # conn         = init_connection()
-            # df_programas = psql.read_sql('SELECT * FROM programas', conn)
-            
-            # # Recupera la tabla del estado de los procesos como un dataframe
-            # temporal_estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
-            # conn.close()
-            
-            # # Estados
-            # nombre_estados  = ['No disponible','Pendiente de análisis','Analizado','Post-Procesado']
-            # colores_estados = ['#CD5C5C','#F4A460','#87CEEB','#66CDAA','#2E8B57']
-            
-            
-            
-            # # Contador
-            # num_valores = numpy.zeros((len(fechas_comparacion),df_programas.shape[0],len(nombre_estados)),dtype=int)
-            
-            # for itiempo in range(len(fechas_comparacion)):
-                
-            #     tiempo_consulta = fechas_comparacion[itiempo]
-                
-            #     for iprograma in range(df_programas.shape[0]):
-                
-            #         # Extrae los datos disponibles del programa consultado 
-            #         estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['programa']==iprograma+1]
-                    
-            #         # Bucle if para desplegar información únicamente si hay información del programa seleccionado
-            #         if estado_procesos_programa.shape[0] != 0:
-                                
-            #             # Quita del dataframe las columnas con el identificador del programa y el número registro (no interesa mostrarlo en la web)
-            #             estado_procesos_programa = estado_procesos_programa.drop(['id_proceso','programa'], axis = 1)
-                        
-            #             # Reemplaza los nan por None
-            #             estado_procesos_programa = estado_procesos_programa.fillna(numpy.nan).replace([numpy.nan], [None])
-                        
-            #             # Actualiza el indice del dataframe 
-            #             indices_dataframe         = numpy.arange(0,estado_procesos_programa.shape[0],1,dtype=int)
-            #             estado_procesos_programa['id_temp'] = indices_dataframe
-            #             estado_procesos_programa.set_index('id_temp',drop=True,append=False,inplace=True)
-                        
-                        
-            #             ### Determina el estado de cada proceso, en la fecha seleccionada
-            #             estado_procesos_programa['id_estado']    = [None]*estado_procesos_programa.shape[0]
-                        
-                
-            #             for ianho in range(estado_procesos_programa.shape[0]):
-                        
-            #                 # Caso 3. Fecha de consulta posterior al post-procesado.
-            #                 if pandas.isnull(estado_procesos_programa['fecha_post_procesado'][ianho]) is False:
-            #                     if tiempo_consulta.date() >= (estado_procesos_programa['fecha_post_procesado'][ianho]):     
-            #                         estado_procesos_programa['id_estado'][ianho] = 3
-            #                 else:
-                                
-            #                     # Caso 2. Fecha de consulta posterior al análisis de laboratorio pero anterior a realizar el post-procesado.
-            #                     if pandas.isnull(estado_procesos_programa['fecha_analisis_laboratorio'][ianho]) is False:
-            #                         if tiempo_consulta.date() >= (estado_procesos_programa['fecha_analisis_laboratorio'][ianho]):  # estado_procesos_programa['fecha_analisis_laboratorio'][ianho] is not None:     
-            #                             estado_procesos_programa['id_estado'][ianho] = 2
-            #                         else:
-            #                             if tiempo_consulta.date()  >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
-            #                                 estado_procesos_programa['id_estado'][ianho] = 1 
-                                                                                
-            #                     else:
-            #                         # Caso 1. Fecha de consulta posterior a terminar la campaña pero anterior al análisis en laboratorio, o análisis no disponible. 
-            #                         if pandas.isnull(estado_procesos_programa['fecha_entrada_datos'][ianho]) is False:
-            #                             if tiempo_consulta.date()  >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
-            #                                 estado_procesos_programa['id_estado'][ianho] = 1 
-                                            
-                                    
-            #             # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
-                
-            #             for ivalor in range(len(nombre_estados)):
-            #                 try:
-            #                     num_valores[itiempo,iprograma,ivalor] = estado_procesos_programa['id_estado'].value_counts()[ivalor]
-            #                 except:
-            #                     pass
-            
-                    
-            
-            
-            # fig, ax           = plt.subplots()
-            # anchura_barra     = 0.125
-            # etiquetas         = df_programas['abreviatura']
-            # id_mes            = numpy.arange(0,len(fechas_comparacion))
-            
-            # nombres_meses     =['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-            # vector_nombres    = [None]*fechas_comparacion.shape[0]
-            # for idato in range(fechas_comparacion.shape[0]):
-            #     vector_nombres[idato] = nombres_meses[fechas_comparacion[idato].month-1] + ' ' + fechas_comparacion[idato].strftime("%y")
-            
-            # # Bucle con cada programa de muestreo
-            # valor_maximo_programa = numpy.zeros(df_programas.shape[0])
-            # for iprograma in range(df_programas.shape[0]): 
-                
-            #     # Desplaza la coordenada x de cada programa para representarlo separado de los demás
-            #     posicion_x_programa    = id_mes + anchura_barra*(iprograma - 2)
-                
-            #     # Extrae los valores de muestras en cada estado para el programa correspondiente
-            #     valores_programa   = num_valores[:,iprograma,:]
-                
-            #     # Busca la posición del fondo de cada barra a partir de los valores de la barra anterior
-            #     valores_acumulados = numpy.cumsum(valores_programa,axis =1)
-            #     acumulados_mod     = numpy.c_[ numpy.zeros(valores_acumulados.shape[0]), valores_acumulados]
-            #     acumulados_mod     = numpy.delete(acumulados_mod, -1, axis = 1)
-            
-            #     # Determina la posición de las etiquetas y la máxima altura (para luego definir el rango del eje y)
-            #     etiqueta_altura                   = valores_acumulados[:,-1] + 1.5
-            #     valor_maximo_programa [iprograma] = max(etiqueta_altura)
-                
-            #     # Representa la barra correspondiente a cada estado, en los distintos tiempos considerados
-            #     for igrafico in range(num_valores.shape[2]):
-                    
-            #         posicion_fondo = acumulados_mod[:,igrafico]
-                    
-            #         plt.bar(posicion_x_programa, num_valores[:,iprograma,igrafico], anchura_barra, bottom = posicion_fondo ,color=colores_estados[igrafico],edgecolor='k')
-            
-            #     # Añade una etiqueta para identificar al programa
-            #     etiqueta_nombre   = [etiquetas[iprograma]]*num_valores.shape[0]
-            #     for ibarra in range(num_valores.shape[0]):
-            #         # Etiqueta con el nombre del programa
-            #         ax.text(posicion_x_programa[ibarra], etiqueta_altura[ibarra], etiqueta_nombre[ibarra], ha="center", va="bottom")
-            #         # Etiqueta con el valor de cada uno de los estados
-            #         if valores_programa[ibarra,0] > 0:
-            #             ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,0] , str(valores_programa[ibarra,0]), ha="center", va="bottom")
-            #         if valores_programa[ibarra,1] > 0:
-            #             ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,1] , str(valores_programa[ibarra,1]), ha="center", va="bottom")
-            #         if valores_programa[ibarra,2] > 0:
-            #             ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,2] , str(valores_programa[ibarra,2]), ha="center", va="bottom")
-            #         if valores_programa[ibarra,3] > 0:
-            #             ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,3] , str(valores_programa[ibarra,3]), ha="center", va="bottom")
-            
-            # # Cambia el nombre de los valores del eje X. De nºs enteros al mes correspondiente
-            # plt.xticks(id_mes,vector_nombres)
-            
-            # # Ajusta límites del gráfico
-            # plt.ylim([0, max(valor_maximo_programa)+2])
-                 
-            # # Ajusta tamaño 
-            # fig.set_size_inches(16.5, 5.5)
-            
-            # # Añade leyenda
-            # plt.legend(nombre_estados, bbox_to_anchor = (0.85, 1.085), ncol=len(nombre_estados)) # ,loc="upper left"
-            
-            # # Añade nombre a los ejes
-            # plt.xlabel('Fecha')
-            # plt.ylabel('Años de muestreo')
-            
-            # # Añade un cuadro de texto explicado las abreviaturas
-            # textstr = ''
-            # for iprograma in range(df_programas.shape[0]):
-            #     textstr = textstr + df_programas['abreviatura'][iprograma] + '=' + df_programas['nombre_programa'][iprograma] + '; '
-            # #textstr = 'P=PELACUS RV = RADIALES VIGO RC = RADIALES CORUÑA  RS = RADIALES SANTANDER RP = RADPROF '
-            # ax.text(0.15, 1.125, textstr, transform=ax.transAxes, fontsize=11,
-            #         verticalalignment='top', bbox={'edgecolor':'none','facecolor':'white'})
-                   
-            # buf = BytesIO()
-            # fig.savefig(buf, format="png",bbox_inches='tight')
-            # st.image(buf)       
-            
-            # st.download_button("DESCARGAR GRÁFICO",buf,'GRAFICO.png')
-            
-            
+ 
         
         
         
@@ -545,7 +378,7 @@ def actualiza_procesos():
         # Despliega un formulario para introducir los datos de las muestras que se están analizando
         with st.form("Formulario seleccion"):
         
-            descripcion_muestras = st.text_input('Descipción de las muestras', value="")
+            nombre_muestras = st.text_input('Nombre del run', value="")
             
             col1, col2, col3= st.columns(3,gap="small")
             with col1:
@@ -559,7 +392,13 @@ def actualiza_procesos():
             with col3:
                 anho_consulta = st.number_input('Año:',format='%i',value=anho_actual,max_value=anho_actual)
         
-            fecha_estimada_fin = st.date_input('Fecha estimada de finalizacion',min_value=fecha_actual,value=fecha_actual)
+            col1, col2= st.columns(2,gap="small")
+            with col1:
+                fecha_inicio       = st.date_input('Fecha estimada de finalizacion',min_value=fecha_actual,value=fecha_actual)
+            with col2:
+                fecha_estimada_fin = st.date_input('Fecha estimada de finalizacion',min_value=fecha_actual,value=fecha_actual)
+
+            observaciones_muestras = st.text_input('Observaciones', value="")
         
             # Botón de envío para confirmar selección
             submit = st.form_submit_button("Enviar")
@@ -568,13 +407,13 @@ def actualiza_procesos():
                 
                 conn = init_connection()
                 cursor = conn.cursor()           
-                instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,año,num_muestras,fecha_inicio,fecha_estimada_fin,fecha_real_fin,io_estado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_proceso) DO UPDATE SET (programa,año,nombre_programa,num_muestras,fecha_inicio,fecha_estimada_fin,fecha_real_fin,io_estado) = (EXCLUDED.programa,EXCLUDED.año,EXCLUDED.nombre_programa,EXCLUDED.num_muestras,EXCLUDED.fecha_inicio,EXCLUDED.fecha_estimada_fin,EXCLUDED.fecha_real_fin,EXCLUDED.io_estado);"   
-                cursor.execute(instruccion_sql, (descripcion_muestras,id_programa_elegido,nombre_programa,anho_consulta,num_muestras,fecha_actual,fecha_estimada_fin,None,1)) 
+                instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,año,num_muestras,fecha_inicio,fecha_estimada_fin,fecha_real_fin,observaciones,io_estado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_proceso) DO UPDATE SET (programa,año,nombre_programa,num_muestras,fecha_inicio,fecha_estimada_fin,fecha_real_fin,observaciones,io_estado) = (EXCLUDED.programa,EXCLUDED.año,EXCLUDED.nombre_programa,EXCLUDED.num_muestras,EXCLUDED.fecha_inicio,EXCLUDED.fecha_estimada_fin,EXCLUDED.fecha_real_fin,EXCLUDED.observaciones,EXCLUDED.io_estado);"   
+                cursor.execute(instruccion_sql, (nombre_muestras,id_programa_elegido,nombre_programa,anho_consulta,num_muestras,fecha_inicio,fecha_estimada_fin,None,observaciones_muestras,1)) 
                 conn.commit() 
                 cursor.close()
                 conn.close()  
                 
-                texto_exito = 'Muestras ' + descripcion_muestras + ' añadidas a la cola de procesado'
+                texto_exito = 'Muestras ' + nombre_muestras + ' añadidas a la cola de procesado'
                 st.success(texto_exito)
 
 
