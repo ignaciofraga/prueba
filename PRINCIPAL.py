@@ -51,7 +51,8 @@ if FUNCIONES_AUXILIARES.log_in() is True:
         if st.session_state["usuario"] == 'COAC - Supervisión Nutrientes':
      
             paginas = {"INICIO": PAGINAS.principal,
-                     "CONSULTA ESTADOS": PAGINAS.consulta_estado, 
+                     "CONSULTA PROGRAMA ANALIZADOS": PAGINAS.consulta_estado, 
+                     "CONSULTA PROCESOS EN CURSO": PAGINAS.consulta_procesos,
                      "CONSULTA DATOS BOTELLAS":PAGINAS.consulta_botellas
                       }           
             
