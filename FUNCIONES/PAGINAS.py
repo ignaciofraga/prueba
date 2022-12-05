@@ -260,6 +260,7 @@ def consulta_estado():
             # Representa el gráfico
             fig, ax           = plt.subplots()
             anchura_barra     = 0.125
+            altura_base       = 1.5
             etiquetas         = df_programas['abreviatura']
             id_mes            = numpy.arange(0,len(fechas_comparacion))
             
@@ -284,7 +285,7 @@ def consulta_estado():
                 acumulados_mod     = numpy.delete(acumulados_mod, -1, axis = 1)
             
                 # Determina la posición de las etiquetas y la máxima altura (para luego definir el rango del eje y)
-                etiqueta_altura                   = valores_acumulados[:,-1] + 1.5
+                etiqueta_altura                   = valores_acumulados[:,-1] + altura_base
                 valor_maximo_programa [iprograma] = max(etiqueta_altura)
                 
                 # Representa la barra correspondiente a cada estado, en los distintos tiempos considerados
@@ -300,7 +301,7 @@ def consulta_estado():
                     
                     # Etiqueta con el nombre del programa
                     angulo_giro = 90
-                    if etiqueta_altura[ifecha] > 0:
+                    if etiqueta_altura[ifecha] > altura_base:
                         ax.text(posicion_x_programa[ifecha], etiqueta_altura[ifecha], etiqueta_nombre[ifecha], ha="center", va="bottom",rotation=angulo_giro)
                     
                     # Etiqueta con el valor de cada uno de los estados
