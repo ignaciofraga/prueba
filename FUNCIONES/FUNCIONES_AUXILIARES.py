@@ -622,9 +622,9 @@ def comprueba_estado(id_programa,anho_proceso,fecha_comparacion):
     # Consulta a la base de datos las fechas de cada proceso
     conn = init_connection()
     cursor = conn.cursor()           
-    instruccion_sql = 'SELECT fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_analisis_laboratorio,contacto_post_procesado FROM estado_procesos WHERE programa = ' + str(id_programa) +' AND año = ' + str(anho_proceso) +';'
-    st.text(instruccion_sql)
-    cursor.execute(instruccion_sql) 
+#    instruccion_sql = 'SELECT fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_analisis_laboratorio,contacto_post_procesado FROM estado_procesos WHERE programa = ' + str(id_programa) +' AND año = ' + str(anho_proceso) +';'
+    instruccion_sql = 'SELECT fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_analisis_laboratorio,contacto_post_procesado FROM estado_procesos WHERE programa = %s AND año = %s;'
+    cursor.execute(instruccion_sql,(int(id_programa),int(anho_proceso))) 
     datos_bd =cursor.fetchall()         
     cursor.close()
     conn.close()      
