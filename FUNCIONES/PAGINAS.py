@@ -143,16 +143,18 @@ def consulta_estado():
             
             else:
             
-                # Predimensiona un dataframe con los resultados de la correccion
-                df_estados = pandas.DataFrame(columns=['Programa','Año','Estado','Fecha Actualización','Contacto'])
+                # # Predimensiona un dataframe con los resultados de la correccion
+                # df_estados = pandas.DataFrame(columns=['Programa','Año','Estado','Fecha Actualización','Contacto'])
                 
-                for ianho in range(estado_procesos_programa.shape[0]):
+                # for ianho in range(estado_procesos_programa.shape[0]):
                     
-                    anho_proceso   = estado_procesos_programa['año'].iloc[ianho]
-                    iestado,contacto,fecha_actualizacion = FUNCIONES_AUXILIARES.comprueba_estado(id_programa,anho_proceso,fecha_consulta)
+                #     anho_proceso   = estado_procesos_programa['año'].iloc[ianho]
+                #     iestado,contacto,fecha_actualizacion = FUNCIONES_AUXILIARES.comprueba_estado(id_programa,anho_proceso,fecha_consulta)
             
-                    df_estados['Programa'].loc[ianho] = nombre_programa
+                #     df_estados['Programa'].loc[ianho] = nombre_programa
             
+                df_estados = FUNCIONES_AUXILIARES.comprueba_estado(id_programa,fecha_consulta)
+        
                 st.text(df_estados)
             
                 # # Quita del dataframe las columnas con el identificador del programa y el número registro (no interesa mostrarlo en la web)

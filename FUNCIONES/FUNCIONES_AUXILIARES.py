@@ -617,49 +617,66 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
 ##################### FUNCION PARA INSERTAR DATOS DISCRETOS  ##################
 ############################################################################### 
 
-def comprueba_estado(id_programa,anho_proceso,fecha_comparacion):
+def comprueba_estado(id_programa,fecha_comparacion):
 
-    # Consulta a la base de datos las fechas de cada proceso
+#     # Consulta a la base de datos las fechas de cada proceso
+#     conn = init_connection()
+#     cursor = conn.cursor()           
+# #    instruccion_sql = 'SELECT fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_analisis_laboratorio,contacto_post_procesado FROM estado_procesos WHERE programa = ' + str(id_programa) +' AND año = ' + str(anho_proceso) +';'
+#     instruccion_sql = 'SELECT fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_analisis_laboratorio,contacto_post_procesado FROM estado_procesos WHERE programa = %s AND año = %s;'
+#     cursor.execute(instruccion_sql,(int(id_programa),int(anho_proceso))) 
+#     datos_bd =cursor.fetchall()         
+#     cursor.close()
+#     conn.close()      
+
+
+    # Recupera la tabla del estado de los procesos como un dataframe
     conn = init_connection()
-    cursor = conn.cursor()           
-#    instruccion_sql = 'SELECT fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_analisis_laboratorio,contacto_post_procesado FROM estado_procesos WHERE programa = ' + str(id_programa) +' AND año = ' + str(anho_proceso) +';'
-    instruccion_sql = 'SELECT fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_analisis_laboratorio,contacto_post_procesado FROM estado_procesos WHERE programa = %s AND año = %s;'
-    cursor.execute(instruccion_sql,(int(id_programa),int(anho_proceso))) 
-    datos_bd =cursor.fetchall()         
-    cursor.close()
-    conn.close()      
+    estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
+    conn.close()
 
-    fecha_final_muestreo       = datos_bd[0][0]
-    fecha_analisis_laboratorio = datos_bd[0][1]
-    fecha_post_procesado       = datos_bd[0][2]
-    contacto_muestreo          = datos_bd[0][3]
-    contacto_procesado         = datos_bd[0][4]
-    contacto_post_procesado    = datos_bd[0][5]
+    estado_procesos_programa = estado_procesos[estado_procesos['programa']==id_programa]
+
+    df_estados = pandas.DataFrame(columns=['Programa','Año','Estado','Fecha Actualización','Contacto'])
+                
+    for ianho in range(estado_procesos_programa.shape[0]):
+
+
+        fecha_final_muestreo       = estado_procesos_programa['fecha_final_muestreo'].iloc[ianho]
+        fecha_analisis_laboratorio = estado_procesos_programa['fecha_analisis_laboratorio'].iloc[ianho]
+        fecha_post_procesado       = estado_procesos_programa['fecha_post_procesado'].iloc[ianho]
+        contacto_muestreo          = estado_procesos_programa['contacto_muestreo'].iloc[ianho]
+        contacto_procesado         = estado_procesos_programa['contacto_analisis_laboratorio'].iloc[ianho]
+        contacto_post_procesado    = estado_procesos_programa['contacto_post_procesado'].iloc[ianho]
     
-    # Comprobacion muestreo 
-    if fecha_final_muestreo:
-        if fecha_comparacion >= fecha_final_muestreo:
-            iestado              = 1 
-            contacto             = contacto_muestreo
-            fecha_actualizacion  = fecha_final_muestreo
-    else:
-        iestado             = 0
-        contacto            = None
-        fecha_actualizacion = None
+        # Comprobacion muestreo 
+        if fecha_final_muestreo:
+            if fecha_comparacion >= fecha_final_muestreo:
+                iestado              = 1 
+                contacto             = contacto_muestreo
+                fecha_actualizacion  = fecha_final_muestreo
+        else:
+            iestado             = 0
+            contacto            = None
+            fecha_actualizacion = None
+    
+        # Comprobacion procesado 
+        if fecha_analisis_laboratorio is not None and fecha_comparacion >= fecha_analisis_laboratorio:
+            iestado              = 2 
+            contacto             = contacto_procesado
+            fecha_actualizacion  = fecha_analisis_laboratorio
+    
+        # Comprobacion post-procesado 
+        if fecha_post_procesado is not None and fecha_comparacion >= fecha_post_procesado:
+            iestado              = 3 
+            contacto             = contacto_post_procesado
+            fecha_actualizacion  = fecha_post_procesado
 
-    # Comprobacion procesado 
-    if fecha_analisis_laboratorio is not None and fecha_comparacion >= fecha_analisis_laboratorio:
-        iestado              = 2 
-        contacto             = contacto_procesado
-        fecha_actualizacion  = fecha_analisis_laboratorio
+        df_estados['Estado'].iloc[ianho]              = iestado
+        df_estados['Fecha Actualización'].iloc[ianho] = fecha_actualizacion    
+        df_estados['Contacto'].iloc[ianho]            = contacto   
 
-    # Comprobacion post-procesado 
-    if fecha_post_procesado is not None and fecha_comparacion >= fecha_post_procesado:
-        iestado              = 3 
-        contacto             = contacto_post_procesado
-        fecha_actualizacion  = fecha_post_procesado
-
-    return iestado,contacto,fecha_actualizacion
+    return df_estados
 
 
     # # Caso 3. Fecha de consulta posterior al post-procesado.
