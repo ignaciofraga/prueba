@@ -617,7 +617,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
 ##################### FUNCION PARA INSERTAR DATOS DISCRETOS  ##################
 ############################################################################### 
 
-def comprueba_estado(id_programa,fecha_comparacion):
+def comprueba_estado(nombre_programa,fecha_comparacion):
 
 #     # Consulta a la base de datos las fechas de cada proceso
 #     conn = init_connection()
@@ -635,22 +635,21 @@ def comprueba_estado(id_programa,fecha_comparacion):
     estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
     conn.close()
 
-    estado_procesos_programa = estado_procesos[estado_procesos['programa']==id_programa]
+    estado_procesos_programa = estado_procesos[estado_procesos['nombre_programa']==nombre_programa]
 
     df_estados = pandas.DataFrame(index=numpy.arange(0, estado_procesos_programa.shape[0]),columns=['Programa','Año','Estado','Fecha Actualización','Contacto'])
-                
+        
+    df_estados['Programa'] = nombre_programa
+    df_estados['Año']      = estado_procesos_programa['año']
+        
     for ianho in range(estado_procesos_programa.shape[0]):
 
-        
         fecha_final_muestreo       = estado_procesos_programa['fecha_final_muestreo'].iloc[ianho]
         fecha_analisis_laboratorio = estado_procesos_programa['fecha_analisis_laboratorio'].iloc[ianho]
         fecha_post_procesado       = estado_procesos_programa['fecha_post_procesado'].iloc[ianho]
         contacto_muestreo          = estado_procesos_programa['contacto_muestreo'].iloc[ianho]
         contacto_procesado         = estado_procesos_programa['contacto_analisis_laboratorio'].iloc[ianho]
         contacto_post_procesado    = estado_procesos_programa['contacto_post_procesado'].iloc[ianho]
-
-        st.text(ianho)
-        st.text(fecha_analisis_laboratorio)
     
         # Comprobacion muestreo 
         if fecha_final_muestreo:
@@ -675,13 +674,11 @@ def comprueba_estado(id_programa,fecha_comparacion):
             contacto             = contacto_post_procesado
             fecha_actualizacion  = fecha_post_procesado
 
-        st.text(iestado)
-
         df_estados['Estado'].iloc[ianho]              = iestado
         df_estados['Fecha Actualización'].iloc[ianho] = fecha_actualizacion    
-        df_estados['Contacto'].iloc[ianho]            = contacto   
+        df_estados['Contacto'].iloc[ianho]            = contacto 
+        #df_estados['Año'].iloc[ianho]                 = estado_procesos_programa['año'].iloc[ianho]
 
-    st.text(df_estados)
 
     return df_estados
 
