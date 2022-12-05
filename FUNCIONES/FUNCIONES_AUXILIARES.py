@@ -626,7 +626,7 @@ def comprueba_estado(nombre_programa,fecha_comparacion,nombre_estados,df_estado_
     # estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
     # conn.close()
 
-    estado_procesos_programa = df_estado_procesos[estado_procesos['nombre_programa']==nombre_programa]
+    estado_procesos_programa = df_estado_procesos[df_estado_procesos['nombre_programa']==nombre_programa]
 
     df_estados = pandas.DataFrame(index=numpy.arange(0, estado_procesos_programa.shape[0]),columns=['Programa','Año','Estado','Fecha Actualización','Contacto'])
         
