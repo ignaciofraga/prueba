@@ -189,7 +189,10 @@ def consulta_estado():
                 plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(-0.1, -0.3),fontsize=8)
                 
 
-                
+                # Representa el pie-chart con el estado de los procesos
+                buf = BytesIO()
+                fig.savefig(buf, format="png",bbox_inches='tight')
+                st.image(buf)                
 
                 
                   
