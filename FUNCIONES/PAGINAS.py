@@ -172,7 +172,9 @@ def consulta_estado():
                 num_valores = numpy.zeros(len(nombre_estados),dtype=int)
                 for ivalor in range(len(nombre_estados)):
                     try:
-                        num_valores[ivalor] = df_estados['Estado'].value_counts()[ivalor]
+                        #num_valores[ivalor] = df_estados['Estado'].value_counts()[ivalor]
+                        num_valores[ivalor] = df_estados.Estado.value_counts()[nombre_estados[ivalor]]
+                        #df.word.value_counts()['myword']
                     except:
                         pass
                 porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),0)
