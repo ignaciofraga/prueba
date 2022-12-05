@@ -672,9 +672,9 @@ def comprueba_estado(id_programa,fecha_comparacion):
             contacto             = contacto_post_procesado
             fecha_actualizacion  = fecha_post_procesado
 
-        df_estados['Estado'].iloc[ianho]              = iestado
-        df_estados['Fecha Actualización'].iloc[ianho] = fecha_actualizacion    
-        df_estados['Contacto'].iloc[ianho]            = contacto   
+        df_estados['Estado'].loc[ianho]              = iestado
+        df_estados['Fecha Actualización'].loc[ianho] = fecha_actualizacion    
+        df_estados['Contacto'].loc[ianho]            = contacto   
 
     return df_estados
 
