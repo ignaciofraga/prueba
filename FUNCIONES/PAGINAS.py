@@ -151,7 +151,7 @@ def consulta_estado():
                     anho_proceso   = estado_procesos_programa['año'].iloc[ianho]
                     iestado,contacto,fecha_actualizacion = FUNCIONES_AUXILIARES.comprueba_estado(id_programa,anho_proceso,fecha_consulta)
             
-                    df_estados['Programa'].iloc[ianho] = nombre_programa
+                    df_estados['Programa'].loc[ianho] = nombre_programa
             
                 # # Quita del dataframe las columnas con el identificador del programa y el número registro (no interesa mostrarlo en la web)
                 # estado_procesos_programa = estado_procesos_programa.drop(['id_proceso','programa'], axis = 1)
