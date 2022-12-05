@@ -237,7 +237,116 @@ def consulta_estado():
             
             st.text(fechas_comparacion)
                 
+            # Predimensiona contador
+            num_valores = numpy.zeros((len(fechas_comparacion),df_programas.shape[0],len(nombre_estados)),dtype=int)
             
+            # Bucle para determinar el estado de cada programa, en cada fecha
+            for iprograma in range(df_programas.shape[0]):
+                
+                nombre_programa = df_programas['nombre_programa'].iloc[iprograma]
+        
+                for ifecha in range(len(fechas_comparacion)):
+                    
+                    fecha_consulta = fechas_comparacion[ifecha]
+                    df_estados     = FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,fecha_consulta,nombre_estados)
+                          
+                    for ivalor in range(len(nombre_estados)):
+                        try:
+                            num_valores[ifecha,iprograma,ivalor] = df_estados.Estado.value_counts()[nombre_estados[ivalor]]
+                        except:
+                            pass
+        
+                    
+            fig, ax           = plt.subplots()
+            anchura_barra     = 0.125
+            etiquetas         = df_programas['abreviatura']
+            id_mes            = numpy.arange(0,len(fechas_comparacion))
+            
+            nombres_meses     =['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+            vector_nombres    = [None]*fechas_comparacion.shape[0]
+            for idato in range(fechas_comparacion.shape[0]):
+                vector_nombres[idato] = nombres_meses[fechas_comparacion[idato].month-1] + ' ' + fechas_comparacion[idato].strftime("%y")
+            
+            # Bucle con cada programa de muestreo
+            valor_maximo_programa = numpy.zeros(df_programas.shape[0])
+            for iprograma in range(df_programas.shape[0]): 
+                
+                # Desplaza la coordenada x de cada programa para representarlo separado de los demás
+                posicion_x_programa    = id_mes + anchura_barra*(iprograma - 2)
+                
+                # Extrae los valores de muestras en cada estado para el programa correspondiente
+                valores_programa   = num_valores[:,iprograma,:]
+                
+                # Busca la posición del fondo de cada barra a partir de los valores de la barra anterior
+                valores_acumulados = numpy.cumsum(valores_programa,axis =1)
+                acumulados_mod     = numpy.c_[ numpy.zeros(valores_acumulados.shape[0]), valores_acumulados]
+                acumulados_mod     = numpy.delete(acumulados_mod, -1, axis = 1)
+            
+                # Determina la posición de las etiquetas y la máxima altura (para luego definir el rango del eje y)
+                etiqueta_altura                   = valores_acumulados[:,-1] + 1.5
+                valor_maximo_programa [iprograma] = max(etiqueta_altura)
+                
+                # Representa la barra correspondiente a cada estado, en los distintos tiempos considerados
+                for igrafico in range(num_valores.shape[2]):
+                    
+                    posicion_fondo = acumulados_mod[:,igrafico]
+                    
+                    plt.bar(posicion_x_programa, num_valores[:,iprograma,igrafico], anchura_barra, bottom = posicion_fondo ,color=colores_estados[igrafico],edgecolor='k')
+            
+                # Añade una etiqueta para identificar al programa
+                etiqueta_nombre   = [etiquetas[iprograma]]*num_valores.shape[0]
+                for ibarra in range(num_valores.shape[0]):
+                    # Etiqueta con el nombre del programa
+                    ax.text(posicion_x_programa[ibarra], etiqueta_altura[ibarra], etiqueta_nombre[ibarra], ha="center", va="bottom")
+                    # Etiqueta con el valor de cada uno de los estados
+                    if valores_programa[ibarra,0] > 0:
+                        ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,0] , str(valores_programa[ibarra,0]), ha="center", va="bottom")
+                    if valores_programa[ibarra,1] > 0:
+                        ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,1] , str(valores_programa[ibarra,1]), ha="center", va="bottom")
+                    if valores_programa[ibarra,2] > 0:
+                        ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,2] , str(valores_programa[ibarra,2]), ha="center", va="bottom")
+                    if valores_programa[ibarra,3] > 0:
+                        ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,3] , str(valores_programa[ibarra,3]), ha="center", va="bottom")
+            
+            # Cambia el nombre de los valores del eje X. De nºs enteros al mes correspondiente
+            plt.xticks(id_mes,vector_nombres)
+            
+            # Ajusta límites del gráfico
+            plt.ylim([0, max(valor_maximo_programa)+2])
+                 
+            # Ajusta tamaño 
+            fig.set_size_inches(16.5, 5.5)
+            
+            # Añade leyenda
+            plt.legend(nombre_estados, bbox_to_anchor = (0.85, 1.085), ncol=len(nombre_estados)) # ,loc="upper left"
+            
+            # Añade nombre a los ejes
+            plt.xlabel('Fecha')
+            plt.ylabel('Años de muestreo')
+            
+            # Añade un cuadro de texto explicado las abreviaturas
+            textstr = ''
+            for iprograma in range(df_programas.shape[0]):
+                textstr = textstr + df_programas['abreviatura'][iprograma] + '=' + df_programas['nombre_programa'][iprograma] + '; '
+            #textstr = 'P=PELACUS RV = RADIALES VIGO RC = RADIALES CORUÑA  RS = RADIALES SANTANDER RP = RADPROF '
+            ax.text(0.15, 1.125, textstr, transform=ax.transAxes, fontsize=11,
+                    verticalalignment='top', bbox={'edgecolor':'none','facecolor':'white'})
+                   
+            buf = BytesIO()
+            fig.savefig(buf, format="png",bbox_inches='tight')
+            st.image(buf)       
+            
+            st.download_button("DESCARGAR GRÁFICO",buf,'GRAFICO.png')
+            
+            
+        
+            
+        
+        
+        
+        
+        
+        
             # # Recupera la tabla de los programas disponibles como un dataframe
             # conn         = init_connection()
             # df_programas = psql.read_sql('SELECT * FROM programas', conn)
