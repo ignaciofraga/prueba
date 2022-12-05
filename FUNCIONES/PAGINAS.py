@@ -394,7 +394,7 @@ def actualiza_procesos():
         
             col1, col2= st.columns(2,gap="small")
             with col1:
-                fecha_inicio       = st.date_input('Fecha estimada de finalizacion',min_value=fecha_actual,value=fecha_actual)
+                fecha_inicio       = st.date_input('Fecha de inicio',value=fecha_actual)
             with col2:
                 fecha_estimada_fin = st.date_input('Fecha estimada de finalizacion',min_value=fecha_actual,value=fecha_actual)
 
