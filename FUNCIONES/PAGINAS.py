@@ -143,7 +143,7 @@ def consulta_estado():
             
             else:
                         
-                nombre_estados  = ['No disponible','Pendiente de análisis','Analizado','Post-Procesado']
+                nombre_estados  = ['No disponible','Pendiente de análisis','Analizado','Control de calidad secundario']
                 colores_estados = ['#CD5C5C','#F4A460','#87CEEB','#66CDAA','#2E8B57']        
 
                 df_estados = FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,fecha_consulta,nombre_estados)
@@ -156,7 +156,7 @@ def consulta_estado():
                 if (params.value.includes('No disponible')){return {'color': 'black', 'backgroundColor': '#CD5C5C'}}
                 if (params.value.includes('Pendiente de análisis')){return {'color': 'black', 'backgroundColor': '#F4A460'}}
                 if (params.value.includes('Analizado')){return {'color': 'black', 'backgroundColor': '#87CEEB'}}
-                if (params.value.includes('Post-Procesado')){return {'color': 'black', 'backgroundColor': '#66CDAA'}}
+                if (params.value.includes('Control de calidad secundario')){return {'color': 'black', 'backgroundColor': '#66CDAA'}}
                 };""")
                 
                 st.header("Listado de datos")
@@ -186,7 +186,7 @@ def consulta_estado():
                 # Representa y ordena la leyenda
                 etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
 #                plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(-0.1, -0.3),fontsize=8)
-                plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(2.1, 0.5),fontsize=8)                
+                plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(1.5, 0.5),fontsize=8)                
 
                 # Representa el pie-chart con el estado de los procesos
                 buf = BytesIO()
