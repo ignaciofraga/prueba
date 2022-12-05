@@ -617,7 +617,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
 ##################### FUNCION PARA INSERTAR DATOS DISCRETOS  ##################
 ############################################################################### 
 
-def comprueba_estado(nombre_programa,fecha_comparacion):
+def comprueba_estado(nombre_programa,fecha_comparacion,nombre_estados):
 
 #     # Consulta a la base de datos las fechas de cada proceso
 #     conn = init_connection()
@@ -654,27 +654,27 @@ def comprueba_estado(nombre_programa,fecha_comparacion):
         # Comprobacion muestreo 
         if fecha_final_muestreo:
             if fecha_comparacion >= fecha_final_muestreo:
-                iestado              = 1 
+                iestado              = nombre_estados[1] 
                 contacto             = contacto_muestreo
                 fecha_actualizacion  = fecha_final_muestreo
         else:
-            iestado             = 0
+            estado              = nombre_estados[0]
             contacto            = None
             fecha_actualizacion = None
     
         # Comprobacion procesado 
         if fecha_analisis_laboratorio is not None and fecha_comparacion >= fecha_analisis_laboratorio:
-            iestado              = 2 
+            estado               = nombre_estados[2] 
             contacto             = contacto_procesado
             fecha_actualizacion  = fecha_analisis_laboratorio
     
         # Comprobacion post-procesado 
         if fecha_post_procesado is not None and fecha_comparacion >= fecha_post_procesado:
-            iestado              = 3 
+            estado               = nombre_estados[3] 
             contacto             = contacto_post_procesado
             fecha_actualizacion  = fecha_post_procesado
 
-        df_estados['Estado'].iloc[ianho]              = iestado
+        df_estados['Estado'].iloc[ianho]              = estado
         df_estados['Fecha Actualización'].iloc[ianho] = fecha_actualizacion    
         df_estados['Contacto'].iloc[ianho]            = contacto 
         #df_estados['Año'].iloc[ianho]                 = estado_procesos_programa['año'].iloc[ianho]

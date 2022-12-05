@@ -143,10 +143,10 @@ def consulta_estado():
             
             else:
                         
-                df_estados = FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,fecha_consulta)
-
                 nombre_estados  = ['No disponible','Pendiente de análisis','Analizado','Post-Procesado']
                 colores_estados = ['#CD5C5C','#F4A460','#87CEEB','#66CDAA','#2E8B57']        
+
+                df_estados = FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,fecha_consulta,nombre_estados)
             
                 df_estados = df_estados.sort_values('Año')
             
@@ -172,7 +172,7 @@ def consulta_estado():
                 num_valores = numpy.zeros(len(nombre_estados),dtype=int)
                 for ivalor in range(len(nombre_estados)):
                     try:
-                        num_valores[ivalor] = df_estados['id_estado'].value_counts()[ivalor]
+                        num_valores[ivalor] = df_estados['Estado'].value_counts()[ivalor]
                     except:
                         pass
                 porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),0)
