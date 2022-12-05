@@ -641,13 +641,16 @@ def comprueba_estado(id_programa,fecha_comparacion):
                 
     for ianho in range(estado_procesos_programa.shape[0]):
 
-
+        
         fecha_final_muestreo       = estado_procesos_programa['fecha_final_muestreo'].iloc[ianho]
         fecha_analisis_laboratorio = estado_procesos_programa['fecha_analisis_laboratorio'].iloc[ianho]
         fecha_post_procesado       = estado_procesos_programa['fecha_post_procesado'].iloc[ianho]
         contacto_muestreo          = estado_procesos_programa['contacto_muestreo'].iloc[ianho]
         contacto_procesado         = estado_procesos_programa['contacto_analisis_laboratorio'].iloc[ianho]
         contacto_post_procesado    = estado_procesos_programa['contacto_post_procesado'].iloc[ianho]
+
+        st.text(ianho)
+        st.text(fecha_analisis_laboratorio)
     
         # Comprobacion muestreo 
         if fecha_final_muestreo:
