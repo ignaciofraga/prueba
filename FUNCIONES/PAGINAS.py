@@ -146,9 +146,7 @@ def consulta_estado():
             
             else:
                         
-      
-
-                df_estados = FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,fecha_consulta,nombre_estados)
+                df_estados = FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,fecha_consulta,nombre_estados,temporal_estado_procesos)
             
                 df_estados = df_estados.sort_values('Año')
             
@@ -259,7 +257,7 @@ def consulta_estado():
                     
         
         
-        
+            # Representa el gráfico
             fig, ax           = plt.subplots()
             anchura_barra     = 0.125
             etiquetas         = df_programas['abreviatura']
@@ -298,18 +296,21 @@ def consulta_estado():
             
                 # Añade una etiqueta para identificar al programa
                 etiqueta_nombre   = [etiquetas[iprograma]]*num_valores.shape[0]
-                for ibarra in range(num_valores.shape[0]):
+                for ifecha in range(num_valores.shape[0]):
+                    
                     # Etiqueta con el nombre del programa
-                    ax.text(posicion_x_programa[ibarra], etiqueta_altura[ibarra], etiqueta_nombre[ibarra], ha="center", va="bottom")
+                    angulo_giro = 60
+                    ax.text(posicion_x_programa[ifecha], etiqueta_altura[ifecha], etiqueta_nombre[ifecha], ha="center", va="bottom",rotation=angulo_giro)
+                    
                     # Etiqueta con el valor de cada uno de los estados
-                    if valores_programa[ibarra,0] > 0:
-                        ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,0] , str(valores_programa[ibarra,0]), ha="center", va="bottom")
-                    if valores_programa[ibarra,1] > 0:
-                        ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,1] , str(valores_programa[ibarra,1]), ha="center", va="bottom")
-                    if valores_programa[ibarra,2] > 0:
-                        ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,2] , str(valores_programa[ibarra,2]), ha="center", va="bottom")
-                    if valores_programa[ibarra,3] > 0:
-                        ax.text(posicion_x_programa[ibarra], valores_acumulados[ibarra,3] , str(valores_programa[ibarra,3]), ha="center", va="bottom")
+                    if valores_programa[ifecha,0] > 0:
+                        ax.text(posicion_x_programa[ifecha], valores_acumulados[ifecha,0] , str(valores_programa[ifecha,0]), ha="center", va="bottom")
+                    if valores_programa[ifecha,1] > 0:
+                        ax.text(posicion_x_programa[ifecha], valores_acumulados[ifecha,1] , str(valores_programa[ifecha,1]), ha="center", va="bottom")
+                    if valores_programa[ifecha,2] > 0:
+                        ax.text(posicion_x_programa[ifecha], valores_acumulados[ifecha,2] , str(valores_programa[ifecha,2]), ha="center", va="bottom")
+                    if valores_programa[ifecha,3] > 0:
+                        ax.text(posicion_x_programa[ifecha], valores_acumulados[ifecha,3] , str(valores_programa[ifecha,3]), ha="center", va="bottom")
             
             # Cambia el nombre de los valores del eje X. De nºs enteros al mes correspondiente
             plt.xticks(id_mes,vector_nombres)

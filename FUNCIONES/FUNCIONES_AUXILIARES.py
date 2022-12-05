@@ -620,12 +620,6 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
 def comprueba_estado(nombre_programa,fecha_comparacion,nombre_estados,df_estado_procesos):
 
 
-
-    # # Recupera la tabla del estado de los procesos como un dataframe
-    # conn = init_connection()
-    # estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
-    # conn.close()
-
     estado_procesos_programa = df_estado_procesos[df_estado_procesos['nombre_programa']==nombre_programa]
 
     df_estados = pandas.DataFrame(index=numpy.arange(0, estado_procesos_programa.shape[0]),columns=['Programa','Año','Estado','Fecha Actualización','Contacto'])
