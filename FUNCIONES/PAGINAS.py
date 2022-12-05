@@ -153,7 +153,7 @@ def consulta_estado():
             
                 #     df_estados['Programa'].loc[ianho] = nombre_programa
             
-                df_estados = FUNCIONES_AUXILIARES.comprueba_estado(id_programa,fecha_consulta)
+                df_estados = FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,fecha_consulta)
         
                 st.text(df_estados)
             
