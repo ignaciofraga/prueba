@@ -654,7 +654,7 @@ def comprueba_estado(nombre_programa,fecha_comparacion,nombre_estados):
         # Comprobacion muestreo 
         if fecha_final_muestreo:
             if fecha_comparacion >= fecha_final_muestreo:
-                iestado              = nombre_estados[1] 
+                estado               = nombre_estados[1] 
                 contacto             = contacto_muestreo
                 fecha_actualizacion  = fecha_final_muestreo
         else:

@@ -161,7 +161,7 @@ def consulta_estado():
                 
                 st.header("Listado de datos")
                 gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_estados)
-                gb.configure_column("estado", cellStyle=cellsytle_jscode)
+                gb.configure_column("Estado", cellStyle=cellsytle_jscode)
             
                 gridOptions = gb.build()
                 
