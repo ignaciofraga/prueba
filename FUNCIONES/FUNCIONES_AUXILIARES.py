@@ -622,59 +622,71 @@ def comprueba_estado(id_programa,anho_proceso,fecha_comparacion):
     # Consulta a la base de datos las fechas de cada proceso
     conn = init_connection()
     cursor = conn.cursor()           
-    instruccion_sql = 'SELECT fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado FROM estado_procesos WHERE programa = ' + str(id_programa) +' AND año = ' + str(anho_proceso) +';'
+    instruccion_sql = 'SELECT fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_analisis_laboratorio,contacto_post_procesado FROM estado_procesos WHERE programa = ' + str(id_programa) +' AND año = ' + str(anho_proceso) +';'
     cursor.execute(instruccion_sql) 
     datos_bd =cursor.fetchall()         
     cursor.close()
     conn.close()      
 
-    fecha_final_muestreo = datos_bd[0][0]
+    fecha_final_muestreo       = datos_bd[0][0]
     fecha_analisis_laboratorio = datos_bd[0][1]
-    fecha_post_procesado = datos_bd[0][2]
-    contacto_muestreo = datos_bd[0][3]
-    contacto_post_procesado = datos_bd[0][4]
+    fecha_post_procesado       = datos_bd[0][2]
+    contacto_muestreo          = datos_bd[0][3]
+    contacto_procesado         = datos_bd[0][4]
+    contacto_post_procesado    = datos_bd[0][5]
     
-    st.text(fecha_final_muestreo)
-    st.text(fecha_analisis_laboratorio)
-    st.text(fecha_post_procesado)
-    st.text(contacto_muestreo)
-    st.text(contacto_post_procesado)
+    # Comprobacion muestreo 
+    if fecha_final_muestreo:
+        if fecha_comparacion >= fecha_final_muestreo:
+            iestado              = 1 
+            contacto             = contacto_muestreo
+            fecha_actualizacion  = fecha_final_muestreo
+    else:
+        iestado             = 0
+        contacto            = None
+        fecha_actualizacion = None
 
-        # # Recupera de la base de datos las fechas de análisis y procesado (si están disponibles)
-        # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        # cursor = conn.cursor()    
+    # Comprobacion procesado 
+    if fecha_analisis_laboratorio is not None and fecha_comparacion >= fecha_analisis_laboratorio:
+        iestado              = 2 
+        contacto             = contacto_procesado
+        fecha_actualizacion  = fecha_analisis_laboratorio
+
+    # Comprobacion post-procesado 
+    if fecha_post_procesado is not None and fecha_comparacion >= fecha_post_procesado:
+        iestado              = 3 
+        contacto             = contacto_post_procesado
+        fecha_actualizacion  = fecha_post_procesado
+
+    return iestado,contacto,fecha_actualizacion
+
+
+    # # Caso 3. Fecha de consulta posterior al post-procesado.
+    # if fecha_post_procesado:
+    #     if tiempo_consulta >= (estado_procesos_programa['fecha_post_procesado'][ianho]):     
+    #         estado_procesos_programa['id_estado'][ianho] = 3
+    #         estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho] 
+    #         estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_post_procesado'][ianho].strftime("%m/%d/%Y")
+    # else:
         
-        # instruccion_sql = 'SELECT programa,nombre_programa,año,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado FROM estado_procesos WHERE programa = ' + str(id_programa) +' AND año = ' + str(anho_procesado) +';'
-        # cursor.execute(instruccion_sql)
-        # datos_bd =cursor.fetchall()
-        # conn.commit()
-
-        #             # Caso 3. Fecha de consulta posterior al post-procesado.
-        #             if pandas.isnull(estado_procesos_programa['fecha_post_procesado'][ianho]) is False:
-        #                 if tiempo_consulta >= (estado_procesos_programa['fecha_post_procesado'][ianho]):     
-        #                     estado_procesos_programa['id_estado'][ianho] = 3
-        #                     estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho] 
-        #                     estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_post_procesado'][ianho].strftime("%m/%d/%Y")
-        #             else:
-                        
-        #                 # Caso 2. Fecha de consulta posterior al análisis de laboratorio pero anterior a realizar el post-procesado.
-        #                 if pandas.isnull(estado_procesos_programa['fecha_analisis_laboratorio'][ianho]) is False:
-        #                     if tiempo_consulta >= (estado_procesos_programa['fecha_analisis_laboratorio'][ianho]):  # estado_procesos_programa['fecha_analisis_laboratorio'][ianho] is not None:     
-        #                         estado_procesos_programa['id_estado'][ianho] = 2
-        #                         estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho] 
-        #                         estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_analisis_laboratorio'][ianho].strftime("%m/%d/%Y")
-        #                     else:
-        #                         if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
-        #                             estado_procesos_programa['id_estado'][ianho] = 1 
-        #                             estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho]
-        #                             estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_entrada_datos'][ianho].strftime("%m/%d/%Y")
-                                                        
-                        
-        #                 else:
-        #                     # Caso 1. Fecha de consulta posterior a terminar la campaña pero anterior al análisis en laboratorio, o análisis no disponible. 
-        #                     if pandas.isnull(estado_procesos_programa['fecha_entrada_datos'][ianho]) is False:
-        #                         if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
-        #                             estado_procesos_programa['id_estado'][ianho] = 1 
-        #                             estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho]
-        #                             estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_entrada_datos'][ianho].strftime("%m/%d/%Y")
-                                
+    #     # Caso 2. Fecha de consulta posterior al análisis de laboratorio pero anterior a realizar el post-procesado.
+    #     if pandas.isnull(estado_procesos_programa['fecha_analisis_laboratorio'][ianho]) is False:
+    #         if tiempo_consulta >= (estado_procesos_programa['fecha_analisis_laboratorio'][ianho]):  # estado_procesos_programa['fecha_analisis_laboratorio'][ianho] is not None:     
+    #             estado_procesos_programa['id_estado'][ianho] = 2
+    #             estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho] 
+    #             estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_analisis_laboratorio'][ianho].strftime("%m/%d/%Y")
+    #         else:
+    #             if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
+    #                 estado_procesos_programa['id_estado'][ianho] = 1 
+    #                 estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho]
+    #                 estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_entrada_datos'][ianho].strftime("%m/%d/%Y")
+                                        
+        
+    #     else:
+    #         # Caso 1. Fecha de consulta posterior a terminar la campaña pero anterior al análisis en laboratorio, o análisis no disponible. 
+    #         if pandas.isnull(estado_procesos_programa['fecha_entrada_datos'][ianho]) is False:
+    #             if tiempo_consulta >= (estado_procesos_programa['fecha_entrada_datos'][ianho]): #estado_procesos_programa['fecha_final_muestreo'][ianho] is not None:
+    #                 estado_procesos_programa['id_estado'][ianho] = 1 
+    #                 estado_procesos_programa['contacto'][ianho] = estado_procesos_programa['contacto_post_procesado'][ianho]
+    #                 estado_procesos_programa['fecha actualizacion'][ianho] = estado_procesos_programa['fecha_entrada_datos'][ianho].strftime("%m/%d/%Y")
+                
