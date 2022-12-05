@@ -203,8 +203,10 @@ def consulta_estado():
         
         # Recupera la tabla de los programas disponibles como un dataframe
         conn = init_connection()
-        df_programas = psql.read_sql('SELECT * FROM programas', conn)
+        df_programas       = psql.read_sql('SELECT * FROM programas', conn)
+        df_estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
         conn.close()
+        
     
         # Despliega un formulario para elegir el programa y la fecha a consultar
         with st.form("Formulario seleccion"):
@@ -234,9 +236,7 @@ def consulta_estado():
             else:
                 fechas_comparacion  = fechas_final_mes  
                 
-            
-            st.text(fechas_comparacion)
-                
+               
             # Predimensiona contador
             num_valores = numpy.zeros((len(fechas_comparacion),df_programas.shape[0],len(nombre_estados)),dtype=int)
             
@@ -248,7 +248,7 @@ def consulta_estado():
                 for ifecha in range(len(fechas_comparacion)):
                     
                     fecha_consulta = fechas_comparacion[ifecha]
-                    df_estados     = FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,fecha_consulta,nombre_estados)
+                    df_estados     = FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,fecha_consulta,nombre_estados,df_estado_procesos)
                           
                     for ivalor in range(len(nombre_estados)):
                         try:
@@ -257,6 +257,9 @@ def consulta_estado():
                             pass
         
                     
+        
+        
+        
             fig, ax           = plt.subplots()
             anchura_barra     = 0.125
             etiquetas         = df_programas['abreviatura']
@@ -328,7 +331,6 @@ def consulta_estado():
             textstr = ''
             for iprograma in range(df_programas.shape[0]):
                 textstr = textstr + df_programas['abreviatura'][iprograma] + '=' + df_programas['nombre_programa'][iprograma] + '; '
-            #textstr = 'P=PELACUS RV = RADIALES VIGO RC = RADIALES CORUÑA  RS = RADIALES SANTANDER RP = RADPROF '
             ax.text(0.15, 1.125, textstr, transform=ax.transAxes, fontsize=11,
                     verticalalignment='top', bbox={'edgecolor':'none','facecolor':'white'})
                    
