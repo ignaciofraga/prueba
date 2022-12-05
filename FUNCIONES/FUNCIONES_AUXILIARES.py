@@ -637,7 +637,7 @@ def comprueba_estado(id_programa,fecha_comparacion):
 
     estado_procesos_programa = estado_procesos[estado_procesos['programa']==id_programa]
 
-    df_estados = pandas.DataFrame(columns=['Programa','Año','Estado','Fecha Actualización','Contacto'])
+    df_estados = pandas.DataFrame(index=numpy.arange(0, estado_procesos_programa.shape[0]),columns=['Programa','Año','Estado','Fecha Actualización','Contacto'])
                 
     for ianho in range(estado_procesos_programa.shape[0]):
 
@@ -677,9 +677,9 @@ def comprueba_estado(id_programa,fecha_comparacion):
 
         st.text(iestado)
 
-        df_estados['Estado'].loc[ianho]              = iestado
-        df_estados['Fecha Actualización'].loc[ianho] = fecha_actualizacion    
-        df_estados['Contacto'].loc[ianho]            = contacto   
+        df_estados['Estado'].iloc[ianho]              = iestado
+        df_estados['Fecha Actualización'].iloc[ianho] = fecha_actualizacion    
+        df_estados['Contacto'].iloc[ianho]            = contacto   
 
     st.text(df_estados)
 
