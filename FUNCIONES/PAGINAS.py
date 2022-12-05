@@ -186,7 +186,7 @@ def consulta_estado():
                 # Representa y ordena la leyenda
                 etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
 #                plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(-0.1, -0.3),fontsize=8)
-                plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(1.1, 0.5),fontsize=8)                
+                plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(2.1, 0.5),fontsize=8)                
 
                 # Representa el pie-chart con el estado de los procesos
                 buf = BytesIO()
