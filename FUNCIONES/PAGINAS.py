@@ -153,6 +153,8 @@ def consulta_estado():
             
                     df_estados['Programa'].loc[ianho] = nombre_programa
             
+                st.text(df_estados)
+            
                 # # Quita del dataframe las columnas con el identificador del programa y el número registro (no interesa mostrarlo en la web)
                 # estado_procesos_programa = estado_procesos_programa.drop(['id_proceso','programa'], axis = 1)
                 
