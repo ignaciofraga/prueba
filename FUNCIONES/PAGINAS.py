@@ -1835,10 +1835,12 @@ def entrada_botellas():
         df_programas              = psql.read_sql('SELECT * FROM programas', conn)
         conn.close()
      
-        id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
-     
+        #id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+        id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+        
         st.text('SS')   
         st.text(df_salidas.shape[0])
+        st.text(id_radiales)
         # Mantén sólo las salidas de radiales
         df_salidas  = df_salidas[df_salidas['programa']==int(id_radiales)]
         st.text(df_salidas.shape[0])
