@@ -708,7 +708,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     indice_variable = variables_procesado_bd.index(variable_seleccionada)
 
     # Reemplaza nan por None
-    df_seleccion             = df_seleccion.replace(numpy.nan, None)
+    #df_seleccion             = df_seleccion.replace(numpy.nan, None)
 
     qf_variable_seleccionada = variable_seleccionada + '_qf'
 
@@ -786,6 +786,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             # Selecciona el rango del gráfico
             min_val = min(df_datos_buenos[variable_seleccionada].dropna().min(),df_seleccion[variable_seleccionada].dropna().min())
             max_val = max(df_datos_buenos[variable_seleccionada].dropna().max(),df_seleccion[variable_seleccionada].dropna().max())
+            st.text(df_datos_buenos[variable_seleccionada].dropna().max())
+            st.text(df_seleccion[variable_seleccionada].dropna().max())
             if io_malos:
                 df_datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
                 min_val = min(min_val,df_datos_malos[variable_seleccionada].min())
@@ -842,8 +844,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
         for ipunto in range(df_seleccion.shape[0]):            
-            if df_seleccion['botella'].iloc[ipunto] is None:
-                nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
+            if df_seleccion['botella'].iloc[ipunto] is None or df_seleccion['botella'].iloc[ipunto] == numpy.nan:
+                nombre_muestreos[ipunto] = 'Prof.' + str(int(df_seleccion['presion_ctd'].iloc[ipunto]))
             else:
                 nombre_muestreos[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
