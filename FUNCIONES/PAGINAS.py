@@ -1759,6 +1759,8 @@ def entrada_botellas():
                         datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
                         qf_defecto = 1   
+                        
+                        st.text(io_O2)
              
                         
                         for idato in range(datos_botellas.shape[0]):
