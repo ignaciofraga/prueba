@@ -191,7 +191,9 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
     with col1: 
         
         listado_casts_estaciones  = df_prog_anho_sal_est_sel['num_cast'].unique() 
+        listado_casts_estaciones  = listado_casts_estaciones.astype(int)
         cast_seleccionado         = st.selectbox('Cast',(listado_casts_estaciones))
+        
         
     with col2: 
 
