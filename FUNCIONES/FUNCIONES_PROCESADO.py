@@ -873,7 +873,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         # Añade la leyenda
         ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
         
-
+        st.text(df_seleccion['oxigeno_ctd'])
+        st.text(df_seleccion['oxigeno_wk'])
+        
         io_plot = 0
         if not df_seleccion['oxigeno_ctd'].isnull().all(): 
             az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#006633',label='OXIMETRO')
