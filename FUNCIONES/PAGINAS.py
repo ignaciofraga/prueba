@@ -1832,7 +1832,13 @@ def entrada_botellas():
         df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
         df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
         df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_programas              = psql.read_sql('SELECT * FROM programas', conn)
         conn.close()
+     
+        id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+     
+        # Mantén sólo las salidas de radiales
+        df_salidas  = df_salidas[df_salidas['programa']==id_radiales]
      
         # Combina la información de muestreos y salidas en un único dataframe 
         df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               

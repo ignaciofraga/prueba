@@ -794,8 +794,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             # max_val = max(df_datos_buenos[variable_seleccionada].dropna().max(),df_seleccion[variable_seleccionada].dropna().max())
             min_val = min(min(df_datos_buenos[variable_seleccionada]),min(df_seleccion[variable_seleccionada]))
             max_val = max(max(df_datos_buenos[variable_seleccionada]),max(df_seleccion[variable_seleccionada]))
-            st.text(min_val)
-            st.text(max_val)
+   
             if io_malos:
                 df_datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
                 min_val = min(min_val,df_datos_malos[variable_seleccionada].min())
@@ -860,10 +859,6 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             else:
                 nombre_muestreos[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
-            st.text(nombre_muestreos[ipunto])
-            
-        st.text(vmin_rango)
-        st.text(vmax_rango)
         
         # Ajusta el rango de las x 
         custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
