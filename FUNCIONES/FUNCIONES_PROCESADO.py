@@ -722,11 +722,17 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     # Borra los dataframes que ya no hagan falta para ahorrar memoria
     del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos,df_disponible_bgq_bd,df_disponible_fis_bd)
 
+    # Genera un dataframe sólo con los datos "buenos"        
+    df_datos_buenos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_bueno]
+
     # comprueba si hay datos de la variable a analizar en la salida seleccionada
     if df_seleccion[variable_seleccionada].isnull().all():
         texto_error = "La base de datos no contiene información para la variable, salida y estación seleccionadas"
         st.warning(texto_error, icon="⚠️")
 
+    elif df_datos_buenos[variable_seleccionada].isnull().all():
+        texto_error = "La base de datos no contiene datos de la variable, salida y estación seleccionadas considerados como buenos"
+        st.warning(texto_error, icon="⚠️")
     else:
 
         # Determina los meses que marcan el rango de busqueda
@@ -781,13 +787,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             st.write("Selecciona el rango del gráfico")  
                  
             df_seleccion             = df_seleccion.replace(numpy.nan, None) 
-            df_datos_buenos             = df_datos_buenos.replace(numpy.nan, None) 
-            st.text(df_datos_buenos[variable_seleccionada])
-            
-            st.text(df_datos_buenos[variable_seleccionada].dropna().min())
-            st.text(df_seleccion[variable_seleccionada].dropna().min())
-            st.text(df_datos_buenos[variable_seleccionada].dropna().max())
-            st.text(df_seleccion[variable_seleccionada].dropna().max())
+            df_datos_buenos          = df_datos_buenos.replace(numpy.nan, None) 
             
             # Selecciona el rango del gráfico
             # min_val = min(df_datos_buenos[variable_seleccionada].dropna().min(),df_seleccion[variable_seleccionada].dropna().min())
