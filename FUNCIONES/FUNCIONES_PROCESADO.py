@@ -707,6 +707,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,io_control_calidad)
     indice_variable = variables_procesado_bd.index(variable_seleccionada)
 
+    # Reemplaza nan por None
+    df_seleccion             = df_seleccion.replace(numpy.nan, None)
+
     qf_variable_seleccionada = variable_seleccionada + '_qf'
 
     # Recupera los datos disponibles de la misma estación, para la misma variable
