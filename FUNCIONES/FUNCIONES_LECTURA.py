@@ -144,8 +144,8 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
                                                     "R_CLOR":"r_clor","R_CLOR_FLAG_W":"r_clor_qf","R_PER":"r_per","R_PER_FLAG_W":"r_per_qf","CO3_TMP":"co3_temp"
                                                     })    
     
-    datos_radiales['nitrogeno_total']    = datos_radiales['nitrato'] + datos_radiales['nitrito']
-    datos_radiales['nitrogeno_total_qf'] = 2
+    datos_radiales['TON']    = datos_radiales['nitrato'] + datos_radiales['nitrito']
+    datos_radiales['TON_qf'] = 2
     
     # Añade una columan con el QF de la temperatura, igual al de la salinidad
     datos_radiales['temperatura_ctd_qf'] = datos_radiales['salinidad_ctd_qf'] 
@@ -217,9 +217,6 @@ def lectura_datos_pelacus(nombre_archivo):
   
     # Asigna el valor del cast. Si es un texto no asigna valor
     
-#    import re
-#>>> re.findall(r'\d+', "hello 42 I'm a 32 string 30")
-
     datos_pelacus['num_cast'] = numpy.ones(datos_pelacus.shape[0],dtype=int)
     for idato in range(datos_pelacus.shape[0]):
         try: # Si es entero
@@ -228,10 +225,10 @@ def lectura_datos_pelacus(nombre_archivo):
         except:
             datos_pelacus['num_cast'][idato] = None
 
-    # Asigna el identificador de cada muestreo siguiendo las indicaciones de EXPOCODE. 
-    datos_pelacus['nombre_muestreo'] = [None]*datos_pelacus.shape[0]
-    for idato in range(datos_pelacus.shape[0]):    
-        datos_pelacus['nombre_muestreo'][idato] = '29XX' + datos_pelacus['fecha'][idato].strftime("%Y%m%d")
+    # # Asigna el identificador de cada muestreo siguiendo las indicaciones de EXPOCODE. 
+    # datos_pelacus['nombre_muestreo'] = [None]*datos_pelacus.shape[0]
+    # for idato in range(datos_pelacus.shape[0]):    
+    #     datos_pelacus['nombre_muestreo'][idato] = '29XX' + datos_pelacus['fecha'][idato].strftime("%Y%m%d")
 
     # Corrige las horas (diferente formato)
     for idato in range(datos_pelacus.shape[0]): 
@@ -246,6 +243,17 @@ def lectura_datos_pelacus(nombre_archivo):
                                                   "Latitud":"latitud","Longitud":"longitud","t_CTD":"temperatura_ctd","Sal_CTD":"salinidad_ctd","SiO2":"silicato","SiO2_flag":"silicato_qf",
                                                   "NO3":"nitrato","NO3T_flag":"nitrato_qf","NO2":"nitrito","NO2_flag":"nitrito_qf","NH4":"amonio","NH4_flag":"amonio_qf","PO4":"fosfato","PO4_flag":"fosfato_qf","Cla":"clorofila_a"
                                                   })
+
+    
+    datos_pelacus['temperatura_ctd_qf'] = 9
+    datos_pelacus['salinidad_ctd_qf']   = 9
+    # Asigna qf a los datos disponibles 
+    for idato in range(datos_pelacus.shape[0]):
+        if datos_pelacus['temperatura_ctd'][idato]:
+            datos_pelacus['temperatura_ctd_qf'][idato]=2
+        if datos_pelacus['salinidad_ctd'][idato]:
+            datos_pelacus['salinidad_ctd_qf'][idato]=2            
+
 
     return datos_pelacus
 
