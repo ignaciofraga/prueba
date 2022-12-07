@@ -889,7 +889,7 @@ def entrada_salidas_mar():
                 
                     io_incluido = 0
                     for isalida in range(df_salidas_radiales.shape[0]):
-                        if df_salidas_radiales['fecha_salida'][isalida] == fecha_salida and df_salidas_radiales['tipo_salida'][isalida] == tipo_salida:
+                        if df_salidas_radiales['fecha_salida'].iloc[isalida] == fecha_salida and df_salidas_radiales['tipo_salida'].iloc[isalida] == tipo_salida:
                             io_incluido = 1
     
                     if io_incluido == 0:                     

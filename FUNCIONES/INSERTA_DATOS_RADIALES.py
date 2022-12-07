@@ -11,7 +11,8 @@ Created on Wed Jun  8 17:55:43 2022
 
 
 
-import FUNCIONES_INSERCION
+import FUNCIONES_LECTURA
+import FUNCIONES_PROCESADO
 import pandas
 pandas.options.mode.chained_assignment = None
 import datetime
@@ -52,33 +53,33 @@ for iarchivo in range(len(listado_archivos)):
     print('Procesando la informacion correspondiente al año ',nombre_archivo[-9:-5])
 
     print('Leyendo los datos contenidos en el archivo excel')
-    datos_radiales = FUNCIONES_INSERCION.lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto)
+    datos_radiales = FUNCIONES_LECTURA.lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto)
         
     # Realiza un control de calidad primario a los datos importados   
     print('Realizando control de calidad')
-    datos_radiales_corregido,textos_aviso = FUNCIONES_INSERCION.control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)  
+    datos_radiales_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)  
 
     # Recupera el identificador del programa de muestreo
-    id_programa,abreviatura_programa = FUNCIONES_INSERCION.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+    id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
     
     # Encuentra la estación asociada a cada registro
     print('Asignando la estación correspondiente a cada medida')
-    datos_radiales_corregido = FUNCIONES_INSERCION.evalua_estaciones(datos_radiales_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+    datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_estaciones(datos_radiales_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
     # Encuentra las salidas al mar correspondientes
     tipo_salida = 'MENSUAL'   
-    datos_radiales_corregido = FUNCIONES_INSERCION.evalua_salidas(datos_radiales_corregido,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+    datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_salidas(datos_radiales_corregido,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
  
     # Encuentra el identificador asociado a cada registro
     print('Asignando el registro correspondiente a cada medida')
-    datos_radiales_corregido = FUNCIONES_INSERCION.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+    datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
    
     # # # # Introduce los datos en la base de datos
     print('Introduciendo los datos en la base de datos')
     
-    FUNCIONES_INSERCION.inserta_datos_fisica(datos_radiales_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_PROCESADO.inserta_datos_fisica(datos_radiales_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
 
-    FUNCIONES_INSERCION.inserta_datos_biogeoquimica(datos_radiales_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_radiales_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
 
 
 #     # # Actualiza estado

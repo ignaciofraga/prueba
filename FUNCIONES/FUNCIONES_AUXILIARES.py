@@ -12,6 +12,9 @@ import st_aggrid
 import numpy
 from io import BytesIO
 import pandas
+from sqlalchemy import create_engine
+
+pandas.options.mode.chained_assignment = None
 
 ###############################################################################
 ###################### FUNCION CONEXIÓN #######################################
@@ -614,7 +617,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
 
 
 ###############################################################################
-##################### FUNCION PARA INSERTAR DATOS DISCRETOS  ##################
+################ FUNCION PARA COMPROBAR EL ESTADO DEL PROCESADO ###############
 ############################################################################### 
 
 def comprueba_estado(nombre_programa,fecha_comparacion,nombre_estados,df_estado_procesos):
@@ -667,3 +670,63 @@ def comprueba_estado(nombre_programa,fecha_comparacion,nombre_estados,df_estado_
 
     return df_estados
 
+
+
+
+
+
+
+
+###############################################################################
+############### FUNCION PARA ACTUALIZAR EL ESTADO DEL PROCESADO ###############
+############################################################################### 
+
+def actualiza_estado(datos,id_programa,nombre_programa,fecha_actualizacion,email_contacto,itipo_informacion,direccion_host,base_datos,usuario,contrasena,puerto):
+
+    # Busca de cuántos años diferentes contiene información el dataframe
+    vector_auxiliar_tiempo = numpy.zeros(datos.shape[0],dtype=int)
+    for idato in range(datos.shape[0]):
+        vector_auxiliar_tiempo[idato] = datos['fecha_muestreo'][idato].year
+    anhos_muestreados                 = numpy.unique(vector_auxiliar_tiempo)
+    datos['año']                      = vector_auxiliar_tiempo 
+    
+    # Procesado para cada uno de los años incluidos en el dataframe importado
+    for ianho in range(len(anhos_muestreados)):
+        
+        anho_procesado = anhos_muestreados[ianho]
+               
+        if itipo_informacion == 1:
+            # Selecciona la información de cada uno de los años 
+            fechas_anuales  = datos['fecha_muestreo'][datos['año']==anhos_muestreados[ianho]]
+        
+            # Encuentra la fecha de final de muestreo 
+            fecha_actualizacion = fechas_anuales.max()
+
+        # Recupera los datos disponibles        
+        con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+        conn_psql        = create_engine(con_engine)
+        datos_bd         = psql.read_sql('SELECT * FROM estado_procesos', conn_psql)
+        conn_psql.dispose()
+                
+        datos_bd_programa       = datos_bd[datos_bd['programa']==id_programa]
+        datos_bd_programa_anho  = datos_bd_programa[datos_bd_programa['año']==anho_procesado]
+        
+        if datos_bd_programa_anho.shape[0] == 0:
+            id_proceso = datos_bd.shape[0] + 1
+        else:
+            id_proceso = datos_bd_programa_anho['id_proceso'].iloc[0] 
+            
+        conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        cursor = conn.cursor()  
+        if itipo_informacion == 1:
+            instruccion_sql = "INSERT INTO estado_procesos (id_proceso,programa,nombre_programa,año,fecha_final_muestreo,contacto_muestreo) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (id_proceso) DO UPDATE SET (programa,nombre_programa,año,fecha_final_muestreo,contacto_muestreo) = ROW(EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.año,EXCLUDED.fecha_final_muestreo,EXCLUDED.contacto_muestreo);"   
+        if itipo_informacion == 2:
+            instruccion_sql = "INSERT INTO estado_procesos (id_proceso,programa,nombre_programa,año,fecha_analisis_laboratorio,contacto_analisis_laboratorio) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (id_proceso) DO UPDATE SET (programa,nombre_programa,año,fecha_analisis_laboratorio,contacto_analisis_laboratorio) = ROW(EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.año,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.contacto_analisis_laboratorio);"   
+        if itipo_informacion == 3:
+            instruccion_sql = "INSERT INTO estado_procesos (id_proceso,programa,nombre_programa,año,fecha_post_procesado,contacto_post_procesado) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (id_proceso) DO UPDATE SET (programa,nombre_programa,año,fecha_post_procesado,contacto_post_procesado) = ROW(EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.año,EXCLUDED.fecha_post_procesado,EXCLUDED.contacto_post_procesado);"   
+                        
+            
+        cursor.execute(instruccion_sql, (int(id_proceso),int(id_programa),nombre_programa,int(anho_procesado),fecha_actualizacion,email_contacto))
+        conn.commit() 
+        
+    

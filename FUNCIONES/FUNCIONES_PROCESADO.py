@@ -150,81 +150,6 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
 
  
  
-###################################################################################################
-######## FUNCION PARA ACTUALIZAR LA TABLA DE ESTADOS, UTILIZADA POR LA APLICACIO STREAMLIT ########
-###################################################################################################
-    
-def actualiza_estado(datos,fecha_actualizacion,id_programa,nombre_programa,itipo_informacion,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto):
-
-
-    
-    # Busca de cuántos años diferentes contiene información el dataframe
-    vector_auxiliar_tiempo = numpy.zeros(datos.shape[0],dtype=int)
-    for idato in range(datos.shape[0]):
-        vector_auxiliar_tiempo[idato] = datos['fecha_muestreo'][idato].year
-    anhos_muestreados                 = numpy.unique(vector_auxiliar_tiempo)
-    datos['año']                      = vector_auxiliar_tiempo 
-    
-    # Procesado para cada uno de los años incluidos en el dataframe importado
-    for ianho in range(len(anhos_muestreados)):
-        
-        anho_procesado = anhos_muestreados[ianho]
-               
-        # Selecciona la información de cada uno de los años 
-        fechas_anuales  = datos['fecha_muestreo'][datos['año']==anhos_muestreados[ianho]]
-        
-        # Encuentra la fecha de final de muestreo
-        fecha_final_muestreo = fechas_anuales.max()
-        
-        # Recupera de la base de datos las fechas de análisis y procesado (si están disponibles)
-        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        cursor = conn.cursor()    
-        
-        instruccion_sql = 'SELECT programa,nombre_programa,año,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado FROM estado_procesos WHERE programa = ' + str(id_programa) +' AND año = ' + str(anho_procesado) +';'
-        cursor.execute(instruccion_sql)
-        datos_bd =cursor.fetchall()
-        conn.commit()
-        
-        # Si no hay datos, genera un vector de valores nulos
-        if len(datos_bd) == 0:
-                
-            # Genera el vector con los datos a insertar. diferente según sea análisis o post-procesado
-            if itipo_informacion == 1: # La información a insertar es un nuevo registro de análisis de laboratorio
-                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,fecha_actualizacion,None,None,email_contacto]
-            
-            if itipo_informacion == 2: # La información a insertar es un registro de post-procesado 
-                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,None,fecha_actualizacion,None,email_contacto]
-            
-            if itipo_informacion == 3: # La información a insertar es un registro de entrada de datos 
-                datos_insercion     = [int(id_programa),nombre_programa,int(anho_procesado),fecha_final_muestreo,None,None,email_contacto,None]
-            
-            
-            # Inserta la información en la base de datos
-            instruccion_sql = "INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,año) DO UPDATE SET (nombre_programa,fecha_final_muestreo,fecha_analisis_laboratorio,fecha_post_procesado,contacto_muestreo,contacto_post_procesado) = (EXCLUDED.nombre_programa,EXCLUDED.fecha_final_muestreo,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.fecha_post_procesado,EXCLUDED.contacto_muestreo,EXCLUDED.contacto_post_procesado);"   
-            cursor.execute(instruccion_sql, (datos_insercion))
-            conn.commit()
-
-        # Si la base de datos ya contiene registros del programa y año a insertar, actualizar las fechas correspondientes
-        else:
-            if itipo_informacion == 1:
-                instruccion_sql = "UPDATE estado_procesos SET fecha_analisis_laboratorio = %s,contacto_post_procesado = %s WHERE programa = %s AND año = %s;"   
-                cursor.execute(instruccion_sql, (fecha_actualizacion,email_contacto,int(id_programa),int(anho_procesado)))
-                conn.commit()                
-
-            if itipo_informacion == 2:
-                instruccion_sql = "UPDATE estado_procesos SET fecha_post_procesado = %s,contacto_post_procesado = %s WHERE programa = %s AND año = %s;"   
-                cursor.execute(instruccion_sql, (fecha_actualizacion,email_contacto,int(id_programa),int(anho_procesado)))
-                conn.commit()  
-                
-            if itipo_informacion == 3:
-                instruccion_sql = "UPDATE estado_procesos SET fecha_entrada_datos = %s,contacto_post_procesado = %s WHERE programa = %s AND año = %s;"   
-                cursor.execute(instruccion_sql, (fecha_actualizacion,email_contacto,int(id_programa),int(anho_procesado)))
-                conn.commit() 
-    
-    cursor.close()
-    conn.close()    
-    
-
 
 
 
@@ -1403,3 +1328,4 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
     return datos_corregidos
     
     
+
