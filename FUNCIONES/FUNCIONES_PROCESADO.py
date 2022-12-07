@@ -1216,6 +1216,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 for idato in range(df_seleccion.shape[0]):
     
                     instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, cc_nutrientes = %s WHERE muestreo = %s;'
+                    st.text(df_seleccion['muestreo'].iloc[idato])
+                    st.text(variable_seleccionada)
+                    st.text(df_seleccion[variable_seleccionada].iloc[idato])
                     cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(2),int(df_seleccion['muestreo'].iloc[idato])))
                     conn.commit() 
     
