@@ -1756,6 +1756,7 @@ def entrada_botellas():
 
                         datos_botellas_listado  = datos_botellas.columns.values.tolist()
                         st.text(datos_botellas_listado)
+                        datos_botellas['id_estacion_temp']         =    datos_botellas['estacion']
             
                         # Asigna el identificador de la salida al mar
                         datos_botellas ['id_salida'] =  id_salida
