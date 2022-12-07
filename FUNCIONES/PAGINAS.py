@@ -1795,6 +1795,8 @@ def entrada_botellas():
                                       VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (oxigeno_ctd,oxigeno_ctd_qf) = ROW(EXCLUDED.oxigeno_ctd,EXCLUDED.oxigeno_ctd_qf);''' 
                                         
                                 cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['oxigeno_ctd'][idato],int(qf_defecto)))
+                                st.text(datos_botellas['oxigeno_ctd'][idato])
+                                st.text(datos_botellas['id_muestreo_temp'][idato])                                
                                 conn.commit()     
             
                         texto_exito = 'Archivo ' + archivo_subido.name + ' procesado correctamente'
