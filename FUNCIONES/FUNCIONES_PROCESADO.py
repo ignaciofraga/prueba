@@ -784,8 +784,6 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             st.write("Selecciona el rango del gráfico")  
                    
             # Selecciona el rango del gráfico
-            # min_val = min(df_datos_buenos[variable_seleccionada].min(),df_seleccion[variable_seleccionada].min())
-            # max_val = max(df_datos_buenos[variable_seleccionada].max(),df_seleccion[variable_seleccionada].max())
             min_val = min(df_datos_buenos[variable_seleccionada].dropna().min(),df_seleccion[variable_seleccionada].dropna().min())
             max_val = max(df_datos_buenos[variable_seleccionada].dropna().max(),df_seleccion[variable_seleccionada].dropna().max())
             if io_malos:
@@ -843,14 +841,17 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         rango_profs = ax.get_ylim()
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
-        for ipunto in range(df_seleccion.shape[0]):
-            st.text(df_seleccion['botella'].iloc[ipunto])
+        for ipunto in range(df_seleccion.shape[0]):            
             if df_seleccion['botella'].iloc[ipunto] is None:
                 nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
             else:
                 nombre_muestreos[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
-       
+            st.text(nombre_muestreos[ipunto])
+            
+        st.text(vmin_rango)
+        st.text(vmax_rango)
+        
         # Ajusta el rango de las x 
         custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
         ax.set_xticks(custom_ticks)
