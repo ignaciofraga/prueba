@@ -1837,10 +1837,12 @@ def entrada_botellas():
      
         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
      
+        st.text('SS')   
         st.text(df_salidas.shape[0])
         # Mantén sólo las salidas de radiales
         df_salidas  = df_salidas[df_salidas['programa']==int(id_radiales)]
         st.text(df_salidas.shape[0])
+        
         # Combina la información de muestreos y salidas en un único dataframe 
         df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
         df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
