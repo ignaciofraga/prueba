@@ -1838,7 +1838,7 @@ def entrada_botellas():
         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
      
         # Mantén sólo las salidas de radiales
-        df_salidas  = df_salidas[df_salidas['programa']==id_radiales]
+        df_salidas  = df_salidas[df_salidas['programa']==int(id_radiales)]
      
         # Combina la información de muestreos y salidas en un único dataframe 
         df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
