@@ -1229,6 +1229,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                     st.text(df_seleccion['muestreo'].iloc[idato])
                     st.text(variable_seleccionada)
                     st.text(df_seleccion[variable_seleccionada].iloc[idato])
+                    st.text(instruccion_sql)
                     cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(2),int(df_seleccion['muestreo'].iloc[idato])))
                     conn.commit() 
     
