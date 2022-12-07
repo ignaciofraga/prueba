@@ -695,6 +695,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     id_dato_bueno             = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Bueno'].iloc[0]
     id_dato_dudoso            = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Dudoso'].iloc[0]
 
+
+    listado_variables_fisicas       = df_datos_fisicos.columns.values.tolist()
+    listado_variables_biogeoquimica = df_datos_biogeoquimicos.columns.values.tolist()
     
     ### CONTROL DE CALIDAD DE LOS DATOS
 
@@ -1206,6 +1209,13 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
     
         if io_envio:
+            
+            # Identifica la tabla en la que escribir datos (según la variable en cuestión)
+            if variable_seleccionada in listado_variables_fisicas:
+                tabla_escritura = 'datos_discretos_fisica'
+            if variable_seleccionada in listado_variables_biogeoquimica:
+                tabla_escritura = 'datos_discretos_biogeoquimica'
+
     
             with st.spinner('Actualizando la base de datos'):
            
@@ -1215,7 +1225,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
        
                 for idato in range(df_seleccion.shape[0]):
     
-                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, cc_nutrientes = %s WHERE muestreo = %s;'
+                    instruccion_sql = "UPDATE " + tabla_escritura + " SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, cc_nutrientes = %s WHERE muestreo = %s;'
                     st.text(df_seleccion['muestreo'].iloc[idato])
                     st.text(variable_seleccionada)
                     st.text(df_seleccion[variable_seleccionada].iloc[idato])
