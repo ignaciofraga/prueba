@@ -782,6 +782,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                  
             df_seleccion             = df_seleccion.replace(numpy.nan, None) 
             df_datos_buenos             = df_datos_buenos.replace(numpy.nan, None) 
+            st.text(df_datos_buenos[variable_seleccionada])
             
             st.text(df_datos_buenos[variable_seleccionada].dropna().min())
             st.text(df_seleccion[variable_seleccionada].dropna().min())
