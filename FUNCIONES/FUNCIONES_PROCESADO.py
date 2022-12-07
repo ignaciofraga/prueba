@@ -698,6 +698,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
 
     listado_variables_fisicas       = df_datos_fisicos.columns.values.tolist()
     listado_variables_biogeoquimica = df_datos_biogeoquimicos.columns.values.tolist()
+    listado_nutrientes              = ['TON','nitrato','nitrito','amonio','fosfato','silicato']
     
     ### CONTROL DE CALIDAD DE LOS DATOS
 
@@ -1209,15 +1210,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
     
         if io_envio:
-            
-            # Identifica la tabla en la que escribir datos (según la variable en cuestión)
-            if variable_seleccionada in listado_variables_fisicas:
-                instruccion_sql = "UPDATE datos_discretos_fisica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
                 
-            if variable_seleccionada in listado_variables_biogeoquimica:
-                instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
-
-    
             with st.spinner('Actualizando la base de datos'):
            
                 # Introducir los valores en la base de datos
@@ -1226,7 +1219,19 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
        
                 for idato in range(df_seleccion.shape[0]):
     
-                    cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['muestreo'].iloc[idato])))
+                    if variable_seleccionada in listado_variables_fisicas:
+                        instruccion_sql = "UPDATE datos_discretos_fisica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
+                        cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['muestreo'].iloc[idato])))
+                
+                    if variable_seleccionada in listado_variables_biogeoquimica: 
+                        if variable_seleccionada in listado_nutrientes:
+                            instruccion_sql = "UPDATE datos_discretos_fisica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, cc_nutrientes = %s WHERE muestreo = %s;'
+                            cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(1),int(df_seleccion['muestreo'].iloc[idato])))
+                                    
+                        else:
+                            instruccion_sql = "UPDATE datos_discretos_fisica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
+                            cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['muestreo'].iloc[idato])))
+                                 
                     conn.commit() 
     
                 cursor.close()
