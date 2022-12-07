@@ -707,9 +707,6 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,io_control_calidad)
     indice_variable = variables_procesado_bd.index(variable_seleccionada)
 
-    # Reemplaza nan por None
-    #df_seleccion             = df_seleccion.replace(numpy.nan, None)
-
     qf_variable_seleccionada = variable_seleccionada + '_qf'
 
     # Recupera los datos disponibles de la misma estación, para la misma variable
@@ -804,7 +801,10 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 vmin_rango  = st.number_input('Valor mínimo gráfico:',value=min_val)
             with col3:
                 vmax_rango  = st.number_input('Valor máximo gráfico:',value=max_val)        
-            
+
+
+        #Reemplaza nan por None
+        df_seleccion             = df_seleccion.replace(numpy.nan, None)            
 
     
         ################# GRAFICOS ################
@@ -844,7 +844,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
         for ipunto in range(df_seleccion.shape[0]):            
-            if df_seleccion['botella'].iloc[ipunto] is None or df_seleccion['botella'].iloc[ipunto] is numpy.nan:
+            if df_seleccion['botella'].iloc[ipunto] is None:
                 nombre_muestreos[ipunto] = 'Prof.' + str(int(df_seleccion['presion_ctd'].iloc[ipunto]))
             else:
                 nombre_muestreos[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
