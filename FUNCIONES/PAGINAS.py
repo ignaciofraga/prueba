@@ -1748,9 +1748,14 @@ def entrada_botellas():
                         # Lee datos de botellas
                         mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
             
+                        datos_botellas_listado  = datos_botellas.columns.values.tolist()
+                        st.text(datos_botellas_listado)
+            
                         # Aplica control de calidad
                         datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
 
+                        datos_botellas_listado  = datos_botellas.columns.values.tolist()
+                        st.text(datos_botellas_listado)
             
                         # Asigna el identificador de la salida al mar
                         datos_botellas ['id_salida'] =  id_salida
