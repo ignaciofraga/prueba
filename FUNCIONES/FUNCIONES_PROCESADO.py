@@ -844,7 +844,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
         for ipunto in range(df_seleccion.shape[0]):            
-            if df_seleccion['botella'].iloc[ipunto] is None or df_seleccion['botella'].iloc[ipunto] == numpy.nan:
+            if df_seleccion['botella'].iloc[ipunto] is None or df_seleccion['botella'].iloc[ipunto] is numpy.nan:
                 nombre_muestreos[ipunto] = 'Prof.' + str(int(df_seleccion['presion_ctd'].iloc[ipunto]))
             else:
                 nombre_muestreos[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
