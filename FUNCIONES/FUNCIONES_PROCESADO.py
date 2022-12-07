@@ -781,10 +781,12 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             st.write("Selecciona el rango del gráfico")  
                    
             # Selecciona el rango del gráfico
-            min_val = min(df_datos_buenos[variable_seleccionada].dropna().min(),df_seleccion[variable_seleccionada].dropna().min())
-            max_val = max(df_datos_buenos[variable_seleccionada].dropna().max(),df_seleccion[variable_seleccionada].dropna().max())
-            st.text(df_datos_buenos[variable_seleccionada].dropna().max())
-            st.text(df_seleccion[variable_seleccionada].dropna().max())
+            # min_val = min(df_datos_buenos[variable_seleccionada].dropna().min(),df_seleccion[variable_seleccionada].dropna().min())
+            # max_val = max(df_datos_buenos[variable_seleccionada].dropna().max(),df_seleccion[variable_seleccionada].dropna().max())
+            min_val = min(min(df_datos_buenos[variable_seleccionada]),min(df_seleccion[variable_seleccionada]))
+            max_val = max(max(df_datos_buenos[variable_seleccionada]),max(df_seleccion[variable_seleccionada]))
+            st.text(min_val)
+            st.text(max_val)
             if io_malos:
                 df_datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
                 min_val = min(min_val,df_datos_malos[variable_seleccionada].min())
