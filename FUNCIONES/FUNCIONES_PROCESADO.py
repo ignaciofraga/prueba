@@ -516,18 +516,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 ultimo_registro_bd                = ultimo_registro_bd + 1
                 datos['id_muestreo_temp'][idato]  = ultimo_registro_bd  
  
-            #     # Registro ya incluido, recuperar el identificador
-            #     if tabla_muestreos['estacion'][idato_existente] == datos['id_estacion_temp'].iloc[idato] and tabla_muestreos['fecha_muestreo'][idato_existente] == datos['fecha_muestreo'].iloc[idato] and  tabla_muestreos['hora_muestreo'][idato_existente] == datos['hora_muestreo'].iloc[idato] and  tabla_muestreos['presion_ctd'][idato_existente] == datos['presion_ctd'].iloc[idato] and  tabla_muestreos['configuracion_perfilador'][idato_existente] == datos['configuracion_perfilador'].iloc[idato] and  tabla_muestreos['configuracion_superficie'][idato_existente] == datos['configuracion_superficie'].iloc[idato]:
-            #         datos['id_muestreo_temp'].iloc[idato]  =  tabla_muestreos['id_muestreo'][idato_existente]    
-            #         datos['io_nuevo_muestreo'].iloc[idato] = 0
-            
-            # # Nuevo registro
-            # if datos['io_nuevo_muestreo'].iloc[idato] == 1:
-            #     # Asigna el identificador (siguiente al máximo disponible)
-            #     ultimo_registro_bd                = ultimo_registro_bd + 1
-            #     datos['id_muestreo_temp'].iloc[idato]  = ultimo_registro_bd  
-              
-        
+
         if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
         
             # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
