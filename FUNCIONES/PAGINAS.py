@@ -2007,23 +2007,23 @@ def procesado_nutrientes():
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
                                
-                # Botón para descargar la información como Excel
-                nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
+                # # Botón para descargar la información como Excel
+                # nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
             
-                datos_exporta = datos_corregidos.rename(columns={"nitrogeno_total": "TON"})
-                datos_exporta = datos_exporta[['nombre_muestreo','TON','nitrato','nitrito','silicato','fosfato']]
+                # datos_exporta = datos_corregidos.rename(columns={"nitrogeno_total": "TON"})
+                # datos_exporta = datos_exporta[['nombre_muestreo','TON','nitrato','nitrito','silicato','fosfato']]
 
             
-                output = BytesIO()
-                writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                datos_exporta.to_excel(writer, index=False, sheet_name='DATOS')
-                writer.save()
-                datos_exporta = output.getvalue()
+                # output = BytesIO()
+                # writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                # datos_exporta.to_excel(writer, index=False, sheet_name='DATOS')
+                # writer.save()
+                # datos_exporta = output.getvalue()
             
-                st.download_button(
-                    label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
-                    data=datos_exporta,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
-                    mime="application/vnd.ms-excel")
+                # st.download_button(
+                #     label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
+                #     data=datos_exporta,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
+                #     mime="application/vnd.ms-excel")
             
                 # Añade información de oxígeno, pH, alcalinidad, profunidad....a las muestras que ya estaban en la base de datos
                 df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_datos_disponibles, on="muestreo")                               
@@ -2036,6 +2036,27 @@ def procesado_nutrientes():
                 for idato in range(datos_corregidos.shape[0]):
                     datos_corregidos['año'].iloc[idato] = (datos_corregidos['fecha_muestreo'].iloc[idato]).year
                                 
+                    
+                # Botón para descargar la información como Excel
+                nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
+           
+                datos_exporta = datos_corregidos.rename(columns={"nitrogeno_total": "TON"})
+                datos_exporta = datos_exporta[['nombre_muestreo','TON','nitrato','nitrito','silicato','fosfato']]
+
+           
+                output = BytesIO()
+                writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                datos_exporta.to_excel(writer, index=False, sheet_name='DATOS')
+                writer.save()
+                datos_exporta = output.getvalue()
+           
+                st.download_button(
+                   label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
+                   data=datos_exporta,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
+                   mime="application/vnd.ms-excel")
+                    
+                    
+                    
                 # Realiza control de calidad
                 FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_corregidos,variables_procesado,variables_procesado_bd,variables_unidades)
 
