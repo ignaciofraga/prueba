@@ -1564,7 +1564,7 @@ def entrada_condiciones_ambientales():
             with col3:
                  altura_ola  = st.number_input('Altura de ola (m):',value=float(altura_ola_defecto),min_value=float(0),step =0.5)
                  for idato_estado in range(len(estado_mar_nombre)):
-                     if altura_ola > estado_mar_hmin[idato_estado] and altura_ola <= estado_mar_hmax[idato_estado]:
+                     if altura_ola >= estado_mar_hmin[idato_estado] and altura_ola <= estado_mar_hmax[idato_estado]:
                          indice_prop = idato_estado
                  #mar_douglas = st.selectbox('Mar Douglas:',(douglas_nombre),index=indice_prop)
                  estado_mar    = st.selectbox('Estado del mar:',(estado_mar_nombre),index = indice_prop)
