@@ -2038,7 +2038,7 @@ def procesado_nutrientes():
                    mime="application/vnd.ms-excel")
                     
                 for iespacio in range(5):
-                    st.text()
+                    st.text(' ')
                     
                 st.subheader('Control de calidad de los resultados obtenidos')
                     
