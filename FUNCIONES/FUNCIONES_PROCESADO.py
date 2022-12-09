@@ -1289,16 +1289,24 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
     
     
     # Pasa las concentraciones a mol/kg
+    posicion_RMN_bajos = numpy.zeros(2,dtype=int)
+    posicion_RMN_altos = numpy.zeros(2,dtype=int)
+    icont_bajos        = 0
+    icont_altos        = 0
     datos_entrada['DENSIDAD'] = numpy.ones(datos_entrada.shape[0])
     for idato in range(datos_entrada.shape[0]):
         if datos_entrada['Sample ID'].iloc[idato][0:7].lower() == 'rmn low' :
             datos_entrada['DENSIDAD'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+            posicion_RMN_bajos[icont_bajos] = idato
+            icont_bajos                     = icont_bajos + 1
             st.text('Dato')
-            st.text(datos_entrada['DENSIDAD'].iloc[idato])
+            st.text(posicion_RMN_bajos)
         elif datos_entrada['Sample ID'].iloc[idato][0:8].lower() == 'rmn high':
             datos_entrada['DENSIDAD'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+            posicion_RMN_altos[icont_altos] = idato
+            icont_altos                     = icont_altos + 1
             st.text('Dato2')
-            st.text(datos_entrada['DENSIDAD'].iloc[idato])
+            st.text(posicion_RMN_altos)
         else:
             datos_entrada['DENSIDAD'].iloc[idato] = (999.1+0.77*((datos_entrada['salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
                    
@@ -1312,8 +1320,8 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
     
     ####  APLICA LA CORRECCIÓN DE DERIVA ####
     # Encuentra las posiciones de los RMNs
-    posicion_RMN_bajos  = [i for i, e in enumerate(datos_entrada['Sample ID']) if e == 'RMN Low']
-    posicion_RMN_altos  = [i for i, e in enumerate(datos_entrada['Sample ID']) if e == 'RMN High']
+    #posicion_RMN_bajos  = [i for i, e in enumerate(datos_entrada['Sample ID']) if e == 'RMN Low']
+    #posicion_RMN_altos  = [i for i, e in enumerate(datos_entrada['Sample ID']) if e == 'RMN High']
     
     for ivariable in range(len(variables_run)):
         
