@@ -147,9 +147,7 @@ def consulta_estado():
             else:
                         
                 df_estados = FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,fecha_consulta,nombre_estados,temporal_estado_procesos)
-            
-                st.text(df_estados)
-            
+                        
                 df_estados = df_estados.sort_values('Año')
             
                 # Despliega la información en una tabla
