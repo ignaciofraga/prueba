@@ -1295,9 +1295,10 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
             datos_entrada['DENSIDAD'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
             st.text('Dato')
             st.text(datos_entrada['DENSIDAD'].iloc[idato])
-        elif datos_entrada['Sample ID'].iloc[idato] == 'RMN High':
+        elif datos_entrada['Sample ID'].iloc[idato][0:8].lower() == 'rmn high':
             datos_entrada['DENSIDAD'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
-            
+            st.text('Dato2')
+            st.text(datos_entrada['DENSIDAD'].iloc[idato])
         else:
             datos_entrada['DENSIDAD'].iloc[idato] = (999.1+0.77*((datos_entrada['salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
                    
