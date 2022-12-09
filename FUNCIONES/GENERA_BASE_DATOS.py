@@ -1043,7 +1043,7 @@ conn.close()
 # ' pres_atmosferica int,'
 # ' viento_beaufort text,'
 # ' altura_ola NUMERIC (3, 1),'
-# ' mar_douglas text,'
+# ' estado_mar text,'
 # ' mar_fondo text,'
 # ' mar_direccion text,'
 # ' temp_aire NUMERIC (3, 1),'
