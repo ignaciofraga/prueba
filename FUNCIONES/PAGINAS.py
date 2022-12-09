@@ -2007,26 +2007,23 @@ def procesado_nutrientes():
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
                 
-                st.text(archivo_AA.name[0:-4])
+                st.text(archivo_AA.name[0:-5])
                 
                 # Botón para descargar la información como Excel
-                # nombre_archivo =  'PROCESADO_' + + '.xlsx'
+                nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
             
-                # output = BytesIO()
-                # writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                # df_salidas_seleccion.to_excel(writer, index=False, sheet_name='DATOS')
+                output = BytesIO()
+                writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
                 # workbook = writer.book
                 # worksheet = writer.sheets['DATOS']
-                # writer.save()
-                # df_salidas_seleccion = output.getvalue()
+                writer.save()
+                datos_corregidos = output.getvalue()
             
-                # st.download_button(
-                #     label="DESCARGA EXCEL CON LAS SALIDAS REALIZADAS",
-                #     data=df_salidas_seleccion,
-                #     file_name=nombre_archivo,
-                #     help= 'Descarga un archivo .csv con los datos solicitados',
-                #     mime="application/vnd.ms-excel"
-                # )
+                st.download_button(
+                    label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
+                    data=datos_corregidos,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
+                    mime="application/vnd.ms-excel")
             
                 # Añade información de oxígeno, pH, alcalinidad, profunidad....a las muestras que ya estaban en la base de datos
                 df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_datos_disponibles, on="muestreo")                               
