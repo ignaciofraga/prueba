@@ -2006,17 +2006,17 @@ def procesado_nutrientes():
             
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
-                
-                st.text(archivo_AA.name[0:-5])
-                
+                               
                 # Botón para descargar la información como Excel
                 nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
             
+                datos_exporta = datos_corregidos.rename(columns={"nitrogeno_total": "TON"})
+                datos_exporta = datos_exporta['nombre_muestreo','TON','nitrato','nitrito','silicato','fosfato']
+
+            
                 output = BytesIO()
                 writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
-                # workbook = writer.book
-                # worksheet = writer.sheets['DATOS']
+                datos_exporta.to_excel(writer, index=False, sheet_name='DATOS')
                 writer.save()
                 datos_exporta = output.getvalue()
             
