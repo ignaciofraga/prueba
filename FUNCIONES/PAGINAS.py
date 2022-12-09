@@ -1554,7 +1554,8 @@ def entrada_condiciones_ambientales():
                 velocidad_viento  = st.number_input('Vel.Viento (nudos):',value=float(velocidad_viento_defecto),min_value=float(0),step =0.5)
                 direccion_viento  = st.selectbox('Dir.Viento:',(direcciones),index = indice_direccion_viento_defecto)
                 pres_atmosferica  = st.number_input('Presion atm. (mmHg):',format='%i',value=int(pres_atmosferica_defecto),min_value=0)
-                temp_aire         = st.number_input('Temperatura del aire(ºC):',value=float(temp_aire_defecto),min_value=float(0),step=0.1)
+                humedad_relativa = st.number_input('Humedad relativa (%):',value=int(humedad_relativa_defecto),min_value=0)
+                
                 
                 # for idato_beaufort in range(len(beaufort_nombre)):
                 #     if velocidad_viento >= beaufort_vmin[idato_beaufort] and velocidad_viento < beaufort_vmax[idato_beaufort]:
@@ -1570,12 +1571,12 @@ def entrada_condiciones_ambientales():
                  estado_mar    = st.selectbox('Estado del mar:',(estado_mar_nombre),index = indice_prop)
                  mar_fondo     = st.selectbox('Mar de fondo:',(seleccion_SN),index = indice_mar_fondo_defecto)
                  mar_direccion = st.selectbox('Dir.Oleaje:',(direcciones),index = indice_mar_direccion_defecto)
-                 temp_superf   = st.number_input('Temperatura superficie (ºC):',value=float(temp_superficie_defecto),min_value=float(0),step=0.1)
-    
+                 
     
             with col4:
+                 temp_aire        = st.number_input('Temperatura del aire(ºC):',value=float(temp_aire_defecto),min_value=float(0),step=0.1)
+                 temp_superf      = st.number_input('Temperatura superficie (ºC):',value=float(temp_superficie_defecto),min_value=float(0),step=0.1)    
                  marea            = st.selectbox('Marea:',(mareas),index = indice_marea_defecto)
-                 humedad_relativa = st.number_input('Humedad relativa (%):',value=int(humedad_relativa_defecto),min_value=0)
                  prof_secchi      = st.number_input('Prof.Sechi(m):',value=float(prof_secchi_defecto),min_value=float(0),step=0.5)           
                  max_clorofila    = st.number_input('Max.Clorofila(m):',value=float(max_clorofila_defecto),min_value=float(0),step=0.5)
 
