@@ -632,6 +632,7 @@ def comprueba_estado(nombre_programa,fecha_comparacion,nombre_estados,df_estado_
     df_estados['Programa'] = nombre_programa
     df_estados['Año']      = estado_procesos_programa['año']
     st.text(df_estados['Año'])
+    st.text(estado_procesos_programa['año'])
         
     for ianho in range(estado_procesos_programa.shape[0]):
 
