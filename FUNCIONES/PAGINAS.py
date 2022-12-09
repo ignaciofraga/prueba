@@ -150,7 +150,7 @@ def consulta_estado():
             
                 st.text(df_estados)
             
-                df_estados = df_estados.sort_values('año')
+                df_estados = df_estados.sort_values('Año')
             
                 # Despliega la información en una tabla
                 

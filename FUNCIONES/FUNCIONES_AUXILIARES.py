@@ -626,14 +626,11 @@ def comprueba_estado(nombre_programa,fecha_comparacion,nombre_estados,df_estado_
 
 
     estado_procesos_programa = df_estado_procesos[df_estado_procesos['nombre_programa']==nombre_programa]
-
-    df_estados = pandas.DataFrame(index=numpy.arange(0, estado_procesos_programa.shape[0]),columns=['Programa','Año','Estado','Fecha Actualización','Contacto'])
-            
-    df_estados['Programa'] = nombre_programa
-    df_estados['Año']      = estado_procesos_programa['año']
-    st.text(df_estados['Año'])
-    st.text(estado_procesos_programa['año'])
         
+    estado_procesos_programa['Estado']              = None
+    estado_procesos_programa['Fecha Actualización'] = None
+    estado_procesos_programa['Contacto']            = None
+    
     for ianho in range(estado_procesos_programa.shape[0]):
 
         fecha_final_muestreo       = estado_procesos_programa['fecha_final_muestreo'].iloc[ianho]
@@ -666,16 +663,67 @@ def comprueba_estado(nombre_programa,fecha_comparacion,nombre_estados,df_estado_
             contacto             = contacto_post_procesado
             fecha_actualizacion  = fecha_post_procesado
 
-        df_estados['Estado'].iloc[ianho]              = estado
-        df_estados['Fecha Actualización'].iloc[ianho] = fecha_actualizacion.strftime("%Y-%m-%d")   
-        df_estados['Contacto'].iloc[ianho]            = contacto 
-        #df_estados['Año'].iloc[ianho]                 = estado_procesos_programa['año'].iloc[ianho]
+        estado_procesos_programa['Estado'].iloc[ianho]              = estado
+        estado_procesos_programa['Fecha Actualización'].iloc[ianho] = fecha_actualizacion.strftime("%Y-%m-%d")   
+        estado_procesos_programa['Contacto'].iloc[ianho]            = contacto 
+
+    # Renombre columnas y elimina las que no se usan
+    estado_procesos_programa = estado_procesos_programa.rename(columns={"nombre_programa": "Programa","año": "Año"})
+    estado_procesos_programa = estado_procesos_programa.drop(columns=['fecha_final_muestreo','fecha_analisis_laboratorio','fecha_post_procesado','contacto_muestreo','contacto_analisis_laboratorio','contacto_post_procesado','id_proceso','programa'])
+
+    return estado_procesos_programa
 
 
-    return df_estados
+# def comprueba_estado(nombre_programa,fecha_comparacion,nombre_estados,df_estado_procesos):
 
 
+#     estado_procesos_programa = df_estado_procesos[df_estado_procesos['nombre_programa']==nombre_programa]
 
+#     # df_estados = pandas.DataFrame(index=numpy.arange(0, estado_procesos_programa.shape[0]),columns=['Programa','Año','Estado','Fecha Actualización','Contacto'])
+            
+#     # df_estados['Programa'] = nombre_programa
+#     # df_estados['Año']      = estado_procesos_programa['año']
+
+        
+#     for ianho in range(estado_procesos_programa.shape[0]):
+
+#         fecha_final_muestreo       = estado_procesos_programa['fecha_final_muestreo'].iloc[ianho]
+#         fecha_analisis_laboratorio = estado_procesos_programa['fecha_analisis_laboratorio'].iloc[ianho]
+#         fecha_post_procesado       = estado_procesos_programa['fecha_post_procesado'].iloc[ianho]
+#         contacto_muestreo          = estado_procesos_programa['contacto_muestreo'].iloc[ianho]
+#         contacto_procesado         = estado_procesos_programa['contacto_analisis_laboratorio'].iloc[ianho]
+#         contacto_post_procesado    = estado_procesos_programa['contacto_post_procesado'].iloc[ianho]
+    
+#         # Comprobacion muestreo 
+#         if fecha_final_muestreo:
+#             if fecha_comparacion >= fecha_final_muestreo:
+#                 estado               = nombre_estados[1] 
+#                 contacto             = contacto_muestreo
+#                 fecha_actualizacion  = fecha_final_muestreo
+#         else:
+#             estado              = nombre_estados[0]
+#             contacto            = None
+#             fecha_actualizacion = None
+    
+#         # Comprobacion procesado 
+#         if fecha_analisis_laboratorio is not None and fecha_comparacion >= fecha_analisis_laboratorio:
+#             estado               = nombre_estados[2] 
+#             contacto             = contacto_procesado
+#             fecha_actualizacion  = fecha_analisis_laboratorio
+    
+#         # Comprobacion post-procesado 
+#         if fecha_post_procesado is not None and fecha_comparacion >= fecha_post_procesado:
+#             estado               = nombre_estados[3] 
+#             contacto             = contacto_post_procesado
+#             fecha_actualizacion  = fecha_post_procesado
+
+#         df_estados['Estado'].iloc[ianho]              = estado
+#         df_estados['Fecha Actualización'].iloc[ianho] = fecha_actualizacion.strftime("%Y-%m-%d")   
+#         df_estados['Contacto'].iloc[ianho]            = contacto 
+#         #df_estados['Año'].iloc[ianho]                 = estado_procesos_programa['año'].iloc[ianho]
+
+
+#     return df_estados
 
 
 
