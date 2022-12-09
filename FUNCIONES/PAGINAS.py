@@ -2007,7 +2007,7 @@ def procesado_nutrientes():
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
                 
-                st.text(archivo_AA[0:-4])
+                st.text(archivo_AA.name)
                 
                 # Botón para descargar la información como Excel
                 # nombre_archivo =  'PROCESADO_' + + '.xlsx'
