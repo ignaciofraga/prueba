@@ -1901,12 +1901,6 @@ def procesado_nutrientes():
         
     st.subheader('Procesado de datos de nutrientes')
     
-    # Recupera los datos de conexión
-    direccion_host   = st.secrets["postgres"].host
-    base_datos       = st.secrets["postgres"].dbname
-    usuario          = st.secrets["postgres"].user
-    contrasena       = st.secrets["postgres"].password
-    puerto           = st.secrets["postgres"].port
     
     # Recupera tablas con informacion utilizada en el procesado
     conn                    = init_connection()

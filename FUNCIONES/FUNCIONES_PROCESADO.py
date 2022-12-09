@@ -1271,6 +1271,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
 
 def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_columna,temperatura_laboratorio):
 
+    import streamlit as st
+    
     # Predimensiona un dataframe con los resultados de la correccion
     datos_corregidos = pandas.DataFrame(columns=variables_run)    
 
@@ -1289,9 +1291,10 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
     # Pasa las concentraciones a mol/kg
     datos_entrada['DENSIDAD'] = numpy.ones(datos_entrada.shape[0])
     for idato in range(datos_entrada.shape[0]):
-        if datos_entrada['Sample ID'].iloc[idato] == 'RMN Low' :
+        if datos_entrada['Sample ID'].iloc[idato][0:7] == 'RMN Low' :
             datos_entrada['DENSIDAD'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
-            
+            st.text('Dato')
+            st.text(datos_entrada['DENSIDAD'].iloc[idato])
         elif datos_entrada['Sample ID'].iloc[idato] == 'RMN High':
             datos_entrada['DENSIDAD'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
             
