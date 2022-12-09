@@ -1298,15 +1298,11 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
         if datos_entrada['Sample ID'].iloc[idato][0:7].lower() == 'rmn low' :
             datos_entrada['DENSIDAD'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
             posicion_RMN_bajos[icont_bajos] = idato
-            icont_bajos                     = icont_bajos + 1
-            st.text('Dato')
-            st.text(posicion_RMN_bajos)
+            icont_bajos                     = icont_bajos + 1            
         elif datos_entrada['Sample ID'].iloc[idato][0:8].lower() == 'rmn high':
             datos_entrada['DENSIDAD'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
             posicion_RMN_altos[icont_altos] = idato
             icont_altos                     = icont_altos + 1
-            st.text('Dato2')
-            st.text(posicion_RMN_altos)
         else:
             datos_entrada['DENSIDAD'].iloc[idato] = (999.1+0.77*((datos_entrada['salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
                    
@@ -1334,6 +1330,9 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
         # Concentraciones de las muestras analizadas como referencias
         RMN_altos       = datos_entrada[variable_concentracion][posicion_RMN_altos]
         RMN_bajos       = datos_entrada[variable_concentracion][posicion_RMN_bajos]
+        
+        st.text(RMN_altos)
+        st.text(RMN_bajos)
     
         # Predimensiona las rectas a y b
         posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0]-1,posicion_RMN_bajos[1]+1)
