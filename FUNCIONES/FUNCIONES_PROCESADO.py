@@ -1270,8 +1270,6 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
 ################################################################
 
 def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_columna,temperatura_laboratorio):
-
-    import streamlit as st
     
     # Predimensiona un dataframe con los resultados de la correccion
     datos_corregidos = pandas.DataFrame(columns=variables_run)    
@@ -1320,10 +1318,7 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
     #posicion_RMN_altos  = [i for i, e in enumerate(datos_entrada['Sample ID']) if e == 'RMN High']
     
     for ivariable in range(len(variables_run)):
-        
-        test = datos_entrada[variables_run[ivariable]][posicion_RMN_altos]
-        st.text(test)
-        
+               
         variable_concentracion  = variables_run[ivariable] + '_CONC'
         
         # Concentraciones de las referencias
@@ -1333,10 +1328,7 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
         # Concentraciones de las muestras analizadas como referencias
         RMN_altos       = datos_entrada[variable_concentracion][posicion_RMN_altos]
         RMN_bajos       = datos_entrada[variable_concentracion][posicion_RMN_bajos]
-        
-        #st.text(RMN_altos)
-        #st.text(RMN_bajos)
-    
+            
         # Predimensiona las rectas a y b
         posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0]-1,posicion_RMN_bajos[1]+1)
         recta_at              = numpy.zeros(datos_entrada.shape[0])

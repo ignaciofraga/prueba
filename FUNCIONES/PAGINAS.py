@@ -1919,7 +1919,7 @@ def procesado_nutrientes():
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
  
     # Define los vectores con las variables a procesar
-    variables_procesado    = ['Nitrógeno total','Nitrato','Nitrito','Silicato','Fosfato']    
+    variables_procesado    = ['TON','Nitrato','Nitrito','Silicato','Fosfato']    
     variables_procesado_bd = ['nitrogeno_total','nitrato','nitrito','silicato','fosfato']
     variables_unidades     = ['\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg']
     
@@ -2006,6 +2006,27 @@ def procesado_nutrientes():
             
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
+                
+                st.text(archivo_AA)
+                
+                # Botón para descargar la información como Excel
+                # nombre_archivo =  'PROCESADO_' + + '.xlsx'
+            
+                # output = BytesIO()
+                # writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                # df_salidas_seleccion.to_excel(writer, index=False, sheet_name='DATOS')
+                # workbook = writer.book
+                # worksheet = writer.sheets['DATOS']
+                # writer.save()
+                # df_salidas_seleccion = output.getvalue()
+            
+                # st.download_button(
+                #     label="DESCARGA EXCEL CON LAS SALIDAS REALIZADAS",
+                #     data=df_salidas_seleccion,
+                #     file_name=nombre_archivo,
+                #     help= 'Descarga un archivo .csv con los datos solicitados',
+                #     mime="application/vnd.ms-excel"
+                # )
             
                 # Añade información de oxígeno, pH, alcalinidad, profunidad....a las muestras que ya estaban en la base de datos
                 df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_datos_disponibles, on="muestreo")                               
