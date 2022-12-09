@@ -1291,7 +1291,7 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
     # Pasa las concentraciones a mol/kg
     datos_entrada['DENSIDAD'] = numpy.ones(datos_entrada.shape[0])
     for idato in range(datos_entrada.shape[0]):
-        if datos_entrada['Sample ID'].iloc[idato][0:7] == 'RMN Low' :
+        if datos_entrada['Sample ID'].iloc[idato][0:7].lower() == 'rmn low' :
             datos_entrada['DENSIDAD'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
             st.text('Dato')
             st.text(datos_entrada['DENSIDAD'].iloc[idato])
