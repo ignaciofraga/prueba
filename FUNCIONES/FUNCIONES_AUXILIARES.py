@@ -664,8 +664,10 @@ def comprueba_estado(nombre_programa,fecha_comparacion,nombre_estados,df_estado_
             fecha_actualizacion  = fecha_post_procesado
 
         estado_procesos_programa['Estado'].iloc[ianho]              = estado
-        estado_procesos_programa['Fecha Actualización'].iloc[ianho] = fecha_actualizacion.strftime("%Y-%m-%d")   
-        estado_procesos_programa['Contacto'].iloc[ianho]            = contacto 
+        estado_procesos_programa['Contacto'].iloc[ianho]            = contacto
+        if estado_procesos_programa['Fecha Actualización'].iloc[ianho]:
+            estado_procesos_programa['Fecha Actualización'].iloc[ianho] = fecha_actualizacion.strftime("%Y-%m-%d")   
+         
 
     # Renombre columnas y elimina las que no se usan
     estado_procesos_programa = estado_procesos_programa.rename(columns={"nombre_programa": "Programa","año": "Año"})
