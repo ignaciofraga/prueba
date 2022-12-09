@@ -2007,24 +2007,6 @@ def procesado_nutrientes():
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
                                
-                # # Botón para descargar la información como Excel
-                # nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
-            
-                # datos_exporta = datos_corregidos.rename(columns={"nitrogeno_total": "TON"})
-                # datos_exporta = datos_exporta[['nombre_muestreo','TON','nitrato','nitrito','silicato','fosfato']]
-
-            
-                # output = BytesIO()
-                # writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                # datos_exporta.to_excel(writer, index=False, sheet_name='DATOS')
-                # writer.save()
-                # datos_exporta = output.getvalue()
-            
-                # st.download_button(
-                #     label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
-                #     data=datos_exporta,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
-                #     mime="application/vnd.ms-excel")
-            
                 # Añade información de oxígeno, pH, alcalinidad, profunidad....a las muestras que ya estaban en la base de datos
                 df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_datos_disponibles, on="muestreo")                               
                 df_datos_disponibles  = df_datos_disponibles.drop(columns=['nitrogeno_total','nitrato','nitrito','fosfato','silicato']) # Para evitar duplicidad de columnas
@@ -2055,7 +2037,10 @@ def procesado_nutrientes():
                    data=datos_exporta,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
                    mime="application/vnd.ms-excel")
                     
+                for iespacio in range(5):
+                    st.text()
                     
+                st.subheader('Control de calidad de los resultados obtenidos')
                     
                 # Realiza control de calidad
                 FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_corregidos,variables_procesado,variables_procesado_bd,variables_unidades)
