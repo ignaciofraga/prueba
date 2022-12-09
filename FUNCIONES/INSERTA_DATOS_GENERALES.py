@@ -67,7 +67,7 @@ conn.close()
 
 ### Información de los programas ###
 
-programas       = ['PELACUS','RADIAL VIGO','RADIAL CORUÑA','RADIAL SANTANDER','RADPROF','OTROS']
+programas       = ['PELACUS','RADIAL VIGO','RADIAL CORUÑA','RADIAL CANTABRICO','RADPROF','OTROS']
 centro_asociado = ['CORUNA','VIGO','CORUNA','SANTANDER','CORUNA','CORUNA']
 abreviatura     = ['PELACUS','RADVIGO','RADCOR','RADCAN','RADPROF','OTROS']
 
@@ -222,6 +222,30 @@ for idato in range(len(nombre_estacion)):
     conn.commit()
 cursor.close()
 conn.close()
+
+
+
+
+
+### Informacion de las estaciones de la radial mensual CANTABRICO###
+
+nombre_estacion = ['C1','C2','C3','G1','G2','G3','G4','S2','S4','S6','S7','S9']
+latitud         = [43.6001,43.7000,43.7670,43.5801,43.6748,43.7783,44.3333,43.5000,43.5751,43.7085,43.8001,43.8758]
+longitud        = [-6.1332,-6.1502,-6.1671,-5.6065,-5.5786,-5.5468,-5.6668,-3.7834,-3.7836,-3.7834,-3.7833,-3.7855]
+
+
+instruccion_sql = '''INSERT INTO estaciones (nombre_estacion,programa,latitud,longitud)
+    VALUES (%s,%s,%s,%s) ON CONFLICT (programa,latitud,longitud) DO NOTHING;''' 
+        
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()
+for idato in range(len(nombre_estacion)):
+    
+    cursor.execute(instruccion_sql, (nombre_estacion[idato],int(4),latitud[idato],longitud[idato]))
+    conn.commit()
+cursor.close()
+conn.close()
+
 
 
 
