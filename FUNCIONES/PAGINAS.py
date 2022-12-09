@@ -2041,7 +2041,7 @@ def procesado_nutrientes():
                 nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
            
                 datos_exporta = datos_corregidos.rename(columns={"nitrogeno_total": "TON"})
-                datos_exporta = datos_exporta[['nombre_muestreo','TON','nitrato','nitrito','silicato','fosfato']]
+                #datos_exporta = datos_exporta[['nombre_muestreo','TON','nitrato','nitrito','silicato','fosfato']]
 
            
                 output = BytesIO()
