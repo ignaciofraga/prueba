@@ -1321,6 +1321,9 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
     
     for ivariable in range(len(variables_run)):
         
+        test = datos_entrada[variables_run[ivariable]][posicion_RMN_altos]
+        st.text(test)
+        
         variable_concentracion  = variables_run[ivariable] + '_CONC'
         
         # Concentraciones de las referencias
@@ -1331,8 +1334,8 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
         RMN_altos       = datos_entrada[variable_concentracion][posicion_RMN_altos]
         RMN_bajos       = datos_entrada[variable_concentracion][posicion_RMN_bajos]
         
-        st.text(RMN_altos)
-        st.text(RMN_bajos)
+        #st.text(RMN_altos)
+        #st.text(RMN_bajos)
     
         # Predimensiona las rectas a y b
         posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0]-1,posicion_RMN_bajos[1]+1)
