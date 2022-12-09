@@ -2018,11 +2018,11 @@ def procesado_nutrientes():
                 # workbook = writer.book
                 # worksheet = writer.sheets['DATOS']
                 writer.save()
-                datos_corregidos = output.getvalue()
+                datos_exporta = output.getvalue()
             
                 st.download_button(
                     label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
-                    data=datos_corregidos,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
+                    data=datos_exporta,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
                     mime="application/vnd.ms-excel")
             
                 # Añade información de oxígeno, pH, alcalinidad, profunidad....a las muestras que ya estaban en la base de datos
