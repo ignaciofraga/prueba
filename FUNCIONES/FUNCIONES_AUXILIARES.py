@@ -408,9 +408,7 @@ def consulta_botellas():
         identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
         for idato in range(len(listado_salidas)):
             identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
-    
-        st.text(identificadores_salidas)
-    
+        
         # Elimina las columnas que no interesan en los dataframes a utilizar
         #df_salidas_seleccion        = df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
         df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
