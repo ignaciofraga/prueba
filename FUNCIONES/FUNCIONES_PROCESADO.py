@@ -566,7 +566,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 ultimo_registro_bd                = ultimo_registro_bd + 1
                 datos['id_muestreo_temp'][idato]  = ultimo_registro_bd  
  
-        
+        st.text(datos['io_nuevo_muestreo'])
         
         if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
         
