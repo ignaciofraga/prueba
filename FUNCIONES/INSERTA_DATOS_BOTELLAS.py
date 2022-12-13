@@ -36,7 +36,7 @@ direccion_host = '193.146.155.99'
 # Parámetros
 nombre_programa = 'RADIAL CORUÑA'
 
-anho = 2022
+anho = 2021
 ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
 tipo_salida   = 'MENSUAL' 
 
@@ -56,7 +56,8 @@ listado_salidas = glob(ruta_datos, recursive = True)
 
 # Mantén sólo la parte de fechas
 for idato in range(len(listado_salidas)):
-#for idato in range(1):
+# icuenta = 3
+# for idato in range(icuenta,icuenta+8):
     
     fecha_salida_texto = listado_salidas[idato][-14:-6]
 
