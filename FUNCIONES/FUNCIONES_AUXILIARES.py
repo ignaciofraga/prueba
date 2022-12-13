@@ -416,11 +416,13 @@ def consulta_botellas():
         df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
         df_muestreos                = df_muestreos.drop(columns=['configuracion_perfilador','configuracion_superficie'])
 
-        st.text(df_salidas_seleccion)
+        #st.text(df_salidas_seleccion)
 
         # conserva los datos de las salidas seleccionadas
         df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
-    
+ 
+        st.text(df_salidas_seleccion)   
+ 
         # Recupera los muestreos correspondientes a las salidas seleccionadas
         df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
         df_muestreos_seleccionados  = pandas.merge(df_salidas_seleccion, df_muestreos, on="id_salida")
