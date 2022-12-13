@@ -394,6 +394,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
             buque                       = id_buque[id_configuracion_perfilador-1]
           
             import streamlit as st
+            st.text(fechas_salidas_mar[isalida])
             st.text(fechas_salidas_mar[isalida].month)
             nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_salidas_mar[isalida].month-1]) + ' ' +  str(fechas_salidas_mar[isalida].year)
           
