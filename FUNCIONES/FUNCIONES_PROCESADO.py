@@ -668,7 +668,7 @@ def inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrase
     
     # Genera un dataframe solo con las variales biogeoquimicas de los datos a importar 
     datos_biogeoquimica = datos[['id_muestreo_temp','fluorescencia_ctd','fluorescencia_ctd_qf','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk_qf',
-                                 'nitrogeno_total','nitrogeno_total_qf','nitrato','nitrato_qf','nitrito','nitrito_qf','amonio','amonio_qf','fosfato','fosfato_qf','silicato','silicato_qf','tcarbn','tcarbn_qf','doc','doc_qf',
+                                 'TON','TON_qf','nitrato','nitrato_qf','nitrito','nitrito_qf','amonio','amonio_qf','fosfato','fosfato_qf','silicato','silicato_qf','tcarbn','tcarbn_qf','doc','doc_qf',
                                  'cdom','cdom_qf','clorofila_a','clorofila_a_qf','alcalinidad','alcalinidad_qf','ph','ph_qf','ph_metodo','r_clor','r_clor_qf','r_per','r_per_qf','co3_temp']]    
     datos_biogeoquimica = datos_biogeoquimica.rename(columns={"id_muestreo_temp": "muestreo"})
     
@@ -1322,11 +1322,11 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
            
     # Corrige las concentraciones a partir de los rendimientos de la coumna reductora
     datos_entrada['nitrato_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
-    datos_entrada['nitrogeno_total_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
-    factor = ((datos_entrada['nitrogeno_total'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])/(datos_entrada['nitrogeno_total'].iloc[indices_calibracion[-1]] + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])
+    datos_entrada['TON_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
+    factor = ((datos_entrada['TON'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])/(datos_entrada['TON'].iloc[indices_calibracion[-1]] + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])
     for idato in range(datos_entrada.shape[0]):
-        datos_entrada['nitrato_rendimiento'].iloc[idato] = (datos_entrada['nitrogeno_total'].iloc[idato]*factor - datos_entrada['nitrito'].iloc[idato])/(rendimiento_columna/100) 
-        datos_entrada['nitrogeno_total_rendimiento'].iloc[idato] = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['nitrito'].iloc[idato]
+        datos_entrada['nitrato_rendimiento'].iloc[idato] = (datos_entrada['TON'].iloc[idato]*factor - datos_entrada['nitrito'].iloc[idato])/(rendimiento_columna/100) 
+        datos_entrada['TON_rendimiento'].iloc[idato] = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['nitrito'].iloc[idato]
     
     
     # Pasa las concentraciones a mol/kg
@@ -1348,7 +1348,7 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
             datos_entrada['DENSIDAD'].iloc[idato] = (999.1+0.77*((datos_entrada['salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
                    
                     
-    datos_entrada['nitrogeno_total_CONC'] = datos_entrada['nitrogeno_total_rendimiento']/datos_entrada['DENSIDAD']  
+    datos_entrada['TON_CONC'] = datos_entrada['TON_rendimiento']/datos_entrada['DENSIDAD']  
     datos_entrada['nitrato_CONC'] = datos_entrada['nitrato_rendimiento']/datos_entrada['DENSIDAD']  
     datos_entrada['nitrito_CONC'] = datos_entrada['nitrito']/datos_entrada['DENSIDAD']  
     datos_entrada['silicato_CONC'] = datos_entrada['silicato']/datos_entrada['DENSIDAD']  

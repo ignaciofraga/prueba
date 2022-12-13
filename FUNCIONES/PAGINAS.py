@@ -1901,9 +1901,7 @@ def consulta_botellas():
 
 
 def procesado_nutrientes():
-        
-    st.subheader('Procesado de datos de nutrientes')
-    
+         
     
     # Recupera tablas con informacion utilizada en el procesado
     conn                    = init_connection()
@@ -1923,7 +1921,7 @@ def procesado_nutrientes():
  
     # Define los vectores con las variables a procesar
     variables_procesado    = ['TON','Nitrato','Nitrito','Silicato','Fosfato']    
-    variables_procesado_bd = ['nitrogeno_total','nitrato','nitrito','silicato','fosfato']
+    variables_procesado_bd = ['TON','nitrato','nitrito','silicato','fosfato']
     variables_unidades     = ['\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg']
     
     
@@ -1934,8 +1932,9 @@ def procesado_nutrientes():
     # Añade salidas del AA
     if tipo_accion == acciones[0]:
         
+        st.subheader('Procesado de datos de nutrientes')
         
-        variables_run = ['nitrogeno_total','nitrito','silicato','fosfato']    
+        variables_run = ['TON','nitrito','silicato','fosfato']    
     
     
         # Despliega un formulario para subir los archivos del AA y las referencias
@@ -1999,7 +1998,7 @@ def procesado_nutrientes():
                 datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias,variables_run,rendimiento_columna,temperatura_laboratorio)
             
                 # Calcula el NO3 como diferencia entre el TON y el NO2
-                datos_corregidos['nitrato'] = datos_corregidos['nitrogeno_total'] - datos_corregidos['nitrito']
+                datos_corregidos['nitrato'] = datos_corregidos['TON'] - datos_corregidos['nitrito']
             
                 # corrige posibles valores negativos
                 datos_corregidos['nitrato'][datos_corregidos['nitrato']<0] = 0
@@ -2012,7 +2011,7 @@ def procesado_nutrientes():
                                
                 # Añade información de oxígeno, pH, alcalinidad, profunidad....a las muestras que ya estaban en la base de datos
                 df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_datos_disponibles, on="muestreo")                               
-                df_datos_disponibles  = df_datos_disponibles.drop(columns=['nitrogeno_total','nitrato','nitrito','fosfato','silicato']) # Para evitar duplicidad de columnas
+                df_datos_disponibles  = df_datos_disponibles.drop(columns=['TON','nitrato','nitrito','fosfato','silicato']) # Para evitar duplicidad de columnas
 
                 datos_corregidos      = pandas.merge(datos_corregidos, df_datos_disponibles, on="nombre_muestreo")  
                 
@@ -2025,8 +2024,7 @@ def procesado_nutrientes():
                 # Botón para descargar la información como Excel
                 nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
            
-                datos_exporta = datos_corregidos.rename(columns={"nitrogeno_total": "TON"})
-                datos_exporta = datos_exporta[['nombre_muestreo','presion_ctd','TON','nitrato','nitrito','silicato','fosfato','temperatura_ctd','salinidad_ctd']]
+                datos_exporta = datos_corregidos[['nombre_muestreo','presion_ctd','temperatura_ctd','salinidad_ctd','TON','nitrato','nitrito','silicato','fosfato']]
 
            
                 output = BytesIO()
@@ -2053,6 +2051,8 @@ def procesado_nutrientes():
     # Añade resultados del procesado (salidas del AA procesadas en excel) 
     if tipo_accion == acciones[1]:
         
+        st.subheader('Inserción de datos de nutrientes')
+        
         FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_procesado,variables_procesado_bd,df_referencia)
 
         
@@ -2060,6 +2060,8 @@ def procesado_nutrientes():
         
     # control de calidad de salidas previamente disponibles
     if tipo_accion == acciones[2]: 
+        
+        st.subheader('Control de calidad de datos de nutrientes')
 
         # compón un dataframe con la información de muestreo y datos biogeoquímicos
         df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
