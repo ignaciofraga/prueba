@@ -1997,6 +1997,8 @@ def procesado_nutrientes():
                 # Aplica la corrección de deriva (DRIFT)                 
                 datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias,variables_run,rendimiento_columna,temperatura_laboratorio)
             
+                st.text(datos_corregidos)
+            
                 # Calcula el NO3 como diferencia entre el TON y el NO2
                 datos_corregidos['nitrato'] = datos_corregidos['TON'] - datos_corregidos['nitrito']
             
