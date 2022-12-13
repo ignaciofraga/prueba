@@ -555,20 +555,12 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                     if tabla_muestreos['estacion'][idato_existente] == datos['id_estacion_temp'][idato] and tabla_muestreos['fecha_muestreo'][idato_existente] == datos['fecha_muestreo'][idato] and  tabla_muestreos['hora_muestreo'][idato_existente] == datos['hora_muestreo'][idato] and  tabla_muestreos['presion_ctd'][idato_existente] == datos['presion_ctd'][idato] and  tabla_muestreos['configuracion_perfilador'][idato_existente] == datos['configuracion_perfilador'][idato] and  tabla_muestreos['configuracion_superficie'][idato_existente] == datos['configuracion_superficie'][idato]:
                         datos['id_muestreo_temp'] [idato] =  tabla_muestreos['id_muestreo'][idato_existente]    
                         datos['io_nuevo_muestreo'][idato] = 0
+                        st.text('jol')
                 else:  
-                    st.text(tabla_muestreos['estacion'][idato_existente])
-                    st.text(datos['id_estacion_temp'][idato])
-                    st.text(tabla_muestreos['fecha_muestreo'][idato_existente])
-                    st.text(datos['fecha_muestreo'][idato])
-                    st.text(tabla_muestreos['presion_ctd'][idato_existente])
-                    st.text(datos['presion_ctd'][idato])
-                    st.text(tabla_muestreos['configuracion_perfilador'][idato_existente])
-                    st.text(datos['configuracion_perfilador'][idato])
-                    st.text(tabla_muestreos['configuracion_superficie'][idato_existente])
-                    st.text(datos['configuracion_superficie'][idato])
                     if tabla_muestreos['estacion'][idato_existente] == datos['id_estacion_temp'][idato] and tabla_muestreos['fecha_muestreo'][idato_existente] == datos['fecha_muestreo'][idato] and   tabla_muestreos['presion_ctd'][idato_existente] == datos['presion_ctd'][idato] and  tabla_muestreos['configuracion_perfilador'][idato_existente] == datos['configuracion_perfilador'][idato] and  tabla_muestreos['configuracion_superficie'][idato_existente] == datos['configuracion_superficie'][idato]:
                         datos['id_muestreo_temp'] [idato] =  tabla_muestreos['id_muestreo'][idato_existente]    
-                        datos['io_nuevo_muestreo'][idato] = 0               
+                        datos['io_nuevo_muestreo'][idato] = 0     
+                        st.text('ole')
                 
             # Nuevo registro
             if datos['io_nuevo_muestreo'][idato] == 1:
