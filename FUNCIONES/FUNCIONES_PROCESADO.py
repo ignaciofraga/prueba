@@ -500,6 +500,8 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
 
 def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto):
     
+    import streamlit as st
+    
     # Recupera la tabla con los registros de los muestreos
     con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql        = create_engine(con_engine)
@@ -559,7 +561,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 ultimo_registro_bd                = ultimo_registro_bd + 1
                 datos['id_muestreo_temp'][idato]  = ultimo_registro_bd  
  
-
+        st.text(datos['io_nuevo_muestreo'])
+        
         if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
         
             # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
@@ -585,8 +588,6 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                  
                 exporta_registros['nombre_muestreo'][idato]  = nombre_muestreo
 
-            import streamlit as st
-            st.text(exporta_registros)
 
             # # Inserta el dataframe resultante en la base de datos 
             exporta_registros.set_index('id_muestreo',drop=True,append=False,inplace=True)
