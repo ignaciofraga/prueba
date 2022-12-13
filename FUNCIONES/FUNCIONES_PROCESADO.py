@@ -555,9 +555,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                     datos['id_muestreo_temp'] [idato] =  tabla_muestreos['id_muestreo'][idato_existente]    
                     datos['io_nuevo_muestreo'][idato] = 0
                     
-                    st.text(datos['id_estacion_temp'][idato])
-                    st.text(tabla_muestreos['hora_muestreo'][idato_existente])
-                    st.text(datos['hora_muestreo'][idato])
+                st.text(datos['id_estacion_temp'][idato])
+                st.text(tabla_muestreos['hora_muestreo'][idato_existente])
+                st.text(datos['hora_muestreo'][idato])
                 
             # Nuevo registro
             if datos['io_nuevo_muestreo'][idato] == 1:
