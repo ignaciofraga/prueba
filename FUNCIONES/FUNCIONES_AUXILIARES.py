@@ -421,15 +421,11 @@ def consulta_botellas():
         # conserva los datos de las salidas seleccionadas
         df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
 
-        st.text(df_salidas_seleccion)
  
         # Recupera los muestreos correspondientes a las salidas seleccionadas
-        # df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
-        # df_muestreos_seleccionados  = pandas.merge(df_salidas_seleccion, df_muestreos, on="id_salida")
         df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(identificadores_salidas)]
         df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"id_muestreo": "muestreo"})
-        
-        st.text(df_muestreos_seleccionados)     
+          
                    
         # Asocia las coordenadas y nombre de estación de cada muestreo
         df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
@@ -440,8 +436,7 @@ def consulta_botellas():
         
         # Asocia las propiedades biogeoquimicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos, on="muestreo")
-    
-    
+        
         # Elimina las columnas que no interesan
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo'])
     
@@ -462,8 +457,8 @@ def consulta_botellas():
         output = BytesIO()
         writer = pandas.ExcelWriter(output, engine='xlsxwriter')
         df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
-        workbook = writer.book
-        worksheet = writer.sheets['DATOS']
+        # workbook = writer.book
+        # worksheet = writer.sheets['DATOS']
         writer.save()
         datos_exporta = output.getvalue()
     
