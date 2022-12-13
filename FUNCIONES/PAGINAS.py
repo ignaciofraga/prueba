@@ -2073,7 +2073,7 @@ def procesado_nutrientes():
             
             tipo_salida               = st.selectbox('Tipo de salida',(listado_tipos_salida))
 
-        with col2:
+        with col3:
                    
             archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
             
