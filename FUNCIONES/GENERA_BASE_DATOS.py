@@ -454,7 +454,7 @@ direccion_host = '193.146.155.99'
 # 'ON UPDATE CASCADE ON DELETE CASCADE'
 # )
 
-# listado_unicidades = (', UNIQUE (estacion,fecha_muestreo,hora_muestreo,salida_mar,presion_ctd,configuracion_superficie,configuracion_perfilador))')
+# listado_unicidades = (', UNIQUE (estacion,fecha_muestreo,hora_muestreo,salida_mar,presion_ctd,botella,configuracion_superficie,configuracion_perfilador))')
 
 # instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
 

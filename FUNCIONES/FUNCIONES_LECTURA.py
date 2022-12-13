@@ -325,14 +325,15 @@ def lectura_datos_estadillo(nombre_archivo,nombre_plantilla):
     
     ## Comprueba el formato de los datos
     
-    # Verifica si están todas las columnas, comparando con una plantilla
-    datos_plantilla = pandas.read_excel(nombre_plantilla, 'datos') 
+    # # Verifica si están todas las columnas, comparando con una plantilla
+    # datos_plantilla = pandas.read_excel(nombre_plantilla, 'datos') 
     
-    if pandas.Series(datos_entrada.columns).isin(datos_plantilla.columns).all() is False:
-        texto_error = 'Los datos de entrada no se ajustan a la plantilla. Revisar el formato del archivo'
+    # if pandas.Series(datos_entrada.columns).isin(datos_plantilla.columns).all() is False:
+    #     texto_error = 'Los datos de entrada no se ajustan a la plantilla. Revisar el formato del archivo'
     
-    else:
-        texto_error = []
+    # else:
+    #     texto_error = []
+    texto_error = []
     
     # corrije el formato de las fechas
     for idato in range(datos_entrada.shape[0]):
