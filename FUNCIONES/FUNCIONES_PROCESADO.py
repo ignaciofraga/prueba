@@ -585,6 +585,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                  
                 exporta_registros['nombre_muestreo'][idato]  = nombre_muestreo
 
+            import streamlit as st
+            st.text(exporta_registros)
 
             # # Inserta el dataframe resultante en la base de datos 
             exporta_registros.set_index('id_muestreo',drop=True,append=False,inplace=True)
