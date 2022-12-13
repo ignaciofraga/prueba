@@ -1996,9 +1996,7 @@ def procesado_nutrientes():
             
                 # Aplica la corrección de deriva (DRIFT)                 
                 datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias,variables_run,rendimiento_columna,temperatura_laboratorio)
-            
-                st.text(datos_corregidos)
-            
+                
                 # Calcula el NO3 como diferencia entre el TON y el NO2
                 datos_corregidos['nitrato'] = datos_corregidos['TON'] - datos_corregidos['nitrito']
             
@@ -2013,8 +2011,6 @@ def procesado_nutrientes():
                                
                 # Añade información de oxígeno, pH, alcalinidad, profunidad....a las muestras que ya estaban en la base de datos
                 df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_datos_disponibles, on="muestreo")                               
-                
-                st.text(df_datos_disponibles)
                 df_datos_disponibles  = df_datos_disponibles.drop(columns=['TON','nitrato','nitrito','fosfato','silicato']) # Para evitar duplicidad de columnas
 
                 datos_corregidos      = pandas.merge(datos_corregidos, df_datos_disponibles, on="nombre_muestreo")  
