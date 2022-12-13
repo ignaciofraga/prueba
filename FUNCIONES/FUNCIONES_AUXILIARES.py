@@ -420,8 +420,7 @@ def consulta_botellas():
 
         # conserva los datos de las salidas seleccionadas
         df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
- 
-        st.text(df_salidas_seleccion)   
+  
  
         # Recupera los muestreos correspondientes a las salidas seleccionadas
         # df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
@@ -433,14 +432,20 @@ def consulta_botellas():
         # Asocia las coordenadas y nombre de estación de cada muestreo
         df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
+
+        st.text(df_muestreos_seleccionados) 
         
         # Asocia las propiedades físicas de cada muestreo
         df_datos_fisicos            = df_datos_fisicos_seleccion.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos, on="id_muestreo")
     
+        st.text(df_muestreos_seleccionados) 
+    
         # Asocia las propiedades biogeoquimicas de cada muestreo
         df_datos_biogeoquimicos     = df_datos_biogeoquimicos_seleccion.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos, on="id_muestreo")
+    
+        st.text(df_muestreos_seleccionados) 
     
         # Elimina las columnas que no interesan
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','id_muestreo'])
