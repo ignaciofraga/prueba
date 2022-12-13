@@ -550,14 +550,15 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
             for idato_existente in range(tabla_muestreos.shape[0]):
                 
-                # Registro ya incluido, recuperar el identificador
-                if tabla_muestreos['estacion'][idato_existente] == datos['id_estacion_temp'][idato] and tabla_muestreos['fecha_muestreo'][idato_existente] == datos['fecha_muestreo'][idato] and  tabla_muestreos['hora_muestreo'][idato_existente] == datos['hora_muestreo'][idato] and  tabla_muestreos['presion_ctd'][idato_existente] == datos['presion_ctd'][idato] and  tabla_muestreos['configuracion_perfilador'][idato_existente] == datos['configuracion_perfilador'][idato] and  tabla_muestreos['configuracion_superficie'][idato_existente] == datos['configuracion_superficie'][idato]:
-                    datos['id_muestreo_temp'] [idato] =  tabla_muestreos['id_muestreo'][idato_existente]    
-                    datos['io_nuevo_muestreo'][idato] = 0
-                    
-                st.text(datos['id_estacion_temp'][idato])
-                st.text(tabla_muestreos['hora_muestreo'][idato_existente])
-                st.text(datos['hora_muestreo'][idato])
+                if tabla_muestreos['hora_muestreo'][idato_existente] is not None and datos['hora_muestreo'][idato] is not None:
+                    # Registro ya incluido, recuperar el identificador
+                    if tabla_muestreos['estacion'][idato_existente] == datos['id_estacion_temp'][idato] and tabla_muestreos['fecha_muestreo'][idato_existente] == datos['fecha_muestreo'][idato] and  tabla_muestreos['hora_muestreo'][idato_existente] == datos['hora_muestreo'][idato] and  tabla_muestreos['presion_ctd'][idato_existente] == datos['presion_ctd'][idato] and  tabla_muestreos['configuracion_perfilador'][idato_existente] == datos['configuracion_perfilador'][idato] and  tabla_muestreos['configuracion_superficie'][idato_existente] == datos['configuracion_superficie'][idato]:
+                        datos['id_muestreo_temp'] [idato] =  tabla_muestreos['id_muestreo'][idato_existente]    
+                        datos['io_nuevo_muestreo'][idato] = 0
+                else:    
+                    if tabla_muestreos['estacion'][idato_existente] == datos['id_estacion_temp'][idato] and tabla_muestreos['fecha_muestreo'][idato_existente] == datos['fecha_muestreo'][idato] and   tabla_muestreos['presion_ctd'][idato_existente] == datos['presion_ctd'][idato] and  tabla_muestreos['configuracion_perfilador'][idato_existente] == datos['configuracion_perfilador'][idato] and  tabla_muestreos['configuracion_superficie'][idato_existente] == datos['configuracion_superficie'][idato]:
+                        datos['id_muestreo_temp'] [idato] =  tabla_muestreos['id_muestreo'][idato_existente]    
+                        datos['io_nuevo_muestreo'][idato] = 0               
                 
             # Nuevo registro
             if datos['io_nuevo_muestreo'][idato] == 1:
