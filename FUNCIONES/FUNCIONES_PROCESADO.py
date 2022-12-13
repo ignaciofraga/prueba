@@ -851,9 +851,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             
             col1, col2, col3, col4 = st.columns(4,gap="small")
             with col2:
-                vmin_rango  = st.number_input('Valor mínimo gráfico:',value=min_val)
+                vmin_rango  = st.number_input('Valor mínimo gráfico:',value=min_val,key='vmin_graf1')
             with col3:
-                vmax_rango  = st.number_input('Valor máximo gráfico:',value=max_val)        
+                vmax_rango  = st.number_input('Valor máximo gráfico:',value=max_val,key='vmax_graf1')        
 
 
         ##Reemplaza nan por None
@@ -964,18 +964,18 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                    
                 col1, col2, col3, col4 = st.columns(4,gap="small")
                 with col2:
-                    vmin_rango_x  = st.number_input('Valor mínimo eje x:',value=min_val_x)
+                    vmin_rango_x  = st.number_input('Valor mínimo eje x:',value=min_val_x,key='vmin_x_graf_fosf')
                 with col3:
-                    vmax_rango_x  = st.number_input('Valor máximo eje x:',value=max_val_x)  
+                    vmax_rango_x  = st.number_input('Valor máximo eje x:',value=max_val_x,key='vmax_x_graf_fosf')  
  
                 min_val_y = 0.95*min(df_disponible_bd['fosfato'].min(),df_seleccion['fosfato'].min())
                 max_val_y = 1.05*max(df_disponible_bd['fosfato'].max(),df_seleccion['fosfato'].max())
                    
                 col1, col2, col3, col4 = st.columns(4,gap="small")
                 with col2:
-                    vmin_rango_y  = st.number_input('Valor mínimo eje y:',value=min_val_y)
+                    vmin_rango_y  = st.number_input('Valor mínimo eje y:',value=min_val_y,key='vmin_y_graf_fosf')
                 with col3:
-                    vmax_rango_y  = st.number_input('Valor máximo eje y:',value=max_val_y) 
+                    vmax_rango_y  = st.number_input('Valor máximo eje y:',value=max_val_y,key='vmax_y_graf_fosf') 
             
             
     
@@ -1042,18 +1042,18 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                    
                 col1, col2, col3, col4 = st.columns(4,gap="small")
                 with col2:
-                    vmin_rango_x  = st.number_input('Valor mínimo nitrato:',value=min_val_x)
+                    vmin_rango_x  = st.number_input('Valor mínimo nitrato:',value=min_val_x,key='vmin_nit')
                 with col3:
-                    vmax_rango_x  = st.number_input('Valor máximo nitrato:',value=max_val_x)  
+                    vmax_rango_x  = st.number_input('Valor máximo nitrato:',value=max_val_x,key='vmax_nit')  
  
                 min_val_y = 0.95*min(df_disponible_bd['fosfato'].min(),df_seleccion['fosfato'].min())
                 max_val_y = 1.05*max(df_disponible_bd['fosfato'].max(),df_seleccion['fosfato'].max())
                    
                 col1, col2, col3, col4 = st.columns(4,gap="small")
                 with col2:
-                    vmin_rango_y  = st.number_input('Valor mínimo fosfato:',value=min_val_y)
+                    vmin_rango_y  = st.number_input('Valor mínimo fosfato:',value=min_val_y,key='vmin_fosf')
                 with col3:
-                    vmax_rango_y  = st.number_input('Valor máximo fosfato:',value=max_val_y)         
+                    vmax_rango_y  = st.number_input('Valor máximo fosfato:',value=max_val_y,key='vmax_fosf')         
 
    
                     
@@ -1071,18 +1071,18 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                        
                     col1, col2, col3, col4 = st.columns(4,gap="small")
                     with col2:
-                        vmin_rango_x_g2  = st.number_input('Valor mínimo nitrato:',value=min_val_x_g2)
+                        vmin_rango_x_g2  = st.number_input('Valor mínimo nitrato:',value=min_val_x_g2,key='vmin_nit_2')
                     with col3:
-                        vmax_rango_x_g2  = st.number_input('Valor máximo nitrato:',value=max_val_x_g2)  
+                        vmax_rango_x_g2  = st.number_input('Valor máximo nitrato:',value=max_val_x_g2,key='vmax_nit_2')  
      
                     min_val_y_g2 = 0.95*min(df_disponible_bd['ph'].min(),df_seleccion['ph'].min())
                     max_val_y_g2 = 1.05*max(df_disponible_bd['ph'].max(),df_seleccion['ph'].max())
                        
                     col1, col2, col3, col4 = st.columns(4,gap="small")
                     with col2:
-                        vmin_rango_y_g2  = st.number_input('Valor mínimo pH:',value=min_val_y_g2)
+                        vmin_rango_y_g2  = st.number_input('Valor mínimo pH:',value=min_val_y_g2,key='vmin_ph')
                     with col3:
-                        vmax_rango_y_g2  = st.number_input('Valor máximo pH:',value=max_val_y_g2) 
+                        vmax_rango_y_g2  = st.number_input('Valor máximo pH:',value=max_val_y_g2,key='vmax_ph') 
 
                 fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.1, 'hspace':0}, width_ratios=[1, 1])      
     
@@ -1193,18 +1193,18 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                        
                     col1, col2, col3, col4 = st.columns(4,gap="small")
                     with col2:
-                        vmin_rango_x  = st.number_input('Valor mínimo silicato:',value=min_val_x)
+                        vmin_rango_x  = st.number_input('Valor mínimo silicato:',value=min_val_x,key='vmin_sil')
                     with col3:
-                        vmax_rango_x  = st.number_input('Valor máximo silicato:',value=max_val_x)  
+                        vmax_rango_x  = st.number_input('Valor máximo silicato:',value=max_val_x,key='vmax_sil')  
      
                     min_val_y = 0.95*min(df_disponible_bd['alcalinidad'].min(),df_seleccion['alcalinidad'].min())
                     max_val_y = 1.05*max(df_disponible_bd['alcalinidad'].max(),df_seleccion['alcalinidad'].max())
                        
                     col1, col2, col3, col4 = st.columns(4,gap="small")
                     with col2:
-                        vmin_rango_y  = st.number_input('Valor mínimo alcalinidad:',value=min_val_y)
+                        vmin_rango_y  = st.number_input('Valor mínimo alcalinidad:',value=min_val_y,key='vmin_alc')
                     with col3:
-                        vmax_rango_y  = st.number_input('Valor máximo alcalinidad:',value=max_val_y)   
+                        vmax_rango_y  = st.number_input('Valor máximo alcalinidad:',value=max_val_y,key='vmax_alc')   
     
                 fig, ax = plt.subplots()       
                 
