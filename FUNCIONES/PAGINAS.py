@@ -2083,6 +2083,10 @@ def procesado_nutrientes():
             
             df_datos_importacion  = pandas.read_excel(archivo_datos) 
             
+            # corrije el formato de las fechas
+            for idato in range(df_datos_importacion.shape[0]):
+                df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()
+            
             # Realiza un control de calidad primario a los datos importados   
             datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
 
