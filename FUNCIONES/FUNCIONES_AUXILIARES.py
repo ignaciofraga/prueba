@@ -426,6 +426,7 @@ def consulta_botellas():
         # df_muestreos                = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
         # df_muestreos_seleccionados  = pandas.merge(df_salidas_seleccion, df_muestreos, on="id_salida")
         df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(identificadores_salidas)]
+        df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"id_muestreo": "muestreo"})
         
         st.text(df_muestreos_seleccionados)     
                    
@@ -436,19 +437,17 @@ def consulta_botellas():
         st.text(df_muestreos_seleccionados) 
         
         # Asocia las propiedades físicas de cada muestreo
-        df_datos_fisicos            = df_datos_fisicos_seleccion.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
-        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos, on="id_muestreo")
+        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos, on="muestreo")
     
         st.text(df_muestreos_seleccionados) 
     
         # Asocia las propiedades biogeoquimicas de cada muestreo
-        df_datos_biogeoquimicos     = df_datos_biogeoquimicos_seleccion.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
-        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos, on="id_muestreo")
+        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos, on="muestreo")
     
         st.text(df_muestreos_seleccionados) 
     
         # Elimina las columnas que no interesan
-        df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','id_muestreo'])
+        df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo'])
     
         # Mueve os identificadores de muestreo al final del dataframe
         listado_cols = df_exporta.columns.tolist()
