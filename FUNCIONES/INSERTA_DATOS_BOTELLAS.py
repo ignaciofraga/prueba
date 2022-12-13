@@ -11,7 +11,8 @@ Created on Wed Jun  8 17:55:43 2022
 
 
 
-import FUNCIONES_INSERCION
+import FUNCIONES_PROCESADO
+import FUNCIONES_LECTURA
 import pandas
 pandas.options.mode.chained_assignment = None
 import datetime
@@ -35,12 +36,12 @@ direccion_host = '193.146.155.99'
 # Parámetros
 nombre_programa = 'RADIAL CORUÑA'
 
-anho = 2021
+anho = 2022
 ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
 tipo_salida   = 'MENSUAL' 
 
 # Recupera el identificador del programa
-id_programa,abreviatura_programa = FUNCIONES_INSERCION.recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
             
 # recupera la información de las estaciones incluidas en la base de datos
 con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
@@ -135,13 +136,13 @@ for idato in range(len(listado_salidas)):
             lectura_archivo = open(archivo, "r")  
             datos_archivo = lectura_archivo.readlines()
             
-            mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_INSERCION.lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
             # Asigna el identificador de la salida al mar
-            datos_botellas = FUNCIONES_INSERCION.evalua_salidas(datos_botellas,id_programa,nombre_programa,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+            datos_botellas = FUNCIONES_PROCESADO.evalua_salidas(datos_botellas,id_programa,nombre_programa,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
             
             # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-            datos_botellas = FUNCIONES_INSERCION.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
 
             # Inserta datos físicos
