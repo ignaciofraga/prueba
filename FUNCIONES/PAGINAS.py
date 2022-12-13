@@ -2046,6 +2046,10 @@ def procesado_nutrientes():
                 # Realiza control de calidad
                 FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_corregidos,variables_procesado,variables_procesado_bd,variables_unidades)
 
+
+
+
+
     # Añade excel para importarlo   
     if tipo_accion == acciones[1]:
     
@@ -2086,24 +2090,26 @@ def procesado_nutrientes():
             id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
             
             # Encuentra la estación asociada a cada registro
-            print('Asignando la estación correspondiente a cada medida')
+            st.spinner('Asignando la estación y salida al mar de cada medida')
             datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
             # Encuentra las salidas al mar correspondientes  
             datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
          
             # Encuentra el identificador asociado a cada registro
-            print('Asignando el registro correspondiente a cada medida')
+            st.spinner('Asignando el registro correspondiente a cada medida')
             datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
            
             # # # # # Introduce los datos en la base de datos
-            # print('Introduciendo los datos en la base de datos')
+            st.spinner('Intoduciendo la información en la base de datos')
             
             FUNCIONES_PROCESADO.inserta_datos_fisica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
 
             FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
 
             
+    
+    
     
 
     # Añade manualmente resultados del procesado 
