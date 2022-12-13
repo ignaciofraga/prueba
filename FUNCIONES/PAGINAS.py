@@ -2064,7 +2064,7 @@ def procesado_nutrientes():
         
         # Despliega menús de selección de la variable, salida y la estación a controlar                
         listado_tipos_salida = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
-        col1, col2, col3 = st.columns(3,gap="small")
+        col1, col2 = st.columns(2,gap="small")
         with col1: 
             
             programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']))
@@ -2072,10 +2072,8 @@ def procesado_nutrientes():
         with col2: 
             
             tipo_salida               = st.selectbox('Tipo de salida',(listado_tipos_salida))
-
-        with col3:
                    
-            archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
+        archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
             
         if archivo_datos is not None:
             
