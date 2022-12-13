@@ -1916,7 +1916,7 @@ def procesado_nutrientes():
     df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
                          
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    acciones     = ['Procesar salidas del AA', 'Añadir o modificar datos procesados' ,'Realizar control de calidad de datos disponibles']
+    acciones     = ['Procesar salidas del AA','Añadir datos procesados','Modificar datos procesados','Realizar control de calidad de datos disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
  
     # Define los vectores con las variables a procesar
@@ -2046,10 +2046,70 @@ def procesado_nutrientes():
                 # Realiza control de calidad
                 FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_corregidos,variables_procesado,variables_procesado_bd,variables_unidades)
 
-
-
-    # Añade resultados del procesado (salidas del AA procesadas en excel) 
+    # Añade excel para importarlo   
     if tipo_accion == acciones[1]:
+    
+        # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+        direccion_host   = st.secrets["postgres"].host
+        base_datos       = st.secrets["postgres"].dbname
+        usuario          = st.secrets["postgres"].user
+        contrasena       = st.secrets["postgres"].password
+        puerto           = st.secrets["postgres"].port
+        
+        # Recupera los datos disponibles en la base de datos
+        conn                      = init_connection()
+        df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+        conn.close()    
+        
+        
+        # Despliega menús de selección de la variable, salida y la estación a controlar                
+        listado_tipos_salida = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
+        col1, col2, col3 = st.columns(3,gap="small")
+        with col1: 
+            
+            programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']))
+
+        with col2: 
+            
+            tipo_salida               = st.selectbox('Tipo de salida',(listado_tipos_salida))
+
+        with col2:
+                   
+            archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
+            
+        if archivo_datos is not None:
+            
+            df_datos_importacion  = pandas.read_excel(archivo_datos) 
+            
+            # Realiza un control de calidad primario a los datos importados   
+            datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
+
+            # Recupera el identificador del programa de muestreo
+            id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+            
+            # Encuentra la estación asociada a cada registro
+            print('Asignando la estación correspondiente a cada medida')
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+
+            # Encuentra las salidas al mar correspondientes  
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+         
+            # Encuentra el identificador asociado a cada registro
+            print('Asignando el registro correspondiente a cada medida')
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+           
+            # # # # # Introduce los datos en la base de datos
+            # print('Introduciendo los datos en la base de datos')
+            
+            FUNCIONES_PROCESADO.inserta_datos_fisica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
+
+            FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
+
+            
+    
+
+    # Añade manualmente resultados del procesado 
+    if tipo_accion == acciones[2]:
         
         st.subheader('Inserción de datos de nutrientes')
         
@@ -2059,7 +2119,7 @@ def procesado_nutrientes():
 
         
     # control de calidad de salidas previamente disponibles
-    if tipo_accion == acciones[2]: 
+    if tipo_accion == acciones[3]: 
         
         st.subheader('Control de calidad de datos de nutrientes')
 

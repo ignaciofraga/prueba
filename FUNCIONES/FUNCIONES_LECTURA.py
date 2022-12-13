@@ -313,37 +313,37 @@ def lectura_datos_radprof(nombre_archivo):
 
 
 
-##########################################################
-######## FUNCION PARA LEER ESTADILLOS DE ENTRADA  ########
-########################################################## 
+# ##########################################################
+# ######## FUNCION PARA LEER ESTADILLOS DE ENTRADA  ########
+# ########################################################## 
     
-def lectura_datos_estadillo(nombre_archivo,nombre_plantilla):
+# def entrada_datos_excel(nombre_archivo):
 
     
-    # Importa el .xlsx
-    datos_entrada = pandas.read_excel(nombre_archivo, 'datos',dtype={'hora_muestreo': datetime.time})
+#     # Importa el .xlsx
+#     datos_entrada = pandas.read_excel(nombre_archivo, 'datos',dtype={'hora_muestreo': datetime.time})
     
-    ## Comprueba el formato de los datos
+#     ## Comprueba el formato de los datos
     
-    # # Verifica si están todas las columnas, comparando con una plantilla
-    # datos_plantilla = pandas.read_excel(nombre_plantilla, 'datos') 
+#     # # Verifica si están todas las columnas, comparando con una plantilla
+#     # datos_plantilla = pandas.read_excel(nombre_plantilla, 'datos') 
     
-    # if pandas.Series(datos_entrada.columns).isin(datos_plantilla.columns).all() is False:
-    #     texto_error = 'Los datos de entrada no se ajustan a la plantilla. Revisar el formato del archivo'
+#     # if pandas.Series(datos_entrada.columns).isin(datos_plantilla.columns).all() is False:
+#     #     texto_error = 'Los datos de entrada no se ajustan a la plantilla. Revisar el formato del archivo'
     
-    # else:
-    #     texto_error = []
-    texto_error = []
+#     # else:
+#     #     texto_error = []
+#     texto_error = []
     
-    # corrije el formato de las fechas
-    for idato in range(datos_entrada.shape[0]):
-        datos_entrada['fecha_muestreo'][idato] = (datos_entrada['fecha_muestreo'][idato]).date()
+#     # corrije el formato de las fechas
+#     for idato in range(datos_entrada.shape[0]):
+#         datos_entrada['fecha_muestreo'][idato] = (datos_entrada['fecha_muestreo'][idato]).date()
         
-    # Añade el identificador de la configuración del perfilador y la superficie (darle una vuelta a esto)
-    datos_entrada['configuracion_perfilador'] = numpy.ones(datos_entrada.shape[0])
-    datos_entrada['configuracion_superficie'] = numpy.ones(datos_entrada.shape[0])
+#     # Añade el identificador de la configuración del perfilador y la superficie (darle una vuelta a esto)
+#     datos_entrada['configuracion_perfilador'] = numpy.ones(datos_entrada.shape[0])
+#     datos_entrada['configuracion_superficie'] = numpy.ones(datos_entrada.shape[0])
 
-    return datos_entrada,texto_error 
+#     return datos_entrada,texto_error 
 
 
 
