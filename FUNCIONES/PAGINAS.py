@@ -2126,7 +2126,8 @@ def procesado_nutrientes():
                 listado_excluded = ['EXCLUDED.' + var for var in variables_fisica]
                 str_exclude   = ','.join(listado_excluded)
                 for idato in range(datos_corregidos.shape[0]):
-                                        
+                            
+                    st.text(datos_fisica.iloc[idato])
                     instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s," +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
