@@ -1934,7 +1934,7 @@ def procesado_nutrientes():
         
         st.subheader('Procesado de datos de nutrientes')
         
-        variables_run = ['TON','nitrito','silicato','fosfato']    
+        variables_run = ['ton','nitrito','silicato','fosfato']    
     
     
         # Despliega un formulario para subir los archivos del AA y las referencias
@@ -1998,7 +1998,7 @@ def procesado_nutrientes():
                 datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias,variables_run,rendimiento_columna,temperatura_laboratorio)
                 
                 # Calcula el NO3 como diferencia entre el TON y el NO2
-                datos_corregidos['nitrato'] = datos_corregidos['TON'] - datos_corregidos['nitrito']
+                datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
             
                 # corrige posibles valores negativos
                 datos_corregidos['nitrato'][datos_corregidos['nitrato']<0] = 0
@@ -2042,6 +2042,12 @@ def procesado_nutrientes():
                     st.text(' ')
                     
                 st.subheader('Control de calidad de los resultados obtenidos')
+                
+                # # Define los vectores con las variables a procesar
+                # variables_procesado    = ['Nitrato','Nitrito','Silicato','Fosfato']    
+                # variables_procesado_bd = ['nitrato','nitrito','silicato','fosfato']
+                # variables_unidades     = ['\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg']
+                
                     
                 # Realiza control de calidad
                 FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_corregidos,variables_procesado,variables_procesado_bd,variables_unidades)

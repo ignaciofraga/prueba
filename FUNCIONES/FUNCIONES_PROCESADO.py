@@ -1335,11 +1335,11 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
            
     # Corrige las concentraciones a partir de los rendimientos de la coumna reductora
     datos_entrada['nitrato_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
-    datos_entrada['TON_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
-    factor = ((datos_entrada['TON'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])/(datos_entrada['TON'].iloc[indices_calibracion[-1]] + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])
+    datos_entrada['ton_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
+    factor = ((datos_entrada['ton'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])/(datos_entrada['ton'].iloc[indices_calibracion[-1]] + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])
     for idato in range(datos_entrada.shape[0]):
-        datos_entrada['nitrato_rendimiento'].iloc[idato] = (datos_entrada['TON'].iloc[idato]*factor - datos_entrada['nitrito'].iloc[idato])/(rendimiento_columna/100) 
-        datos_entrada['TON_rendimiento'].iloc[idato] = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['nitrito'].iloc[idato]
+        datos_entrada['nitrato_rendimiento'].iloc[idato] = (datos_entrada['ton'].iloc[idato]*factor - datos_entrada['nitrito'].iloc[idato])/(rendimiento_columna/100) 
+        datos_entrada['ton_rendimiento'].iloc[idato] = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['nitrito'].iloc[idato]
     
     
     # Pasa las concentraciones a mol/kg
@@ -1361,7 +1361,7 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
             datos_entrada['DENSIDAD'].iloc[idato] = (999.1+0.77*((datos_entrada['salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
                    
                     
-    datos_entrada['TON_CONC'] = datos_entrada['TON_rendimiento']/datos_entrada['DENSIDAD']  
+    datos_entrada['ton_CONC'] = datos_entrada['ton_rendimiento']/datos_entrada['DENSIDAD']  
     datos_entrada['nitrato_CONC'] = datos_entrada['nitrato_rendimiento']/datos_entrada['DENSIDAD']  
     datos_entrada['nitrito_CONC'] = datos_entrada['nitrito']/datos_entrada['DENSIDAD']  
     datos_entrada['silicato_CONC'] = datos_entrada['silicato']/datos_entrada['DENSIDAD']  
