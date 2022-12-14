@@ -2085,8 +2085,10 @@ def procesado_nutrientes():
             
             # corrige el formato de las fechas
             for idato in range(df_datos_importacion.shape[0]):
-                df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()
-            
+                df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
+                if df_datos_importacion['fecha_muestreo'][idato]:
+                    df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
+
             # Realiza un control de calidad primario a los datos importados   
             datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
 
