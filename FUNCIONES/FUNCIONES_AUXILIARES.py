@@ -336,7 +336,7 @@ def consulta_botellas():
                              
                 
         with col2:
-            io_nitrogeno_total     = st.checkbox('Nitrógeno total', value=True)
+            io_nitrogeno_total     = st.checkbox('TON', value=True)
             if io_nitrogeno_total:
                 listado_variables = listado_variables + ['ton'] + ['ton_qf']
                 
@@ -430,10 +430,10 @@ def consulta_botellas():
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
                
         # Asocia las propiedades físicas de cada muestreo
-        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos, on="muestreo")
+        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos_seleccion, on="muestreo")
                 
         # Asocia las propiedades biogeoquimicas de cada muestreo
-        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos, on="muestreo")
+        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
         
         # Elimina las columnas que no interesan
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo'])
