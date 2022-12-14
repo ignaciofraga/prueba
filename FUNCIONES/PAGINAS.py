@@ -2118,7 +2118,7 @@ def procesado_nutrientes():
            
             if len(variables_fisica)>0:
                 
-                listado_aux   = ['muestreo'] + variables_fisica 
+                listado_aux   = ['id_muestreo_temp'] + variables_fisica 
                 datos_fisica  = datos_corregidos[listado_aux] 
                 
                 str_variables = ','.join(variables_fisica)
