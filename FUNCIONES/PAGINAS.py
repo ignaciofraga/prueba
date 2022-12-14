@@ -2092,8 +2092,8 @@ def procesado_nutrientes():
 
             # Identifica las variables que contiene el archivo
             variables_archivo = df_datos_importacion.columns.tolist()
-            variables_fisica  = variables_archivo.isin(variables_bd['variables_fisicas'])
-            variables_bgq     = variables_archivo.isin(variables_bd['variables_biogeoquimicas'])
+            variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
+            variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
             
             st.text(variables_fisica)
             st.text(variables_bgq)
