@@ -2116,46 +2116,59 @@ def procesado_nutrientes():
             with st.spinner('Asignando el registro correspondiente a cada medida'):
                 datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
            
+            # Añade datos físicos
             if len(variables_fisica)>0:
-                
-                listado_aux   = ['id_muestreo_temp'] + variables_fisica 
-                datos_fisica  = datos_corregidos[listado_aux]
-                
-                listado_muestreos  = datos_corregidos['id_muestreo_temp']
-                datos_fisica       = datos_corregidos[variables_fisica]
-                
-                str_variables = ','.join(variables_fisica)
-                str_valores   = ',%s'*len(variables_fisica)
-                listado_excluded = ['EXCLUDED.' + var for var in variables_fisica]
-                str_exclude   = ','.join(listado_excluded)
-                for idato in range(datos_corregidos.shape[0]):
-                    #datos_fisica['id_muestreo_temp'].iloc[idato] = int(datos_fisica['id_muestreo_temp'].iloc[idato])        
-                    #st.text(datos_fisica.iloc[idato])
+                                
+                with st.spinner('Añadiendo datos físicos'):
+                    listado_muestreos  = datos_corregidos['id_muestreo_temp']
+                    datos_fisica       = datos_corregidos[variables_fisica]
                     
-                    instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
-                    valores = [int(listado_muestreos[idato])] + datos_fisica.iloc[idato].tolist()
-                    st.text(valores)
+                    str_variables = ','.join(variables_fisica)
+                    str_valores   = ',%s'*len(variables_fisica)
+                    listado_excluded = ['EXCLUDED.' + var for var in variables_fisica]
+                    str_exclude   = ','.join(listado_excluded)
                     
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                    cursor = conn.cursor()
-                    #cursor.execute(instruccion_sql, (int(df_muestreos['id_muestreo_temp'].iloc[idato]),datos_fisica.iloc[idato].tolist()))
+                    cursor = conn.cursor()  
                     
-                    # instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
-                    # st.text(instruccion_sql)                    
-                    cursor.execute(instruccion_sql, (valores))
+                    for idato in range(datos_corregidos.shape[0]):
+    
+                        instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
+                        valores = [int(listado_muestreos[idato])] + datos_fisica.iloc[idato].tolist()
+                        cursor.execute(instruccion_sql, (valores))
+                        conn.commit()
+                            
+                    cursor.close()
+                    conn.close()
+ 
+            # Añade datos biogeoquímicos
+            if len(variables_bgq)>0:
+                                
+                with st.spinner('Añadiendo datos biogeoquímicos'):
+                    listado_muestreos  = datos_corregidos['id_muestreo_temp']
+                    datos_bgq       = datos_corregidos[variables_bgq]
                     
-                    #instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd) VALUES (%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd) = ROW(EXCLUDED.temperatura_ctd);"                            
-                    # st.text(instruccion_sql)
-                    # st.text(datos_fisica['id_muestreo_temp'][idato])
-                    # st.text(type(datos_fisica['id_muestreo_temp'][idato]))                    
-                    #cursor.execute(instruccion_sql, (int(datos_fisica['id_muestreo_temp'][idato]),10.100))
+                    str_variables = ','.join(variables_bgq)
+                    str_valores   = ',%s'*len(variables_bgq)
+                    listado_excluded = ['EXCLUDED.' + var for var in variables_bgq]
+                    str_exclude   = ','.join(listado_excluded)
                     
+                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                    cursor = conn.cursor()  
                     
+                    for idato in range(datos_corregidos.shape[0]):
+    
+                        instruccion_sql = "INSERT INTO datos_discretos_biogeoquimica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
+                        valores = [int(listado_muestreos[idato])] + datos_bgq.iloc[idato].tolist()
+                        cursor.execute(instruccion_sql, (valores))
+                        conn.commit()
+                            
+                    cursor.close()
+                    conn.close()    
                     
-                    conn.commit()
-                        
+            texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
+            st.success(texto_exito)
 
-           
             
             # # Introduce los datos en la base de datos
             # with st.spinner('Intoduciendo la información en la base de datos'):
