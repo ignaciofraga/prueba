@@ -544,9 +544,9 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
           
             col1, col2,col3,col4 = st.columns(4,gap="small")
             with col1: 
-                
-                texto_botella = 'Botella:' + str(int(df_seleccion['botella'].iloc[idato]))
-                st.text(texto_botella)
+                if df_seleccion['botella'].iloc[idato]:
+                    texto_botella = 'Botella:' + str(int(df_seleccion['botella'].iloc[idato]))
+                    st.text(texto_botella)
                 
             with col2: 
                 
