@@ -436,8 +436,8 @@ listado_variables = ('(id_muestreo SERIAL PRIMARY KEY,'
 ' botella int,'
 ' prof_referencia NUMERIC (6, 2),'
 ' presion_ctd NUMERIC (6, 2) NOT NULL,'
-' configuracion_perfilador int NOT NULL,'
-' configuracion_superficie int NOT NULL,'
+' configuracion_perfilador int,'
+' configuracion_superficie int,'
 ) 
 
 listado_dependencias = ('FOREIGN KEY (estacion)'
