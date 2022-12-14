@@ -676,7 +676,7 @@ def inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrase
     
     # Genera un dataframe solo con las variales biogeoquimicas de los datos a importar 
     datos_biogeoquimica = datos[['id_muestreo_temp','fluorescencia_ctd','fluorescencia_ctd_qf','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk_qf',
-                                 'TON','TON_qf','nitrato','nitrato_qf','nitrito','nitrito_qf','amonio','amonio_qf','fosfato','fosfato_qf','silicato','silicato_qf','tcarbn','tcarbn_qf','doc','doc_qf',
+                                 'ton','ton_qf','nitrato','nitrato_qf','nitrito','nitrito_qf','amonio','amonio_qf','fosfato','fosfato_qf','silicato','silicato_qf','tcarbn','tcarbn_qf','doc','doc_qf',
                                  'cdom','cdom_qf','clorofila_a','clorofila_a_qf','alcalinidad','alcalinidad_qf','ph','ph_qf','ph_metodo','r_clor','r_clor_qf','r_per','r_per_qf','co3_temp']]    
     datos_biogeoquimica = datos_biogeoquimica.rename(columns={"id_muestreo_temp": "muestreo"})
     
@@ -749,7 +749,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
 
     listado_variables_fisicas       = df_datos_fisicos.columns.values.tolist()
     listado_variables_biogeoquimica = df_datos_biogeoquimicos.columns.values.tolist()
-    listado_nutrientes              = ['TON','nitrato','nitrito','amonio','fosfato','silicato']
+    listado_nutrientes              = ['ton','nitrato','nitrito','amonio','fosfato','silicato']
     
     ### CONTROL DE CALIDAD DE LOS DATOS
 

@@ -338,7 +338,7 @@ def consulta_botellas():
         with col2:
             io_nitrogeno_total     = st.checkbox('Nitrógeno total', value=True)
             if io_nitrogeno_total:
-                listado_variables = listado_variables + ['TON'] + ['TON_qf']
+                listado_variables = listado_variables + ['ton'] + ['ton_qf']
                 
             io_nitrato   = st.checkbox('Nitrato', value=True)
             if io_nitrato:

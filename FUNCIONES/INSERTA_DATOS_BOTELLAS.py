@@ -36,7 +36,7 @@ direccion_host = '193.146.155.99'
 # Parámetros
 nombre_programa = 'RADIAL CORUÑA'
 
-anho = 2021
+anho = 2022
 ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
 tipo_salida   = 'MENSUAL' 
 
