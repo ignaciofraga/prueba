@@ -2129,13 +2129,23 @@ def procesado_nutrientes():
                     datos_fisica['id_muestreo_temp'].iloc[idato] = int(datos_fisica['id_muestreo_temp'].iloc[idato])        
                     st.text(datos_fisica.iloc[idato])
                     
-                    instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
-                    st.text(instruccion_sql)
+                    # instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
+                    # st.text(instruccion_sql)
                     
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
                     # cursor.execute(instruccion_sql, (datos_fisica.iloc[idato].tolist()))
-                    cursor.execute(instruccion_sql, (datos_fisica['id_muestreo_temp'].iloc[idato],datos_fisica['salinidad_ctd'].iloc[idato],datos_fisica['turbidez_ctd'].iloc[idato],datos_fisica['par_ctd'].iloc[idato],datos_fisica['temperatura_ctd'].iloc[idato]))
+                    
+                    # instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
+                    # st.text(instruccion_sql)                    
+                    # cursor.execute(instruccion_sql, (datos_fisica['id_muestreo_temp'].iloc[idato],datos_fisica['salinidad_ctd'].iloc[idato],datos_fisica['turbidez_ctd'].iloc[idato],datos_fisica['par_ctd'].iloc[idato],datos_fisica['temperatura_ctd'].iloc[idato]))
+                    
+                    instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo) VALUES (%s) ON CONFLICT (muestreo) DO NOTHING;"# UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
+                    st.text(instruccion_sql)                    
+                    cursor.execute(instruccion_sql, (datos_fisica['id_muestreo_temp'].iloc[idato]))
+                    
+                    
+                    
                     conn.commit()
                         
 
