@@ -430,6 +430,7 @@ def consulta_botellas():
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
         
         st.text(df_muestreos_seleccionados)
+        st.text(df_muestreos_seleccionados.columns.tolist())
         
         # Asocia las propiedades físicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos, on="muestreo")
