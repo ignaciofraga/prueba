@@ -2142,7 +2142,7 @@ def procesado_nutrientes():
                     
                     instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo) VALUES (%s) ON CONFLICT (muestreo) DO NOTHING;"# UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
                     st.text(instruccion_sql)                    
-                    cursor.execute(instruccion_sql, (datos_fisica['id_muestreo_temp'].iloc[idato]))
+                    cursor.execute(instruccion_sql, (int(datos_fisica['id_muestreo_temp'].iloc[idato])))
                     
                     
                     
