@@ -2129,7 +2129,7 @@ def procesado_nutrientes():
                 listado_excluded = ['EXCLUDED.' + var for var in variables_fisica]
                 str_exclude   = ','.join(listado_excluded)
                 for idato in range(datos_corregidos.shape[0]):
-                    datos_fisica['id_muestreo_temp'].iloc[idato] = int(datos_fisica['id_muestreo_temp'].iloc[idato])        
+                    #datos_fisica['id_muestreo_temp'].iloc[idato] = int(datos_fisica['id_muestreo_temp'].iloc[idato])        
                     #st.text(datos_fisica.iloc[idato])
                     
                     instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
@@ -2137,7 +2137,7 @@ def procesado_nutrientes():
                     
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
-                    cursor.execute(instruccion_sql, (df_muestreos['id_muestreo_temp'].iloc[idato],datos_fisica.iloc[idato].tolist()))
+                    cursor.execute(instruccion_sql, (int(df_muestreos['id_muestreo_temp'].iloc[idato]),datos_fisica.iloc[idato].tolist()))
                     
                     # instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
                     # st.text(instruccion_sql)                    
