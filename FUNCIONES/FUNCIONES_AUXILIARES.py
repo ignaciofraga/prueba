@@ -428,25 +428,15 @@ def consulta_botellas():
         # Asocia las coordenadas y nombre de estación de cada muestreo
         df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
-        
-        st.text(df_muestreos_seleccionados)
-        st.text(df_muestreos_seleccionados.columns.tolist())
-        st.text(df_muestreos_seleccionados['muestreo'])
-        
+               
         # Asocia las propiedades físicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos, on="muestreo")
-        
-        st.text(df_muestreos_seleccionados)
-        
+                
         # Asocia las propiedades biogeoquimicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos, on="muestreo")
         
-        st.text(df_muestreos_seleccionados)
-        
         # Elimina las columnas que no interesan
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo'])
-    
-        st.text(df_exporta)
     
         # Mueve os identificadores de muestreo al final del dataframe
         listado_cols = df_exporta.columns.tolist()
