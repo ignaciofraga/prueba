@@ -2063,6 +2063,7 @@ def procesado_nutrientes():
         # Recupera los datos disponibles en la base de datos
         conn                      = init_connection()
         df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+        variables_bd              = psql.read_sql('SELECT * FROM variables_procesado', conn)
         conn.close()    
         
         
@@ -2089,30 +2090,40 @@ def procesado_nutrientes():
                 if df_datos_importacion['fecha_muestreo'][idato]:
                     df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
 
-            # Realiza un control de calidad primario a los datos importados   
-            datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
+            # Identifica las variables que contiene el archivo
+            variables_archivo = df_datos_importacion.columns.tolist()
+            variables_fisica  = variables_archivo.isin(variables_bd['variables_fisicas'])
+            variables_bgq     = variables_archivo.isin(variables_bd['variables_biogeoquimicas'])
+            
+            st.text(variables_fisica)
+            st.text(variables_bgq)
 
-            # Recupera el identificador del programa de muestreo
-            id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+
+
+            # # Realiza un control de calidad primario a los datos importados   
+            # datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
+
+            # # Recupera el identificador del programa de muestreo
+            # id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
             
             
-            with st.spinner('Asignando la estación y salida al mar de cada medida'):
-                # Encuentra la estación asociada a cada registro
-                datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            # with st.spinner('Asignando la estación y salida al mar de cada medida'):
+            #     # Encuentra la estación asociada a cada registro
+            #     datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-                # Encuentra las salidas al mar correspondientes  
-                datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+            #     # Encuentra las salidas al mar correspondientes  
+            #     datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
          
-            # Encuentra el identificador asociado a cada registro
-            with st.spinner('Asignando el registro correspondiente a cada medida'):
-                datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            # # Encuentra el identificador asociado a cada registro
+            # with st.spinner('Asignando el registro correspondiente a cada medida'):
+            #     datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
            
-            # Introduce los datos en la base de datos
-            with st.spinner('Intoduciendo la información en la base de datos'):
+            # # Introduce los datos en la base de datos
+            # with st.spinner('Intoduciendo la información en la base de datos'):
             
-                FUNCIONES_PROCESADO.inserta_datos_fisica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
+            #     FUNCIONES_PROCESADO.inserta_datos_fisica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
 
-                FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
+            #     FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
 
             
     
