@@ -500,7 +500,6 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
 
 def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto):
     
-    import streamlit as st
     
     # Recupera la tabla con los registros de los muestreos
     con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
@@ -555,12 +554,12 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                     if tabla_muestreos['estacion'][idato_existente] == datos['id_estacion_temp'][idato] and tabla_muestreos['fecha_muestreo'][idato_existente] == datos['fecha_muestreo'][idato] and  tabla_muestreos['hora_muestreo'][idato_existente] == datos['hora_muestreo'][idato] and  tabla_muestreos['presion_ctd'][idato_existente] == datos['presion_ctd'][idato] and  tabla_muestreos['configuracion_perfilador'][idato_existente] == datos['configuracion_perfilador'][idato] and  tabla_muestreos['configuracion_superficie'][idato_existente] == datos['configuracion_superficie'][idato]:
                         datos['id_muestreo_temp'] [idato] =  tabla_muestreos['id_muestreo'][idato_existente]    
                         datos['io_nuevo_muestreo'][idato] = 0
-                        st.text('jol')
+
                 else:  
                     if tabla_muestreos['estacion'][idato_existente] == datos['id_estacion_temp'][idato] and tabla_muestreos['fecha_muestreo'][idato_existente] == datos['fecha_muestreo'][idato] and   tabla_muestreos['presion_ctd'][idato_existente] == datos['presion_ctd'][idato] and  tabla_muestreos['configuracion_perfilador'][idato_existente] == datos['configuracion_perfilador'][idato] and  tabla_muestreos['configuracion_superficie'][idato_existente] == datos['configuracion_superficie'][idato]:
                         datos['id_muestreo_temp'] [idato] =  tabla_muestreos['id_muestreo'][idato_existente]    
                         datos['io_nuevo_muestreo'][idato] = 0     
-                        st.text('ole')
+
                 
             # Nuevo registro
             if datos['io_nuevo_muestreo'][idato] == 1:
@@ -568,7 +567,6 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 ultimo_registro_bd                = ultimo_registro_bd + 1
                 datos['id_muestreo_temp'][idato]  = ultimo_registro_bd  
  
-        st.text(datos['io_nuevo_muestreo'])
         
         if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
         

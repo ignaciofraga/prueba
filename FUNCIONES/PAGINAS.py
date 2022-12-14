@@ -2098,26 +2098,44 @@ def procesado_nutrientes():
             st.text(variables_fisica)
             st.text(variables_bgq)
 
+            # Realiza un control de calidad primario a los datos importados   
+            datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
 
-
-            # # Realiza un control de calidad primario a los datos importados   
-            # datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
-
-            # # Recupera el identificador del programa de muestreo
-            # id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+            # Recupera el identificador del programa de muestreo
+            id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
             
             
-            # with st.spinner('Asignando la estación y salida al mar de cada medida'):
-            #     # Encuentra la estación asociada a cada registro
-            #     datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            with st.spinner('Asignando la estación y salida al mar de cada medida'):
+                # Encuentra la estación asociada a cada registro
+                datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-            #     # Encuentra las salidas al mar correspondientes  
-            #     datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+                # Encuentra las salidas al mar correspondientes  
+                datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
          
-            # # Encuentra el identificador asociado a cada registro
-            # with st.spinner('Asignando el registro correspondiente a cada medida'):
-            #     datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            # Encuentra el identificador asociado a cada registro
+            with st.spinner('Asignando el registro correspondiente a cada medida'):
+                datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
            
+            if len(variables_fisica)>0:
+                
+                listado_aux   = ['muestreo'] + variables_fisica 
+                datos_fisica  = datos_corregidos[listado_aux] 
+                
+                str_variables = ','.join(variables_fisica)
+                str_valores   = ',%s'*len(variables_fisica)
+                listado_excluded = ['EXCLUDED.' + var for var in variables_fisica]
+                str_exclude   = ','.join(listado_excluded)
+                for idato in range(datos_corregidos.shape[0]):
+                                        
+                    instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s," +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
+                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                    cursor = conn.cursor()
+                    cursor.execute(instruccion_sql, (datos_fisica))
+                    conn.commit()
+                        
+
+           
+            
             # # Introduce los datos en la base de datos
             # with st.spinner('Intoduciendo la información en la base de datos'):
             
