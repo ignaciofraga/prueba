@@ -2024,7 +2024,7 @@ def procesado_nutrientes():
                 # Botón para descargar la información como Excel
                 nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
            
-                datos_exporta = datos_corregidos[['nombre_muestreo','presion_ctd','temperatura_ctd','salinidad_ctd','TON','nitrato','nitrito','silicato','fosfato']]
+                datos_exporta = datos_corregidos[['nombre_muestreo','presion_ctd','temperatura_ctd','salinidad_ctd','ton','nitrato','nitrito','silicato','fosfato']]
 
            
                 output = BytesIO()
