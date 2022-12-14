@@ -2134,7 +2134,7 @@ def procesado_nutrientes():
                     
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
-                    cursor.execute(instruccion_sql, (datos_fisica.iloc[idato]))
+                    cursor.execute(instruccion_sql, (datos_fisica.iloc[idato].tolist()))
                     conn.commit()
                         
 
