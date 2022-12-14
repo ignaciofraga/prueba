@@ -44,7 +44,7 @@ if FUNCIONES_AUXILIARES.log_in() is True:
                         "PROCESOS EN CURSO": PAGINAS.actualiza_procesos, 
                         "CONSULTA DATOS BOTELLAS":PAGINAS.consulta_botellas,
                         "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes,
-                        "PROCESADO QUIMICA":PAGINAS.procesado_quimica
+                        "ENTRADA DATOS":PAGINAS.entrada_datos_excel
                         }
 
             

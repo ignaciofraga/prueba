@@ -1916,7 +1916,7 @@ def procesado_nutrientes():
     df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
                          
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    acciones     = ['Procesar salidas del AA','Añadir datos procesados','Modificar datos procesados','Realizar control de calidad de datos disponibles']
+    acciones     = ['Procesar salidas del AA','Modificar datos procesados','Realizar control de calidad de datos disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
  
     # Define los vectores con las variables a procesar
@@ -2050,140 +2050,10 @@ def procesado_nutrientes():
 
 
 
-    # Añade excel para importarlo   
-    if tipo_accion == acciones[1]:
-    
-        # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
-        direccion_host   = st.secrets["postgres"].host
-        base_datos       = st.secrets["postgres"].dbname
-        usuario          = st.secrets["postgres"].user
-        contrasena       = st.secrets["postgres"].password
-        puerto           = st.secrets["postgres"].port
-        
-        # Recupera los datos disponibles en la base de datos
-        conn                      = init_connection()
-        df_programas              = psql.read_sql('SELECT * FROM programas', conn)
-        variables_bd              = psql.read_sql('SELECT * FROM variables_procesado', conn)
-        conn.close()    
-        
-        
-        # Despliega menús de selección de la variable, salida y la estación a controlar                
-        listado_tipos_salida = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
-        col1, col2 = st.columns(2,gap="small")
-        with col1: 
-            
-            programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']))
 
-        with col2: 
-            
-            tipo_salida               = st.selectbox('Tipo de salida',(listado_tipos_salida))
-                   
-        archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
-            
-        if archivo_datos is not None:
-            
-            df_datos_importacion  = pandas.read_excel(archivo_datos) 
-            
-            # corrige el formato de las fechas
-            for idato in range(df_datos_importacion.shape[0]):
-                df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
-                if df_datos_importacion['fecha_muestreo'][idato]:
-                    df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
-
-            # Identifica las variables que contiene el archivo
-            variables_archivo = df_datos_importacion.columns.tolist()
-            variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
-            variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
-            
-            st.text(variables_fisica)
-            st.text(variables_bgq)
-
-            # Realiza un control de calidad primario a los datos importados   
-            datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
-
-            # Recupera el identificador del programa de muestreo
-            id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
-            
-            
-            with st.spinner('Asignando la estación y salida al mar de cada medida'):
-                # Encuentra la estación asociada a cada registro
-                datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-
-                # Encuentra las salidas al mar correspondientes  
-                datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
-         
-            # Encuentra el identificador asociado a cada registro
-            with st.spinner('Asignando el registro correspondiente a cada medida'):
-                datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-           
-            # Añade datos físicos
-            if len(variables_fisica)>0:
-                                
-                with st.spinner('Añadiendo datos físicos'):
-                    listado_muestreos  = datos_corregidos['id_muestreo_temp']
-                    datos_fisica       = datos_corregidos[variables_fisica]
-                    
-                    str_variables = ','.join(variables_fisica)
-                    str_valores   = ',%s'*len(variables_fisica)
-                    listado_excluded = ['EXCLUDED.' + var for var in variables_fisica]
-                    str_exclude   = ','.join(listado_excluded)
-                    
-                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                    cursor = conn.cursor()  
-                    
-                    for idato in range(datos_corregidos.shape[0]):
-    
-                        instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
-                        valores = [int(listado_muestreos[idato])] + datos_fisica.iloc[idato].tolist()
-                        cursor.execute(instruccion_sql, (valores))
-                        conn.commit()
-                            
-                    cursor.close()
-                    conn.close()
- 
-            # Añade datos biogeoquímicos
-            if len(variables_bgq)>0:
-                                
-                with st.spinner('Añadiendo datos biogeoquímicos'):
-                    listado_muestreos  = datos_corregidos['id_muestreo_temp']
-                    datos_bgq       = datos_corregidos[variables_bgq]
-                    
-                    str_variables = ','.join(variables_bgq)
-                    str_valores   = ',%s'*len(variables_bgq)
-                    listado_excluded = ['EXCLUDED.' + var for var in variables_bgq]
-                    str_exclude   = ','.join(listado_excluded)
-                    
-                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                    cursor = conn.cursor()  
-                    
-                    for idato in range(datos_corregidos.shape[0]):
-    
-                        instruccion_sql = "INSERT INTO datos_discretos_biogeoquimica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
-                        valores = [int(listado_muestreos[idato])] + datos_bgq.iloc[idato].tolist()
-                        cursor.execute(instruccion_sql, (valores))
-                        conn.commit()
-                            
-                    cursor.close()
-                    conn.close()    
-                    
-            texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
-            st.success(texto_exito)
-
-            
-            # # Introduce los datos en la base de datos
-            # with st.spinner('Intoduciendo la información en la base de datos'):
-            
-            #     FUNCIONES_PROCESADO.inserta_datos_fisica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
-
-            #     FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
-
-            
-    
-    
-    
 
     # Añade manualmente resultados del procesado 
-    if tipo_accion == acciones[2]:
+    if tipo_accion == acciones[1]:
         
         st.subheader('Inserción de datos de nutrientes')
         
@@ -2193,7 +2063,7 @@ def procesado_nutrientes():
 
         
     # control de calidad de salidas previamente disponibles
-    if tipo_accion == acciones[3]: 
+    if tipo_accion == acciones[2]: 
         
         st.subheader('Control de calidad de datos de nutrientes')
 
@@ -2268,6 +2138,128 @@ def procesado_quimica():
         FUNCIONES_PROCESADO.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades)
 
  
+# ###############################################################################
+# ################## PÁGINA DE ENTRADA DE ESTADILLOS #################
+# ###############################################################################    
+
+
+def entrada_datos_excel():
+
+    st.subheader('Portal de entrada de datos')
+
+    # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port
+    
+    # Recupera los datos disponibles en la base de datos
+    conn                      = init_connection()
+    df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+    variables_bd              = psql.read_sql('SELECT * FROM variables_procesado', conn)
+    conn.close()    
+    
+    
+    # Despliega menús de selección de la variable, salida y la estación a controlar                
+    listado_tipos_salida = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
+    col1, col2 = st.columns(2,gap="small")
+    with col1: 
+        
+        programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']))
+
+    with col2: 
+        
+        tipo_salida               = st.selectbox('Tipo de salida',(listado_tipos_salida))
+               
+    archivo_datos                 = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
+        
+    if archivo_datos is not None:
+        
+        df_datos_importacion  = pandas.read_excel(archivo_datos) 
+        
+        # corrige el formato de las fechas
+        for idato in range(df_datos_importacion.shape[0]):
+            df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
+            if df_datos_importacion['fecha_muestreo'][idato]:
+                df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
+
+        # Identifica las variables que contiene el archivo
+        variables_archivo = df_datos_importacion.columns.tolist()
+        variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
+        variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
+        
+        # Realiza un control de calidad primario a los datos importados   
+        datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
+
+        # Recupera el identificador del programa de muestreo
+        id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+        
+        
+        with st.spinner('Asignando la estación y salida al mar de cada medida'):
+            # Encuentra la estación asociada a cada registro
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+
+            # Encuentra las salidas al mar correspondientes  
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+     
+        # Encuentra el identificador asociado a cada registro
+        with st.spinner('Asignando el registro correspondiente a cada medida'):
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+       
+        # Añade datos físicos
+        if len(variables_fisica)>0:
+                            
+            with st.spinner('Añadiendo datos físicos'):
+                listado_muestreos  = datos_corregidos['id_muestreo_temp']
+                datos_fisica       = datos_corregidos[variables_fisica]
+                
+                str_variables = ','.join(variables_fisica)
+                str_valores   = ',%s'*len(variables_fisica)
+                listado_excluded = ['EXCLUDED.' + var for var in variables_fisica]
+                str_exclude   = ','.join(listado_excluded)
+                
+                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()  
+                
+                for idato in range(datos_corregidos.shape[0]):
+
+                    instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
+                    valores = [int(listado_muestreos[idato])] + datos_fisica.iloc[idato].tolist()
+                    cursor.execute(instruccion_sql, (valores))
+                    conn.commit()
+                        
+                cursor.close()
+                conn.close()
+ 
+        # Añade datos biogeoquímicos
+        if len(variables_bgq)>0:
+                            
+            with st.spinner('Añadiendo datos biogeoquímicos'):
+                listado_muestreos  = datos_corregidos['id_muestreo_temp']
+                datos_bgq       = datos_corregidos[variables_bgq]
+                
+                str_variables = ','.join(variables_bgq)
+                str_valores   = ',%s'*len(variables_bgq)
+                listado_excluded = ['EXCLUDED.' + var for var in variables_bgq]
+                str_exclude   = ','.join(listado_excluded)
+                
+                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()  
+                
+                for idato in range(datos_corregidos.shape[0]):
+
+                    instruccion_sql = "INSERT INTO datos_discretos_biogeoquimica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
+                    valores = [int(listado_muestreos[idato])] + datos_bgq.iloc[idato].tolist()
+                    cursor.execute(instruccion_sql, (valores))
+                    conn.commit()
+                        
+                cursor.close()
+                conn.close()    
+                
+        texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
+        st.success(texto_exito)
+
 
 
 # ###############################################################################
