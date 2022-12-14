@@ -2121,8 +2121,8 @@ def procesado_nutrientes():
                 listado_aux   = ['id_muestreo_temp'] + variables_fisica 
                 datos_fisica  = datos_corregidos[listado_aux]
                 
-                df_muestreos  = datos_corregidos['id_muestreo_temp']
-                datos_fisica  = datos_corregidos[variables_fisica]
+                listado_muestreos  = datos_corregidos['id_muestreo_temp']
+                datos_fisica       = datos_corregidos[variables_fisica]
                 
                 str_variables = ','.join(variables_fisica)
                 str_valores   = ',%s'*len(variables_fisica)
@@ -2133,7 +2133,7 @@ def procesado_nutrientes():
                     #st.text(datos_fisica.iloc[idato])
                     
                     instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
-                    valores = [int(df_muestreos['id_muestreo_temp'].iloc[idato])] + datos_fisica.iloc[idato]
+                    valores = [int(listado_muestreos[idato])] + datos_fisica.iloc[idato]
                     st.text(valores)
                     
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
