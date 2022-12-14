@@ -2133,16 +2133,16 @@ def procesado_nutrientes():
                     #st.text(datos_fisica.iloc[idato])
                     
                     instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
-                    valores = (int(df_muestreos['id_muestreo_temp'].iloc[idato]),datos_fisica.iloc[idato].tolist())
+                    valores = [int(df_muestreos['id_muestreo_temp'].iloc[idato])] + datos_fisica.iloc[idato]
                     st.text(valores)
                     
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
-                    cursor.execute(instruccion_sql, (int(df_muestreos['id_muestreo_temp'].iloc[idato]),datos_fisica.iloc[idato].tolist()))
+                    #cursor.execute(instruccion_sql, (int(df_muestreos['id_muestreo_temp'].iloc[idato]),datos_fisica.iloc[idato].tolist()))
                     
                     # instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
                     # st.text(instruccion_sql)                    
-                    # cursor.execute(instruccion_sql, (datos_fisica['id_muestreo_temp'].iloc[idato],datos_fisica['salinidad_ctd'].iloc[idato],datos_fisica['turbidez_ctd'].iloc[idato],datos_fisica['par_ctd'].iloc[idato],datos_fisica['temperatura_ctd'].iloc[idato]))
+                    cursor.execute(instruccion_sql, (valores))
                     
                     #instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd) VALUES (%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd) = ROW(EXCLUDED.temperatura_ctd);"                            
                     # st.text(instruccion_sql)
