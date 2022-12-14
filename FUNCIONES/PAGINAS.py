@@ -2119,7 +2119,10 @@ def procesado_nutrientes():
             if len(variables_fisica)>0:
                 
                 listado_aux   = ['id_muestreo_temp'] + variables_fisica 
-                datos_fisica  = datos_corregidos[listado_aux] 
+                datos_fisica  = datos_corregidos[listado_aux]
+                
+                df_muestreos  = datos_corregidos['id_muestreo_temp']
+                datos_fisica  = datos_corregidos[variables_fisica]
                 
                 str_variables = ','.join(variables_fisica)
                 str_valores   = ',%s'*len(variables_fisica)
@@ -2129,22 +2132,22 @@ def procesado_nutrientes():
                     datos_fisica['id_muestreo_temp'].iloc[idato] = int(datos_fisica['id_muestreo_temp'].iloc[idato])        
                     #st.text(datos_fisica.iloc[idato])
                     
-                    # instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
+                    instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
                     # st.text(instruccion_sql)
                     
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
-                    # cursor.execute(instruccion_sql, (datos_fisica.iloc[idato].tolist()))
+                    cursor.execute(instruccion_sql, (df_muestreos['id_muestreo_temp'].iloc[idato],datos_fisica.iloc[idato].tolist()))
                     
                     # instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
                     # st.text(instruccion_sql)                    
                     # cursor.execute(instruccion_sql, (datos_fisica['id_muestreo_temp'].iloc[idato],datos_fisica['salinidad_ctd'].iloc[idato],datos_fisica['turbidez_ctd'].iloc[idato],datos_fisica['par_ctd'].iloc[idato],datos_fisica['temperatura_ctd'].iloc[idato]))
                     
-                    instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd) VALUES (%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd) = ROW(EXCLUDED.temperatura_ctd);"                            
+                    #instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd) VALUES (%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd) = ROW(EXCLUDED.temperatura_ctd);"                            
                     # st.text(instruccion_sql)
                     # st.text(datos_fisica['id_muestreo_temp'][idato])
                     # st.text(type(datos_fisica['id_muestreo_temp'][idato]))                    
-                    cursor.execute(instruccion_sql, (int(datos_fisica['id_muestreo_temp'][idato]),10.100))
+                    #cursor.execute(instruccion_sql, (int(datos_fisica['id_muestreo_temp'][idato]),10.100))
                     
                     
                     
