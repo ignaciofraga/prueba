@@ -1921,7 +1921,7 @@ def procesado_nutrientes():
  
     # Define los vectores con las variables a procesar
     variables_procesado    = ['TON','Nitrato','Nitrito','Silicato','Fosfato']    
-    variables_procesado_bd = ['TON','nitrato','nitrito','silicato','fosfato']
+    variables_procesado_bd = ['ton','nitrato','nitrito','silicato','fosfato']
     variables_unidades     = ['\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg']
     
     
