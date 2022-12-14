@@ -391,11 +391,14 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
             json_estaciones        = json.dumps(estaciones_muestreadas)
             
             id_configuracion_perfilador = list(subset_salida['configuracion_perfilador'].unique())[0]
-            buque                       = id_buque[id_configuracion_perfilador-1]
+            if id_configuracion_perfilador:
+                buque                       = int(id_buque[id_configuracion_perfilador-1])
+            else:
+                buque = None
           
             nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_salidas_mar[isalida].month-1]) + ' ' +  str(fechas_salidas_mar[isalida].year)
           
-            cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_salidas_mar[isalida],fechas_salidas_mar[isalida],int(buque),json_estaciones))
+            cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_salidas_mar[isalida],fechas_salidas_mar[isalida],buque,json_estaciones))
             conn.commit()
             
             # Recupera el identificador de la salida al mar
