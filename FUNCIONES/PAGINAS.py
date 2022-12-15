@@ -1927,7 +1927,7 @@ def procesado_nutrientes():
     
     # Define unos valores de referencia 
     df_referencia        = pandas.DataFrame(columns = variables_procesado_bd,index = [0])
-    df_referencia.loc[0] = [0,0,0,0,0]
+    df_referencia.loc[0] = [float(0),float(0),float(0),float(0),float(0)]
     
     # Añade salidas del AA
     if tipo_accion == acciones[0]:
