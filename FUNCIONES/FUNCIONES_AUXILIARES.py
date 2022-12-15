@@ -531,7 +531,8 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
     df_seleccion    = df_seleccion.sort_values('botella')
     
     # Convierte los NaN a None
-    df_seleccion    = df_seleccion.where(pandas.notnull(df_seleccion), None) 
+    #df_seleccion    = df_seleccion.where(pandas.notnull(df_seleccion), None) 
+    df_seleccion = df_seleccion.fillna(None)
 
     with st.form("Formulario", clear_on_submit=False):
 
@@ -547,7 +548,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
           
             col1, col2,col3,col4 = st.columns(4,gap="small")
             with col1: 
-                if df_seleccion['botella'].iloc[idato] is not None:
+                if df_seleccion['botella'].iloc[idato] is not None :
                     texto_botella = 'Botella:' + str(int(df_seleccion['botella'].iloc[idato]))
                     st.text(texto_botella)
                 
