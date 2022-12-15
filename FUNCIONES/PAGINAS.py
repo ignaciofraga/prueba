@@ -1160,7 +1160,7 @@ def entrada_salidas_mar():
                 personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])                
             json_comisionados       = json.dumps(personal_comisionado)
 
-            if len(personal_no_comisionado_previo) > 0:            
+            if personal_no_comisionado_previo is not None:            
                 personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'],default=personal_no_comisionado_previo)
             else:
                 personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])                
