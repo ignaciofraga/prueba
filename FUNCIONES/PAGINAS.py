@@ -735,7 +735,10 @@ def entrada_salidas_mar():
             json_comisionados       = json.dumps(personal_comisionado)
 
             personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])
-            json_no_comisionados    = json.dumps(personal_no_comisionado)
+            if len(personal_no_comisionado)>0:
+                json_no_comisionados = json.dumps(personal_no_comisionado)
+            else:
+                json_no_comisionados = None  
             
             estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
             json_estaciones         = json.dumps(estaciones_muestreadas)
@@ -1161,7 +1164,10 @@ def entrada_salidas_mar():
                 personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'],default=personal_no_comisionado_previo)
             else:
                 personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])                
-            json_no_comisionados    = json.dumps(personal_no_comisionado)
+            if len(personal_no_comisionado)>0:
+                json_no_comisionados    = json.dumps(personal_no_comisionado)
+            else:
+                json_no_comisionados    = None
             
             if len(estaciones_previas):
                 estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'],default=estaciones_previas)
