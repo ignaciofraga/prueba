@@ -1151,7 +1151,6 @@ def entrada_salidas_mar():
 
                 hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto_final)
 
-            st.text(personal_comisionado_previo)
             if personal_comisionado_previo is not None:
                 personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'],default=personal_comisionado_previo)
             else:
