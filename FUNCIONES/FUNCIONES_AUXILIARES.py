@@ -548,6 +548,8 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
         
         for idato in range(df_seleccion.shape[0]):
           
+            st.text(math.isnan(df_seleccion['botella'].iloc[idato]))
+            st.text(df_seleccion['botella'].iloc[idato])
             col1, col2,col3,col4 = st.columns(4,gap="small")
             with col1: 
                 if df_seleccion['botella'].iloc[idato] is not None or math.isnan(df_seleccion['botella'].iloc[idato]) is False:
