@@ -936,8 +936,6 @@ def entrada_salidas_mar():
         with st.form("Formulario seleccion"):
                    
             nombre_participante  = st.text_input('Nombre y apellidos del nuevo personal', value="")
-
-            correo_participante  = st.text_input('Correo del nuevo personal', value="")
             
             comision             = st.checkbox('Comisionado')
             
@@ -952,12 +950,12 @@ def entrada_salidas_mar():
                 
                 if io_incluido == 0:
 
-                    instruccion_sql = '''INSERT INTO personal_salidas (nombre_apellidos,correo,comisionado)
-                        VALUES (%s,%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,correo,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.correo,EXCLUDED.comisionado);''' 
+                    instruccion_sql = '''INSERT INTO personal_salidas (nombre_apellidos,comisionado)
+                        VALUES (%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.correo,EXCLUDED.comisionado);''' 
                             
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
-                    cursor.execute(instruccion_sql, (nombre_participante,correo_participante,comision))
+                    cursor.execute(instruccion_sql, (nombre_participante,comision))
                     conn.commit()
                     cursor.close()
                     conn.close()
