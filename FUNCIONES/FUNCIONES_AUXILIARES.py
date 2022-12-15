@@ -13,6 +13,7 @@ import numpy
 from io import BytesIO
 import pandas
 from sqlalchemy import create_engine
+import math
 
 pandas.options.mode.chained_assignment = None
 
@@ -532,7 +533,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
     
     # Convierte los NaN a None
     #df_seleccion    = df_seleccion.where(pandas.notnull(df_seleccion), None) 
-    df_seleccion = df_seleccion.fillna(None)
+    #df_seleccion = df_seleccion.fillna(None)
 
     with st.form("Formulario", clear_on_submit=False):
 
@@ -544,11 +545,12 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
             id_tipo_analisis  = df_metodo_ph['id_metodo'][df_metodo_ph['descripcion_metodo_ph']==tipo_analisis].iloc[0] 
             
 
+        
         for idato in range(df_seleccion.shape[0]):
           
             col1, col2,col3,col4 = st.columns(4,gap="small")
             with col1: 
-                if df_seleccion['botella'].iloc[idato] is not None :
+                if df_seleccion['botella'].iloc[idato] is not None or math.isnan(df_seleccion['botella'].iloc[idato]) is False:
                     texto_botella = 'Botella:' + str(int(df_seleccion['botella'].iloc[idato]))
                     st.text(texto_botella)
                 
