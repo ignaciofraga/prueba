@@ -526,7 +526,9 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
         texto_error = "La base de datos ya contiene información para la salida, estación, cast y variable seleccionadas. Los datos introducidos reemplazarán los existentes."
         st.warning(texto_error, icon="⚠️") 
     else:
-        io_valores_prev = 0        
+        io_valores_prev = 0    
+        texto_error = "La base de datos NO contiene información para la salida, estación, cast y variable seleccionadas."
+        st.warning(texto_error, icon="⚠️") 
         
         
     df_seleccion    = df_seleccion.sort_values('botella')
