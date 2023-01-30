@@ -2287,7 +2287,7 @@ def referencias_nutrientes():
     puerto           = st.secrets["postgres"].port
 
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    acciones     = ['Añadir referencia','Consultar referencias disponibles']
+    acciones     = ['Añadir referencias manualmente','Añadir referencias desde Excel','Consultar referencias disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
 
     # Recupera la tabla con los RMNs utilizados 
@@ -2295,26 +2295,52 @@ def referencias_nutrientes():
     conn_psql  = create_engine(con_engine)
     tabla_rmns = psql.read_sql('SELECT * FROM rmn_nutrientes', conn_psql)
         
-    if tipo_accion == acciones[0]:
+    if tipo_accion == acciones[0] or tipo_accion == acciones[1]:
         
         with st.form("Formulario", clear_on_submit=False):
         
             # Despliega un formulario para introducir la información
             nombre_rmn    = st.text_input('Nombre del RMN',value="")
     
-            col1, col2 = st.columns(2,gap="small")
-            with col1:
-                salinidad_rmn_bajo = st.number_input('Salinidad RMN bajo:',format='%f')
-                ton_rmn_bajo       = st.number_input('TON RMN bajo:',format='%f')
-                nitrito_rmn_bajo   = st.number_input('Nitrito RMN bajo:',format='%f')
-                silicato_rmn_bajo  = st.number_input('Silicato RMN bajo:',format='%f')
-                fosfato_rmn_bajo   = st.number_input('Fosfato RMN bajo:',format='%f')            
-            with col2:
-                salinidad_rmn_alto = st.number_input('Salinidad RMN alto:',format='%f')
-                ton_rmn_alto       = st.number_input('TON RMN alto:',format='%f')
-                nitrito_rmn_alto   = st.number_input('Nitrito RMN alto:',format='%f')
-                silicato_rmn_alto  = st.number_input('Silicato RMN alto:',format='%f')
-                fosfato_rmn_alto   = st.number_input('Fosfato RMN alto:',format='%f') 
+            # Entrada manual de datos
+            if tipo_accion == acciones[0]:
+    
+                col1, col2 = st.columns(2,gap="small")
+                with col1:
+                    salinidad_rmn_bajo = st.number_input('Salinidad RMN bajo:',format='%f')
+                    ton_rmn_bajo       = st.number_input('TON RMN bajo:',format='%f')
+                    nitrito_rmn_bajo   = st.number_input('Nitrito RMN bajo:',format='%f')
+                    silicato_rmn_bajo  = st.number_input('Silicato RMN bajo:',format='%f')
+                    fosfato_rmn_bajo   = st.number_input('Fosfato RMN bajo:',format='%f')            
+                with col2:
+                    salinidad_rmn_alto = st.number_input('Salinidad RMN alto:',format='%f')
+                    ton_rmn_alto       = st.number_input('TON RMN alto:',format='%f')
+                    nitrito_rmn_alto   = st.number_input('Nitrito RMN alto:',format='%f')
+                    silicato_rmn_alto  = st.number_input('Silicato RMN alto:',format='%f')
+                    fosfato_rmn_alto   = st.number_input('Fosfato RMN alto:',format='%f') 
+                    
+            # Importacion de datos desde excel
+            if tipo_accion == acciones[1]:
+                
+                archivo_refs             = st.file_uploader("Arrastra o selecciona los archivos con las referencias", accept_multiple_files=False)
+                if archivo_refs is not None:
+        
+                    # Lectura del archivo con las referencias
+                    df_referencias        = pandas.read_excel(archivo_refs)  
+                    
+                    df_referencias_bajo = df_referencias[df_referencias['tipo']=='bajo']
+                    salinidad_rmn_bajo  = df_referencias_bajo['salinidad'].iloc[0]
+                    ton_rmn_bajo        = df_referencias_bajo['ton'].iloc[0]
+                    nitrito_rmn_bajo    = df_referencias_bajo['nitrito'].iloc[0]
+                    silicato_rmn_bajo   = df_referencias_bajo['silicato'].iloc[0]
+                    fosfato_rmn_bajo    = df_referencias_bajo['fosfato'].iloc[0]                    
+
+                    df_referencias_alto = df_referencias[df_referencias['tipo']=='alto']
+                    salinidad_rmn_alto  = df_referencias_alto['salinidad'].iloc[0]
+                    ton_rmn_alto        = df_referencias_alto['ton'].iloc[0]
+                    nitrito_rmn_alto    = df_referencias_alto['nitrito'].iloc[0]
+                    silicato_rmn_alto   = df_referencias_alto['silicato'].iloc[0]
+                    fosfato_rmn_alto    = df_referencias_alto['fosfato'].iloc[0]                      
 
             texto_observaciones    = st.text_input('Observaciones',value="")
             observaciones          = json.dumps(texto_observaciones)
