@@ -2197,7 +2197,8 @@ def entrada_datos_excel():
             df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
             if df_datos_importacion['fecha_muestreo'][idato]:
                 st.text(df_datos_importacion['hora_muestreo'][idato])
-                df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
+                if isinstance(df_datos_importacion['hora_muestreo'][idato], str):
+                    df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
 
         # Identifica las variables que contiene el archivo
         variables_archivo = df_datos_importacion.columns.tolist()
