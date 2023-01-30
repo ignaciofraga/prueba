@@ -2316,10 +2316,11 @@ def referencias_nutrientes():
                 silicato_rmn_alto  = st.number_input('Silicato RMN alto:',format='%f')
                 fosfato_rmn_alto   = st.number_input('Fosfato RMN alto:',format='%f') 
 
-            observaciones    = st.text_input('Observaciones',value="")
+            texto_observaciones    = st.text_input('Observaciones',value="")
+            observaciones          = json.dumps(texto_observaciones)
 
             
-            io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
+            io_envio = st.form_submit_button("Añadir RMN a la base de datos")  
     
         if io_envio:    
             
