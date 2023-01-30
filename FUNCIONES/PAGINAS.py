@@ -1909,7 +1909,10 @@ def procesado_nutrientes():
     df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
     df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
     df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    df_rmns                 = psql.read_sql('SELECT * FROM rmn_nutrientes', conn)
     conn.close()     
+    
+    
  
     # Combina la información de muestreos y salidas en un único dataframe 
     df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
@@ -1938,20 +1941,24 @@ def procesado_nutrientes():
     
     
         # Despliega un formulario para subir los archivos del AA y las referencias
-        col1, col2 = st.columns(2,gap="small")
+        col1, col2,col3 = st.columns(3,gap="small")
         with col1:
             temperatura_laboratorio  = st.number_input('Temperatura laboratorio:',value=20)
-            archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
         with col2:
             rendimiento_columna      = st.number_input('Rendimiento columna:',value=100,min_value=0,max_value=100)
-            archivo_refs             = st.file_uploader("Arrastra o selecciona los archivos con las referencias", accept_multiple_files=False)
+        with col3:            
+            rmn_elegida              = st.selectbox("Selecciona los RMNs utilizados", (df_rmns['nombre_rmn']))
+            df_referencias           = df_rmns[df_rmns['nombre_rmn']==rmn_elegida]
+        
+            #id_rmn_elegido           = int(df_rmns['id_rmn'][df_rmns['nombre_rmn']==rmn_elegida].values[0])               
+
+
+        archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
             
         
         
-        if archivo_AA is not None and archivo_refs is not None:
+        if archivo_AA is not None:
     
-            # Lectura del archivo con las referencias
-            df_referencias        = pandas.read_excel(archivo_refs)   
         
             # Lectura del archivo con los resultados del AA
             datos_AA              = pandas.read_excel(archivo_AA,skiprows=15)            
@@ -2049,8 +2056,8 @@ def procesado_nutrientes():
                 # variables_unidades     = ['\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg']
                 
                     
-                # Realiza control de calidad
-                FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_corregidos,variables_procesado,variables_procesado_bd,variables_unidades)
+                ## Realiza control de calidad
+                #FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_corregidos,variables_procesado,variables_procesado_bd,variables_unidades)
 
 
 

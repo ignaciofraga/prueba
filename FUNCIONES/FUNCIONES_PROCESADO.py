@@ -1355,11 +1355,11 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
         if datos_entrada['Sample ID'].iloc[idato][0:7].lower() == 'rmn low' :
             posicion_RMN_bajos[icont_bajos] = idato
             icont_bajos                     = icont_bajos + 1 
-            datos_entrada['salinidad'].iloc[idato]  = df_referencias['Sal'][0]
+            datos_entrada['salinidad'].iloc[idato]  = df_referencias['salinidad_rmn_bajo'][0]
         if datos_entrada['Sample ID'].iloc[idato][0:8].lower() == 'rmn high':
             posicion_RMN_altos[icont_altos] = idato
             icont_altos                     = icont_altos + 1
-            datos_entrada['salinidad'].iloc[idato]  = df_referencias['Sal'][1]
+            datos_entrada['salinidad'].iloc[idato]  = df_referencias['salinidad_rmn_alto'][0]
 
     densidades = seawater.eos80.dens0(datos_entrada['salinidad'], datos_entrada['temp.lab'])
     datos_entrada['DENSIDAD'] = densidades/1000  
@@ -1381,8 +1381,11 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
         variable_concentracion  = variables_run[ivariable] + '_CONC'
         
         # Concentraciones de las referencias
-        RMN_CE_variable = df_referencias[variables_run[ivariable]].iloc[0]
-        RMN_CI_variable = df_referencias[variables_run[ivariable]].iloc[1]  
+        #variable_rmn    = variables_run[ivariable] + '_rmn_bajo'
+        # RMN_CE_variable = df_referencias[variables_run[ivariable]].iloc[0]
+        # RMN_CI_variable = df_referencias[variables_run[ivariable]].iloc[1]  
+        RMN_CE_variable = df_referencias[variables_run[ivariable] + '_rmn_bajo'].iloc[0]
+        RMN_CI_variable = df_referencias[variables_run[ivariable] + '_rmn_alto'].iloc[0]  
         
         # Concentraciones de las muestras analizadas como referencias
         RMN_altos       = datos_entrada[variable_concentracion][posicion_RMN_altos]
