@@ -2294,7 +2294,7 @@ def referencias_nutrientes():
     con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql  = create_engine(con_engine)
     tabla_rmns = psql.read_sql('SELECT * FROM rmn_nutrientes', conn_psql)
-    conn_psql.close()
+    conn_psql.dispose()
         
     # Acciones 0 y 1, importar informacion
     if tipo_accion == acciones[0] or tipo_accion == acciones[1]:
