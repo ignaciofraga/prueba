@@ -6,3 +6,4 @@ streamlit-aggrid==0.3.2
 sqlalchemy==1.4.40
 xlsxwriter==3.0.3
 pyproj==3.3.1
+seawater==3.3.4

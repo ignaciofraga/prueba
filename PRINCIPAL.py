@@ -43,7 +43,8 @@ if FUNCIONES_AUXILIARES.log_in() is True:
             paginas = {"INICIO": PAGINAS.principal,
                         "PROCESOS EN CURSO": PAGINAS.actualiza_procesos, 
                         "CONSULTA DATOS BOTELLAS":PAGINAS.consulta_botellas,
-                        "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes,
+                        "REFERENCIAS NUTRIENTES":PAGINAS.referencias_nutrientes,                        
+                        "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes,                        
                         "ENTRADA DATOS":PAGINAS.entrada_datos_excel
                         }
 

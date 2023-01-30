@@ -14,7 +14,7 @@ import psycopg2
 import pandas.io.sql as psql
 from sqlalchemy import create_engine
 import json
-import seawater
+import re
 
 from matplotlib.ticker import FormatStrFormatter
 
@@ -1342,27 +1342,25 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
         datos_entrada['nitrato_rendimiento'].iloc[idato] = (datos_entrada['ton'].iloc[idato]*factor - datos_entrada['nitrito'].iloc[idato])/(rendimiento_columna/100) 
         datos_entrada['ton_rendimiento'].iloc[idato] = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['nitrito'].iloc[idato]
     
-    # Asocia la temperatura de laboratorio a todas las muestras
-    datos_entrada['temp.lab'] = temperatura_laboratorio
     
     # Pasa las concentraciones a mol/kg
     posicion_RMN_bajos = numpy.zeros(2,dtype=int)
     posicion_RMN_altos = numpy.zeros(2,dtype=int)
     icont_bajos        = 0
     icont_altos        = 0
-
+    datos_entrada['DENSIDAD'] = numpy.ones(datos_entrada.shape[0])
     for idato in range(datos_entrada.shape[0]):
         if datos_entrada['Sample ID'].iloc[idato][0:7].lower() == 'rmn low' :
+            datos_entrada['DENSIDAD'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][0])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
             posicion_RMN_bajos[icont_bajos] = idato
-            icont_bajos                     = icont_bajos + 1 
-            datos_entrada['salinidad'].iloc[idato]  = df_referencias['Sal'][0]
-        if datos_entrada['Sample ID'].iloc[idato][0:8].lower() == 'rmn high':
+            icont_bajos                     = icont_bajos + 1            
+        elif datos_entrada['Sample ID'].iloc[idato][0:8].lower() == 'rmn high':
+            datos_entrada['DENSIDAD'].iloc[idato]  = (999.1+0.77*((df_referencias['Sal'][1])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
             posicion_RMN_altos[icont_altos] = idato
             icont_altos                     = icont_altos + 1
-            datos_entrada['salinidad'].iloc[idato]  = df_referencias['Sal'][1]
-
-    densidades = seawater.eos80.dens0(datos_entrada['salinidad'], datos_entrada['temp.lab'])
-    datos_entrada['DENSIDAD'] = densidades/1000  
+        else:
+            datos_entrada['DENSIDAD'].iloc[idato] = (999.1+0.77*((datos_entrada['salinidad'].iloc[idato])-((temperatura_laboratorio-15)/5.13)-((temperatura_laboratorio-15)**2)/128))/1000
+                   
                     
     datos_entrada['ton_CONC'] = datos_entrada['ton_rendimiento']/datos_entrada['DENSIDAD']  
     datos_entrada['nitrato_CONC'] = datos_entrada['nitrato_rendimiento']/datos_entrada['DENSIDAD']  
@@ -1404,11 +1402,8 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
         for idato in range(posiciones_corr_drift[0],posiciones_corr_drift[-1]):
             factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
             store[idato]    = factor_f
-            
-            # recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[0]-RMN_bajos.iloc[-1]) 
-            # recta_bt[idato] = RMN_altos.iloc[0] -  factor_f*(RMN_altos.iloc[0]-RMN_altos.iloc[-1]) 
-            recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[-1]-RMN_bajos.iloc[0]) 
-            recta_bt[idato] = RMN_altos.iloc[0] +  factor_f*(RMN_altos.iloc[-1]-RMN_altos.iloc[0]) 
+            recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[0]-RMN_bajos.iloc[-1]) 
+            recta_bt[idato] = RMN_altos.iloc[0] -  factor_f*(RMN_altos.iloc[0]-RMN_altos.iloc[-1]) 
     
             val_combinado         = ((datos_entrada[variable_concentracion][idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
     

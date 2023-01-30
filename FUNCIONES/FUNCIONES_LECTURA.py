@@ -269,7 +269,7 @@ def lectura_datos_pelacus(nombre_archivo):
 def lectura_datos_radprof(nombre_archivo):
   
     # Importa el .xlsx
-    datos_radprof = pandas.read_excel(nombre_archivo, 'DatosFinales',skiprows=1)
+    datos_radprof = pandas.read_excel(nombre_archivo,skiprows=1)
     
     # Define una columna índice
     indices_dataframe         = numpy.arange(0,datos_radprof.shape[0],1,dtype=int)
@@ -299,11 +299,22 @@ def lectura_datos_radprof(nombre_archivo):
                                                   "SiO2 umol/Kg":"silicato","Flag_SiO2":"silicato_qf",
                                                   "NO2 umol/kg":"nitrito","Flag_NO2":"nitrito_qf","PO4 umol/Kg":"fosfato","Flag_PO4":"fosfato_qf"
                                                   })
-    
-    
+
     # Mantén solo las columnas que interesan
     datos_radprof_recorte = datos_radprof[['estacion','botella','fecha_muestreo','hora_muestreo','latitud','longitud','presion_ctd','num_cast','temperatura_ctd','salinidad_ctd',
-                                           'nitrato','nitrato_qf','nitrito','nitrito_qf','silicato','silicato_qf','fosfato','fosfato_qf','configuracion_superficie','configuracion_perfilador']]
+                                            'nitrato','nitrato_qf','nitrito','nitrito_qf','silicato','silicato_qf','fosfato','fosfato_qf','configuracion_superficie','configuracion_perfilador']]
+    
+
+    # # Renombra las columnas para mantener una denominación homogénea
+    # datos_radprof = datos_radprof.rename(columns={"st":"estacion","Niskin":"botella","Cast":'num_cast',
+    #                                               "Lat":"latitud","Lon":"longitud","CTDPRS":"presion_ctd","CTDtemp":"temperatura_ctd","SALCTD":"salinidad_ctd",
+    #                                               "silica":"silicato","SiO2_flag":"silicato_qf","nitra":"nitrato","NO3_flag":"nitrato_qf",
+    #                                               "nitri":"nitrito","NO2_flag":"nitrito_qf","phospha":"fosfato","PO4_flag":"fosfato_qf","ammonia":"amonio"
+    #                                               })   
+    
+    # # Mantén solo las columnas que interesan
+    # datos_radprof_recorte = datos_radprof[['estacion','botella','fecha_muestreo','hora_muestreo','latitud','longitud','presion_ctd','num_cast','temperatura_ctd','salinidad_ctd',
+    #                                        'nitrato','nitrato_qf','nitrito','nitrito_qf','silicato','silicato_qf','fosfato','fosfato_qf','amonio','configuracion_superficie','configuracion_perfilador']]
 
     del(datos_radprof)
 
@@ -311,7 +322,65 @@ def lectura_datos_radprof(nombre_archivo):
 
 
 
+############################################################################
+######## FUNCION PARA LEER DATOS CON EL FORMATO DE CAMPAÑA RADPROF  ########
+############################################################################ 
+    
+def lectura_archivo_perfiles(datos_archivo):
 
+    # Predimensionamientos
+    listado_variables  = []
+    io_datos           = 0
+    
+    # Lee el archivo .cnv
+    cast_muestreo      = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
+    fecha_muestreo     = None
+    hora_muestreo      = None
+    for ilinea in range(len(datos_archivo)):
+        texto_linea = datos_archivo[ilinea]
+        if io_datos == 0:            
+            if texto_linea[0:8] == '** Time:': # Línea con hora del cast
+                hora_muestreo = datetime.datetime.strptime(texto_linea[8:13],'%H:%M').time() 
+            if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
+                cast_muestreo = int(texto_linea[8:12])
+            if texto_linea[0:8] == '** Date:': # Línea con la fecha
+                fecha_muestreo = texto_linea[8:16]
+                try: 
+                    fecha_muestreo = datetime.datetime.strptime(fecha_muestreo, '%d/%m/%y').date()
+                except:
+                    pass
+                
+            if texto_linea[0:6] == '# name': # Línea con variable muestreada
+                posicion_inicio    = texto_linea.find('=') + 2
+                posicion_final     = texto_linea.find(':')
+                nombre_variable    = texto_linea[posicion_inicio:posicion_final]
+                
+                if nombre_variable == 'prSM':
+                    nombre_variable = 'presion_ctd'
+                if nombre_variable == 't090C':
+                    nombre_variable = 'temperatura_ctd'
+                if nombre_variable == 'sal00':
+                    nombre_variable = 'salinidad_ctd'
+                if nombre_variable == 'flScufa':
+                    nombre_variable = 'fluorescencia_ctd' 
+                if nombre_variable == 'par':
+                    nombre_variable = 'par_ctd' 
+                if nombre_variable == 'sbeox0Mm/Kg': 
+                    nombre_variable = 'oxigeno_ctd'                    
+                
+                listado_variables  = listado_variables + [nombre_variable]
+                
+            if texto_linea[0:5] == '*END*': # Línea final de encabezado, a partir de aquí, datos
+                datos_perfil     = []
+                io_datos         = 1
+        
+        else:
+
+            datos_linea = texto_linea.split() 
+            listado_datos = [float(x) for x in datos_linea] 
+            datos_perfil.append(listado_datos) 
+            
+    return datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo
 
 # ##########################################################
 # ######## FUNCION PARA LEER ESTADILLOS DE ENTRADA  ########

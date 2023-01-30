@@ -2269,6 +2269,194 @@ def entrada_datos_excel():
 
 
 
+
+
+# ###############################################################################
+# #### PÁGINA DE ENTRADA DE RMNs UTILIZADOS EN EL PROCESADO DE NUTRIENTES #######
+# ###############################################################################  
+
+def referencias_nutrientes():
+    
+    from sqlalchemy import create_engine
+    
+    # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port
+
+    # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
+    acciones     = ['Añadir referencia','Consultar referencias disponibles']
+    tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
+
+    # Recupera la tabla con los RMNs utilizados 
+    con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    conn_psql  = create_engine(con_engine)
+    tabla_rmns = psql.read_sql('SELECT * FROM rmn_nutrientes', conn_psql)
+        
+    if tipo_accion == acciones[0]:
+        
+        # Despliega un formulario para introducir la información
+        nombre_rmn    = st.text_input('Nombre del RMN',value="")
+
+        col1, col2 = st.columns(2,gap="small")
+        with col1:
+            salinidad_rmn_bajo = st.number_input('Salinidad RMN bajo:')
+            ton_rmn_bajo       = st.number_input('TON RMN bajo:')
+            nitrito_rmn_bajo   = st.number_input('Nitrito RMN bajo:')
+            silicato_rmn_bajo  = st.number_input('Silicato RMN bajo:')
+            fosfato_rmn_bajo   = st.number_input('Fosfato RMN bajo:')            
+        with col2:
+            salinidad_rmn_alto = st.number_input('Salinidad RMN alto:')
+            ton_rmn_alto       = st.number_input('TON RMN alto:')
+            nitrito_rmn_alto   = st.number_input('Nitrito RMN alto:')
+            silicato_rmn_alto  = st.number_input('Silicato RMN alto:')
+            fosfato_rmn_alto   = st.number_input('Fosfato RMN alto:') 
+            
+            # Comprueba si hay una referencia con el mismo nombre 
+            df_temporal = tabla_rmns[tabla_rmns['nombre_rmn']==nombre_rmn]
+            
+            if df_temporal.shape[0] != 0:
+  
+                # Busca el índice del registro con ese nombre
+                indice_rmn = tabla_rmns['id_rmn'][tabla_rmns['nombre_rmn']==nombre_rmn]
+  
+            else:
+                
+                indice_rmn = tabla_rmns.shape[0]
+  
+        instruccion_sql = "INSERT INTO rmn_nutrientes (id_rmn,nombre_rmn, salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto) = ROW(EXCLUDED.salinidad_rmn_bajo,EXCLUDED.ton_rmn_bajo,EXCLUDED.nitrito_rmn_bajo,EXCLUDED.silicato_rmn_bajo,EXCLUDED.fosfato_rmn_bajo,EXCLUDED.salinidad_rmn_alto,EXCLUDED.ton_rmn_alto,EXCLUDED.nitrito_rmn_alto,EXCLUDED.silicato_rmn_alto,EXCLUDED.fosfato_rmn_alto);"                            
+        valores = [indice_rmn,nombre_rmn,salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto].tolist()
+        
+        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        cursor = conn.cursor()
+        cursor.execute(instruccion_sql, (valores))
+        conn.commit()    
+ 
+
+ 
+  #           instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
+  #           VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.estaciones);''' 
+                
+  #           conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+  #           cursor = conn.cursor() 
+ 
+    
+  #               # Reemplaza los valores
+  #               listado_variables = ['salinidad_rmn_bajo','ton_rmn_bajo','nitrito_rmn_bajo','silicato_rmn_bajo','fosfato_rmn_bajo','salinidad_rmn_alto','ton_rmn_alto','nitrito_rmn_alto','silicato_rmn_alto','fosfato_rmn_alto']
+
+                
+  
+  #               tabla_rmns['salinidad_rmn_bajo'][tabla_rmns['nombre_rmn']==nombre_rmn] = salinidad_rmn_bajo              
+  # datos_nuevo = {'nombre_rmn': [nombre_rmn],'salinidad_rmn_bajo': [salinidad_rmn_bajo],'ton_rmn_bajo':[ton_rmn_bajo],'nitrito_rmn_bajo':[nitrito_rmn_bajo],'silicato_rmn_bajo':[silicato_rmn_bajo],'fosfato_rmn_bajo':[fosfato_rmn_bajo],'salinidad_rmn_alto': [salinidad_rmn_bajo],'ton_rmn_alto':[ton_rmn_bajo],'nitrito_rmn_alto':[nitrito_rmn_bajo],'silicato_rmn_alto':[silicato_rmn_bajo],'fosfato_rmn_alto':[fosfato_rmn_bajo]}
+
+  
+
+
+
+
+    
+  #               # Une los nuevos datos a los existentes
+  #               datos_nuevo = {'nombre_rmn': [nombre_rmn],'salinidad_rmn_bajo': [salinidad_rmn_bajo],'ton_rmn_bajo':[ton_rmn_bajo],'nitrito_rmn_bajo':[nitrito_rmn_bajo],'silicato_rmn_bajo':[silicato_rmn_bajo],'fosfato_rmn_bajo':[fosfato_rmn_bajo],'salinidad_rmn_alto': [salinidad_rmn_bajo],'ton_rmn_alto':[ton_rmn_bajo],'nitrito_rmn_alto':[nitrito_rmn_bajo],'silicato_rmn_alto':[silicato_rmn_bajo],'fosfato_rmn_alto':[fosfato_rmn_bajo]}
+            
+  
+    
+  #               tabla_rmns = tabla_rmns.drop(tabla_rmns[tabla_rmns['nombre_rmn']==nombre_rmn].index)
+                
+  #           # Une los nuevos datos a los existentes
+  #           datos_nuevo = {'nombre_rmn': [nombre_rmn],'salinidad_rmn_bajo': [salinidad_rmn_bajo],'ton_rmn_bajo':[ton_rmn_bajo],'nitrito_rmn_bajo':[nitrito_rmn_bajo],'silicato_rmn_bajo':[silicato_rmn_bajo],'fosfato_rmn_bajo':[fosfato_rmn_bajo],'salinidad_rmn_alto': [salinidad_rmn_bajo],'ton_rmn_alto':[ton_rmn_bajo],'nitrito_rmn_alto':[nitrito_rmn_bajo],'silicato_rmn_alto':[silicato_rmn_bajo],'fosfato_rmn_alto':[fosfato_rmn_bajo]}
+
+  #           nuevo_rmn = pd.DataFrame(data=datos_nuevo)
+
+  #           tabla_rmns = pandas.concat([tabla_rmns, nuevo_rmn])  
+                
+  #           # Actualiza índices  
+  #           vector_identificadores            = numpy.arange(1,tabla_rmns.shape[0]+1)    
+  #           tabla_rmns['muestreo'] = vector_identificadores
+            
+  #           datos_conjuntos.set_index('muestreo',drop=True,append=False,inplace=True)
+            
+  #           # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+  #           conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+  #           cursor = conn.cursor()
+  #           instruccion_sql = "TRUNCATE datos_discretos_biogeoquimica;"
+  #           cursor.execute(instruccion_sql)
+  #           conn.commit()
+  #           cursor.close()
+  #           conn.close()     
+
+
+  #   ' nombre_rmn text NOT NULL,'
+  #   ' salinidad_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+  #   ' ton_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+  #   ' nitrito_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+  #   ' silicato_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+  #   ' fosfato_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+  #   ' salinidad_rmn_alto NUMERIC (5, 3) NOT NULL,'
+  #   ' ton_rmn_alto NUMERIC (5, 3) NOT NULL,'
+  #   ' nitrito_rmn_alto NUMERIC (5, 3) NOT NULL,'
+  #   ' silicato_rmn_alto NUMERIC (5, 3) NOT NULL,'
+  #   ' fosfato_rmn_alto NUMERIC (5, 3) NOT NULL'        
+   
+    
+  #       instruccion_sql = "SELECT os_biogeoquimica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
+  #       valores = [int(listado_muestreos[idato])] + datos_bgq.iloc[idato].tolist()
+  #       cursor.execute(instruccion_sql, (valores))
+  #       conn.commit()
+        
+                
+  #       # Genera un dataframe solo con las variales biogeoquimicas de los datos a importar 
+  #       datos_biogeoquimica = datos[['id_muestreo_temp','fluorescencia_ctd','fluorescencia_ctd_qf','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk_qf',
+  #                                    'ton','ton_qf','nitrato','nitrato_qf','nitrito','nitrito_qf','amonio','amonio_qf','fosfato','fosfato_qf','silicato','silicato_qf','tcarbn','tcarbn_qf','doc','doc_qf',
+  #                                    'cdom','cdom_qf','clorofila_a','clorofila_a_qf','alcalinidad','alcalinidad_qf','ph','ph_qf','ph_metodo','r_clor','r_clor_qf','r_per','r_per_qf','co3_temp']]    
+  #       datos_biogeoquimica = datos_biogeoquimica.rename(columns={"id_muestreo_temp": "muestreo"})
+        
+  #       # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
+  #       for idato in range(tabla_registros_biogoquim.shape[0]):
+  #           try:
+  #               tabla_registros_biogoquim = tabla_registros_biogoquim.drop(tabla_registros_biogoquim[tabla_registros_biogoquim.muestreo == datos_biogeoquimica['muestreo'][idato]].index)
+  #           except:
+  #               pass
+            
+  #       # Une ambos dataframes, el que contiene los datos nuevo y el que tiene los datos que ya están en la base de datos
+  #       datos_conjuntos = pandas.concat([tabla_registros_biogoquim, datos_biogeoquimica])
+            
+  #       vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
+  #       datos_conjuntos['muestreo'] = vector_identificadores
+        
+  #       datos_conjuntos.set_index('muestreo',drop=True,append=False,inplace=True)
+        
+  #       # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+  #       conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+  #       cursor = conn.cursor()
+  #       instruccion_sql = "TRUNCATE datos_discretos_biogeoquimica;"
+  #       cursor.execute(instruccion_sql)
+  #       conn.commit()
+  #       cursor.close()
+  #       conn.close() 
+        
+  #       # Inserta el dataframe resultante en la base de datos 
+  #       datos_conjuntos.to_sql('datos_discretos_biogeoquimica', conn_psql,if_exists='append')
+
+  #       conn_psql.dispose() # Cierra la conexión con la base de datos 
+        
+        
+        
+        # ' fecha date NOT NULL,'
+        # ' salinidad_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+        # ' ton_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+        # ' nitrito_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+        # ' silicato_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+        # ' fosfato_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+        # ' salinidad_rmn_alto NUMERIC (5, 3) NOT NULL,'
+        # ' ton_rmn_alto NUMERIC (5, 3) NOT NULL,'
+        # ' nitrito_rmn_alto NUMERIC (5, 3) NOT NULL,'
+        # ' silicato_rmn_alto NUMERIC (5, 3) NOT NULL,'
+        # ' fosfato_rmn_alto NUMERIC (5, 3) NOT NULL'
+        # ) 
+        
+
 # ###############################################################################
 # ################## PÁGINA DE ENTRADA DE ESTADILLOS #################
 # ###############################################################################    
