@@ -2326,7 +2326,7 @@ def referencias_nutrientes():
             if df_temporal.shape[0] != 0:
   
                 # Busca el índice del registro con ese nombre
-                indice_rmn = tabla_rmns['id_rmn'][tabla_rmns['nombre_rmn']==nombre_rmn].iloc[0]
+                indice_rmn = int(tabla_rmns['id_rmn'][tabla_rmns['nombre_rmn']==nombre_rmn].iloc[0])
   
             else:
                 
