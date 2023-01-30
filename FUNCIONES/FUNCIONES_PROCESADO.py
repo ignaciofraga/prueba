@@ -273,6 +273,8 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         # Asigna a la matriz de datos la estación asociada a cada registro
         datos['id_estacion_temp'][indices_datos] = estaciones_muestradas['id_estacion'][idato]
     
+        st.text(idato)
+        st.text(estaciones_muestradas['io_nueva_estacion'][idato])
     
     if numpy.count_nonzero(estaciones_muestradas['io_nueva_estacion']) > 0:
     
