@@ -2316,7 +2316,7 @@ def referencias_nutrientes():
             #     silicato_rmn_alto  = st.number_input('Silicato RMN alto:')
             #     fosfato_rmn_alto   = st.number_input('Fosfato RMN alto:') 
             
-            col1, col2,col3,col4,col5,col6 = st.columns(2,gap="small")
+            col1, col2,col3,col4,col5,col6 = st.columns(6,gap="small")
             with col2:
                 st.text('RMN bajo')
                 st.text('RMN alto')
