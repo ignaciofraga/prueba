@@ -2304,7 +2304,7 @@ def referencias_nutrientes():
     
             col1, col2 = st.columns(2,gap="small")
             with col1:
-                salinidad_rmn_bajo = st.number_input('Salinidad RMN bajo:')
+                salinidad_rmn_bajo = st.number_input('Salinidad RMN bajo:',format='%f')
                 ton_rmn_bajo       = st.number_input('TON RMN bajo:')
                 nitrito_rmn_bajo   = st.number_input('Nitrito RMN bajo:')
                 silicato_rmn_bajo  = st.number_input('Silicato RMN bajo:')
@@ -2317,7 +2317,7 @@ def referencias_nutrientes():
                 fosfato_rmn_alto   = st.number_input('Fosfato RMN alto:') 
 
             observaciones    = st.text_input('Observaciones',value="")
-format='{:,d}'
+
             
             io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
     
