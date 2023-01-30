@@ -2297,22 +2297,28 @@ def referencias_nutrientes():
         
     if tipo_accion == acciones[0]:
         
-        # Despliega un formulario para introducir la información
-        nombre_rmn    = st.text_input('Nombre del RMN',value="")
-
-        col1, col2 = st.columns(2,gap="small")
-        with col1:
-            salinidad_rmn_bajo = st.number_input('Salinidad RMN bajo:')
-            ton_rmn_bajo       = st.number_input('TON RMN bajo:')
-            nitrito_rmn_bajo   = st.number_input('Nitrito RMN bajo:')
-            silicato_rmn_bajo  = st.number_input('Silicato RMN bajo:')
-            fosfato_rmn_bajo   = st.number_input('Fosfato RMN bajo:')            
-        with col2:
-            salinidad_rmn_alto = st.number_input('Salinidad RMN alto:')
-            ton_rmn_alto       = st.number_input('TON RMN alto:')
-            nitrito_rmn_alto   = st.number_input('Nitrito RMN alto:')
-            silicato_rmn_alto  = st.number_input('Silicato RMN alto:')
-            fosfato_rmn_alto   = st.number_input('Fosfato RMN alto:') 
+        with st.form("Formulario", clear_on_submit=False):
+        
+            # Despliega un formulario para introducir la información
+            nombre_rmn    = st.text_input('Nombre del RMN',value="")
+    
+            col1, col2 = st.columns(2,gap="small")
+            with col1:
+                salinidad_rmn_bajo = st.number_input('Salinidad RMN bajo:')
+                ton_rmn_bajo       = st.number_input('TON RMN bajo:')
+                nitrito_rmn_bajo   = st.number_input('Nitrito RMN bajo:')
+                silicato_rmn_bajo  = st.number_input('Silicato RMN bajo:')
+                fosfato_rmn_bajo   = st.number_input('Fosfato RMN bajo:')            
+            with col2:
+                salinidad_rmn_alto = st.number_input('Salinidad RMN alto:')
+                ton_rmn_alto       = st.number_input('TON RMN alto:')
+                nitrito_rmn_alto   = st.number_input('Nitrito RMN alto:')
+                silicato_rmn_alto  = st.number_input('Silicato RMN alto:')
+                fosfato_rmn_alto   = st.number_input('Fosfato RMN alto:') 
+                
+            io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
+    
+        if io_envio:    
             
             # Comprueba si hay una referencia con el mismo nombre 
             df_temporal = tabla_rmns[tabla_rmns['nombre_rmn']==nombre_rmn]
