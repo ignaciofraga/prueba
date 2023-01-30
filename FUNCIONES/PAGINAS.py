@@ -2349,7 +2349,7 @@ def referencias_nutrientes():
             cursor.execute(instruccion_sql, (valores))
             conn.commit()   
             
-            texto_exito = 'Datos  ' + tipo_proceso + ' correctamente'
+            texto_exito = 'Datos  del RMN ' + nombre_rmn + ' ' + tipo_proceso + ' correctamente'
             st.success(texto_exito)
  
 
