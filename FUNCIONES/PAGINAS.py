@@ -2196,6 +2196,7 @@ def entrada_datos_excel():
         for idato in range(df_datos_importacion.shape[0]):
             df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
             if df_datos_importacion['fecha_muestreo'][idato]:
+                st.text(df_datos_importacion['hora_muestreo'][idato])
                 df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
 
         # Identifica las variables que contiene el archivo
