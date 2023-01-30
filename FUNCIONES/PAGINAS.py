@@ -2305,16 +2305,16 @@ def referencias_nutrientes():
             col1, col2 = st.columns(2,gap="small")
             with col1:
                 salinidad_rmn_bajo = st.number_input('Salinidad RMN bajo:',format='%f')
-                ton_rmn_bajo       = st.number_input('TON RMN bajo:')
-                nitrito_rmn_bajo   = st.number_input('Nitrito RMN bajo:')
-                silicato_rmn_bajo  = st.number_input('Silicato RMN bajo:')
-                fosfato_rmn_bajo   = st.number_input('Fosfato RMN bajo:')            
+                ton_rmn_bajo       = st.number_input('TON RMN bajo:',format='%f')
+                nitrito_rmn_bajo   = st.number_input('Nitrito RMN bajo:',format='%f')
+                silicato_rmn_bajo  = st.number_input('Silicato RMN bajo:',format='%f')
+                fosfato_rmn_bajo   = st.number_input('Fosfato RMN bajo:',format='%f')            
             with col2:
-                salinidad_rmn_alto = st.number_input('Salinidad RMN alto:')
-                ton_rmn_alto       = st.number_input('TON RMN alto:')
-                nitrito_rmn_alto   = st.number_input('Nitrito RMN alto:')
-                silicato_rmn_alto  = st.number_input('Silicato RMN alto:')
-                fosfato_rmn_alto   = st.number_input('Fosfato RMN alto:') 
+                salinidad_rmn_alto = st.number_input('Salinidad RMN alto:',format='%f')
+                ton_rmn_alto       = st.number_input('TON RMN alto:',format='%f')
+                nitrito_rmn_alto   = st.number_input('Nitrito RMN alto:',format='%f')
+                silicato_rmn_alto  = st.number_input('Silicato RMN alto:',format='%f')
+                fosfato_rmn_alto   = st.number_input('Fosfato RMN alto:',format='%f') 
 
             observaciones    = st.text_input('Observaciones',value="")
 
