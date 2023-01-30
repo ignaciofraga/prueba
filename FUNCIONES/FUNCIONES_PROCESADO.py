@@ -248,6 +248,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     else:
         id_ultima_estacion_bd = 0
         
+    import streamlit as st
     # Encuentra el nombre asociado a cada par de lat/lon y si está incluida en la base de datos (io_nueva = 0 ya incluida en la base de datos; 1 NO incluida en la base de datos)
     for idato in range(estaciones_muestradas.shape[0]):
         
@@ -273,6 +274,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         # Asigna a la matriz de datos la estación asociada a cada registro
         datos['id_estacion_temp'][indices_datos] = estaciones_muestradas['id_estacion'][idato]
     
+        
         st.text(idato)
         st.text(estaciones_muestradas['io_nueva_estacion'][idato])
     
