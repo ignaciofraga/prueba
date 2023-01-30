@@ -2304,7 +2304,7 @@ def referencias_nutrientes():
     
             col1, col2 = st.columns(2,gap="small")
             with col1:
-                salinidad_rmn_bajo = st.number_input('Salinidad RMN bajo:',format='{:10.4f}')
+                salinidad_rmn_bajo = st.number_input('Salinidad RMN bajo:','format'='{:10.4f}')
                 ton_rmn_bajo       = st.number_input('TON RMN bajo:')
                 nitrito_rmn_bajo   = st.number_input('Nitrito RMN bajo:')
                 silicato_rmn_bajo  = st.number_input('Silicato RMN bajo:')
