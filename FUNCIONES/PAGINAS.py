@@ -2294,7 +2294,9 @@ def referencias_nutrientes():
     con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql  = create_engine(con_engine)
     tabla_rmns = psql.read_sql('SELECT * FROM rmn_nutrientes', conn_psql)
+    conn_psql.close()
         
+    # Acciones 0 y 1, importar informacion
     if tipo_accion == acciones[0] or tipo_accion == acciones[1]:
         
         with st.form("Formulario", clear_on_submit=False):
@@ -2374,11 +2376,45 @@ def referencias_nutrientes():
             cursor = conn.cursor()
             cursor.execute(instruccion_sql, (valores))
             conn.commit()   
+            conn.close()
             
             texto_exito = 'Datos  del RMN ' + nombre_rmn + ' ' + tipo_proceso + ' correctamente'
             st.success(texto_exito)
- 
 
+    # Accion 2, mostrar los RMNs disponibles en la base de datos    
+    if tipo_accion == acciones[2]:
+
+        # Elimina las columnas que no interesa mostrar
+        tabla_rmns = tabla_rmns.drop(columns=['id_rmn'])
+    
+        ## Renombra las columnas
+        #tabla_rmns = tabla_rmns.rename(columns={'nombre_rmn':'Nombre','participantes_no_comisionados':'Participantes no comisionados'})
+    
+
+        # Muestra una tabla con las salidas realizadas
+        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(tabla_rmns)
+        gridOptions = gb.build()
+        st_aggrid.AgGrid(tabla_rmns,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+
+
+        # Botón para descargar las salidas disponibles
+        nombre_archivo =  'DATOS_RMNs.xlsx'
+    
+        output = BytesIO()
+        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+        tabla_rmns.to_excel(writer, index=False, sheet_name='DATOS')
+
+        writer.save()
+        df_salidas_radiales = output.getvalue()
+    
+        st.download_button(
+            label="DESCARGA EXCEL CON LOS RMNs ALMACENADOS",
+            data=df_salidas_radiales,
+            file_name=nombre_archivo,
+            help= 'Descarga un archivo .csv con los datos solicitados',
+            mime="application/vnd.ms-excel"
+        )
+        
  
 
 # ###############################################################################
