@@ -200,15 +200,6 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     conn_psql        = create_engine(con_engine)
     tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql) 
     
-    # Cambia nombres a minusculas para comparar 
-    tabla_estaciones['nombre_estacion'] = tabla_estaciones['nombre_estacion'].apply(lambda x:x.lower())
-    
-    # Cambia los nombres a minusculas
-    datos['estacion'] = datos['estacion'].astype(str)
-    datos['estacion'] = datos['estacion'].apply(lambda x:x.lower())
-    
-    # Columna para punteros de estaciones
-    datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
     
     # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
     estaciones_programa            = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
@@ -216,54 +207,78 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     estaciones_programa['id_temp'] = indices_dataframe
     estaciones_programa.set_index('id_temp',drop=True,append=False,inplace=True)
     
-    # Genera un dataframe con las estaciones incluidas en el muestreo
-    estaciones_muestreadas                      = datos['estacion'].unique()
-    estaciones_muestreadas                      = pandas.DataFrame(data=estaciones_muestreadas,columns=['estacion'])  
-    estaciones_muestreadas['id_estacion']       = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-    estaciones_muestreadas['io_nueva_estacion'] = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-    estaciones_muestreadas['latitud_estacion']  = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-    estaciones_muestreadas['longitud_estacion'] = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-    estaciones_muestreadas = estaciones_muestreadas.rename(columns={"estacion":"nombre_estacion"})
-
-
-    # Contadores e identificadores 
+    ## Identifica la estación asociada a cada registro
+    
+    # Columna para punteros de estaciones
+    datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+    
+    # Genera un dataframe con la combinación única de latitud/longitud en los muestreos
+    estaciones_muestradas                      = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
+    estaciones_muestradas['id_estacion']           = numpy.zeros(estaciones_muestradas.shape[0],dtype=int)
+    estaciones_muestradas['io_nueva_estacion'] = numpy.ones(estaciones_muestradas.shape[0],dtype=int)
+    estaciones_muestradas['nombre_estacion']   = [None]*estaciones_muestradas.shape[0]
+    
+    # Comprueba que las estaciones no están próximas entre sí (y son la misma pero con pequeñas diferencias en las coordenadas)
+    proy_datos = Proj(proj='utm',zone=29,ellps='WGS84', preserve_units=False) # Referencia coords
+    dist_min   = 750
+    
+    for iestacion in range(estaciones_muestradas.shape[0]-1):
+        x_ref, y_ref = proy_datos(estaciones_muestradas['longitud'][iestacion], estaciones_muestradas['latitud'][iestacion], inverse=False)
+        for isiguientes in range(iestacion+1,estaciones_muestradas.shape[0]):
+            x_compara, y_compara  = proy_datos(estaciones_muestradas['longitud'][isiguientes], estaciones_muestradas['latitud'][isiguientes], inverse=False)
+            distancia             = math.sqrt((((x_ref-x_compara)**2) + ((y_ref-y_compara)**2)))
+    
+            if distancia < dist_min:
+                aux = (datos ['latitud'] == estaciones_muestradas['latitud'][isiguientes]) & (datos ['longitud'] == estaciones_muestradas['longitud'][isiguientes])
+                if any(aux) is True:
+                    indices_datos = [i for i, x in enumerate(aux) if x]
+                    datos['latitud'][indices_datos] = estaciones_muestradas['latitud'][iestacion]
+                    datos['longitud'][indices_datos] = estaciones_muestradas['longitud'][iestacion]            
+       
+    # vuelve a generar el dataframe de muestreos (por si había estaciones iguales)
+    del(estaciones_muestradas)
+    estaciones_muestradas                      = datos.groupby(['latitud','longitud']).size().reset_index().rename(columns={0:'count'})
+    estaciones_muestradas['id_estacion']       = numpy.zeros(estaciones_muestradas.shape[0],dtype=int)
+    estaciones_muestradas['io_nueva_estacion'] = numpy.ones(estaciones_muestradas.shape[0],dtype=int)
+    estaciones_muestradas['nombre_estacion']   = [None]*estaciones_muestradas.shape[0]
+  
+    
     if len(tabla_estaciones['id_estacion'])>0:
         id_ultima_estacion_bd = max(tabla_estaciones['id_estacion'])
     else:
         id_ultima_estacion_bd = 0
         
-    iconta_nueva_estacion     = 1
-    
-    # Encuentra el identificador asociado a cada estacion en la base de datos
-    for iestacion in range(estaciones_muestreadas.shape[0]):
+    # Encuentra el nombre asociado a cada par de lat/lon y si está incluida en la base de datos (io_nueva = 0 ya incluida en la base de datos; 1 NO incluida en la base de datos)
+    for idato in range(estaciones_muestradas.shape[0]):
         
-        df_temporal = tabla_estaciones[tabla_estaciones['nombre_estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]
+        # Encuentra el nombre asignado en los datos importados a cada nueva estación 
+        aux = (datos ['latitud'] == estaciones_muestradas['latitud'][idato]) & (datos ['longitud'] == estaciones_muestradas['longitud'][idato])
+        if any(aux) is True:
+            indices_datos = [i for i, x in enumerate(aux) if x]
+            estaciones_muestradas['nombre_estacion'][idato]  = datos['estacion'][indices_datos[0]]
     
-        # Estacion ya incluida en la base de datos. Recuperar identificador
-        if df_temporal.shape[0]>0:
-            estaciones_muestreadas['id_estacion'][iestacion]       = df_temporal['id_estacion'].iloc[0]
+        # comprueba si la estación muestreada está entre las incluidas en la base de datos (dentro del programa correspondiente)
+        aux = (estaciones_programa['latitud'] == estaciones_muestradas['latitud'][idato]) & (estaciones_programa['longitud'] == estaciones_muestradas['longitud'][idato])
+        # Si la estación muestreada está incluida, asigna a la estación muestreada el identificador utilizado en la base de datos
+        if any(aux) is True:
+            indices = [i for i, x in enumerate(aux) if x]
+            estaciones_muestradas['io_nueva_estacion'][idato]  = 0
             
-        # Nueva estación, asignar orden creciente de identificador
+            estaciones_muestradas['id_estacion'][idato]  = estaciones_programa['id_estacion'][indices[0]]
+        # Si no está incluida, continúa con la numeración de las estaciones e inserta un nuevo registro en la base de datos
         else:
-            estaciones_muestreadas['id_estacion'][iestacion]       = id_ultima_estacion_bd + iconta_nueva_estacion
-            estaciones_muestreadas['io_nueva_estacion'][iestacion] = 1           
-            iconta_nueva_estacion                                 = iconta_nueva_estacion + 1
-            
-        # Asigna el identificador de estación a los datos importados
-        datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]=estaciones_muestreadas['id_estacion'][iestacion]
-            
-        # Determina la lat/lon de la estacion a partir de los valores de los registros asociados
-        estaciones_muestreadas['latitud_estacion'][iestacion]  = (datos['latitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
-        estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
-
-
-    # Añade en la base de datos las nuevas estaciones    
-    if numpy.count_nonzero(estaciones_muestreadas['io_nueva_estacion']) > 0:
+            id_ultima_estacion_bd                    = id_ultima_estacion_bd + 1
+            estaciones_muestradas['id_estacion'][idato]  = id_ultima_estacion_bd 
+                 
+        # Asigna a la matriz de datos la estación asociada a cada registro
+        datos['id_estacion_temp'][indices_datos] = estaciones_muestradas['id_estacion'][idato]
+        
+    if numpy.count_nonzero(estaciones_muestradas['io_nueva_estacion']) > 0:
     
         # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
-        nuevos_muestreos  = estaciones_muestreadas[estaciones_muestreadas['io_nueva_estacion']==1]
+        nuevos_muestreos  = estaciones_muestradas[estaciones_muestradas['io_nueva_estacion']==1]
         # Mantén sólo las columnas que interesan
-        exporta_registros = nuevos_muestreos[['id_estacion','nombre_estacion','latitud_estacion','longitud_estacion']]
+        exporta_registros = nuevos_muestreos[['id_estacion','nombre_estacion','latitud','longitud']]
         # Añade columna con el identiicador del programa
         exporta_registros['programa'] = numpy.zeros(exporta_registros.shape[0],dtype=int)
         exporta_registros['programa'] = id_programa
@@ -274,7 +289,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         exporta_registros.to_sql('estaciones', conn_psql,if_exists='append')
 
     # elimina la informacion cargada y que no se vaya a exportar, para liberar memoria
-    del(estaciones_muestreadas,estaciones_programa,tabla_estaciones)
+    del(estaciones_muestradas,estaciones_programa,tabla_estaciones)
     
     conn_psql.dispose() # Cierra la conexión con la base de datos 
     
@@ -401,66 +416,45 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
     # RADIALES CANTABRICO
     if id_programa == 4 :
     
-        # Extrae el mes y año de cada salida al mar
-        datos['mes'] = numpy.zeros(datos.shape[0])
-        datos['año'] = numpy.zeros(datos.shape[0])
-        for idato in range(datos.shape[0]):
-            datos['mes'].iloc[idato] =  datos['fecha_muestreo'].iloc[idato].month    
-            datos['año'].iloc[idato] =  datos['fecha_muestreo'].iloc[idato].year 
-    
-    
-        anhos_salida_mar = datos['año'].unique()
-
+        # Encuentra las fechas de muestreo únicas
+        fechas_salidas_mar = datos['fecha_muestreo'].unique()
         
         # Asigna nombre a la salida
         meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']
            
         
-        # instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,hora_salida,hora_retorno,estaciones)
-        #     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,hora_salida,hora_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_salida,EXCLUDED.hora_retorno,EXCLUDED.estaciones);''' 
-                
         instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
-            VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.estaciones);''' 
+            VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''
+            #UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.estaciones);''' 
                 
-        
         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
         cursor = conn.cursor()
-        
-        for ianho in range(len(anhos_salida_mar)):
-        
-            subset_anual     = datos[datos['año']==anhos_salida_mar[ianho]] 
-            meses_salida_mar = subset_anual['mes'].unique()
-        
-            for isalida in range(len(meses_salida_mar)):
-                
-                # Encuentra las estaciones muestreadas
-                subset_salida                        = subset_anual[subset_anual['mes']==meses_salida_mar[isalida]]
-                identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
-                estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
-                for iestacion in range(len(estaciones_muestreadas)):
-                    estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
-                json_estaciones        = json.dumps(estaciones_muestreadas)
-                
-
-                nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[int(meses_salida_mar[isalida]-1)]) 
-                nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[int(meses_salida_mar[isalida]-1)]) + ' ' +  str(int(anhos_salida_mar[ianho]))
-                           
-                cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,min(subset_salida['fecha_muestreo']),max(subset_salida['fecha_muestreo']),json_estaciones))
-#                cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,min(subset_salida['fecha_muestreo']),max(subset_salida['fecha_muestreo']),min(subset_salida['hora_muestreo']),max(subset_salida['hora_muestreo']),json_estaciones))
-                conn.commit()
-                
-                # Recupera el identificador de la salida al mar
-                instruccion_sql_recupera = "SELECT id_salida FROM salidas_muestreos WHERE nombre_salida = '" + nombre_salida + "';"
-                cursor.execute(instruccion_sql_recupera)
-                #print(cursor.fetchall(),nombre_salida)
-                id_salida =cursor.fetchone()[0]
-                conn.commit()
-        
-                datos['id_salida'][(datos['año']==anhos_salida_mar[ianho]) & (datos['mes']==meses_salida_mar[isalida])] = id_salida
-                
+        for isalida in range(len(fechas_salidas_mar)):
+            
+            # Encuentra las estaciones muestreadas
+            subset_salida                        = datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]
+            identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
+            estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
+            for iestacion in range(len(estaciones_muestreadas)):
+                estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
+            json_estaciones        = json.dumps(estaciones_muestreadas)
+            
+          
+            nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_salidas_mar[isalida].month-1]) + ' ' +  str(fechas_salidas_mar[isalida].year)
+          
+            cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_salidas_mar[isalida],fechas_salidas_mar[isalida],json_estaciones))
+            conn.commit()
+            
+            # Recupera el identificador de la salida al mar
+            instruccion_sql_recupera = "SELECT id_salida FROM salidas_muestreos WHERE nombre_salida = '" + nombre_salida + "';"
+            cursor.execute(instruccion_sql_recupera)
+            id_salida =cursor.fetchone()[0]
+            conn.commit()
+    
+            datos['id_salida'][datos['fecha_muestreo']==fechas_salidas_mar[isalida]] = id_salida
             
         cursor.close()
-        conn.close()    
+        conn.close()
 
         
     # RADPROF
@@ -524,12 +518,12 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     if tabla_muestreos.shape[0] == 0:
     
         # genera un dataframe con las variables que interesa introducir en la base de datos
-        exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','configuracion_perfilador','configuracion_superficie','latitud','longitud']]
+        exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','configuracion_perfilador','configuracion_superficie']]
         # añade el indice de cada registro
         indices_registros                    = numpy.arange(1,(exporta_registros.shape[0]+1))    
         exporta_registros['id_muestreo']     = indices_registros
         # renombra la columna con información de la estación muestreada
-        exporta_registros                    = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
+        exporta_registros                    = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar'})
         # # añade el nombre del muestreo
         exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
         for idato in range(exporta_registros.shape[0]):    
@@ -558,31 +552,36 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
         for idato in range(datos.shape[0]):
 
-            if datos['hora_muestreo'][idato] is not None:          
-                df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato]) &  (tabla_muestreos['configuracion_perfilador'] == datos['configuracion_perfilador'][idato]) & (tabla_muestreos['configuracion_superficie'] == datos['configuracion_superficie'][idato])]
-            else:
-                df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato]) &  (tabla_muestreos['configuracion_perfilador'] == datos['configuracion_perfilador'][idato]) & (tabla_muestreos['configuracion_superficie'] == datos['configuracion_superficie'][idato])]
-           
-            
-            if df_temp.shape[0]> 0:
-                datos['id_muestreo_temp'] [idato] =  df_temp['id_muestreo'].iloc[0]    
-                datos['io_nuevo_muestreo'][idato] = 0
+            for idato_existente in range(tabla_muestreos.shape[0]):
                 
-            else:
-                datos['io_nuevo_muestreo'][idato] = 1
+                if tabla_muestreos['hora_muestreo'][idato_existente] is not None and datos['hora_muestreo'][idato] is not None:
+                    # Registro ya incluido, recuperar el identificador
+                    if tabla_muestreos['estacion'][idato_existente] == datos['id_estacion_temp'][idato] and tabla_muestreos['fecha_muestreo'][idato_existente] == datos['fecha_muestreo'][idato] and  tabla_muestreos['hora_muestreo'][idato_existente] == datos['hora_muestreo'][idato] and  tabla_muestreos['presion_ctd'][idato_existente] == datos['presion_ctd'][idato] and  tabla_muestreos['configuracion_perfilador'][idato_existente] == datos['configuracion_perfilador'][idato] and  tabla_muestreos['configuracion_superficie'][idato_existente] == datos['configuracion_superficie'][idato]:
+                        datos['id_muestreo_temp'] [idato] =  tabla_muestreos['id_muestreo'][idato_existente]    
+                        datos['io_nuevo_muestreo'][idato] = 0
+
+                else:  
+                    if tabla_muestreos['estacion'][idato_existente] == datos['id_estacion_temp'][idato] and tabla_muestreos['fecha_muestreo'][idato_existente] == datos['fecha_muestreo'][idato] and   tabla_muestreos['presion_ctd'][idato_existente] == datos['presion_ctd'][idato] and  tabla_muestreos['configuracion_perfilador'][idato_existente] == datos['configuracion_perfilador'][idato] and  tabla_muestreos['configuracion_superficie'][idato_existente] == datos['configuracion_superficie'][idato]:
+                        datos['id_muestreo_temp'] [idato] =  tabla_muestreos['id_muestreo'][idato_existente]    
+                        datos['io_nuevo_muestreo'][idato] = 0     
+
+                
+            # Nuevo registro
+            if datos['io_nuevo_muestreo'][idato] == 1:
+                # Asigna el identificador (siguiente al máximo disponible)
                 ultimo_registro_bd                = ultimo_registro_bd + 1
-                datos['id_muestreo_temp'][idato]  = ultimo_registro_bd 
-            
+                datos['id_muestreo_temp'][idato]  = ultimo_registro_bd  
+ 
         
         if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
         
             # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
             nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
             # Mantén sólo las columnas que interesan
-            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','configuracion_perfilador','configuracion_superficie','latitud','longitud']]
+            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','configuracion_perfilador','configuracion_superficie']]
                         
             # Cambia el nombre de la columna de estaciones
-            exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion","id_muestreo_temp":"id_muestreo",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
+            exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion","id_muestreo_temp":"id_muestreo",'id_salida':'salida_mar'})
             # Indice temporal
             exporta_registros['indice_temporal'] = numpy.arange(0,exporta_registros.shape[0])
             exporta_registros.set_index('indice_temporal',drop=True,append=False,inplace=True)
@@ -604,7 +603,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             exporta_registros.set_index('id_muestreo',drop=True,append=False,inplace=True)
             exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append')    
     
-    conn_psql.dispose() # Cierra la conexión con la base de datos  
+    conn_psql.dispose() # Cierra la conexión con la base de datos 
     
     return datos
 

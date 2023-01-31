@@ -13,9 +13,11 @@ Created on Wed Jun  8 17:55:43 2022
 
 import FUNCIONES_LECTURA
 import FUNCIONES_PROCESADO
+import FUNCIONES_AUXILIARES
 import pandas
 pandas.options.mode.chained_assignment = None
 import datetime
+import numpy
 
 
 # Parámetros de la base de datos
@@ -26,10 +28,10 @@ puerto         = '5432'
 direccion_host = '193.146.155.99'
 
 # Parámetros
-programa_muestreo = 'RADIAL CORUÑA'
+programa_muestreo = 'RADIAL CANTABRICO'
 
 #archivo_variables_base_datos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VARIABLES.xlsx'  
-directorio_datos             = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES'
+directorio_datos             = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADCAN'
 
 itipo_informacion = 1 # 1-dato nuevo (analisis laboratorio)  2-dato re-analizado (control calidad)   
 email_contacto    = 'prueba@ieo.csic.es'
@@ -41,19 +43,29 @@ fecha_actualizacion = datetime.date.today()
 ### PROCESADO ###
 
 # Listado de archivos disponibles
-from os import listdir
-from os.path import isfile, join
-listado_archivos = [f for f in listdir(directorio_datos) if isfile(join(directorio_datos, f))]
+
+listado_archivos = ['RADCAN_2020.xlsx','RADCAN_2019.xlsx','RADCAN_2012-2013-2014.xlsx']
 
 for iarchivo in range(len(listado_archivos)):
-#for iarchivo in range(1):
+#for iarchivo in range(3,5):
 
     nombre_archivo = directorio_datos + '/' + listado_archivos[iarchivo]
     
     print('Procesando la informacion correspondiente al año ',nombre_archivo[-9:-5])
 
     print('Leyendo los datos contenidos en el archivo excel')
-    datos_radiales = FUNCIONES_LECTURA.lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    datos_radiales = pandas.read_excel(nombre_archivo, 'datos',dtype={'hora_muestreo': datetime.time})
+    for idato in range(datos_radiales.shape[0]):
+        datos_radiales['fecha_muestreo'][idato] = (datos_radiales['fecha_muestreo'][idato]).date()
+        
+    # Añade el identificador de la configuración del perfilador y la superficie (darle una vuelta a esto)
+    datos_radiales['configuracion_perfilador'] = numpy.ones(datos_radiales.shape[0])
+    datos_radiales['configuracion_superficie'] = numpy.ones(datos_radiales.shape[0])
+    
+    
+    
+    #datos_radiales,texto_error = FUNCIONES_LECTURA.lectura_datos_estadillo(nombre_archivo,nombre_archivo)
         
     # Realiza un control de calidad primario a los datos importados   
     print('Realizando control de calidad')
@@ -75,7 +87,7 @@ for iarchivo in range(len(listado_archivos)):
     datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
    
     # # # # # Introduce los datos en la base de datos
-    print('Introduciendo los datos en la base de datos')
+    # print('Introduciendo los datos en la base de datos')
     
     FUNCIONES_PROCESADO.inserta_datos_fisica(datos_radiales_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
 
@@ -84,7 +96,8 @@ for iarchivo in range(len(listado_archivos)):
 
 #     # # Actualiza estado
 #     # print('Actualizando el estado de los procesos')
-#     # FUNCIONES_INSERCION.actualiza_estado(datos_radiales_corregido,fecha_actualizacion,id_programa,programa_muestreo,itipo_informacion,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_AUXILIARES.actualiza_estado(datos_radiales_corregido,id_programa,programa_muestreo,fecha_actualizacion,email_contacto,itipo_informacion,direccion_host,base_datos,usuario,contrasena,puerto)
+                         
 
 #     # print('Procesado del año ', nombre_archivo[-9:-5], ' terminado')
     

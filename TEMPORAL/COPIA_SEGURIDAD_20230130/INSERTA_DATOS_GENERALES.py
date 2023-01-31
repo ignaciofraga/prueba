@@ -204,8 +204,8 @@ profs_referencia_e2 = [0,5,10,20,30,40,70]
 profs_referencia_e4 = [0,4,8,12,18]
 profs_referencia_e3c = [0,5,10,20,30,35,40]
 
-instruccion_sql = '''INSERT INTO estaciones (nombre_estacion,programa,latitud_estacion,longitud_estacion,profundidades_referencia)
-    VALUES (%s,%s,%s,%s,%s) ON CONFLICT (programa,nombre_estacion) DO NOTHING;''' 
+instruccion_sql = '''INSERT INTO estaciones (nombre_estacion,programa,latitud,longitud,profundidades_referencia)
+    VALUES (%s,%s,%s,%s,%s) ON CONFLICT (programa,latitud,longitud) DO NOTHING;''' 
         
 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
 cursor = conn.cursor()
@@ -234,8 +234,8 @@ latitud         = [43.6001,43.7000,43.7670,43.5801,43.6748,43.7783,44.3333,43.50
 longitud        = [-6.1332,-6.1502,-6.1671,-5.6065,-5.5786,-5.5468,-5.6668,-3.7834,-3.7836,-3.7834,-3.7833,-3.7855]
 
 
-instruccion_sql = '''INSERT INTO estaciones (nombre_estacion,programa,latitud_estacion,longitud_estacion)
-    VALUES (%s,%s,%s,%s) ON CONFLICT (programa,nombre_estacion) DO NOTHING;''' 
+instruccion_sql = '''INSERT INTO estaciones (nombre_estacion,programa,latitud,longitud)
+    VALUES (%s,%s,%s,%s) ON CONFLICT (programa,latitud,longitud) DO NOTHING;''' 
         
 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
 cursor = conn.cursor()
@@ -380,7 +380,7 @@ conn.close()
 
 
 parametros_muestreo      = ['nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','num_cast','presion_ctd','prof_referencia','botella','configuracion_perfilador','configuracion_superficie','programa','latitud','longitud']
-variables_biogeoquimicas = ['oxigeno_ctd','fluorescencia_ctd','oxigeno_wk','ton','silicato','nitrato','nitrito','amonio','fosfato','clorofila_a','tcarbn','doc','cdom','alcalinidad','ph','r_clor','r_per','co3_temp']
+variables_biogeoquimicas = ['oxigeno_ctd','fluorescencia_ctd','oxigeno_wk','nitrogeno_total','silicato','nitrato','nitrito','amonio','fosfato','clorofila_a','tcarbn','doc','cdom','alcalinidad','ph','r_clor','r_per','co3_temp']
 variables_fisicas        = ['temperatura_ctd','salinidad_ctd','par_ctd','turbidez_ctd']
 
 index                    = numpy.arange(0,len(variables_biogeoquimicas)) 

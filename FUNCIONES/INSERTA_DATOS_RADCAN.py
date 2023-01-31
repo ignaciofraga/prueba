@@ -45,6 +45,7 @@ fecha_actualizacion = datetime.date.today()
 # Listado de archivos disponibles
 
 listado_archivos = ['RADCAN_2020.xlsx','RADCAN_2019.xlsx','RADCAN_2012-2013-2014.xlsx']
+listado_archivos = ['RADCAN_2012-2013-2014.xlsx']
 
 for iarchivo in range(len(listado_archivos)):
 #for iarchivo in range(3,5):
@@ -94,9 +95,9 @@ for iarchivo in range(len(listado_archivos)):
     FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_radiales_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
 
 
-#     # # Actualiza estado
-#     # print('Actualizando el estado de los procesos')
-    FUNCIONES_AUXILIARES.actualiza_estado(datos_radiales_corregido,id_programa,programa_muestreo,fecha_actualizacion,email_contacto,itipo_informacion,direccion_host,base_datos,usuario,contrasena,puerto)
+# #     # # Actualiza estado
+# #     # print('Actualizando el estado de los procesos')
+#     FUNCIONES_AUXILIARES.actualiza_estado(datos_radiales_corregido,id_programa,programa_muestreo,fecha_actualizacion,email_contacto,itipo_informacion,direccion_host,base_datos,usuario,contrasena,puerto)
                          
 
 #     # print('Procesado del año ', nombre_archivo[-9:-5], ' terminado')
