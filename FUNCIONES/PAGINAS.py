@@ -2008,10 +2008,10 @@ def procesado_nutrientes():
                 datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
             
                 # corrige posibles valores negativos
-                datos_corregidos['nitrato'][datos_corregidos['nitrato']<0] = 0
-                datos_corregidos['nitrito'][datos_corregidos['nitrito']<0] = 0
+                datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
+                datos_corregidos['nitrito'][datos_corregidos['nitrito']<0]   = 0
                 datos_corregidos['silicato'][datos_corregidos['silicato']<0] = 0
-                datos_corregidos['fosfato'][datos_corregidos['fosfato']<0] = 0
+                datos_corregidos['fosfato'][datos_corregidos['fosfato']<0]   = 0
             
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
@@ -2225,27 +2225,30 @@ def entrada_datos_excel():
         # Añade datos físicos
         if len(variables_fisica)>0:
                             
-            with st.spinner('Añadiendo datos físicos'):
-                listado_muestreos  = datos_corregidos['id_muestreo_temp']
-                datos_fisica       = datos_corregidos[variables_fisica]
-                
-                str_variables = ','.join(variables_fisica)
-                str_valores   = ',%s'*len(variables_fisica)
-                listado_excluded = ['EXCLUDED.' + var for var in variables_fisica]
-                str_exclude   = ','.join(listado_excluded)
-                
-                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                cursor = conn.cursor()  
-                
-                for idato in range(datos_corregidos.shape[0]):
+            FUNCIONES_PROCESADO.inserta_datos_fisica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
 
-                    instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
-                    valores = [int(listado_muestreos[idato])] + datos_fisica.iloc[idato].tolist()
-                    cursor.execute(instruccion_sql, (valores))
-                    conn.commit()
+            
+            # with st.spinner('Añadiendo datos físicos'):
+            #     listado_muestreos  = datos_corregidos['id_muestreo_temp']
+            #     datos_fisica       = datos_corregidos[variables_fisica]
+                
+            #     str_variables = ','.join(variables_fisica)
+            #     str_valores   = ',%s'*len(variables_fisica)
+            #     listado_excluded = ['EXCLUDED.' + var for var in variables_fisica]
+            #     str_exclude   = ','.join(listado_excluded)
+                
+            #     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            #     cursor = conn.cursor()  
+                
+            #     for idato in range(datos_corregidos.shape[0]):
+
+            #         instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
+            #         valores = [int(listado_muestreos[idato])] + datos_fisica.iloc[idato].tolist()
+            #         cursor.execute(instruccion_sql, (valores))
+            #         conn.commit()
                         
-                cursor.close()
-                conn.close()
+            #     cursor.close()
+            #     conn.close()
  
         # Añade datos biogeoquímicos
         if len(variables_bgq)>0:
