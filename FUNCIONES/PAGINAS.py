@@ -675,7 +675,9 @@ def entrada_salidas_mar():
         
         # Recupera la tabla con los buques disponibles en la base de datos, como un dataframe
         conn = init_connection()
-        df_buques = psql.read_sql('SELECT * FROM buques', conn)
+        df_buques            = psql.read_sql('SELECT * FROM buques', conn)
+        df_config_perfilador = psql.read_sql('SELECT * FROM configuracion_perfilador', conn)
+        df_config_superficie = psql.read_sql('SELECT * FROM configuracion_superficie', conn)
         conn.close()
         
         # Recupera tablas con información utilizada
@@ -729,6 +731,15 @@ def entrada_salidas_mar():
                 fecha_regreso = st.date_input('Fecha de regreso',max_value=fecha_actual,value=fecha_actual)
 
                 hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto_final)
+                
+            
+            col1, col2 = st.columns(2,gap="small")
+            
+            with col1:     
+                id_configurador_perfil     = st.selectbox('Id.configuracion perfilador',(df_config_perfilador['id_config_perfil']))
+
+            with col2:
+                id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_perfilador['id_config_superficie']))
 
 
             personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])
@@ -897,12 +908,12 @@ def entrada_salidas_mar():
     
                     if io_incluido == 0:                     
                         
-                        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones,estaciones,variables_muestreadas)
-                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones,estaciones,variables_muestreadas) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes_comisionados,EXCLUDED.participantes_no_comisionados,EXCLUDED.observaciones,EXCLUDED.estaciones,EXCLUDED.variables_muestreadas);''' 
+                        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones,estaciones,variables_muestreadas,configuracion_perfilador,configuracion_superficie)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones,estaciones,variables_muestreadas,configuracion_perfilador,configuracion_superficie) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes_comisionados,EXCLUDED.participantes_no_comisionados,EXCLUDED.observaciones,EXCLUDED.estaciones,EXCLUDED.variables_muestreadas,EXCLUDED.configuracion_perfilador,EXCLUDED.configuracion_superficie);''' 
                                 
                         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                         cursor = conn.cursor()
-                        cursor.execute(instruccion_sql, (nombre_salida,3,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_comisionados,json_no_comisionados,observaciones,json_estaciones,json_variables))
+                        cursor.execute(instruccion_sql, (nombre_salida,3,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_comisionados,json_no_comisionados,observaciones,json_estaciones,json_variables,id_configurador_perfil,id_configurador_sup))
                         conn.commit()
                         cursor.close()
                         conn.close()
@@ -2178,25 +2189,35 @@ def entrada_datos_excel():
         conn                      = init_connection()
         df_programas              = psql.read_sql('SELECT * FROM programas', conn)
         variables_bd              = psql.read_sql('SELECT * FROM variables_procesado', conn)
+        df_perfilador             = psql.read_sql('SELECT * FROM configuracion_perfilador', conn)
         conn.close()    
         
         
         # Despliega menús de selección de la variable, salida y la estación a controlar                
-        listado_tipos_salida = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
-        col1, col2 = st.columns(2,gap="small")
+        listado_tipos_salida               = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
+        listado_configuraciones_perfilador = ['Desconocido'] + df_perfilador['id_config_perfil'].tolist()
+        
+        col1, col2, col3 = st.columns(3,gap="small")
         with col1: 
-            
-            programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']))
-    
+            programa_seleccionado = st.selectbox('Programa',(df_programas['nombre_programa']))
+
         with col2: 
+            tipo_salida           = st.selectbox('Tipo de salida',(listado_tipos_salida))
             
-            tipo_salida               = st.selectbox('Tipo de salida',(listado_tipos_salida))
+        with col3:
+            id_perfilador         = st.selectbox('Id. configuracion perfilador',listado_configuraciones_perfilador)
                    
-        archivo_datos                 = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
+        archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
             
         if archivo_datos is not None:
             
             df_datos_importacion  = pandas.read_excel(archivo_datos) 
+            
+            # Asigna la configuracion de perfilador correspondiente
+            if id_perfilador  ==  listado_configuraciones_perfilador[0]:
+                df_datos_importacion['configuracion_perfilador'] = [None]*df_datos_importacion.shape[0]
+            else:
+                df_datos_importacion['configuracion_perfilador'] = int(id_perfilador)               
             
             # corrige el formato de las fechas
             for idato in range(df_datos_importacion.shape[0]):
@@ -2253,32 +2274,12 @@ def entrada_datos_excel():
         # Recupera los datos disponibles en la base de datos
         conn                      = init_connection()
         df_perfilador             = psql.read_sql('SELECT * FROM configuracion_perfilador', conn)
-        df_superficie             = psql.read_sql('SELECT * FROM configuracion_superficie', conn)
+        #df_superficie             = psql.read_sql('SELECT * FROM configuracion_superficie', conn)
         conn.close()  
 
         # Elimina las columnas que no interesa mostrar
         df_perfilador = df_perfilador.drop(columns=['buque','centro_asociado','fecha_inicio','propietario_ctd','fecha_calibracion_ctd','ruta_configuracion_ctd','fecha_calibracion_par','fecha_calibracion_oxigeno','fecha_calibracion_fluorescencia','adcp','num_serie_adcp','fecha_calibracion_adcp'])
- # ' buque int NOT NULL,'
- # ' centro_asociado int,'
- # ' fecha_inicio date,'
- # ' sensor_ctd text,'
- # ' num_serie_ctd text,'
- # ' propietario_ctd text,'
- # ' fecha_calibracion_ctd date,'
- # ' ruta_configuracion_ctd text,'
- # ' sensor_par text,'
- # ' num_serie_par text,'
- # ' fecha_calibracion_par date,'
- # ' sensor_oxigeno text,'
- # ' num_serie_oxigeno text,'
- # ' fecha_calibracion_oxigeno date,'
- # ' sensor_fluorescencia text,'
- # ' num_serie_fluorescencia text,'
- # ' fecha_calibracion_fluorescencia date,'
- # ' adcp text,'
- # ' num_serie_adcp text,'
- # ' fecha_calibracion_adcp date,'
- # ) 
+
         # Reordena columnas
         cols          = df_perfilador.columns.tolist()
         cols          = cols[-1:] + cols[:-1]
@@ -2290,7 +2291,7 @@ def entrada_datos_excel():
         # Muestra una tabla con las configuraciones 
         gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_perfilador)
         gridOptions = gb.build()
-        st_aggrid.AgGrid(df_perfilador,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+        st_aggrid.AgGrid(df_perfilador,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
 
 
 # ###############################################################################

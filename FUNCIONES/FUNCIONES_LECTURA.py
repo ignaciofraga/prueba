@@ -190,11 +190,7 @@ def lectura_datos_pelacus(nombre_archivo):
     
     # Convierte las fechas de DATE a formato correcto
     datos_pelacus['fecha'] =  pandas.to_datetime(datos_pelacus['fecha'], format='%d%m%Y').dt.date
-          
-    # Añade información de la configuración de perfilador y superficie (TEMPORAL!!!!)
-    datos_pelacus['configuracion_superficie'] = [None]*datos_pelacus.shape[0]
-    datos_pelacus['configuracion_perfilador'] = [None]*datos_pelacus.shape[0]
-    
+             
     # Genera una columna con la profundidad. Usar el valor real (si existe) o la teórica en caso contrario
     datos_pelacus['presion_ctd'] = datos_pelacus['Prof_teor.']
     for idato in range(datos_pelacus.shape[0]):
@@ -275,11 +271,7 @@ def lectura_datos_radprof(nombre_archivo):
     indices_dataframe         = numpy.arange(0,datos_radprof.shape[0],1,dtype=int)
     datos_radprof['id_temp'] = indices_dataframe
     datos_radprof.set_index('id_temp',drop=True,append=False,inplace=True)
-    
-    # Añade información de la configuración de perfilador y superficie (TEMPORAL!!!!)
-    datos_radprof['configuracion_superficie'] = [None]*datos_radprof.shape[0]
-    datos_radprof['configuracion_perfilador'] = [None]*datos_radprof.shape[0]
-    
+       
     # Cambia, en el dataframe, una única columna de fecha/hora por dos columnas: una de fecha y otra de hora
     datos_radprof['fecha_muestreo'] = [None]*datos_radprof.shape[0]
     datos_radprof['hora_muestreo']  = [None]*datos_radprof.shape[0]
@@ -302,7 +294,7 @@ def lectura_datos_radprof(nombre_archivo):
 
     # Mantén solo las columnas que interesan
     datos_radprof_recorte = datos_radprof[['estacion','botella','fecha_muestreo','hora_muestreo','latitud','longitud','presion_ctd','num_cast','temperatura_ctd','salinidad_ctd',
-                                            'nitrato','nitrato_qf','nitrito','nitrito_qf','silicato','silicato_qf','fosfato','fosfato_qf','configuracion_superficie','configuracion_perfilador']]
+                                            'nitrato','nitrato_qf','nitrito','nitrito_qf','silicato','silicato_qf','fosfato','fosfato_qf']]
     
 
     # # Renombra las columnas para mantener una denominación homogénea

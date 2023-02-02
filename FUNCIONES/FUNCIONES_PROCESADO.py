@@ -360,8 +360,8 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
         # Listado con los identificadores de buque en función de la configuración del perfilador
         id_buque              = [1,2,3,2]
         
-        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,buque,estaciones)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''
+        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,buque,estaciones,configuracion_perfilador,configuracion_superficie)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''
             #UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,buque,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.buque,EXCLUDED.estaciones);''' 
                 
         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -376,7 +376,8 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                 estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
             json_estaciones        = json.dumps(estaciones_muestreadas)
             
-            id_configuracion_perfilador = list(subset_salida['configuracion_perfilador'].unique())[0]
+            id_configuracion_perfilador = int(list(subset_salida['configuracion_perfilador'].unique())[0])
+            id_configuracion_superficie = int(list(subset_salida['configuracion_superficie'].unique())[0])
             if id_configuracion_perfilador:
                 buque                       = int(id_buque[id_configuracion_perfilador-1])
             else:
@@ -384,7 +385,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
           
             nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_salidas_mar[isalida].month-1]) + ' ' +  str(fechas_salidas_mar[isalida].year)
           
-            cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_salidas_mar[isalida],fechas_salidas_mar[isalida],buque,json_estaciones))
+            cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_salidas_mar[isalida],fechas_salidas_mar[isalida],buque,json_estaciones,id_configuracion_perfilador,id_configuracion_superficie))
             conn.commit()
             
             # Recupera el identificador de la salida al mar
@@ -528,7 +529,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     if tabla_muestreos.shape[0] == 0:
     
         # genera un dataframe con las variables que interesa introducir en la base de datos
-        exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','configuracion_perfilador','configuracion_superficie','latitud','longitud']]
+        exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','latitud','longitud']]
         # añade el indice de cada registro
         indices_registros                    = numpy.arange(1,(exporta_registros.shape[0]+1))    
         exporta_registros['id_muestreo']     = indices_registros
@@ -563,11 +564,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         for idato in range(datos.shape[0]):
 
             if datos['hora_muestreo'][idato] is not None:          
-                # df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato]) &  (tabla_muestreos['configuracion_perfilador'] == datos['configuracion_perfilador'][idato]) & (tabla_muestreos['configuracion_superficie'] == datos['configuracion_superficie'][idato])]
                 df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato])]
 
             else:
-                # df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato]) &  (tabla_muestreos['configuracion_perfilador'] == datos['configuracion_perfilador'][idato]) & (tabla_muestreos['configuracion_superficie'] == datos['configuracion_superficie'][idato])]
                 df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato])]
            
             
@@ -586,7 +585,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
             nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
             # Mantén sólo las columnas que interesan
-            exporta_registros = nuevos_muestreos[['id_muestreo','id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','configuracion_perfilador','configuracion_superficie','latitud','longitud']]
+            exporta_registros = nuevos_muestreos[['id_muestreo','id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','latitud','longitud']]
                         
             # Cambia el nombre de la columna de estaciones
             exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
