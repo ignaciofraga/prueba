@@ -45,7 +45,7 @@ fecha_actualizacion = datetime.date.today()
 # Listado de archivos disponibles
 
 listado_archivos = ['RADCAN_2020.xlsx','RADCAN_2019.xlsx','RADCAN_2012-2013-2014.xlsx']
-listado_archivos = ['RADCAN_2012-2013-2014.xlsx']
+#listado_archivos = ['RADCAN_2012-2013-2014.xlsx']
 
 for iarchivo in range(len(listado_archivos)):
 #for iarchivo in range(3,5):
@@ -61,8 +61,8 @@ for iarchivo in range(len(listado_archivos)):
         datos_radiales['fecha_muestreo'][idato] = (datos_radiales['fecha_muestreo'][idato]).date()
         
     # Añade el identificador de la configuración del perfilador y la superficie (darle una vuelta a esto)
-    datos_radiales['configuracion_perfilador'] = numpy.ones(datos_radiales.shape[0])
-    datos_radiales['configuracion_superficie'] = numpy.ones(datos_radiales.shape[0])
+    datos_radiales['configuracion_perfilador'] = [None]*datos_radiales.shape[0]
+    datos_radiales['configuracion_superficie'] = [None]*datos_radiales.shape[0]
     
     
     
@@ -88,7 +88,7 @@ for iarchivo in range(len(listado_archivos)):
     datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
    
     # # # # # Introduce los datos en la base de datos
-    # print('Introduciendo los datos en la base de datos')
+    print('Introduciendo los datos en la base de datos')
     
     FUNCIONES_PROCESADO.inserta_datos_fisica(datos_radiales_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
 

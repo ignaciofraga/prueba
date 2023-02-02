@@ -416,12 +416,6 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
         meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']
            
         
-        # instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,hora_salida,hora_retorno,estaciones)
-        #     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,hora_salida,hora_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_salida,EXCLUDED.hora_retorno,EXCLUDED.estaciones);''' 
-                
-        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
-            VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.estaciones);''' 
-                
         
         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
         cursor = conn.cursor()
@@ -441,12 +435,22 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                     estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
                 json_estaciones        = json.dumps(estaciones_muestreadas)
                 
-
-                nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[int(meses_salida_mar[isalida]-1)]) 
                 nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[int(meses_salida_mar[isalida]-1)]) + ' ' +  str(int(anhos_salida_mar[ianho]))
-                           
-                cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,min(subset_salida['fecha_muestreo']),max(subset_salida['fecha_muestreo']),json_estaciones))
-#                cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,min(subset_salida['fecha_muestreo']),max(subset_salida['fecha_muestreo']),min(subset_salida['hora_muestreo']),max(subset_salida['hora_muestreo']),json_estaciones))
+                
+                if subset_salida['hora_muestreo'].unique()[0] is None:
+                    
+                    instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.estaciones);''' 
+                            
+                    cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,min(subset_salida['fecha_muestreo']),max(subset_salida['fecha_muestreo']),json_estaciones))
+
+                else:
+                    
+                    instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,hora_salida,hora_retorno,estaciones)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,hora_salida,hora_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_salida,EXCLUDED.hora_retorno,EXCLUDED.estaciones);''' 
+                                    
+                    cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,min(subset_salida['fecha_muestreo']),max(subset_salida['fecha_muestreo']),min(subset_salida['hora_muestreo']),max(subset_salida['hora_muestreo']),json_estaciones))
+                
                 conn.commit()
                 
                 # Recupera el identificador de la salida al mar
@@ -518,7 +522,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
     tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
        
-    datos['id_muestreo_temp']  = numpy.zeros(datos.shape[0],dtype=int)
+    datos['id_muestreo']  = numpy.zeros(datos.shape[0],dtype=int)
     
     # si no hay ningun valor en la tabla de registro, meter directamente todos los datos registrados
     if tabla_muestreos.shape[0] == 0:
@@ -543,7 +547,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 
             exporta_registros['nombre_muestreo'][idato]  = nombre_muestreo
 
-            datos['id_muestreo_temp'] [idato]            = idato + 1
+            datos['id_muestreo'] [idato]                 = idato + 1
             
             
         # Inserta en base de datos        
@@ -568,13 +572,13 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
            
             
             if df_temp.shape[0]> 0:
-                datos['id_muestreo_temp'] [idato] =  df_temp['id_muestreo'].iloc[0]    
+                datos['id_muestreo'] [idato]      =  df_temp['id_muestreo'].iloc[0]    
                 datos['io_nuevo_muestreo'][idato] = 0
                 
             else:
                 datos['io_nuevo_muestreo'][idato] = 1
                 ultimo_registro_bd                = ultimo_registro_bd + 1
-                datos['id_muestreo_temp'][idato]  = ultimo_registro_bd 
+                datos['id_muestreo'][idato]       = ultimo_registro_bd 
             
         
         if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
@@ -582,10 +586,10 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
             nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
             # Mantén sólo las columnas que interesan
-            exporta_registros = nuevos_muestreos[['id_muestreo_temp','id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','configuracion_perfilador','configuracion_superficie','latitud','longitud']]
+            exporta_registros = nuevos_muestreos[['id_muestreo','id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','configuracion_perfilador','configuracion_superficie','latitud','longitud']]
                         
             # Cambia el nombre de la columna de estaciones
-            exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion","id_muestreo_temp":"id_muestreo",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
+            exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
             # Indice temporal
             exporta_registros['indice_temporal'] = numpy.arange(0,exporta_registros.shape[0])
             exporta_registros.set_index('indice_temporal',drop=True,append=False,inplace=True)
@@ -629,8 +633,8 @@ def inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puer
     tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
     
     # Genera un dataframe solo con las variales fisicas de los datos a importar 
-    datos_fisica = datos[['temperatura_ctd', 'temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf','par_ctd','par_ctd_qf','turbidez_ctd','turbidez_ctd_qf','id_muestreo_temp']]
-    datos_fisica = datos_fisica.rename(columns={"id_muestreo_temp": "muestreo"})
+    datos_fisica = datos[['temperatura_ctd', 'temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf','par_ctd','par_ctd_qf','turbidez_ctd','turbidez_ctd_qf','id_muestreo']]
+    datos_fisica = datos_fisica.rename(columns={"id_muestreo": "muestreo"})
     
     # # Si no existe ningún registro en la base de datos, introducir todos los datos disponibles
     if tabla_registros_fisica.shape[0] == 0:
@@ -684,10 +688,10 @@ def inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrase
     tabla_registros_biogoquim = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn_psql)
     
     # Genera un dataframe solo con las variales biogeoquimicas de los datos a importar 
-    datos_biogeoquimica = datos[['id_muestreo_temp','fluorescencia_ctd','fluorescencia_ctd_qf','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk_qf',
+    datos_biogeoquimica = datos[['id_muestreo','fluorescencia_ctd','fluorescencia_ctd_qf','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk_qf',
                                  'ton','ton_qf','nitrato','nitrato_qf','nitrito','nitrito_qf','amonio','amonio_qf','fosfato','fosfato_qf','silicato','silicato_qf','tcarbn','tcarbn_qf','doc','doc_qf',
                                  'cdom','cdom_qf','clorofila_a','clorofila_a_qf','alcalinidad','alcalinidad_qf','ph','ph_qf','ph_metodo','r_clor','r_clor_qf','r_per','r_per_qf','co3_temp']]    
-    datos_biogeoquimica = datos_biogeoquimica.rename(columns={"id_muestreo_temp": "muestreo"})
+    datos_biogeoquimica = datos_biogeoquimica.rename(columns={"id_muestreo": "muestreo"})
     
     # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
     for idato in range(tabla_registros_biogoquim.shape[0]):
