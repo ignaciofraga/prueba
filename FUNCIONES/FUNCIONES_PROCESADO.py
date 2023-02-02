@@ -561,7 +561,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             if datos['hora_muestreo'][idato] is not None:          
                 df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato]) &  (tabla_muestreos['configuracion_perfilador'] == datos['configuracion_perfilador'][idato]) & (tabla_muestreos['configuracion_superficie'] == datos['configuracion_superficie'][idato])]
             else:
-                df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato]) &  (tabla_muestreos['configuracion_perfilador'] == datos['configuracion_perfilador'][idato]) & (tabla_muestreos['configuracion_superficie'] == datos['configuracion_superficie'][idato])]
+                # df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato]) &  (tabla_muestreos['configuracion_perfilador'] == datos['configuracion_perfilador'][idato]) & (tabla_muestreos['configuracion_superficie'] == datos['configuracion_superficie'][idato])]
+                df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato])]
            
             
             if df_temp.shape[0]> 0:

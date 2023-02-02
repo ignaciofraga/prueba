@@ -2225,7 +2225,9 @@ def entrada_datos_excel():
         # Añade datos físicos
         if len(variables_fisica)>0:
                             
-            FUNCIONES_PROCESADO.inserta_datos_fisica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
+            with st.spinner('Añadiendo datos físicos'):
+                
+                FUNCIONES_PROCESADO.inserta_datos_fisica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
 
             
             # with st.spinner('Añadiendo datos físicos'):
