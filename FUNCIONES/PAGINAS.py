@@ -2257,8 +2257,28 @@ def entrada_datos_excel():
         conn.close()  
 
         # Elimina las columnas que no interesa mostrar
-        df_perfilador = df_perfilador.drop(columns=['buque','centro_asociado','fecha_inicio','propietario_ctd',' fecha_calibracion_ctd',' ruta_configuracion_ctd','fecha_calibracion_par','fecha_calibracion_oxigeno','fecha_calibracion_fluorescencia','adcp','num_serie_adcp','fecha_calibracion_adcp'])
- 
+        df_perfilador = df_perfilador.drop(columns=['buque','centro_asociado','fecha_inicio','propietario_ctd','fecha_calibracion_ctd','ruta_configuracion_ctd','fecha_calibracion_par','fecha_calibracion_oxigeno','fecha_calibracion_fluorescencia','adcp','num_serie_adcp','fecha_calibracion_adcp'])
+ # ' buque int NOT NULL,'
+ # ' centro_asociado int,'
+ # ' fecha_inicio date,'
+ # ' sensor_ctd text,'
+ # ' num_serie_ctd text,'
+ # ' propietario_ctd text,'
+ # ' fecha_calibracion_ctd date,'
+ # ' ruta_configuracion_ctd text,'
+ # ' sensor_par text,'
+ # ' num_serie_par text,'
+ # ' fecha_calibracion_par date,'
+ # ' sensor_oxigeno text,'
+ # ' num_serie_oxigeno text,'
+ # ' fecha_calibracion_oxigeno date,'
+ # ' sensor_fluorescencia text,'
+ # ' num_serie_fluorescencia text,'
+ # ' fecha_calibracion_fluorescencia date,'
+ # ' adcp text,'
+ # ' num_serie_adcp text,'
+ # ' fecha_calibracion_adcp date,'
+ # ) 
         # Reordena columnas
         cols          = df_perfilador.columns.tolist()
         cols          = cols[-1:] + cols[:-1]
