@@ -739,7 +739,7 @@ def entrada_salidas_mar():
                 id_configurador_perfil     = st.selectbox('Id.configuracion perfilador',(df_config_perfilador['id_config_perfil']))
 
             with col2:
-                id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_perfilador['id_config_superficie']))
+                id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_superficie['id_config_superficie']))
 
 
             personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])
