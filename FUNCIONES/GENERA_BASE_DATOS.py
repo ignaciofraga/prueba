@@ -432,7 +432,7 @@ cursor.execute(instruccion_sql)
 conn.commit()
 
 # Crea la tabla de nuevo
-listado_variables = ('(id_muestreo SERIAL PRIMARY KEY,'
+listado_variables = ('(id_muestreo int PRIMARY KEY,'
 ' nombre_muestreo text,'
 ' fecha_muestreo date NOT NULL,'
 ' hora_muestreo time,'

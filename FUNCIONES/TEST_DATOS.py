@@ -67,54 +67,54 @@ datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_progra
 datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
 
-datos = datos_corregidos
+# datos = datos_corregidos
 
-# Recupera la tabla con los registros de muestreos físicos
-con_engine                = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-conn_psql                 = create_engine(con_engine)
-tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
+# # Recupera la tabla con los registros de muestreos físicos
+# con_engine                = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+# conn_psql                 = create_engine(con_engine)
+# tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
 
-# Genera un dataframe solo con las variales fisicas de los datos a importar 
-datos_fisica = datos[['temperatura_ctd', 'temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf','par_ctd','par_ctd_qf','turbidez_ctd','turbidez_ctd_qf','id_muestreo']]
-datos_fisica = datos_fisica.rename(columns={"id_muestreo": "muestreo"})
+# # Genera un dataframe solo con las variales fisicas de los datos a importar 
+# datos_fisica = datos[['temperatura_ctd', 'temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf','par_ctd','par_ctd_qf','turbidez_ctd','turbidez_ctd_qf','id_muestreo']]
+# datos_fisica = datos_fisica.rename(columns={"id_muestreo": "muestreo"})
 
-# # Si no existe ningún registro en la base de datos, introducir todos los datos disponibles
-if tabla_registros_fisica.shape[0] == 0:
-    datos_fisica.set_index('muestreo',drop=True,append=False,inplace=True)
-    datos_fisica.to_sql('datos_discretos_fisica', conn_psql,if_exists='append')
+# # # Si no existe ningún registro en la base de datos, introducir todos los datos disponibles
+# if tabla_registros_fisica.shape[0] == 0:
+#     datos_fisica.set_index('muestreo',drop=True,append=False,inplace=True)
+#     datos_fisica.to_sql('datos_discretos_fisica', conn_psql,if_exists='append')
     
 
-# En caso contrario, comprobar qué parte de la información está en la base de datos
-else: 
-    # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
-    for idato in range(datos_fisica.shape[0]):
-        #try:
-        tabla_registros_fisica = tabla_registros_fisica.drop(tabla_registros_fisica[tabla_registros_fisica.muestreo == datos_fisica['muestreo'][idato]].index)
-        # except:
-        #     pass
+# # En caso contrario, comprobar qué parte de la información está en la base de datos
+# else: 
+#     # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
+#     for idato in range(datos_fisica.shape[0]):
+#         #try:
+#         tabla_registros_fisica = tabla_registros_fisica.drop(tabla_registros_fisica[tabla_registros_fisica.muestreo == datos_fisica['muestreo'][idato]].index)
+#         # except:
+#         #     pass
         
-    # Une ambos dataframes, el que contiene los datos nuevo y el que tiene los datos que ya están en la base de datos
-    datos_conjuntos = pandas.concat([tabla_registros_fisica, datos_fisica])
+#     # Une ambos dataframes, el que contiene los datos nuevo y el que tiene los datos que ya están en la base de datos
+#     datos_conjuntos = pandas.concat([tabla_registros_fisica, datos_fisica])
         
-    vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
-    datos_conjuntos['muestreo'] = vector_identificadores
+#     vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
+#     datos_conjuntos['muestreo'] = vector_identificadores
     
-    datos_conjuntos.set_index('muestreo',drop=True,append=False,inplace=True)
+#     datos_conjuntos.set_index('muestreo',drop=True,append=False,inplace=True)
     
-    # # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
-    # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    # cursor = conn.cursor()
-    # instruccion_sql = "TRUNCATE datos_discretos_fisica;"
-    # cursor.execute(instruccion_sql)
-    # conn.commit()
-    # cursor.close()
-    # conn.close() 
+#     # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+#     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+#     cursor = conn.cursor()
+#     instruccion_sql = "TRUNCATE datos_discretos_fisica;"
+#     cursor.execute(instruccion_sql)
+#     conn.commit()
+#     cursor.close()
+#     conn.close() 
     
-    # # Inserta el dataframe resultante en la base de datos 
-    # datos_conjuntos.to_sql('datos_discretos_fisica', conn_psql,if_exists='append')
+#     # Inserta el dataframe resultante en la base de datos 
+#     datos_conjuntos.to_sql('datos_discretos_fisica', conn_psql,if_exists='append')
 
 
-conn_psql.dispose() # Cierra la conexión con la base de datos 
+# conn_psql.dispose() # Cierra la conexión con la base de datos 
 
 
 
