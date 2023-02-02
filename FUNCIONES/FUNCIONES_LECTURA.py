@@ -192,8 +192,8 @@ def lectura_datos_pelacus(nombre_archivo):
     datos_pelacus['fecha'] =  pandas.to_datetime(datos_pelacus['fecha'], format='%d%m%Y').dt.date
           
     # Añade información de la configuración de perfilador y superficie (TEMPORAL!!!!)
-    datos_pelacus['configuracion_superficie'] = numpy.ones(datos_pelacus.shape[0],dtype=int)
-    datos_pelacus['configuracion_perfilador'] = numpy.ones(datos_pelacus.shape[0],dtype=int)
+    datos_pelacus['configuracion_superficie'] = [None]*datos_pelacus.shape[0]
+    datos_pelacus['configuracion_perfilador'] = [None]*datos_pelacus.shape[0]
     
     # Genera una columna con la profundidad. Usar el valor real (si existe) o la teórica en caso contrario
     datos_pelacus['presion_ctd'] = datos_pelacus['Prof_teor.']
@@ -277,8 +277,8 @@ def lectura_datos_radprof(nombre_archivo):
     datos_radprof.set_index('id_temp',drop=True,append=False,inplace=True)
     
     # Añade información de la configuración de perfilador y superficie (TEMPORAL!!!!)
-    datos_radprof['configuracion_superficie'] = numpy.ones(datos_radprof.shape[0],dtype=int)
-    datos_radprof['configuracion_perfilador'] = numpy.ones(datos_radprof.shape[0],dtype=int)
+    datos_radprof['configuracion_superficie'] = [None]*datos_radprof.shape[0]
+    datos_radprof['configuracion_perfilador'] = [None]*datos_radprof.shape[0]
     
     # Cambia, en el dataframe, una única columna de fecha/hora por dos columnas: una de fecha y otra de hora
     datos_radprof['fecha_muestreo'] = [None]*datos_radprof.shape[0]
