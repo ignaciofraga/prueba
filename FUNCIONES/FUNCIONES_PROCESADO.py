@@ -558,8 +558,16 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'][idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
             if datos['num_cast'][idato] is not None:
                 nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'][idato]))
+            else:
+                nombre_muestreo = nombre_muestreo + '_C1' 
+                
             if datos['botella'][idato] is not None:
-                nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'][idato]))                
+                nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'][idato])) 
+            else:
+                if datos['prof_referencia'][idato] is not None: 
+                    nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['prof_referencia'][idato]))
+                else:
+                    nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'][idato])) 
                 
             exporta_registros['nombre_muestreo'][idato]  = nombre_muestreo
 
@@ -615,12 +623,19 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'][idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
                 if datos['num_cast'][idato] is not None:
                     nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'][idato]))
+                else:
+                    nombre_muestreo = nombre_muestreo + '_C1'     
+                
                 if datos['botella'][idato] is not None:
-                    nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'][idato]))                
+                    nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'][idato])) 
+                else:
+                    if datos['prof_referencia'][idato] is not None: 
+                        nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['prof_referencia'][idato]))
+                    else:
+                        nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'][idato])) 
                  
                 exporta_registros['nombre_muestreo'][idato]  = nombre_muestreo
-
-
+        
             # # Inserta el dataframe resultante en la base de datos 
             exporta_registros.set_index('id_muestreo',drop=True,append=False,inplace=True)
             exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append')    
