@@ -586,12 +586,19 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
         for idato in range(datos.shape[0]):
 
-            if datos['hora_muestreo'][idato] is not None:          
-                df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato])]
-
+            if datos['botella'][idato] is not None:        
+                if datos['hora_muestreo'][idato] is not None:          
+                    df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['botella']==datos['botella'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato])]
+    
+                else:
+                    df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['botella']==datos['botella'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato])]
             else:
-                df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato])]
-           
+                if datos['hora_muestreo'][idato] is not None:          
+                    df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato])]
+    
+                else:
+                    df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato])]
+               
             
             if df_temp.shape[0]> 0:
                 datos['id_muestreo'] [idato]      =  df_temp['id_muestreo'].iloc[0]    
@@ -676,7 +683,7 @@ def inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puer
         # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
         for idato in range(datos_fisica.shape[0]):
             try:
-                tabla_registros_fisica = tabla_registros_fisica.drop(tabla_registros_fisica[tabla_registros_fisica.muestreo == datos_fisica['muestreo'][idato]].index)
+                tabla_registros_fisica = tabla_registros_fisica.drop(tabla_registros_fisica[tabla_registros_fisica.muestreo == int(datos_fisica['muestreo'][idato])].index)
             except:
                 pass
             

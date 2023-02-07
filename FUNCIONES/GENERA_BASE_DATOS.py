@@ -705,8 +705,12 @@ listado_variables = ('(muestreo int PRIMARY KEY,'
 
 listado_dependencias = ('FOREIGN KEY (muestreo)'
 'REFERENCES muestreos_discretos (id_muestreo)'
-'ON UPDATE CASCADE ON DELETE CASCADE'
 )
+
+# listado_dependencias = ('FOREIGN KEY (muestreo)'
+# 'REFERENCES muestreos_discretos (id_muestreo)'
+# 'ON UPDATE CASCADE ON DELETE CASCADE'
+# )
 
 listado_unicidades = (', UNIQUE (muestreo))')
 
