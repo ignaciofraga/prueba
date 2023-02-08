@@ -2033,6 +2033,14 @@ def procesado_nutrientes():
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
                                
+                # Muestra una tabla con las configuraciones 
+                import st_aggrid 
+                gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
+                gridOptions = gb.build()
+                st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,height = 350,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
+            
+                
+                
                 # Añade información de oxígeno, pH, alcalinidad, profunidad....a las muestras que ya estaban en la base de datos
                 df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_datos_disponibles, on="muestreo")                               
                 df_datos_disponibles  = df_datos_disponibles.drop(columns=['ton','nitrato','nitrito','fosfato','silicato']) # Para evitar duplicidad de columnas
