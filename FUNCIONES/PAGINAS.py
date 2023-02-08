@@ -2029,7 +2029,7 @@ def procesado_nutrientes():
                                
                 # Añade información de oxígeno, pH, alcalinidad....de la base de datos (si está disponible)
                 df_bgq_relevantes        = df_datos_biogeoquimicos[['oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk','oxigeno_wk_qf','ph','ph_qf']]               
-                df_datos_bdq_disponibles = pandas.merge(df_bgq_relevantes, df_datos_disponibles, on="muestreo")                               
+                df_datos_bdq_disponibles = pandas.merge(df_bgq_relevantes, datos_corregidos, on="muestreo")                               
 
                 if df_datos_bdq_disponibles.shape[0] == datos_corregidos.shape[0]:
                     datos_corregidos      = pandas.merge(datos_corregidos, df_datos_bdq_disponibles, on="nombre_muestreo")
