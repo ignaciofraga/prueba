@@ -1964,7 +1964,7 @@ def procesado_nutrientes():
             
             archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
                 
-            io_envio = st.form_submit_button("Añadir RMN a la base de datos")        
+            io_envio = st.form_submit_button("Procesar el archivo subido")        
         
             if archivo_AA is not None and io_envio is True:
         
