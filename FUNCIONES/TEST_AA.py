@@ -25,15 +25,15 @@ import seawater
 
 
 archivo_AA   = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/RADCAN/211129_RCAN19_ENE_costR1R1.xlsx'
-archivo_AA   = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/RADCAN/221003_RCAN19_MAR_costR1R1.xlsx'
+archivo_AA   = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/RADCAN/221005_RCAN19_ABR_costR1R1.xlsx'
 
 archivo_refs = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/RADCAN/REFERENCIAS_RADCAN19.xlsx'
 
-archivo_datos_procesados = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/RADCAN/DATOS_PROCESADOS.xlsx'
+archivo_datos_procesados = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/RADCAN/DATOS_PROCESADOS_ABRIL.xlsx'
 
 
 rendimiento_columna     = 100
-temperatura_laboratorio = 21.5
+temperatura_laboratorio = 21.3
 
 # Variables
 variables_run = ['ton','nitrito','silicato','fosfato'] 
@@ -152,8 +152,8 @@ else:
     #posicion_RMN_bajos  = [i for i, e in enumerate(datos_entrada['Sample ID']) if e == 'RMN Low']
     #posicion_RMN_altos  = [i for i, e in enumerate(datos_entrada['Sample ID']) if e == 'RMN High']
     
-    #for ivariable in range(1):
-    for ivariable in range(len(variables_run)):
+    for ivariable in range(1):
+    #for ivariable in range(len(variables_run)):
                
         variable_concentracion  = variables_run[ivariable] + '_CONC'
         
@@ -166,12 +166,14 @@ else:
         RMN_bajos       = datos_entrada[variable_concentracion][posicion_RMN_bajos]
             
         # Predimensiona las rectas a y b
-        posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0]-1,posicion_RMN_bajos[1]+1)
+        indice_min_correccion = min(posicion_RMN_altos[0],posicion_RMN_bajos[0])
+        indice_max_correccion = max(posicion_RMN_altos[1],posicion_RMN_bajos[1])
         recta_at              = numpy.zeros(datos_entrada.shape[0])
         recta_bt              = numpy.zeros(datos_entrada.shape[0])
         
-        store = numpy.zeros(datos_entrada.shape[0])
-        store2 = numpy.zeros(datos_entrada.shape[0])
+        seq_low  = numpy.zeros(datos_entrada.shape[0])
+        seq_high = numpy.zeros(datos_entrada.shape[0])
+        store2   = numpy.zeros(datos_entrada.shape[0])
     
         pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
         t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos.iloc[0] 
@@ -179,12 +181,13 @@ else:
         variable_drift = numpy.zeros(datos_entrada.shape[0])
     
         # Aplica la corrección basada de dos rectas, descrita en Hassenmueller
-        for idato in range(posiciones_corr_drift[0],posiciones_corr_drift[-1]):
-            factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
-            store[idato]    = factor_f
-            # recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[0]-RMN_bajos.iloc[-1]) 
-            # recta_bt[idato] = RMN_altos.iloc[0] -  factor_f*(RMN_altos.iloc[0]-RMN_altos.iloc[-1]) 
+        for idato in range(indice_min_correccion,indice_max_correccion):
+            factor_f        = (idato-posicion_RMN_bajos[0])/(posicion_RMN_bajos[1]-posicion_RMN_bajos[0])
+            seq_low[idato]  = factor_f
             recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[-1]-RMN_bajos.iloc[0]) 
+            
+            factor_f        = (idato-posicion_RMN_altos[0])/(posicion_RMN_altos[1]-posicion_RMN_altos[0])
+            seq_high[idato]  = factor_f
             recta_bt[idato] = RMN_altos.iloc[0] +  factor_f*(RMN_altos.iloc[-1]-RMN_altos.iloc[0]) 
     
             val_combinado         = ((datos_entrada[variable_concentracion][idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
@@ -212,26 +215,26 @@ else:
 
     tabla_comparacion = pandas.merge(df_datos_disponibles_comparacion, datos_corregidos, on="nombre_muestreo")   
 
-    # Create two subplots and unpack the output array immediately
-    # f, (ax1, ax2,ax3,ax4) = plt.subplots(2, 2, sharey=True)
-    # ax1.scatter(tabla_comparacion['ton'], 'ton_proc')
-    # ax1.plot([min(tabla_comparacion['ton']),max(tabla_comparacion['ton'])], [min(tabla_comparacion['ton']),max(tabla_comparacion['ton'])])
-    f, axs = plt.subplots(2, 2)
-    axs[0, 0].scatter(tabla_comparacion['ton'], tabla_comparacion['ton_proc'],marker='.')
-    axs[0, 0].plot([min(tabla_comparacion['ton']),max(tabla_comparacion['ton'])], [min(tabla_comparacion['ton']),max(tabla_comparacion['ton'])])
-    axs[0, 0].set_title('TON')
+    # # Create two subplots and unpack the output array immediately
+    # # f, (ax1, ax2,ax3,ax4) = plt.subplots(2, 2, sharey=True)
+    # # ax1.scatter(tabla_comparacion['ton'], 'ton_proc')
+    # # ax1.plot([min(tabla_comparacion['ton']),max(tabla_comparacion['ton'])], [min(tabla_comparacion['ton']),max(tabla_comparacion['ton'])])
+    # f, axs = plt.subplots(2, 2)
+    # axs[0, 0].scatter(tabla_comparacion['ton'], tabla_comparacion['ton_proc'],marker='.')
+    # axs[0, 0].plot([min(tabla_comparacion['ton']),max(tabla_comparacion['ton'])], [min(tabla_comparacion['ton']),max(tabla_comparacion['ton'])])
+    # axs[0, 0].set_title('TON')
 
-    axs[0, 1].scatter(tabla_comparacion['nitrito'], tabla_comparacion['nitrito_proc'],marker='.')
-    axs[0, 1].plot([min(tabla_comparacion['nitrito']),max(tabla_comparacion['nitrito'])], [min(tabla_comparacion['nitrito']),max(tabla_comparacion['nitrito'])])
-    axs[0, 1].set_title('NITRITO')
+    # axs[0, 1].scatter(tabla_comparacion['nitrito'], tabla_comparacion['nitrito_proc'],marker='.')
+    # axs[0, 1].plot([min(tabla_comparacion['nitrito']),max(tabla_comparacion['nitrito'])], [min(tabla_comparacion['nitrito']),max(tabla_comparacion['nitrito'])])
+    # axs[0, 1].set_title('NITRITO')
     
-    axs[1, 0].scatter(tabla_comparacion['silicato'], tabla_comparacion['silicato_proc'],marker='.')
-    axs[1, 0].plot([min(tabla_comparacion['silicato']),max(tabla_comparacion['silicato'])], [min(tabla_comparacion['silicato']),max(tabla_comparacion['silicato'])])
-    axs[1, 0].set_title('SILICATO')
+    # axs[1, 0].scatter(tabla_comparacion['silicato'], tabla_comparacion['silicato_proc'],marker='.')
+    # axs[1, 0].plot([min(tabla_comparacion['silicato']),max(tabla_comparacion['silicato'])], [min(tabla_comparacion['silicato']),max(tabla_comparacion['silicato'])])
+    # axs[1, 0].set_title('SILICATO')
     
-    axs[1, 1].scatter(tabla_comparacion['fosfato'], tabla_comparacion['fosfato_proc'],marker='.')
-    axs[1, 1].plot([min(tabla_comparacion['fosfato']),max(tabla_comparacion['fosfato'])], [min(tabla_comparacion['fosfato']),max(tabla_comparacion['fosfato'])])
-    axs[1, 1].set_title('FOSFATO')  
+    # axs[1, 1].scatter(tabla_comparacion['fosfato'], tabla_comparacion['fosfato_proc'],marker='.')
+    # axs[1, 1].plot([min(tabla_comparacion['fosfato']),max(tabla_comparacion['fosfato'])], [min(tabla_comparacion['fosfato']),max(tabla_comparacion['fosfato'])])
+    # axs[1, 1].set_title('FOSFATO')  
   
   
     

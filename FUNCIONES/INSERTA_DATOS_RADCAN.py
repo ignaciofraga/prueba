@@ -45,7 +45,7 @@ fecha_actualizacion = datetime.date.today()
 # Listado de archivos disponibles
 
 listado_archivos = ['RADCAN_2020.xlsx','RADCAN_2019.xlsx','RADCAN_2012-2013-2014.xlsx']
-listado_archivos = ['RADCAN_2019.xlsx']
+#listado_archivos = ['RADCAN_2019.xlsx']
 
 for iarchivo in range(len(listado_archivos)):
 #for iarchivo in range(3,5):

@@ -1435,29 +1435,27 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
         RMN_bajos       = datos_entrada[variable_concentracion][posicion_RMN_bajos]
             
         # Predimensiona las rectas a y b
-        posiciones_corr_drift = numpy.arange(posicion_RMN_altos[0]-1,posicion_RMN_bajos[1]+1)
+        indice_min_correccion = min(posicion_RMN_altos[0],posicion_RMN_bajos[0])
+        indice_max_correccion = max(posicion_RMN_altos[1],posicion_RMN_bajos[1])
         recta_at              = numpy.zeros(datos_entrada.shape[0])
         recta_bt              = numpy.zeros(datos_entrada.shape[0])
-        
-        store = numpy.zeros(datos_entrada.shape[0])
-    
+            
         pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
         t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos.iloc[0] 
     
         variable_drift = numpy.zeros(datos_entrada.shape[0])
     
         # Aplica la corrección basada de dos rectas, descrita en Hassenmueller
-        for idato in range(posiciones_corr_drift[0],posiciones_corr_drift[-1]):
-            factor_f        = (idato-posiciones_corr_drift[0])/(posiciones_corr_drift[-1]-posiciones_corr_drift[0])
-            store[idato]    = factor_f
-            
-            # recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[0]-RMN_bajos.iloc[-1]) 
-            # recta_bt[idato] = RMN_altos.iloc[0] -  factor_f*(RMN_altos.iloc[0]-RMN_altos.iloc[-1]) 
+        for idato in range(indice_min_correccion,indice_max_correccion):
+
+            factor_f        = (idato-posicion_RMN_bajos[0])/(posicion_RMN_bajos[1]-posicion_RMN_bajos[0])
             recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[-1]-RMN_bajos.iloc[0]) 
+            
+            factor_f        = (idato-posicion_RMN_altos[0])/(posicion_RMN_altos[1]-posicion_RMN_altos[0])
             recta_bt[idato] = RMN_altos.iloc[0] +  factor_f*(RMN_altos.iloc[-1]-RMN_altos.iloc[0]) 
     
-            val_combinado         = ((datos_entrada[variable_concentracion][idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
-    
+            val_combinado   = ((datos_entrada[variable_concentracion][idato]-recta_at[idato])/(recta_bt[idato]-recta_at[idato]))*(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) + RMN_bajos.iloc[0]
+                 
             variable_drift[idato] = val_combinado*pte_RMN+t_indep_RMN
     
         variable_drift[variable_drift<0] = 0
