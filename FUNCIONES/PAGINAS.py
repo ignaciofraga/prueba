@@ -2027,22 +2027,22 @@ def procesado_nutrientes():
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
                                
-                # Añade información de oxígeno, pH, alcalinidad....de la base de datos (si está disponible)
-                df_bgq_relevantes        = df_datos_biogeoquimicos[['oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk','oxigeno_wk_qf','ph','ph_qf']]               
-                df_datos_bdq_disponibles = pandas.merge(df_bgq_relevantes, datos_corregidos, on="muestreo")                               
+                # # Añade información de oxígeno, pH, alcalinidad....de la base de datos (si está disponible)
+                # df_bgq_relevantes        = df_datos_biogeoquimicos[['muestreo','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk','oxigeno_wk_qf','ph','ph_qf']]               
+                # df_datos_bdq_disponibles = pandas.merge(df_bgq_relevantes, datos_corregidos, on="muestreo")                               
 
-                if df_datos_bdq_disponibles.shape[0] == datos_corregidos.shape[0]:
-                    datos_corregidos      = pandas.merge(datos_corregidos, df_datos_bdq_disponibles, on="nombre_muestreo")
+                # if df_datos_bdq_disponibles.shape[0] == datos_corregidos.shape[0]:
+                #     datos_corregidos      = pandas.merge(datos_corregidos, df_datos_bdq_disponibles, on="nombre_muestreo")
 
-                # Añade información de ctd de la base de datos (si está disponible)
-                df_fisicos_relevantes       = df_datos_fisicos[['temperatura_ctd','temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf']]               
-                df_datos_fisica_disponibles = pandas.merge(df_fisicos_relevantes, df_datos_disponibles, on="muestreo")                               
+                # # Añade información de ctd de la base de datos (si está disponible)
+                # df_fisicos_relevantes       = df_datos_fisicos[['muestreo','temperatura_ctd','temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf']]               
+                # df_datos_fisica_disponibles = pandas.merge(df_fisicos_relevantes, df_datos_disponibles, on="muestreo")                               
                 
-                if df_datos_fisica_disponibles.shape[0] == datos_corregidos.shape[0]:
-                    datos_corregidos      = pandas.merge(datos_corregidos, df_datos_fisica_disponibles, on="nombre_muestreo")
+                # if df_datos_fisica_disponibles.shape[0] == datos_corregidos.shape[0]:
+                #     datos_corregidos      = pandas.merge(datos_corregidos, df_datos_fisica_disponibles, on="nombre_muestreo")
 
                 # Añade información del muestreo (si está disponible)
-                df_muestreo_relevantes        = df_muestreos[['fecha_muestreo','hora_muestreo','botella','presion_ctd']]               
+                df_muestreo_relevantes        = df_muestreos[['nombre_muestreo','fecha_muestreo','hora_muestreo','botella','presion_ctd']]               
                 df_datos_muestreo_disponibles = pandas.merge(df_muestreo_relevantes, df_datos_disponibles, on="muestreo")                               
                 
                 if df_datos_muestreo_disponibles.shape[0] == datos_corregidos.shape[0]:
