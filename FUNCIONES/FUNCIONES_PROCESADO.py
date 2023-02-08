@@ -1413,13 +1413,7 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
     datos_entrada['silicato_CONC'] = datos_entrada['silicato']/datos_entrada['DENSIDAD']  
     datos_entrada['fosfato_CONC'] = datos_entrada['fosfato']/datos_entrada['DENSIDAD']  
 
-    # Muestra una tabla con las configuraciones 
-    import st_aggrid 
-    gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_entrada)
-    gridOptions = gb.build()
-    st_aggrid.AgGrid(datos_entrada,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
 
-    
     
     ####  APLICA LA CORRECCIÓN DE DERIVA ####
     # Encuentra las posiciones de los RMNs
@@ -1471,6 +1465,14 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
         
     # Añade columna con el identificador de cada muestra
     datos_corregidos['nombre_muestreo'] = datos_entrada['Sample ID']
+
+    # Muestra una tabla con las configuraciones 
+    import st_aggrid 
+    gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
+    gridOptions = gb.build()
+    st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,height = 350,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
+
+    
         
     return datos_corregidos
     
