@@ -2045,6 +2045,19 @@ def procesado_nutrientes():
                 df_muestreo_relevantes  = df_muestreos[['muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','botella','presion_ctd']]               
                 datos_corregidos        = pandas.merge(datos_corregidos, df_muestreo_relevantes, on="nombre_muestreo")
 
+                # Añade información de oxígeno, pH, alcalinidad....de la base de datos (si está disponible)
+                df_bgq_relevantes        = df_datos_biogeoquimicos[['muestreo','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk','oxigeno_wk_qf','ph','ph_qf']]               
+                temp                     = pandas.merge(datos_corregidos, df_bgq_relevantes, on="muestreo")
+
+                if temp.shape[0] == datos_corregidos.shape[0]:
+                    datos_corregidos      = pandas.merge(datos_corregidos, df_bgq_relevantes, on="muestreo")
+
+                # Añade información de ctd de la base de datos (si está disponible)
+                df_fisicos_relevantes    = df_datos_fisicos[['muestreo','temperatura_ctd','temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf']]               
+                temp                     = pandas.merge(datos_corregidos, df_fisicos_relevantes, on="muestreo")
+
+                if temp.shape[0] == datos_corregidos.shape[0]:
+                    datos_corregidos      = pandas.merge(datos_corregidos, df_fisicos_relevantes, on="muestreo")
 
 
                     # # Añade columna con información del año
