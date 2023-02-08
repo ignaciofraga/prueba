@@ -2046,6 +2046,8 @@ def procesado_nutrientes():
                 df_datos_muestreo_disponibles = pandas.merge(df_muestreo_relevantes, df_datos_disponibles, on="nombre_muestreo")                               
                 temp      = pandas.merge(datos_corregidos, df_muestreo_relevantes, on="nombre_muestreo")
 
+                datos_corregidos      = pandas.merge(datos_corregidos, df_muestreo_relevantes, on="nombre_muestreo")
+
                 if temp.shape[0] == datos_corregidos.shape[0]:
                     datos_corregidos      = pandas.merge(datos_corregidos, df_muestreo_relevantes, on="nombre_muestreo")
 
