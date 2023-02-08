@@ -57,7 +57,8 @@ listado_meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOST
 listado_temp  = [16.8,17.8,21.5,21.3,19.5,21.4,21.1,22.8,21.4]
 listado_rtos  = [100,95.12,100,100,100,95.22,94.94,95.42,96.02]
 
-for imes in range(len(listado_meses)):
+#for imes in range(len(listado_meses)):
+for imes in range(3,4):
 
     archivo_AA = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/RADCAN/' + listado_meses[imes] + '.xlsx'
     rendimiento_columna     = listado_rtos[imes]
