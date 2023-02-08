@@ -2040,10 +2040,10 @@ def procesado_nutrientes():
                 if df_datos_disponibles.shape[0] == datos_corregidos.shape[0]:
                     datos_corregidos      = pandas.merge(datos_corregidos, df_datos_disponibles, on="nombre_muestreo")  
                 
-                # Añade columna con información del año
-                datos_corregidos['año']                = numpy.zeros(datos_corregidos.shape[0],dtype=int)
-                for idato in range(datos_corregidos.shape[0]):
-                    datos_corregidos['año'].iloc[idato] = (datos_corregidos['fecha_muestreo'].iloc[idato]).year
+                    # Añade columna con información del año
+                    datos_corregidos['año']                = numpy.zeros(datos_corregidos.shape[0],dtype=int)
+                    for idato in range(datos_corregidos.shape[0]):
+                        datos_corregidos['año'].iloc[idato] = (datos_corregidos['fecha_muestreo'].iloc[idato]).year
                                 
                     
                 # Botón para descargar la información como Excel
