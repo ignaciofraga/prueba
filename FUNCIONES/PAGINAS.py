@@ -2042,25 +2042,33 @@ def procesado_nutrientes():
                 # Botón para descargar la información como Excel
                 nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
            
-                #datos_exporta = datos_corregidos[['nombre_muestreo','presion_ctd','temperatura_ctd','salinidad_ctd','ton','nitrato','nitrito','silicato','fosfato']]
+                
+                # Muestra una tabla con las configuraciones 
+                gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
+                gridOptions = gb.build()
+                st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
 
-                datos_exporta = datos_corregidos
+
+
+            
            
-                output = BytesIO()
-                writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                datos_exporta.to_excel(writer, index=False, sheet_name='DATOS')
-                writer.save()
-                datos_exporta = output.getvalue()
+                # datos_exporta = datos_corregidos[['nombre_muestreo','presion_ctd','temperatura_ctd','salinidad_ctd','ton','nitrato','nitrito','silicato','fosfato']]
+          
+                # output = BytesIO()
+                # writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                # datos_exporta.to_excel(writer, index=False, sheet_name='DATOS')
+                # writer.save()
+                # datos_exporta = output.getvalue()
            
-                st.download_button(
-                   label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
-                   data=datos_exporta,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
-                   mime="application/vnd.ms-excel")
+                # st.download_button(
+                #    label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
+                #    data=datos_exporta,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
+                #    mime="application/vnd.ms-excel")
                     
-                for iespacio in range(5):
-                    st.text(' ')
+                # for iespacio in range(5):
+                #     st.text(' ')
                     
-                st.subheader('Control de calidad de los resultados obtenidos')
+                # st.subheader('Control de calidad de los resultados obtenidos')
                 
                 # # Define los vectores con las variables a procesar
                 # variables_procesado    = ['Nitrato','Nitrito','Silicato','Fosfato']    
