@@ -1954,9 +1954,9 @@ def procesado_nutrientes():
         # Despliega un formulario para subir los archivos del AA y las referencias
         col1, col2,col3 = st.columns(3,gap="small")
         with col1:
-            temperatura_laboratorio  = st.number_input('Temperatura laboratorio:',value=20)
+            temperatura_laboratorio  = st.number_input('Temperatura laboratorio:',value=20.5)
         with col2:
-            rendimiento_columna      = st.number_input('Rendimiento columna:',value=100,min_value=0,max_value=100)
+            rendimiento_columna      = st.number_input('Rendimiento columna:',value=100.0,min_value=0,max_value=100)
         with col3:            
             rmn_elegida              = st.selectbox("Selecciona los RMNs utilizados", (df_rmns['nombre_rmn']))
             df_referencias           = df_rmns[df_rmns['nombre_rmn']==rmn_elegida]
