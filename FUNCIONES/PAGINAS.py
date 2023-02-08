@@ -1956,7 +1956,7 @@ def procesado_nutrientes():
         with col1:
             temperatura_laboratorio  = st.number_input('Temperatura laboratorio:',value=20.5)
         with col2:
-            rendimiento_columna      = st.number_input('Rendimiento columna:',value=99.5,min_value=0.1,max_value=100.1)
+            rendimiento_columna      = st.number_input('Rendimiento columna:',value=float(100),min_value=float(0),max_value=float(100))
         with col3:            
             rmn_elegida              = st.selectbox("Selecciona los RMNs utilizados", (df_rmns['nombre_rmn']))
             df_referencias           = df_rmns[df_rmns['nombre_rmn']==rmn_elegida]
