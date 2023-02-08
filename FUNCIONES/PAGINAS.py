@@ -1966,103 +1966,103 @@ def procesado_nutrientes():
                 
             io_envio = st.form_submit_button("Procesar el archivo subido")        
         
-            if archivo_AA is not None and io_envio is True:
+        if archivo_AA is not None and io_envio is True:
+    
         
+            # Lectura del archivo con los resultados del AA
+            datos_AA              = pandas.read_excel(archivo_AA,skiprows=15)            
+            datos_AA              = datos_AA.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
+                  
+            # Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado
+            df_muestreos          = df_muestreos.rename(columns={"id_muestreo":"muestreo"}) # Para igualar los nombres de columnas                                               
+            df_datos_disponibles  = pandas.merge(df_datos_fisicos, df_muestreos, on="muestreo")            
             
-                # Lectura del archivo con los resultados del AA
-                datos_AA              = pandas.read_excel(archivo_AA,skiprows=15)            
-                datos_AA              = datos_AA.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
-                      
-                # Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado
-                df_muestreos          = df_muestreos.rename(columns={"id_muestreo":"muestreo"}) # Para igualar los nombres de columnas                                               
-                df_datos_disponibles  = pandas.merge(df_datos_fisicos, df_muestreos, on="muestreo")            
-                
-                # Encuentra las posiciones de las referencias de sw
-                indices_referencias = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='sw']) - 1
-                # Agrupa en dos tandas, las iniciales y las finales
-                spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
-                listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
-    
-                ref_inicial        = listado_refs[0][-1] + 1
-                ref_final          = listado_refs[1][0]
-                
-                # Encuentra la salinidad de cada muestra
-                datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
-                datos_AA['io_procesado']  = None
-                for idato in range(ref_inicial,ref_final):
-                    if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
-         
-                        id_temp = df_datos_disponibles['muestreo'][df_datos_disponibles['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
-                            
-                        if len(id_temp) > 0:
-                            datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
-                            datos_AA['io_procesado'].iloc[idato]  = 1
-                        else:
-                            texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
-                            #st.warning(texto_error, icon="⚠️")                        
-       
-                # comprobación por si no hay ningún dato a procesar
-                if datos_AA['io_procesado'].isnull().all():
-                    texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
-                    st.warning(texto_error, icon="⚠️")          
-       
-                else:
-                    
-                # En caso contrario procesa los datos
-                            
-                    # Aplica la corrección de deriva (DRIFT)                 
-                    datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias,variables_run,rendimiento_columna,temperatura_laboratorio)
-                    
-                    # Calcula el NO3 como diferencia entre el TON y el NO2
-                    datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
-                
-                    # corrige posibles valores negativos
-                    datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
-                    datos_corregidos['nitrito'][datos_corregidos['nitrito']<0]   = 0
-                    datos_corregidos['silicato'][datos_corregidos['silicato']<0] = 0
-                    datos_corregidos['fosfato'][datos_corregidos['fosfato']<0]   = 0
-                
-                    texto_exito = 'Muestreos disponibles procesados correctamente'
-                    st.success(texto_exito)
-                                   
-    
-                    # Añade información del muestreo (si está disponible)
-                    df_muestreo_relevantes  = df_muestreos[['muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','botella','presion_ctd']]               
-                    datos_corregidos        = pandas.merge(datos_corregidos, df_muestreo_relevantes, on="nombre_muestreo")
-                    listado_columnas        = ['muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','botella','presion_ctd','ton','nitrato','nitrito','silicato','fosfato']
-                    datos_corregidos        = datos_corregidos[listado_columnas]
-    
-    
-                    # Añade información de oxígeno, pH, alcalinidad....de la base de datos (si está disponible)
-                    df_bgq_relevantes        = df_datos_biogeoquimicos[['muestreo','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk','oxigeno_wk_qf','ph','ph_qf']]               
-                    temp                     = pandas.merge(datos_corregidos, df_bgq_relevantes, on="muestreo")
-    
-                    if temp.shape[0] == datos_corregidos.shape[0]:
-                        datos_corregidos      = pandas.merge(datos_corregidos, df_bgq_relevantes, on="muestreo")
-    
-                    # Añade información de ctd de la base de datos (si está disponible)
-                    df_fisicos_relevantes    = df_datos_fisicos[['muestreo','temperatura_ctd','temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf']]               
-                    temp                     = pandas.merge(datos_corregidos, df_fisicos_relevantes, on="muestreo")
-    
-                    if temp.shape[0] == datos_corregidos.shape[0]:
-                        datos_corregidos      = pandas.merge(datos_corregidos, df_fisicos_relevantes, on="muestreo")
-    
-                    datos_corregidos = datos_corregidos.drop(columns=['muestreo'])  
+            # Encuentra las posiciones de las referencias de sw
+            indices_referencias = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='sw']) - 1
+            # Agrupa en dos tandas, las iniciales y las finales
+            spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
+            listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
+
+            ref_inicial        = listado_refs[0][-1] + 1
+            ref_final          = listado_refs[1][0]
+            
+            # Encuentra la salinidad de cada muestra
+            datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
+            datos_AA['io_procesado']  = None
+            for idato in range(ref_inicial,ref_final):
+                if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
+     
+                    id_temp = df_datos_disponibles['muestreo'][df_datos_disponibles['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
                         
-                    # Botón para descargar la información como Excel
-                    nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
-               
-    
-                    output = BytesIO()
-                    writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                    datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
-                    writer.save()
-                    datos_exporta = output.getvalue()
-               
-                    st.download_button(
-                        label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
-                        data=datos_corregidos,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
-                        mime="application/vnd.ms-excel")
+                    if len(id_temp) > 0:
+                        datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
+                        datos_AA['io_procesado'].iloc[idato]  = 1
+                    else:
+                        texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
+                        #st.warning(texto_error, icon="⚠️")                        
+   
+            # comprobación por si no hay ningún dato a procesar
+            if datos_AA['io_procesado'].isnull().all():
+                texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
+                st.warning(texto_error, icon="⚠️")          
+   
+            else:
+                
+            # En caso contrario procesa los datos
+                        
+                # Aplica la corrección de deriva (DRIFT)                 
+                datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias,variables_run,rendimiento_columna,temperatura_laboratorio)
+                
+                # Calcula el NO3 como diferencia entre el TON y el NO2
+                datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
+            
+                # corrige posibles valores negativos
+                datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
+                datos_corregidos['nitrito'][datos_corregidos['nitrito']<0]   = 0
+                datos_corregidos['silicato'][datos_corregidos['silicato']<0] = 0
+                datos_corregidos['fosfato'][datos_corregidos['fosfato']<0]   = 0
+            
+                texto_exito = 'Muestreos disponibles procesados correctamente'
+                st.success(texto_exito)
+                               
+
+                # Añade información del muestreo (si está disponible)
+                df_muestreo_relevantes  = df_muestreos[['muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','botella','presion_ctd']]               
+                datos_corregidos        = pandas.merge(datos_corregidos, df_muestreo_relevantes, on="nombre_muestreo")
+                listado_columnas        = ['muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','botella','presion_ctd','ton','nitrato','nitrito','silicato','fosfato']
+                datos_corregidos        = datos_corregidos[listado_columnas]
+
+
+                # Añade información de oxígeno, pH, alcalinidad....de la base de datos (si está disponible)
+                df_bgq_relevantes        = df_datos_biogeoquimicos[['muestreo','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk','oxigeno_wk_qf','ph','ph_qf']]               
+                temp                     = pandas.merge(datos_corregidos, df_bgq_relevantes, on="muestreo")
+
+                if temp.shape[0] == datos_corregidos.shape[0]:
+                    datos_corregidos      = pandas.merge(datos_corregidos, df_bgq_relevantes, on="muestreo")
+
+                # Añade información de ctd de la base de datos (si está disponible)
+                df_fisicos_relevantes    = df_datos_fisicos[['muestreo','temperatura_ctd','temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf']]               
+                temp                     = pandas.merge(datos_corregidos, df_fisicos_relevantes, on="muestreo")
+
+                if temp.shape[0] == datos_corregidos.shape[0]:
+                    datos_corregidos      = pandas.merge(datos_corregidos, df_fisicos_relevantes, on="muestreo")
+
+                datos_corregidos = datos_corregidos.drop(columns=['muestreo'])  
+                    
+                # Botón para descargar la información como Excel
+                nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
+           
+
+                output = BytesIO()
+                writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
+                writer.save()
+                datos_exporta = output.getvalue()
+           
+                st.download_button(
+                    label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
+                    data=datos_corregidos,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
+                    mime="application/vnd.ms-excel")
                     
                 # for iespacio in range(5):
                 #     st.text(' ')
