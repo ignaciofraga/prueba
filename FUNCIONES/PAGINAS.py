@@ -2047,7 +2047,7 @@ def procesado_nutrientes():
                 temp      = pandas.merge(datos_corregidos, df_muestreo_relevantes, on="nombre_muestreo")
 
                 if temp.shape[0] == datos_corregidos.shape[0]:
-                    datos_corregidos      = pandas.merge(datos_corregidos, df_datos_muestreo_disponibles, on="nombre_muestreo")
+                    datos_corregidos      = pandas.merge(datos_corregidos, df_muestreo_relevantes, on="nombre_muestreo")
 
 
                     # # Añade columna con información del año
