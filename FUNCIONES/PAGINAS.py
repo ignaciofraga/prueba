@@ -2012,10 +2012,10 @@ def procesado_nutrientes():
                 
             # En caso contrario procesa los datos
             
-                # Muestra una tabla con las configuraciones 
-                gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_AA)
-                gridOptions = gb.build()
-                st_aggrid.AgGrid(datos_AA,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
+                # # Muestra una tabla con las configuraciones 
+                # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_AA)
+                # gridOptions = gb.build()
+                # st_aggrid.AgGrid(datos_AA,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
 
             
                 # Aplica la corrección de deriva (DRIFT)                 
