@@ -1963,10 +1963,7 @@ def procesado_nutrientes():
                 df_referencias           = df_rmns[df_rmns['nombre_rmn']==rmn_elegida]
             
             archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
-            
-            tipos_procesado = ['Procesar archivo','Procesar archivo y comparar con datos disponibles']
-            procesado       = st.radio("Indicar el procesado a realizar",tipos_procesado,horizontal = True)
-                
+                            
             io_envio = st.form_submit_button("Procesar el archivo subido")        
         
         if archivo_AA is not None and io_envio is True:
@@ -2050,6 +2047,21 @@ def procesado_nutrientes():
                 if temp.shape[0] == datos_corregidos.shape[0]:
                     datos_corregidos      = pandas.merge(datos_corregidos, df_fisicos_relevantes, on="muestreo")
 
+                # # Selecciona qué hacer con los datos procesados (base de datos, descargar o ambas cosas)
+                # col1, col2,col3 = st.columns(3,gap="small")
+                # with col1:
+                #     if st.button('AÑADIR DATOS A LA BASE DE DATOS'):
+                #         io_procesado = 1
+                # with col2:
+                #     if st.button('DESCARGAR DATOS EN FORMATO EXCEL'):
+                #         io_procesado = 2
+                # with col3:
+                #     if st.button('DESCARGAR DATOS EN FORMATO EXCEL Y AÑADIRLOS A BASE DE DATOS'):
+                #         io_procesado = 3    
+                
+
+
+
                 datos_corregidos = datos_corregidos.drop(columns=['muestreo'])  
                     
                 # Botón para descargar la información como Excel
@@ -2057,13 +2069,13 @@ def procesado_nutrientes():
                        
                 output = BytesIO()
                 writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
+                datos_excel = datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
                 writer.save()
-                datos_corregidos = output.getvalue()
+                datos_excel = output.getvalue()
             
                 st.download_button(
                     label="DESCARGA EXCEL CON LOS DATOS PROCESADOS",
-                    data=datos_corregidos,
+                    data=datos_excel,
                     file_name=nombre_archivo,
                     help= 'Descarga un archivo .xlsx con los datos procesados',
                     mime="application/vnd.ms-excel"
@@ -2071,20 +2083,6 @@ def procesado_nutrientes():
            
 
                     
-                # for iespacio in range(5):
-                #     st.text(' ')
-                    
-                # st.subheader('Control de calidad de los resultados obtenidos')
-                
-                # # Define los vectores con las variables a procesar
-                # variables_procesado    = ['Nitrato','Nitrito','Silicato','Fosfato']    
-                # variables_procesado_bd = ['nitrato','nitrito','silicato','fosfato']
-                # variables_unidades     = ['\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg']
-                
-                    
-                ## Realiza control de calidad
-                #FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_corregidos,variables_procesado,variables_procesado_bd,variables_unidades)
-
 
 
 
