@@ -2057,8 +2057,11 @@ def procesado_nutrientes():
                     if datos_corregidos[nombre_variable_qf].isnull().all():
                         pass
                     else:
-                        texto = 'La base de datos contiene QF de ' + variables_procesado_bd[ivariable_procesada] + ' correspondientes a las muestras procesadas. \nAñadir la información procesada a la base de datos eliminará los flags almacenados'
+                        texto = 'La base de datos contiene QF de ' + variables_procesado_bd[ivariable_procesada] + ' correspondientes a las muestras procesadas. Revisar y actualizar los flags.'
                         st.warning(texto, icon="⚠️")
+                        
+                    #reduce los decimales 
+                    datos_corregidos[variables_procesado_bd[ivariable_procesada]]=round(datos_corregidos[variables_procesado_bd[ivariable_procesada]],3)
                         
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
                 if io_add_data is True:
