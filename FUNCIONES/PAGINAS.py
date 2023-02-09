@@ -2054,15 +2054,18 @@ def procesado_nutrientes():
            
  
                 data_as_csv= datos_corregidos.to_csv(index=False).encode("utf-8")
-                st.download_button(
-                    "Download data as CSV", 
-                    data_as_csv, 
-                    "benchmark-tools.csv",
-                    "text/csv",
-                    key="download-tools-csv",
-                )
+                # st.download_button(
+                #     "Download data as CSV", 
+                #     data_as_csv, 
+                #     "benchmark-tools.csv",
+                #     "text/csv",
+                #     key="download-tools-csv",
+                # )
 
-               
+                st.download_button(
+                    label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
+                    data=data_as_csv,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
+                    mime="application/vnd.ms-excel")               
            
 # data_as_csv= data_to_csv.to_csv(index=False).encode("utf-8")
 # st.download_button(
