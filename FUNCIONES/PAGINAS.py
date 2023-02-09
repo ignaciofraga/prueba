@@ -1962,16 +1962,18 @@ def procesado_nutrientes():
             # Despliega un formulario para subir los archivos del AA y las referencias
             col1, col2,col3 = st.columns(3,gap="small")
             with col1:
-                temperatura_laboratorio  = st.number_input('Temperatura laboratorio:',value=20.5)
+                temperatura_laboratorio = st.number_input('Temperatura laboratorio:',value=20.5)
             with col2:
-                rendimiento_columna      = st.number_input('Rendimiento columna:',value=float(100),min_value=float(0),max_value=float(100))
+                rendimiento_columna     = st.number_input('Rendimiento columna:',value=float(100),min_value=float(0),max_value=float(100))
             with col3:            
-                rmn_elegida              = st.selectbox("Selecciona los RMNs utilizados", (df_rmns['nombre_rmn']))
-                df_referencias           = df_rmns[df_rmns['nombre_rmn']==rmn_elegida]
+                rmn_elegida             = st.selectbox("Selecciona los RMNs utilizados", (df_rmns['nombre_rmn']))
+                df_referencias          = df_rmns[df_rmns['nombre_rmn']==rmn_elegida]
             
-            archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
+            archivo_AA                  = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
+            
+            io_add_data                 = st.checkbox('Añadir datos procesados a la base de datos')
                             
-            io_envio = st.form_submit_button("Procesar el archivo subido")        
+            io_envio                    = st.form_submit_button("Procesar el archivo subido")        
         
         if archivo_AA is not None and io_envio is True:
     
@@ -2050,39 +2052,39 @@ def procesado_nutrientes():
                     if datos_corregidos[nombre_variable_qf].isnull().all():
                         pass
                     else:
-                        texto_exito = 'La base de datos contiene QF de ' + variables_procesado_bd[ivariable_procesada] + ' correspondientes a las muestras procesadas. \nAñadir la información procesada a la base de datos eliminará los flags almacenados'
+                        texto = 'La base de datos contiene QF de ' + variables_procesado_bd[ivariable_procesada] + ' correspondientes a las muestras procesadas. \nAñadir la información procesada a la base de datos eliminará los flags almacenados'
+                        st.warning(texto, icon="⚠️")
                         
+                # Añade los datos a la base de datos si se seleccionó esta opción                        
+                if io_add_data is True:
                         
-                # Selecciona qué hacer con los datos procesados (base de datos, descargar o ambas cosas)
-                col1, col2 = st.columns(2,gap="small")
-                with col1:
-                    if st.button('AÑADIR DATOS A LA BASE DE DATOS'):
+                         
+                    FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
                         
-                        FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
-                        
+                    texto_exito = 'Datos añadidos correctamente'
+                    st.success(texto_exito)
 
-                with col2:
-                        
-                    listado_columnas        = ['nombre_muestreo','fecha_muestreo','hora_muestreo','botella','presion_ctd','ton','nitrato','nitrito','silicato','fosfato']
-                    datos_corregidos        = datos_corregidos[listado_columnas]
-          
-                    # Botón para descargar la información como Excel
-                    nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
-                           
-                    output = BytesIO()
-                    writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                    datos_excel = datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
-                    writer.save()
-                    datos_excel = output.getvalue()
-                
-                    st.download_button(
-                        label="DESCARGA EXCEL CON LOS DATOS PROCESADOS",
-                        data=datos_excel,
-                        file_name=nombre_archivo,
-                        help= 'Descarga un archivo .xlsx con los datos procesados',
-                        mime="application/vnd.ms-excel"
-                    )              
-           
+                # Descarga los datos como una hoja Excel        
+                listado_columnas        = ['nombre_muestreo','fecha_muestreo','hora_muestreo','botella','presion_ctd','ton','nitrato','nitrito','silicato','fosfato']
+                datos_corregidos        = datos_corregidos[listado_columnas]
+      
+                # Botón para descargar la información como Excel
+                nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
+                       
+                output = BytesIO()
+                writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                datos_excel = datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
+                writer.save()
+                datos_excel = output.getvalue()
+            
+                st.download_button(
+                    label="DESCARGA EXCEL CON LOS DATOS PROCESADOS",
+                    data=datos_excel,
+                    file_name=nombre_archivo,
+                    help= 'Descarga un archivo .xlsx con los datos procesados',
+                    mime="application/vnd.ms-excel"
+                )              
+       
 
                     
 
