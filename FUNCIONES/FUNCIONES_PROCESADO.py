@@ -690,8 +690,8 @@ def inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puer
         # Une ambos dataframes, el que contiene los datos nuevo y el que tiene los datos que ya están en la base de datos
         datos_conjuntos = pandas.concat([tabla_registros_fisica, datos_fisica])
             
-        vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
-        datos_conjuntos['muestreo'] = vector_identificadores
+        # vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
+        # datos_conjuntos['muestreo'] = vector_identificadores
         
         datos_conjuntos.set_index('muestreo',drop=True,append=False,inplace=True)
         
@@ -732,15 +732,15 @@ def inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrase
     # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
     for idato in range(tabla_registros_biogoquim.shape[0]):
         try:
-            tabla_registros_biogoquim = tabla_registros_biogoquim.drop(tabla_registros_biogoquim[tabla_registros_biogoquim.muestreo == datos_biogeoquimica['muestreo'][idato]].index)
+            tabla_registros_biogoquim = tabla_registros_biogoquim.drop(tabla_registros_biogoquim[tabla_registros_biogoquim.muestreo == int(datos_biogeoquimica['muestreo'][idato])].index)
         except:
             pass
         
     # Une ambos dataframes, el que contiene los datos nuevo y el que tiene los datos que ya están en la base de datos
     datos_conjuntos = pandas.concat([tabla_registros_biogoquim, datos_biogeoquimica])
         
-    vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
-    datos_conjuntos['muestreo'] = vector_identificadores
+    # vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
+    # datos_conjuntos['muestreo'] = vector_identificadores
     
     datos_conjuntos.set_index('muestreo',drop=True,append=False,inplace=True)
     
