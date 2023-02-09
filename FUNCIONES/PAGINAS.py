@@ -2043,7 +2043,12 @@ def procesado_nutrientes():
                 
                 datos_corregidos = pandas.merge(datos_corregidos, df_datos_fisicos, on="muestreo",how='left')  
                 
-                
+                # Muestra una tabla con las configuraciones 
+                gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
+                gridOptions = gb.build()
+                st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,height =250,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
+
+
                 
                 # Comprueba si en la base da datos ya hay registros de esa salida con QF de nutrientes
                 for ivariable_procesada in range(len(variables_procesado_bd)):
