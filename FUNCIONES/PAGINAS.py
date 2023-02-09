@@ -2058,7 +2058,7 @@ def procesado_nutrientes():
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
                 if io_add_data is True:
                         
-                    datos_corregidos = datos_corregidos.rename(columns={"id_muestreo": "muestreo"})
+                    datos_corregidos = datos_corregidos.rename(columns={"muestreo": "id_muestreo"})
                     
                     FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
                         
