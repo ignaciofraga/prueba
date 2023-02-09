@@ -1913,7 +1913,14 @@ def consulta_botellas():
 
 def procesado_nutrientes():
          
+    # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port
     
+   
     # Recupera tablas con informacion utilizada en el procesado
     conn                    = init_connection()
     df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
@@ -2024,62 +2031,57 @@ def procesado_nutrientes():
             
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
-                               
-
-                # Añade información del muestreo (si está disponible)
-                df_muestreo_relevantes  = df_muestreos[['muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','botella','presion_ctd']]               
-                datos_corregidos        = pandas.merge(datos_corregidos, df_muestreo_relevantes, on="nombre_muestreo")
-                listado_columnas        = ['muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','botella','presion_ctd','ton','nitrato','nitrito','silicato','fosfato']
-                datos_corregidos        = datos_corregidos[listado_columnas]
-
-
-                # Añade información de oxígeno, pH, alcalinidad....de la base de datos (si está disponible)
-                df_bgq_relevantes        = df_datos_biogeoquimicos[['muestreo','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk','oxigeno_wk_qf','ph','ph_qf']]               
-                temp                     = pandas.merge(datos_corregidos, df_bgq_relevantes, on="muestreo")
-
-                if temp.shape[0] == datos_corregidos.shape[0]:
-                    datos_corregidos      = pandas.merge(datos_corregidos, df_bgq_relevantes, on="muestreo")
-
-                # Añade información de ctd de la base de datos (si está disponible)
-                df_fisicos_relevantes    = df_datos_fisicos[['muestreo','temperatura_ctd','temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf']]               
-                temp                     = pandas.merge(datos_corregidos, df_fisicos_relevantes, on="muestreo")
-
-                if temp.shape[0] == datos_corregidos.shape[0]:
-                    datos_corregidos      = pandas.merge(datos_corregidos, df_fisicos_relevantes, on="muestreo")
-
-                # # Selecciona qué hacer con los datos procesados (base de datos, descargar o ambas cosas)
-                # col1, col2,col3 = st.columns(3,gap="small")
-                # with col1:
-                #     if st.button('AÑADIR DATOS A LA BASE DE DATOS'):
-                #         io_procesado = 1
-                # with col2:
-                #     if st.button('DESCARGAR DATOS EN FORMATO EXCEL'):
-                #         io_procesado = 2
-                # with col3:
-                #     if st.button('DESCARGAR DATOS EN FORMATO EXCEL Y AÑADIRLOS A BASE DE DATOS'):
-                #         io_procesado = 3    
                 
-
-
-
-                datos_corregidos = datos_corregidos.drop(columns=['muestreo'])  
+                
+                # Añade información de la base de datos (muestreo, biogeoquimica y fisica)
+                datos_corregidos = pandas.merge(datos_corregidos, df_muestreos, on="nombre_muestreo",how='left')
+                
+                df_datos_biogeoquimicos = df_datos_biogeoquimicos.drop(columns=variables_procesado_bd) # Para eliminar las columnas previas con datos de nutrientes
+                datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="muestreo",how='left')
+                
+                datos_corregidos = pandas.merge(datos_corregidos, df_datos_fisicos, on="muestreo",how='left')  
+                
+                
+                
+                # Comprueba si en la base da datos ya hay registros de esa salida con QF de nutrientes
+                for ivariable_procesada in range(len(variables_procesado_bd)):
+                    nombre_variable_qf = variables_procesado_bd[ivariable_procesada] + '_qf'
                     
-                # Botón para descargar la información como Excel
-                nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
-                       
-                output = BytesIO()
-                writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                datos_excel = datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
-                writer.save()
-                datos_excel = output.getvalue()
-            
-                st.download_button(
-                    label="DESCARGA EXCEL CON LOS DATOS PROCESADOS",
-                    data=datos_excel,
-                    file_name=nombre_archivo,
-                    help= 'Descarga un archivo .xlsx con los datos procesados',
-                    mime="application/vnd.ms-excel"
-                )              
+                    if datos_corregidos[nombre_variable_qf].isnull().all():
+                        pass
+                    else:
+                        texto_exito = 'La base de datos contiene QF de ' + variables_procesado_bd[ivariable_procesada] + ' correspondientes a las muestras procesadas. \nAñadir la información procesada a la base de datos eliminará los flags almacenados'
+                        
+                        
+                # Selecciona qué hacer con los datos procesados (base de datos, descargar o ambas cosas)
+                col1, col2 = st.columns(2,gap="small")
+                with col1:
+                    if st.button('AÑADIR DATOS A LA BASE DE DATOS'):
+                        
+                        FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
+                        
+
+                with col2:
+                        
+                    listado_columnas        = ['nombre_muestreo','fecha_muestreo','hora_muestreo','botella','presion_ctd','ton','nitrato','nitrito','silicato','fosfato']
+                    datos_corregidos        = datos_corregidos[listado_columnas]
+          
+                    # Botón para descargar la información como Excel
+                    nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
+                           
+                    output = BytesIO()
+                    writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                    datos_excel = datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
+                    writer.save()
+                    datos_excel = output.getvalue()
+                
+                    st.download_button(
+                        label="DESCARGA EXCEL CON LOS DATOS PROCESADOS",
+                        data=datos_excel,
+                        file_name=nombre_archivo,
+                        help= 'Descarga un archivo .xlsx con los datos procesados',
+                        mime="application/vnd.ms-excel"
+                    )              
            
 
                     
