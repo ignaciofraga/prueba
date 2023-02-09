@@ -2053,19 +2053,24 @@ def procesado_nutrientes():
                 nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
            
  
-                data_as_csv= datos_corregidos.to_csv(index=False).encode("utf-8")
-                # st.download_button(
-                #     "Download data as CSV", 
-                #     data_as_csv, 
-                #     "benchmark-tools.csv",
-                #     "text/csv",
-                #     key="download-tools-csv",
-                # )
-
+                # Botón para descargar las salidas disponibles
+                nombre_archivo =  'DATOS_SALIDAS.xlsx'
+            
+                output = BytesIO()
+                writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
+                workbook = writer.book
+                worksheet = writer.sheets['DATOS']
+                writer.save()
+                datos_corregidos = output.getvalue()
+            
                 st.download_button(
-                    label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
-                    data=data_as_csv,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
-                    mime="application/vnd.ms-excel")               
+                    label="DESCARGA EXCEL CON LAS SALIDAS REALIZADAS",
+                    data=datos_corregidos,
+                    file_name=nombre_archivo,
+                    help= 'Descarga un archivo .csv con los datos solicitados',
+                    mime="application/vnd.ms-excel"
+                )              
            
 # data_as_csv= data_to_csv.to_csv(index=False).encode("utf-8")
 # st.download_button(
@@ -2564,11 +2569,11 @@ def referencias_nutrientes():
         tabla_rmns.to_excel(writer, index=False, sheet_name='DATOS')
 
         writer.save()
-        df_salidas_radiales = output.getvalue()
+        df_salida = output.getvalue()
     
         st.download_button(
             label="DESCARGA EXCEL CON LOS RMNs ALMACENADOS",
-            data=df_salidas_radiales,
+            data=df_salida,
             file_name=nombre_archivo,
             help= 'Descarga un archivo .csv con los datos solicitados',
             mime="application/vnd.ms-excel"
