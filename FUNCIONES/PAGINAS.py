@@ -2052,25 +2052,38 @@ def procesado_nutrientes():
                 # Botón para descargar la información como Excel
                 nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
            
-                
-           
-                # Muestra una tabla con las configuraciones 
-                gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
-                gridOptions = gb.build()
-                st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
  
+                data_as_csv= datos_corregidos.to_csv(index=False).encode("utf-8")
+                st.download_button(
+                    "Download data as CSV", 
+                    data_as_csv, 
+                    "benchmark-tools.csv",
+                    "text/csv",
+                    key="download-tools-csv",
+                )
+
+               
+           
+# data_as_csv= data_to_csv.to_csv(index=False).encode("utf-8")
+# st.download_button(
+#     "Download data as CSV", 
+#     data_as_csv, 
+#     "benchmark-tools.csv",
+#     "text/csv",
+#     key="download-tools-csv",
+# )
            
 
-                output = BytesIO()
-                writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
-                writer.save()
-                datos_exporta = output.getvalue()
+                # output = BytesIO()
+                # writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                # datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
+                # writer.save()
+                # datos_exporta = output.getvalue()
            
-                st.download_button(
-                    label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
-                    data=datos_corregidos,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
-                    mime="application/vnd.ms-excel")
+                # st.download_button(
+                #     label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
+                #     data=datos_corregidos,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
+                #     mime="application/vnd.ms-excel")
                     
                 # for iespacio in range(5):
                 #     st.text(' ')
