@@ -1965,7 +1965,7 @@ def procesado_nutrientes():
             archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
             
             tipos_procesado = ['Procesar archivo','Procesar archivo y comparar con datos disponibles']
-            procesado       = st.radio("Indicar el procesado a realizar",tipos_procesado,horizontal = "True")
+            procesado       = st.radio("Indicar el procesado a realizar",tipos_procesado,horizontal = True)
                 
             io_envio = st.form_submit_button("Procesar el archivo subido")        
         
