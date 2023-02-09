@@ -2052,6 +2052,12 @@ def procesado_nutrientes():
                 # Botón para descargar la información como Excel
                 nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
            
+                # Muestra una tabla con las configuraciones 
+                gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_corregidos)
+                gridOptions = gb.build()
+                st_aggrid.AgGrid(datos_corregidos,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
+ 
+           
 
                 output = BytesIO()
                 writer = pandas.ExcelWriter(output, engine='xlsxwriter')
