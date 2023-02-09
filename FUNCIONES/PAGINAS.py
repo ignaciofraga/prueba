@@ -2051,16 +2051,12 @@ def procesado_nutrientes():
                     
                 # Botón para descargar la información como Excel
                 nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
-           
- 
-                # # Botón para descargar las salidas disponibles
-                # nombre_archivo =  'DATOS_SALIDAS.xlsx'
-            
+                       
                 output = BytesIO()
                 writer = pandas.ExcelWriter(output, engine='xlsxwriter')
                 datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
-                workbook = writer.book
-                worksheet = writer.sheets['DATOS']
+                # workbook = writer.book
+                # worksheet = writer.sheets['DATOS']
                 writer.save()
                 datos_corregidos = output.getvalue()
             
