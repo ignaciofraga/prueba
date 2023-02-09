@@ -1963,6 +1963,9 @@ def procesado_nutrientes():
                 df_referencias           = df_rmns[df_rmns['nombre_rmn']==rmn_elegida]
             
             archivo_AA               = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
+            
+            tipos_procesado = ['Procesar archivo','Procesar archivo y comparar con datos disponibles']
+            procesado       = st.sidebar.radio("Indicar el procesado a realizar",acciones)
                 
             io_envio = st.form_submit_button("Procesar el archivo subido")        
         
@@ -2055,39 +2058,18 @@ def procesado_nutrientes():
                 output = BytesIO()
                 writer = pandas.ExcelWriter(output, engine='xlsxwriter')
                 datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
-                # workbook = writer.book
-                # worksheet = writer.sheets['DATOS']
                 writer.save()
                 datos_corregidos = output.getvalue()
             
                 st.download_button(
-                    label="DESCARGA EXCEL CON LAS SALIDAS REALIZADAS",
+                    label="DESCARGA EXCEL CON LOS DATOS PROCESADOS",
                     data=datos_corregidos,
                     file_name=nombre_archivo,
-                    help= 'Descarga un archivo .csv con los datos solicitados',
+                    help= 'Descarga un archivo .xlsx con los datos procesados',
                     mime="application/vnd.ms-excel"
                 )              
            
-# data_as_csv= data_to_csv.to_csv(index=False).encode("utf-8")
-# st.download_button(
-#     "Download data as CSV", 
-#     data_as_csv, 
-#     "benchmark-tools.csv",
-#     "text/csv",
-#     key="download-tools-csv",
-# )
-           
 
-                # output = BytesIO()
-                # writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                # datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
-                # writer.save()
-                # datos_exporta = output.getvalue()
-           
-                # st.download_button(
-                #     label="DESCARGA EXCEL CON LOS RESULTADOS DEL PROCESADO",
-                #     data=datos_corregidos,file_name=nombre_archivo,help= 'Descarga un archivo .csv con los resultados del procesado',
-                #     mime="application/vnd.ms-excel")
                     
                 # for iespacio in range(5):
                 #     st.text(' ')
