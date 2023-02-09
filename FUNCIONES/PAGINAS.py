@@ -2047,7 +2047,7 @@ def procesado_nutrientes():
                 if temp.shape[0] == datos_corregidos.shape[0]:
                     datos_corregidos      = pandas.merge(datos_corregidos, df_fisicos_relevantes, on="muestreo")
 
-                datos_corregidos = datos_corregidos.drop(columns=['muestreo','fecha_muestreo','hora_muestreo'])  
+                datos_corregidos = datos_corregidos.drop(columns=['muestreo','fecha_muestreo','hora_muestreo','nombre_muestreo'])  
                     
                 # Botón para descargar la información como Excel
                 nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
