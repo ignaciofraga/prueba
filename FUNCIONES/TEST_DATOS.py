@@ -28,9 +28,6 @@ contrasena     = 'm0nt34lt0'
 puerto         = '5432'
 direccion_host = '193.146.155.99'
 
-archivo_datos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/RADCAN/DATOS_FISICOS_RADCAN2019.xlsx'
-
-tipo_salida = 'MENSUAL'
 
 programa_seleccionado = 'RADIAL CANTABRICO'
 

@@ -413,7 +413,6 @@ def consulta_botellas():
         # Elimina las columnas que no interesan en los dataframes a utilizar
         #df_salidas_seleccion        = df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
         df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
-        df_muestreos                = df_muestreos.drop(columns=['configuracion_perfilador','configuracion_superficie'])
 
         #st.text(df_salidas_seleccion)
 
