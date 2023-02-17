@@ -436,12 +436,12 @@ def consulta_botellas():
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
         
         # Elimina las columnas que no interesan
-        df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo'])
+        df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
     
         # Mueve os identificadores de muestreo al final del dataframe
         listado_cols = df_exporta.columns.tolist()
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud')))    
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud')))
+        listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))    
+        listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
         df_exporta = df_exporta[listado_cols]
