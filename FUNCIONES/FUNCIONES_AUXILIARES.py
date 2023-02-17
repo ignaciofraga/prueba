@@ -385,7 +385,9 @@ def consulta_botellas():
                 
     # Recorta el dataframe de datos biogeoquimicos con las variables seleccionadas
     df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos.loc[:, listado_variables]
-                
+           
+    st.text(df_datos_biogeoquimicos_seleccion)
+        
     # Si se exportan datos de pH, corregir la informacion del método utilizado
     if io_ph:
         conn                    = init_connection()
@@ -401,6 +403,7 @@ def consulta_botellas():
         listado_columnas.insert(listado_columnas.index('ph_qf')+1,listado_columnas.pop(listado_columnas.index('metodo_pH')))
         df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos_seleccion[listado_columnas]
     
+    st.text(df_datos_biogeoquimicos_seleccion)
     
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
      
@@ -433,10 +436,7 @@ def consulta_botellas():
                       
         # Asocia las propiedades físicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos_seleccion, on="muestreo")
-               
-        st.text(df_datos_fisicos_seleccion)
-        st.text(df_datos_biogeoquimicos_seleccion)
-        
+                     
         # Asocia las propiedades biogeoquimicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
         
