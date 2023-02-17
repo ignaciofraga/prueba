@@ -275,6 +275,8 @@ def consulta_botellas():
     # A partir del programa y año elegido, selecciona uno o varios muestreos   
     listado_salidas                 = st.multiselect('Muestreo',(df_salidas_seleccion['nombre_salida']))   
   
+    st.text(listado_salidas)  
+  
     ### SELECCION DE VARIABLES
   
     listado_variables =['muestreo']  
