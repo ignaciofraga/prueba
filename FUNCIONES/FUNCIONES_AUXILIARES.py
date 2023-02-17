@@ -434,7 +434,7 @@ def consulta_botellas():
         # Asocia las propiedades físicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos_seleccion, on="muestreo")
                
-        st.text(df_muestreos_seleccionados)
+        st.text(df_datos_biogeoquimicos_seleccion)
         
         # Asocia las propiedades biogeoquimicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
