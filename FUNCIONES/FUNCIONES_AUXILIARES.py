@@ -410,7 +410,7 @@ def consulta_botellas():
         for idato in range(len(listado_salidas)):
             identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
         
-        st.text(identificadores_salidas) 
+
         
         # Elimina las columnas que no interesan en los dataframes a utilizar
         #df_salidas_seleccion        = df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
@@ -421,6 +421,7 @@ def consulta_botellas():
         # conserva los datos de las salidas seleccionadas
         df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
 
+        st.text(df_salidas_seleccion)
  
         # Recupera los muestreos correspondientes a las salidas seleccionadas
         df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(identificadores_salidas)]
