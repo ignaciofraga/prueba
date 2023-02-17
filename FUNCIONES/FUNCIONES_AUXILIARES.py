@@ -385,25 +385,23 @@ def consulta_botellas():
                 
     # Recorta el dataframe de datos biogeoquimicos con las variables seleccionadas
     df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos.loc[:, listado_variables]
-           
-    st.text(df_datos_biogeoquimicos_seleccion)
-        
-    # Si se exportan datos de pH, corregir la informacion del método utilizado
-    if io_ph:
-        conn                    = init_connection()
-        df_metodos_ph           = psql.read_sql('SELECT * FROM metodo_pH', conn)
-        conn.close()     
+                   
+    # # Si se exportan datos de pH, corregir la informacion del método utilizado
+    # if io_ph:
+    #     conn                    = init_connection()
+    #     df_metodos_ph           = psql.read_sql('SELECT * FROM metodo_pH', conn)
+    #     conn.close()     
                
-        df_metodos_ph                      = df_metodos_ph.rename(columns={"id_metodo": "ph_metodo"})
-        df_datos_biogeoquimicos_seleccion  = pandas.merge(df_datos_biogeoquimicos_seleccion, df_metodos_ph, on="ph_metodo")
-        df_datos_biogeoquimicos_seleccion  = df_datos_biogeoquimicos_seleccion.drop(columns=['ph_metodo','metodo_ph'])
-        df_datos_biogeoquimicos_seleccion  = df_datos_biogeoquimicos_seleccion.rename(columns={"descripcion_metodo_ph": "metodo_pH"})        
+    #     df_metodos_ph                      = df_metodos_ph.rename(columns={"id_metodo": "ph_metodo"})
+    #     df_datos_biogeoquimicos_seleccion  = pandas.merge(df_datos_biogeoquimicos_seleccion, df_metodos_ph, on="ph_metodo")
+    #     df_datos_biogeoquimicos_seleccion  = df_datos_biogeoquimicos_seleccion.drop(columns=['ph_metodo','metodo_ph'])
+    #     df_datos_biogeoquimicos_seleccion  = df_datos_biogeoquimicos_seleccion.rename(columns={"descripcion_metodo_ph": "metodo_pH"})        
         
-        listado_columnas = df_datos_biogeoquimicos_seleccion.columns.tolist()
-        listado_columnas.insert(listado_columnas.index('ph_qf')+1,listado_columnas.pop(listado_columnas.index('metodo_pH')))
-        df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos_seleccion[listado_columnas]
+    #     listado_columnas = df_datos_biogeoquimicos_seleccion.columns.tolist()
+    #     listado_columnas.insert(listado_columnas.index('ph_qf')+1,listado_columnas.pop(listado_columnas.index('metodo_pH')))
+    #     df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos_seleccion[listado_columnas]
     
-    st.text(df_datos_biogeoquimicos_seleccion)
+    # st.text(df_datos_biogeoquimicos_seleccion)
     
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
      
@@ -412,18 +410,13 @@ def consulta_botellas():
         identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
         for idato in range(len(listado_salidas)):
             identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
-        
-
-        
+                
         # Elimina las columnas que no interesan en los dataframes a utilizar
         #df_salidas_seleccion        = df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
         df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
 
-
-
         # conserva los datos de las salidas seleccionadas
         df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
-
  
         # Recupera los muestreos correspondientes a las salidas seleccionadas
         df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(identificadores_salidas)]
