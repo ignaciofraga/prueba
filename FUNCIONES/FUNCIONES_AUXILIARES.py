@@ -274,9 +274,7 @@ def consulta_botellas():
 
     # A partir del programa y año elegido, selecciona uno o varios muestreos   
     listado_salidas                 = st.multiselect('Muestreo',(df_salidas_seleccion['nombre_salida']))   
-  
-    st.text(listado_salidas)  
-  
+    
     ### SELECCION DE VARIABLES
   
     listado_variables =['muestreo']  
@@ -412,11 +410,13 @@ def consulta_botellas():
         for idato in range(len(listado_salidas)):
             identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
         
+        st.text(identificadores_salidas) 
+        
         # Elimina las columnas que no interesan en los dataframes a utilizar
         #df_salidas_seleccion        = df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
         df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
 
-        st.text(df_salidas_seleccion)
+
 
         # conserva los datos de las salidas seleccionadas
         df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
@@ -425,7 +425,8 @@ def consulta_botellas():
         # Recupera los muestreos correspondientes a las salidas seleccionadas
         df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(identificadores_salidas)]
         df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"id_muestreo": "muestreo"})
-          
+
+                 
                    
         # Asocia las coordenadas y nombre de estación de cada muestreo
         df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
