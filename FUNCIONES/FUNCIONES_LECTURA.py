@@ -459,7 +459,7 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
     datos_PAR         = []
     datos_fluor       = []
     datos_O2          = []
-    import streamlit as st
+
     # Lee el archivo .btl y escribe la información de las botellas en un archivo temporal
     cast_muestreo          = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
     fecha_muestreo_archivo = None
