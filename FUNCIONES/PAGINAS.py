@@ -1793,7 +1793,7 @@ def entrada_botellas():
                         for idato in range(datos_botellas.shape[0]):
 
 
-                            st.text(int(datos_botellas['id_muestreo_temp'][idato]))
+                            st.text(int(datos_botellas['id_muestreo'][idato]))
                             st.text(datos_botellas['temperatura_ctd'][idato])
                             st.text(int(qf_defecto))
                             st.text(datos_botellas['salinidad_ctd'][idato])
@@ -1803,7 +1803,7 @@ def entrada_botellas():
                             instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
                                       VALUES (%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf);''' 
                                         
-                            cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(qf_defecto),datos_botellas['salinidad_ctd'][idato],int(qf_defecto)))
+                            cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo'][idato]),datos_botellas['temperatura_ctd'][idato],int(qf_defecto),datos_botellas['salinidad_ctd'][idato],int(qf_defecto)))
                             conn.commit()                            
                             
                             # PAR (si existe)
@@ -1812,7 +1812,7 @@ def entrada_botellas():
                                 instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,par_ctd,par_ctd_qf)
                                       VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (par_ctd,par_ctd_qf) = ROW(EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
                                 
-                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'].iloc[idato]),datos_botellas['par_ctd'].iloc[idato],int(qf_defecto)))
+                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo'].iloc[idato]),datos_botellas['par_ctd'].iloc[idato],int(qf_defecto)))
                                 conn.commit()
                                            
                             # Fluorescencia (si existe)
@@ -1820,7 +1820,7 @@ def entrada_botellas():
                                 instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,fluorescencia_ctd,fluorescencia_ctd_qf)
                                       VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (fluorescencia_ctd,fluorescencia_ctd_qf) = ROW(EXCLUDED.fluorescencia_ctd,EXCLUDED.fluorescencia_ctd_qf);''' 
                                         
-                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['fluorescencia_ctd'][idato],int(qf_defecto)))
+                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo'][idato]),datos_botellas['fluorescencia_ctd'][idato],int(qf_defecto)))
                                 conn.commit()           
                  
                             # Oxígeno (si existe)
@@ -1828,7 +1828,7 @@ def entrada_botellas():
                                 instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,oxigeno_ctd,oxigeno_ctd_qf)
                                       VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (oxigeno_ctd,oxigeno_ctd_qf) = ROW(EXCLUDED.oxigeno_ctd,EXCLUDED.oxigeno_ctd_qf);''' 
                                         
-                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['oxigeno_ctd'][idato],int(qf_defecto)))                              
+                                cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo'][idato]),datos_botellas['oxigeno_ctd'][idato],int(qf_defecto)))                              
                                 conn.commit()     
             
                         texto_exito = 'Archivo ' + archivo_subido.name + ' procesado correctamente'
@@ -1838,11 +1838,6 @@ def entrada_botellas():
                     
                         texto_error = 'La fecha del archivo ' + archivo_subido.name + ' no coindice con la fecha seleccionada '
                         st.warning(texto_error, icon="⚠️")                    
-                            
-                    
-                    # except:
-                    #     texto_error = 'Error en el procesado del archivo ' + archivo_subido.name
-                    #     st.warning(texto_error, icon="⚠️")
         
             cursor.close()
             conn.close()   
