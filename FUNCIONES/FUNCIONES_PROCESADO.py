@@ -1468,5 +1468,32 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
        
     return datos_corregidos
     
-    
+################################################################
+######## FUNCION PARA ASOCIAR A CADA DATO EL FACTOR CORRECTOR DE QC2 DE NUTRIENTES ########
+################################################################    
 
+def recupera_factores_nutrientes(df_muestreos_seleccionados):
+    
+    import streamlit as st
+    from FUNCIONES.FUNCIONES_AUXILIARES import menu_seleccion   
+    from FUNCIONES.FUNCIONES_AUXILIARES import init_connection 
+    
+    # Recupera los datos de conexión
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port
+
+    # Recupera información de la base de datos
+    conn                      = init_connection()
+    df_factores_nutrientes    = psql.read_sql('SELECT * FROM factores_correctores_nutrientes', conn)
+    df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+    conn.close()
+
+
+    # Carga la tabla con los factores de corrección
+    
+    
+    
+    return df_muestreos_seleccionados

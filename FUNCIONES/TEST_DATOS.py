@@ -33,46 +33,63 @@ programa_seleccionado = 'RADIAL CANTABRICO'
 
 
 
-df_datos_importacion  = pandas.read_excel(archivo_datos) 
-
-
-# corrige el formato de las fechas
-for idato in range(df_datos_importacion.shape[0]):
-    df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
-    if df_datos_importacion['fecha_muestreo'][idato]:
-        if isinstance(df_datos_importacion['hora_muestreo'][idato], str):
-            df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
+identificadores_salidas = [158]
 
 
 
+# Recupera la tabla con los registros de los muestreos
+con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+conn_psql        = create_engine(con_engine)
+df_factores_nutrientes    = psql.read_sql('SELECT * FROM factores_correctores_nutrientes', conn_psql)
+df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
 
-# Realiza un control de calidad primario a los datos importados   
-datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
 
-# Recupera el identificador del programa de muestreo
-id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn_psql)
+df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
+df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn_psql)
+df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn_psql)
+
+conn_psql.dispose()   
 
 
-# Encuentra la estación asociada a cada registro
-datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# Encuentra las salidas al mar correspondientes  
-datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
- 
+df_salidas_seleccion = df_salidas.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones'])
 
-# # Encuentra el identificador asociado a cada registro
-datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
- 
-FUNCIONES_PROCESADO.inserta_datos_fisica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
+df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
 
-# datos = datos_corregidos
+df_datos_fisicos_seleccion = df_datos_fisicos
+df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos
 
-# # Recupera la tabla con los registros de los muestreos
-# con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-# conn_psql        = create_engine(con_engine)
-# tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
-# tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
-   
+
+# Recupera los muestreos correspondientes a las salidas seleccionadas
+df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(identificadores_salidas)]
+df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"id_muestreo": "muestreo"})
+
+# Asocia las coordenadas y nombre de estación de cada muestreo
+df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
+df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
+              
+# Asocia las propiedades físicas de cada muestreo
+df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos_seleccion, on="muestreo")
+             
+# Asocia las propiedades biogeoquimicas de cada muestreo
+df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
+       
+
+
+
+
+factores_salidas  = pandas.merge(df_factores_nutrientes, df_muestreos, on="salida_mar")
+                      
+factores_salidas  = factores_salidas.drop(columns=['nombre_salida','observaciones','salida_mar','nombre_muestreo','fecha_muestreo','hora_muestreo','latitud_muestreo','longitud_muestreo','estacion','num_cast','botella','prof_referencia','presion_ctd'])
+    
+df_muestreos_seleccionados['densidad'] = seawater.eos80.dens0(df_muestreos_seleccionados['salinidad_ctd'], df_muestreos_seleccionados['temperatura_ctd'])
+
+
+
+df_muestreos_seleccionados['factor_nitrato']  = [None]*df_muestreos_seleccionados.shape[0]
+df_muestreos_seleccionados['factor_silicato'] = [None]*df_muestreos_seleccionados.shape[0]
+df_muestreos_seleccionados['factor_fosfato']  = [None]*df_muestreos_seleccionados.shape[0]
 # datos['id_muestreo']  = numpy.zeros(datos.shape[0],dtype=int)
 
 # # si no hay ningun valor en la tabla de registro, meter directamente todos los datos registrados

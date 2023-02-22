@@ -14,6 +14,7 @@ from io import BytesIO
 import pandas
 from sqlalchemy import create_engine
 import math
+import FUNCIONES_PROCESADO
 
 pandas.options.mode.chained_assignment = None
 
@@ -385,24 +386,7 @@ def consulta_botellas():
                 
     # Recorta el dataframe de datos biogeoquimicos con las variables seleccionadas
     df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos.loc[:, listado_variables]
-                   
-    # # Si se exportan datos de pH, corregir la informacion del método utilizado
-    # if io_ph:
-    #     conn                    = init_connection()
-    #     df_metodos_ph           = psql.read_sql('SELECT * FROM metodo_pH', conn)
-    #     conn.close()     
-               
-    #     df_metodos_ph                      = df_metodos_ph.rename(columns={"id_metodo": "ph_metodo"})
-    #     df_datos_biogeoquimicos_seleccion  = pandas.merge(df_datos_biogeoquimicos_seleccion, df_metodos_ph, on="ph_metodo")
-    #     df_datos_biogeoquimicos_seleccion  = df_datos_biogeoquimicos_seleccion.drop(columns=['ph_metodo','metodo_ph'])
-    #     df_datos_biogeoquimicos_seleccion  = df_datos_biogeoquimicos_seleccion.rename(columns={"descripcion_metodo_ph": "metodo_pH"})        
-        
-    #     listado_columnas = df_datos_biogeoquimicos_seleccion.columns.tolist()
-    #     listado_columnas.insert(listado_columnas.index('ph_qf')+1,listado_columnas.pop(listado_columnas.index('metodo_pH')))
-    #     df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos_seleccion[listado_columnas]
-    
-    # st.text(df_datos_biogeoquimicos_seleccion)
-    
+                       
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
      
     if len(listado_salidas) > 0:  
@@ -432,8 +416,10 @@ def consulta_botellas():
                      
         # Asocia las propiedades biogeoquimicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
-        
-        st.text(df_muestreos_seleccionados)
+               
+        ##
+        #df_muestreos_seleccionados  = FUNCIONES_PROCESADO.recupera_factores_nutrientes(df_muestreos_seleccionados)
+        ##
         
         # Elimina las columnas que no interesan
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
