@@ -478,7 +478,7 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
                 texto_longitud = texto_linea[13:-1]
                 st.text(texto_longitud)
                 lon_muestreo  = float(texto_linea[13:20])
-                if texto_longitud[-1] == 'W':
+                if texto_linea[-1] == 'W':
                     lon_muestreo = lon_muestreo*-1
                     
                 st.text(lat_muestreo)
