@@ -479,10 +479,11 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
                 lon_muestreo  = float(texto_linea[13:20])
                 if texto_longitud[-1] == 'W':
                     lon_muestreo = lon_muestreo*-1
+                    
+                st.text(lat_muestreo)
+                st.text(lon_muestreo)
 
             
-            st.text(lat_muestreo)
-            st.text(lon_muestreo)
                 
             if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
                 hora_muestreo = datetime.datetime.strptime(texto_linea[27:35],'%H:%M:%S').time() 
