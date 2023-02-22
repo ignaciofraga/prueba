@@ -459,6 +459,7 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
     datos_PAR         = []
     datos_fluor       = []
     datos_O2          = []
+    datos_tiempos     = []
 
     # Lee el archivo .btl y escribe la información de las botellas en un archivo temporal
     cast_muestreo          = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
@@ -504,7 +505,7 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
     
                 # Encuentra los indices (posiciones) de cada variable, si ésta está incluida
                 indice_botellas  = datos_linea.index("Bottle")
-    
+        
                 try:
                     indice_salinidad = datos_linea.index("Sal00")            
                 except:
@@ -568,7 +569,10 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
                     if io_O2 == 1:
                         datos_O2.append(float(datos_linea[indice_O2 + 2]))                    
                                     
-    
+                else: # Linea con los tiempos de cierre
+                
+                    hora_ciere = datetime.datetime.strptime(datos_linea[0],'%H:%M:%S').time()     
+                    datos_tiempos.append(hora_ciere)
     
     
     # Comprueba que la fecha contenida en el archivo y la del nombre del archivo son la misma
@@ -583,8 +587,8 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
     else:
         
         # Une las listas en un dataframe
-        datos_botellas = pandas.DataFrame(list(zip(datos_botella, datos_salinidad,datos_temperatura,datos_presion)),
-                       columns =['botella', 'salinidad_ctd','temperatura_ctd','presion_ctd'])
+        datos_botellas = pandas.DataFrame(list(zip(datos_botella, datos_tiempos,datos_salinidad,datos_temperatura,datos_presion)),
+                       columns =['botella', 'hora_muestreo' , 'salinidad_ctd','temperatura_ctd','presion_ctd'])
         
         # Añade columnas con el QF de T y S
         datos_botellas['temperatura_ctd_qf'] = 1
@@ -615,19 +619,11 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
         # Añade informacion de lat/lon y fecha para que no elimine el registro durante el control de calidad
         datos_botellas['latitud']                  = lat_muestreo  
         datos_botellas['longitud']                 = lon_muestreo 
-        datos_botellas['fecha_muestreo']           = fecha_salida
-        
-        # datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
-        
-        # Añade columnas con datos del muestreo 
         datos_botellas['id_estacion_temp']         = numpy.zeros(datos_botellas.shape[0],dtype=int)
         datos_botellas['id_estacion_temp']         = id_estacion
         datos_botellas['estacion']                 = id_estacion
         datos_botellas['fecha_muestreo']           = fecha_muestreo_archivo
-        datos_botellas['hora_muestreo']            = hora_muestreo
         datos_botellas['num_cast']                 = cast_muestreo
-        datos_botellas['configuracion_perfilador'] = 1
-        datos_botellas['configuracion_superficie'] = 1
         datos_botellas['programa']                 = id_programa_elegido
         
         mensaje_error = []

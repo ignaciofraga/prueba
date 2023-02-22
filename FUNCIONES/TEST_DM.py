@@ -80,15 +80,15 @@ if fecha_salida_archivo == fecha_salida:
     # Lee datos de botellas
     mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
    
-    # Aplica control de calidad
-    datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
-    datos_botellas['id_estacion_temp']         = datos_botellas['estacion']
+    # # Aplica control de calidad
+    # datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
+    # datos_botellas['id_estacion_temp']         = datos_botellas['estacion']
 
-    # Asigna el identificador de la salida al mar
-    datos_botellas ['id_salida'] =  id_salida
+    # # Asigna el identificador de la salida al mar
+    # datos_botellas ['id_salida'] =  id_salida
 
-    # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-    datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+    # # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+    # datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
  
     # qf_defecto = 1   
