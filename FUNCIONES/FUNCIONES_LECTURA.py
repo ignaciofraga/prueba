@@ -467,13 +467,13 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
         texto_linea = datos_archivo[ilinea]
         if texto_linea[0:1] == '#' or texto_linea[0:1] == '*':
             
-            st.text(texto_linea[0:12])
+
             if texto_linea[0:12] == '** Latitude:': # Línea con latitud del muestreo
                 texto_latitud = texto_linea[12:-1]
                 lat_muestreo  = float(texto_linea[12:19])
                 if texto_latitud[-1] == 'S':
                     lat_muestreo = lat_muestreo*-1
-            st.text(texto_linea[0:13])
+
             if texto_linea[0:13] == '** Longitude:': # Línea con latitud del muestreo
                 texto_longitud = texto_linea[13:-1]
                 lon_muestreo  = float(texto_linea[13:20])
