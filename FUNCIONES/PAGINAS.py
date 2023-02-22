@@ -1789,7 +1789,11 @@ def entrada_botellas():
                         for idato in range(datos_botellas.shape[0]):
 
 
-                            st.text(int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(qf_defecto),datos_botellas['salinidad_ctd'][idato],int(qf_defecto)))                            
+                            st.text(int(datos_botellas['id_muestreo_temp'][idato]))
+                            st.text(datos_botellas['temperatura_ctd'][idato])
+                            st.text(int(qf_defecto))
+                            st.text(datos_botellas['salinidad_ctd'][idato])
+                                                        
 
                             # Inserta datos físicos
                             instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
