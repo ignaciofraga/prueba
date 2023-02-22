@@ -469,23 +469,15 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
             
 
             if texto_linea[0:12] == '** Latitude:': # Línea con latitud del muestreo
-                texto_latitud = texto_linea[12:-1]
                 lat_muestreo  = float(texto_linea[12:19])
-                if texto_latitud[-1] == 'S':
+                if texto_linea[-1] == 'S':
                     lat_muestreo = lat_muestreo*-1
 
             if texto_linea[0:13] == '** Longitude:': # Línea con latitud del muestreo
-                texto_longitud = texto_linea[13:-1]
-                st.text(texto_longitud)
                 lon_muestreo  = float(texto_linea[13:20])
                 if texto_linea[-1] == 'W':
                     lon_muestreo = lon_muestreo*-1
                     
-                st.text(lat_muestreo)
-                st.text(lon_muestreo)
-
-            
-                
             if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
                 hora_muestreo = datetime.datetime.strptime(texto_linea[27:35],'%H:%M:%S').time() 
 
@@ -621,8 +613,8 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
         
         
         # Añade informacion de lat/lon y fecha para que no elimine el registro durante el control de calidad
-        datos_botellas['latitud']                  = lat_estacion  
-        datos_botellas['longitud']                 = lon_estacion
+        datos_botellas['latitud_muestreo']         = lat_muestreo  
+        datos_botellas['longitud_muetreo']         = lon_muestreo 
         datos_botellas['fecha_muestreo']           = fecha_salida
         # datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
         

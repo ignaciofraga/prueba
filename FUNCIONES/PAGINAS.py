@@ -1776,6 +1776,8 @@ def entrada_botellas():
                         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
                         datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
+                        st.text(datos_botellas)   
+             
                         qf_defecto = 1   
                                                 
                         for idato in range(datos_botellas.shape[0]):
