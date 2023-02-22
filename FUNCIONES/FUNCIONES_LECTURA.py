@@ -626,7 +626,7 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
         datos_botellas['id_estacion_temp']         = numpy.zeros(datos_botellas.shape[0],dtype=int)
         datos_botellas['id_estacion_temp']         = id_estacion
         datos_botellas['estacion']                 = id_estacion
-        datos_botellas['fecha_muestreo']           = fecha_salida
+        datos_botellas['fecha_muestreo']           = fecha_muestreo_archivo
         datos_botellas['hora_muestreo']            = hora_muestreo
         datos_botellas['num_cast']                 = cast_muestreo
         datos_botellas['configuracion_perfilador'] = 1
