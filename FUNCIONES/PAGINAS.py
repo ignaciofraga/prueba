@@ -1766,12 +1766,6 @@ def entrada_botellas():
                         # Lee datos de botellas
                         mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
            
-                        # Muestra una tabla con las configuraciones 
-                        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_botellas)
-                        gridOptions = gb.build()
-                        st_aggrid.AgGrid(datos_botellas,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
-   
-           
                         # Aplica control de calidad
                         datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
                         datos_botellas['id_estacion_temp']         =    datos_botellas['estacion']
@@ -1782,22 +1776,9 @@ def entrada_botellas():
                         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
                         datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
-                        # Muestra una tabla con las configuraciones 
-                        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_botellas)
-                        gridOptions = gb.build()
-                        st_aggrid.AgGrid(datos_botellas,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
-   
-             
                         qf_defecto = 1   
                                                 
                         for idato in range(datos_botellas.shape[0]):
-
-
-                            st.text(int(datos_botellas['id_muestreo'][idato]))
-                            st.text(datos_botellas['temperatura_ctd'][idato])
-                            st.text(int(qf_defecto))
-                            st.text(datos_botellas['salinidad_ctd'][idato])
-                                                        
 
                             # Inserta datos físicos
                             instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
