@@ -438,8 +438,6 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
     posicion_inicio    = nombre_archivo.find('e') + 1
     posicion_final     = nombre_archivo.find('.')
     nombre_estacion    = nombre_archivo[posicion_inicio:posicion_final].upper() #+ 'CO'                
-    import streamlit as st
-    st.text(nombre_estacion)
     id_estacion        = df_estaciones_radiales['id_estacion'][df_estaciones_radiales['nombre_estacion']==nombre_estacion].iloc[0] 
     
     # Identifica la fecha del muestreo
@@ -449,8 +447,8 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
     
     id_estacion              = tabla_estaciones['id_estacion'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
     profundidades_referencia = tabla_estaciones['profundidades_referencia'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
-    lat_estacion             = tabla_estaciones['latitud'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
-    lon_estacion             = tabla_estaciones['longitud'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
+    lat_estacion             = tabla_estaciones['latitud_estacion'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
+    lon_estacion             = tabla_estaciones['longitud_estacion'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
     
     
     # Genera las listas en las que se guardarán los datos si éstos existen
@@ -468,8 +466,22 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
     for ilinea in range(len(datos_archivo)):
         texto_linea = datos_archivo[ilinea]
         if texto_linea[0:1] == '#' or texto_linea[0:1] == '*':
-            # if texto_linea[0:8] == '** Time:': # Línea con hora del cast
-            #     hora_muestreo = datetime.datetime.strptime(texto_linea[8:13],'%H:%M').time() 
+            
+            if texto_linea[0:12] == '** Latitude:': # Línea con latitud del muestreo
+                texto_latitud = texto_linea[12:-1]
+                lat_muestreo  = float(texto_linea[12:19])
+                if texto_latitud[-1] == 'S':
+                    lat_muestreo = lat_muestreo*-1
+
+            if texto_linea[0:13] == '** Longitude:': # Línea con latitud del muestreo
+                texto_longitud = texto_linea[13:-1]
+                lon_muestreo  = float(texto_linea[13:20])
+                if texto_longitud[-1] == 'W':
+                    lon_muestreo = lon_muestreo*-1
+
+            import streamlit as st
+            st.text(lat_muestreo)
+            st.text(lon_muestreo)
                 
             if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
                 hora_muestreo = datetime.datetime.strptime(texto_linea[27:35],'%H:%M:%S').time() 
