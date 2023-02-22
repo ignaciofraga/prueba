@@ -1776,7 +1776,11 @@ def entrada_botellas():
                         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
                         datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
-                        st.text(datos_botellas)   
+                        # Muestra una tabla con las configuraciones 
+                        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(datos_botellas)
+                        gridOptions = gb.build()
+                        st_aggrid.AgGrid(datos_botellas,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
+  
              
                         qf_defecto = 1   
                                                 
