@@ -613,8 +613,8 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
         
         
         # Añade informacion de lat/lon y fecha para que no elimine el registro durante el control de calidad
-        datos_botellas['latitud_muestreo']         = lat_muestreo  
-        datos_botellas['longitud_muetreo']         = lon_muestreo 
+        datos_botellas['latitud']                  = lat_muestreo  
+        datos_botellas['longitud']                 = lon_muestreo 
         datos_botellas['fecha_muestreo']           = fecha_salida
         # datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
         

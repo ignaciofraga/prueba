@@ -32,6 +32,8 @@ import FUNCIONES_LECTURA
 
 programa_seleccionado = 'RADIAL CORUÑA'
 tipo_salida           = 'MENSUAL'
+abreviatura_programa  = 'RADCOR'
+
 
 archivo_datos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/PRUEBA_WEB/prueba/EJEMPLOS/EXCEL_ENTRADA.xlsx'
 
@@ -43,70 +45,92 @@ conn_psql.dispose()
 
 
 
+# Recupera el identificador de la salida seleccionada
+id_salida                   = 293
 
-
-# Lectura del archivo con los resultados del AA
-df_datos_importacion =pandas.read_excel(archivo_datos)
-
-variables_archivo = df_datos_importacion.columns.tolist()
-variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
-variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
+fecha_salida                = datetime.date(2023,1,24)
 
 
 
-
-# corrige el formato de las fechas
-for idato in range(df_datos_importacion.shape[0]):
-    df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()
-    if df_datos_importacion['fecha_muestreo'][idato]:
-        df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
-
-# Realiza un control de calidad primario a los datos importados   
-datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
-
-# Recupera el identificador del programa de muestreo
-id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+  
+    
+# Conecta con la base de datos
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor() 
 
 
-#with st.spinner('Asignando la estación y salida al mar de cada medida'):
-# Encuentra la estación asociada a cada registro
-datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+archivo_subido = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados/2023/rad_men_2023_01_24_0485/btl+PAR+flscufa+O2/20230124e2.btl'
+nombre_archivo = '20230124e2.btl'
 
-# Encuentra las salidas al mar correspondientes  
-datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
- 
-# Encuentra el identificador asociado a cada registro
-#with st.spinner('Asignando el registro correspondiente a cada medida'):
-datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+
+lectura_archivo = open(archivo_subido, "r")  
+datos_archivo = lectura_archivo.readlines()
+
+# # Lee los datos de cada archivo de botella
+# nombre_archivo = archivo_subido.name
+# datos_archivo = archivo_subido.getvalue().decode('utf-8').splitlines()            
+
+# Comprueba que la fecha del archivo y de la salida coinciden
+fecha_salida_texto    = nombre_archivo[0:8]
+fecha_salida_archivo  = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
+
+if fecha_salida_archivo == fecha_salida:
+
+    # Lee datos de botellas
+    mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
    
+    # Aplica control de calidad
+    datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
+    datos_botellas['id_estacion_temp']         = datos_botellas['estacion']
 
-if len(variables_fisica)>0:
-    
-    listado_aux   = ['id_muestreo_temp'] + variables_fisica 
-    datos_fisica  = datos_corregidos[listado_aux] 
-    
-    str_variables = ','.join(variables_fisica)
-    str_valores   = ',%s'*len(variables_fisica)
-    listado_excluded = ['EXCLUDED.' + var for var in variables_fisica]
-    str_exclude   = ','.join(listado_excluded)
-    for idato in range(datos_corregidos.shape[0]):
+    # Asigna el identificador de la salida al mar
+    datos_botellas ['id_salida'] =  id_salida
+
+    # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+    datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+ 
+ 
+    # qf_defecto = 1   
                             
-        instruccion_sql = "INSERT INTO datos_discretos_fisica (muestreo," + str_variables + ") VALUES (%s" +  str_valores + ") ON CONFLICT (muestreo) DO UPDATE SET (" + str_variables + ") = ROW(" + str_exclude + ");"                            
-        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        cursor = conn.cursor()
-        cursor.execute(instruccion_sql, (datos_fisica.iloc[idato]))
-        conn.commit()
+    # for idato in range(datos_botellas.shape[0]):
+
+    #     # Inserta datos físicos
+    #     instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
+    #               VALUES (%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf);''' 
+                    
+    #     cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['temperatura_ctd'][idato],int(qf_defecto),datos_botellas['salinidad_ctd'][idato],int(qf_defecto)))
+    #     conn.commit()                            
+        
+    #     # PAR (si existe)
+    #     if io_par == 1:
+            
+    #         instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,par_ctd,par_ctd_qf)
+    #               VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (par_ctd,par_ctd_qf) = ROW(EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
+            
+    #         cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'].iloc[idato]),datos_botellas['par_ctd'].iloc[idato],int(qf_defecto)))
+    #         conn.commit()
+                       
+    #     # Fluorescencia (si existe)
+    #     if io_fluor == 1:                
+    #         instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,fluorescencia_ctd,fluorescencia_ctd_qf)
+    #               VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (fluorescencia_ctd,fluorescencia_ctd_qf) = ROW(EXCLUDED.fluorescencia_ctd,EXCLUDED.fluorescencia_ctd_qf);''' 
+                    
+    #         cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['fluorescencia_ctd'][idato],int(qf_defecto)))
+    #         conn.commit()           
+ 
+    #     # Oxígeno (si existe)
+    #     if io_O2 == 1:                
+    #         instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,oxigeno_ctd,oxigeno_ctd_qf)
+    #               VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (oxigeno_ctd,oxigeno_ctd_qf) = ROW(EXCLUDED.oxigeno_ctd,EXCLUDED.oxigeno_ctd_qf);''' 
+                    
+    #         cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo_temp'][idato]),datos_botellas['oxigeno_ctd'][idato],int(qf_defecto)))                              
+    #         conn.commit()     
 
 
 
-# Introduce los datos en la base de datos
-#with st.spinner('Intoduciendo la información en la base de datos'):
+cursor.close()
+conn.close()   
 
-# FUNCIONES_PROCESADO.inserta_datos_fisica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
-
-# FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_corregidos,direccion_host,base_datos,usuario,contrasena,puerto)
-
-
-    
     
 
