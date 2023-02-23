@@ -461,6 +461,8 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
     datos_O2          = []
     datos_tiempos     = []
 
+    listado_meses = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
     # Lee el archivo .btl y escribe la información de las botellas en un archivo temporal
     cast_muestreo          = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
     fecha_muestreo_archivo = None
@@ -479,8 +481,15 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
                 if texto_linea[-1] == 'W':
                     lon_muestreo = lon_muestreo*-1
                     
+            if texto_linea[0:22] == '* System UpLoad Time =': # Línea con hora del cast
+                listado_textos   = texto_linea.split('= ') 
+                datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
+                            
             if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
-                hora_muestreo = datetime.datetime.strptime(texto_linea[27:35],'%H:%M:%S').time() 
+                listado_textos    = texto_linea.split('= ')  
+                datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
+                offset_tiempo     = (datetime_sistema - datetime_muestreo).seconds
+
 
             if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
 #                cast_muestreo = int(texto_linea[8:len(texto_linea)])
@@ -571,8 +580,11 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
                                     
                 else: # Linea con los tiempos de cierre
                 
-                    hora_ciere = datetime.datetime.strptime(datos_linea[0],'%H:%M:%S').time()     
-                    datos_tiempos.append(hora_ciere)
+                    hora_ciere                = datetime.datetime.strptime(datos_linea[0],'%H:%M:%S').time() 
+                    datetime_cierre           = datetime.datetime.combine(datetime_muestreo.date(),hora_ciere)
+                    datetime_cierre_corregido = datetime_cierre - datetime.timedelta(seconds=offset_tiempo)    
+                    hora_ciere_corregida      = datetime_cierre_corregido.time()
+                    datos_tiempos.append(hora_ciere_corregida)
     
     
     # Comprueba que la fecha contenida en el archivo y la del nombre del archivo son la misma
