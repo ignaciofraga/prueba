@@ -1751,7 +1751,7 @@ def entrada_botellas():
              
         submit = st.form_submit_button("Añadir o modificar datos", clear_on_submit=True)                    
     
-            if submit is True:
+        if submit is True:
           
             # Conecta con la base de datos
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
