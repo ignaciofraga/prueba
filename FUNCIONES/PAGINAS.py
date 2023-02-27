@@ -1750,7 +1750,7 @@ def entrada_botellas():
             with col2:
                 listado_archivos_cnv = st.file_uploader("Arrastra o selecciona los archivos .cnv", accept_multiple_files=True)   
                  
-            submit = st.form_submit_button("Añadir o modificar datos", clear_on_submit=True)                    
+            submit = st.form_submit_button("Añadir o modificar datos")                    
     
         if submit is True:
           
