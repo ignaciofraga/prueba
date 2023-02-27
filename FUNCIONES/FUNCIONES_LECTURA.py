@@ -322,25 +322,34 @@ def lectura_archivo_perfiles(datos_archivo):
 
     # Predimensionamientos
     listado_variables  = []
-    io_datos           = 0
+    datos_perfil       = []
     
     # Lee el archivo .cnv
     cast_muestreo      = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
     fecha_muestreo     = None
     hora_muestreo      = None
+    datetime_muestreo  = None
+    datetime_sistema   = None
+    
     for ilinea in range(len(datos_archivo)):
         texto_linea = datos_archivo[ilinea]
-        if io_datos == 0:            
-            if texto_linea[0:8] == '** Time:': # Línea con hora del cast
-                hora_muestreo = datetime.datetime.strptime(texto_linea[8:13],'%H:%M').time() 
+        
+        if texto_linea[0:1] == '#' or texto_linea[0:1] == '*':            
+ 
             if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
-                cast_muestreo = int(texto_linea[8:12])
-            if texto_linea[0:8] == '** Date:': # Línea con la fecha
-                fecha_muestreo = texto_linea[8:16]
-                try: 
-                    fecha_muestreo = datetime.datetime.strptime(fecha_muestreo, '%d/%m/%y').date()
+                listado_textos   = texto_linea.split(': ') 
+                try:
+                    cast_muestreo = int(listado_textos[-1])
                 except:
                     pass
+                
+            if texto_linea[0:22] == '* System UpLoad Time =': # Línea con hora del cast
+                listado_textos   = texto_linea.split('= ') 
+                datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
+                                        
+            if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
+                listado_textos    = texto_linea.split('= ')  
+                datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
                 
             if texto_linea[0:6] == '# name': # Línea con variable muestreada
                 posicion_inicio    = texto_linea.find('=') + 2
@@ -361,18 +370,112 @@ def lectura_archivo_perfiles(datos_archivo):
                     nombre_variable = 'oxigeno_ctd'                    
                 
                 listado_variables  = listado_variables + [nombre_variable]
-                
-            if texto_linea[0:5] == '*END*': # Línea final de encabezado, a partir de aquí, datos
-                datos_perfil     = []
-                io_datos         = 1
-        
+                            
         else:
-
+            
+            
             datos_linea = texto_linea.split() 
             listado_datos = [float(x) for x in datos_linea] 
             datos_perfil.append(listado_datos) 
             
-    return datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo
+            
+            
+    # Determina el offset de tiempo
+    if datetime_muestreo is not None:               
+        offset_tiempo     = (datetime_sistema - datetime_muestreo).seconds
+    else:
+        mes_muestreo      = datetime_sistema.month
+        if mes_muestreo >=5 and mes_muestreo < 11: # Horario verano
+            offset_tiempo = 7200
+        else: #F Horario invierno
+            offset_tiempo = 3600
+            
+    #Extrae la fecha y hora de muestreo
+    fecha_muestreo = datetime_sistema.date()
+    hora_muestreo  = datetime_sistema - datetime.timedelta(seconds=offset_tiempo)
+
+    return datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo    
+
+
+    # # Predimensionamientos
+    # listado_variables  = []
+    # io_datos           = 0
+    
+    # # Lee el archivo .cnv
+    # cast_muestreo      = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
+    # fecha_muestreo     = None
+    # hora_muestreo      = None
+    # datetime_muestreo  = None
+    # datetime_sistema   = None
+    
+    # for ilinea in range(len(datos_archivo)):
+    #     texto_linea = datos_archivo[ilinea]
+    #     if io_datos == 0:            
+    #         if texto_linea[0:8] == '** Time:': # Línea con hora del cast
+    #             hora_muestreo = datetime.datetime.strptime(texto_linea[8:13],'%H:%M').time() 
+    #         if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
+    #             cast_muestreo = int(texto_linea[8:12])
+    #         if texto_linea[0:8] == '** Date:': # Línea con la fecha
+    #             fecha_muestreo = texto_linea[8:16]
+                
+    #         if texto_linea[0:22] == '* System UpLoad Time =': # Línea con hora del cast
+    #             listado_textos   = texto_linea.split('= ') 
+    #             print(listado_textos)
+    #             datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
+                            
+    #         print(texto_linea[0:22])
+                
+    #         if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
+    #             listado_textos    = texto_linea.split('= ')  
+    #             datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
+                
+    #         print(datetime_sistema,datetime_muestreo)
+    #         # Determina el offset de tiempo
+    #         if datetime_muestreo is not None:               
+    #             offset_tiempo     = (datetime_sistema - datetime_muestreo).seconds
+    #         else:
+    #             mes_muestreo      = datetime_sistema.month
+    #             if mes_muestreo >=5 and mes_muestreo < 11: # Horario verano
+    #                 offset_tiempo = 7200
+    #             else: #F Horario invierno
+    #                 offset_tiempo = 3600
+                    
+    #         #Extrae la fecha y hora de muestreo
+    #         fecha_muestreo = datetime_sistema.date()
+    #         hora_muestreo  = datetime_sistema - datetime.timedelta(seconds=offset_tiempo)
+                
+
+    #         if texto_linea[0:6] == '# name': # Línea con variable muestreada
+    #             posicion_inicio    = texto_linea.find('=') + 2
+    #             posicion_final     = texto_linea.find(':')
+    #             nombre_variable    = texto_linea[posicion_inicio:posicion_final]
+                
+    #             if nombre_variable == 'prSM':
+    #                 nombre_variable = 'presion_ctd'
+    #             if nombre_variable == 't090C':
+    #                 nombre_variable = 'temperatura_ctd'
+    #             if nombre_variable == 'sal00':
+    #                 nombre_variable = 'salinidad_ctd'
+    #             if nombre_variable == 'flScufa':
+    #                 nombre_variable = 'fluorescencia_ctd' 
+    #             if nombre_variable == 'par':
+    #                 nombre_variable = 'par_ctd' 
+    #             if nombre_variable == 'sbeox0Mm/Kg': 
+    #                 nombre_variable = 'oxigeno_ctd'                    
+                
+    #             listado_variables  = listado_variables + [nombre_variable]
+                
+    #         if texto_linea[0:5] == '*END*': # Línea final de encabezado, a partir de aquí, datos
+    #             datos_perfil     = []
+    #             io_datos         = 1
+        
+    #     else:
+
+    #         datos_linea = texto_linea.split() 
+    #         listado_datos = [float(x) for x in datos_linea] 
+    #         datos_perfil.append(listado_datos) 
+            
+    # return datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo
 
 # ##########################################################
 # ######## FUNCION PARA LEER ESTADILLOS DE ENTRADA  ########
@@ -487,7 +590,6 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
                 listado_textos    = texto_linea.split('= ')  
                 datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
                 offset_tiempo     = (datetime_sistema - datetime_muestreo).seconds
-
 
             if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
 #                cast_muestreo = int(texto_linea[8:len(texto_linea)])

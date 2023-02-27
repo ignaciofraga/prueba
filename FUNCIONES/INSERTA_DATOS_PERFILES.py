@@ -21,6 +21,7 @@ import pandas.io.sql as psql
 from sqlalchemy import create_engine
 import psycopg2
 from glob import glob
+import matplotlib.pyplot as plt
 
 
 # Parámetros de la base de datos
@@ -33,7 +34,8 @@ direccion_host = '193.146.155.99'
 # Parámetros
 nombre_programa = 'RADIAL CORUÑA'
 
-anho = 2021
+anho = 2020
+anho = 2023
 ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
 tipo_salida   = 'MENSUAL' 
 configuracion_perfilador = 1
@@ -42,10 +44,13 @@ configuracion_perfilador = 1
 id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
             
 # recupera la información de las estaciones incluidas en la base de datos
-con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-conn_psql        = create_engine(con_engine)
-tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
-tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn_psql)
+con_engine          = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+conn_psql           = create_engine(con_engine)
+tabla_estaciones    = psql.read_sql('SELECT * FROM estaciones', conn_psql)
+tabla_salidas       = psql.read_sql('SELECT * FROM salidas_muestreos', conn_psql)
+tabla_perfiles      = psql.read_sql('SELECT * FROM perfiles_verticales', conn_psql)
+tabla_perfil_fisica = psql.read_sql('SELECT * FROM salidas_muestreos', conn_psql)
+tabla_perfil_bgq    = psql.read_sql('SELECT * FROM salidas_muestreos', conn_psql)
 conn_psql.dispose()
 
 tabla_estaciones_programa = tabla_estaciones[tabla_estaciones['programa']==int(id_programa)]
@@ -63,22 +68,34 @@ for isalida in range(len(listado_salidas)):
     os.chdir(listado_salidas[isalida])
     for archivo in glob("*.cnv"):
         print(archivo)
+        
+
+        
+        # Lectura de la información contenida en el archivo como un dataframe
+        lectura_archivo = open(archivo, "r")  
+        datos_archivo = lectura_archivo.readlines()
+                      
+        datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
+        
+        df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)
+
+
+        plt.figure(isalida)
+        plt.plot(df_datos['temperatura_ctd'],df_datos['presion_ctd'])                
+  
+
+        # Busca la salida a la que corresponde el muestreo
+        id_salida = tabla_salidas_programa['id_salida'][tabla_salidas_programa['fecha_salida']==fecha_muestreo].iloc[0]
+        
+        # Asigna el idenificador de la estacion correspondiente
         posicion_inicio    = archivo.find('e') + 1
         posicion_final     = archivo.find('.cnv')
         nombre_estacion    = archivo[posicion_inicio:posicion_final].upper() 
-        
         id_estacion = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
        
-        lectura_archivo = open(archivo, "r")  
-        datos_archivo = lectura_archivo.readlines()
-               
-        datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
+        # Define el nombre del perfil
+        nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
         
-        df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)                
-  
-        # Busca la salida a la que corresponde el muestreo
-        id_salida = tabla_salidas_programa['id_salida'][tabla_salidas_programa['fecha_salida']==fecha_muestreo].iloc[0]
-      
         # Obtén el identificador del perfil en la base de datos
         instruccion_sql = '''INSERT INTO perfiles_verticales (nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,configuracion_perfilador)
         VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast,configuracion_perfilador) DO NOTHING;''' 
@@ -96,7 +113,6 @@ for isalida in range(len(listado_salidas)):
         id_perfil =cursor.fetchone()[0]
         conn.commit()       
         
-     
         # DATOS FISICA
         df_temp            = df_datos[['presion_ctd','temperatura_ctd']]
         df_temp['qf_temp'] = 2
@@ -167,16 +183,3 @@ for isalida in range(len(listado_salidas)):
         cursor.close()
         conn.close()  
         
-        
-    # # Calcula las variaciones de profundidad para saber si el perfil es de subida o bajada
-    # df_datos['prof_inc'] = numpy.zeros(df_datos.shape[0])
-    # for idato in range(1,df_datos.shape[0]):
-    #    df_datos['prof_inc'][idato] =  df_datos['presion_ctd'][idato] - df_datos['presion_ctd'][idato-1]
-    
-    # df_datos['prof_inc'].iloc[0] = df_datos['prof_inc'].iloc[1]
-    # # Asigna a la máxima profunidad una variación de 0 (para que esté en ambos perfiles)
-    # df_datos['prof_inc'].iloc[df_datos['presion_ctd'].idxmax()]=0  
-    
-    # # Extrae los dataframes de subida y bajada
-    # df_datos_subida = df_datos[df_datos['prof_inc']<=0]
-    # df_datos_bajada = df_datos[df_datos['prof_inc']>=0]
