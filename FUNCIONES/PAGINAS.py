@@ -1850,7 +1850,8 @@ def entrada_botellas():
                         nombre_archivo_cnv    = archivo_cnv.name
                         nombre_archivo_cnv    = nombre_archivo_cnv.replace('.btl','.cnv')
                     
-                        st.text(nombre_archivo_cnv,nombre_archivo_btl)
+                        st.text(nombre_archivo_cnv)
+                        st.text(nombre_archivo_btl)
                     
                         if nombre_archivo_cnv == nombre_archivo_btl:
                             
