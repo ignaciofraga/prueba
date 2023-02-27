@@ -1775,13 +1775,13 @@ def entrada_botellas():
                     datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines()            
                     
                     # Comprueba que la fecha del archivo y de la salida coinciden
-                    fecha_salida_texto    = nombre_archivo[0:8]
+                    fecha_salida_texto    = nombre_archivo_btl[0:8]
                     fecha_salida_archivo  = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
                     
                     if fecha_salida_archivo == fecha_salida:
                     
                         ### DATOS DE BOTELLERO ###
-                        mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+                        mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_btl,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
            
                         # Aplica control de calidad
                         datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
