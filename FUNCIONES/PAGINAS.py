@@ -1849,17 +1849,12 @@ def entrada_botellas():
                     
                         nombre_archivo_cnv    = archivo_cnv.name
                         nombre_archivo_cnv    = nombre_archivo_cnv.replace('.cnv','.btl')
-                    
-                        st.text(nombre_archivo_cnv)
-                        st.text(nombre_archivo_btl)
-                    
+                                           
                         if nombre_archivo_cnv == nombre_archivo_btl:
                             
                             configuracion_perfilador = 1 # Cambiar esto en el futuro
                             
-                            # Lectura de la información contenida en el archivo como un dataframe
-                            # lectura_archivo = open(archivo_btl, "r")  
-                            # datos_archivo = lectura_archivo.readlines()
+                            st.text(archivo_cnv)
                             
                             datos_archivo = archivo_cnv.getvalue().decode('utf-8').splitlines() 
                                           
