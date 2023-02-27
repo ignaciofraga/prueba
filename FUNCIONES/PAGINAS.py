@@ -1758,21 +1758,21 @@ def entrada_botellas():
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
             cursor = conn.cursor() 
             
-            for archivo_subido in listado_archivos_btl:
-                
-                st.text(archivo_subido)
+            for archivo_btl in listado_archivos_btl:
+             
+                st.text(archivo_btl)
                 
                 # encuentra el nombre de la estación
-                nombre_archivo     = archivo_subido.name
-                posicion_inicio    = nombre_archivo.find('e') + 1
-                posicion_final     = nombre_archivo.find('.')
-                nombre_estacion    = nombre_archivo[posicion_inicio:posicion_final].upper() #+ 'CO'                
+                nombre_archivo_btl = archivo_btl.name
+                posicion_inicio    = nombre_archivo_btl.find('e') + 1
+                posicion_final     = nombre_archivo_btl.find('.')
+                nombre_estacion    = nombre_archivo_btl[posicion_inicio:posicion_final].upper() #+ 'CO'                
 
                 texto_estado = 'Procesando la información de la estación ' + nombre_estacion
                 with st.spinner(texto_estado):
                                     
                     # Lee los datos de cada archivo de botella
-                    datos_archivo = archivo_subido.getvalue().decode('utf-8').splitlines()            
+                    datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines()            
                     
                     # Comprueba que la fecha del archivo y de la salida coinciden
                     fecha_salida_texto    = nombre_archivo[0:8]
@@ -1833,12 +1833,12 @@ def entrada_botellas():
                                 cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo'][idato]),datos_botellas['oxigeno_ctd'][idato],int(qf_defecto)))                              
                                 conn.commit()     
             
-                        texto_exito = 'Archivo ' + archivo_subido.name + ' procesado correctamente'
+                        texto_exito = 'Archivo .btl' + archivo_btl.name + ' procesado correctamente'
                         st.success(texto_exito) 
                         
                     else:
                     
-                        texto_error = 'La fecha del archivo ' + archivo_subido.name + ' no coindice con la fecha seleccionada '
+                        texto_error = 'La fecha del archivo ' + archivo_btl.name + ' no coindice con la fecha seleccionada '
                         st.warning(texto_error, icon="⚠️")  
                         
                         
@@ -1847,120 +1847,126 @@ def entrada_botellas():
                         
                     ### DATOS DE PERFIL
                     
-                    archivo_btl    = nombre_archivo.replace('.btl','.cnv')
-                    configuracion_perfilador = 1 # Cambiar esto en el futuro
+                    for archivo_cnv in listado_archivos_cnv:
                     
-                    # Lectura de la información contenida en el archivo como un dataframe
-                    # lectura_archivo = open(archivo_btl, "r")  
-                    # datos_archivo = lectura_archivo.readlines()
+                        nombre_archivo_cnv    = archivo_cnv.replace('.btl','.cnv')
+                        nombre_archivo_cnv    = nombre_archivo_cnv.replace('.btl','.cnv')
                     
-                    datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines() 
-                                  
-                    datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
-                    
-                    df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)
-                        
-
-                    # Busca la salida a la que corresponde el muestreo
-                    id_salida = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_muestreo].iloc[0]
-                    
-                    # Asigna el idenificador de la estacion correspondiente
-                    posicion_inicio    = nombre_archivo.find('e') + 1
-                    posicion_final     = nombre_archivo.find('.cnv')
-                    nombre_estacion    = nombre_archivo[posicion_inicio:posicion_final].upper() 
-                    id_estacion = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
-                   
-                    # Define el nombre del perfil
-                    nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
-                    
-                    # Obtén el identificador del perfil en la base de datos
-                    instruccion_sql = '''INSERT INTO perfiles_verticales (nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,configuracion_perfilador)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast,configuracion_perfilador) DO NOTHING;''' 
-                    
-                    nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
-                    
-                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                    cursor = conn.cursor()    
-                    cursor.execute(instruccion_sql,(nombre_perfil,int(id_estacion),int(id_salida),int(cast_muestreo),fecha_muestreo,hora_muestreo,int(configuracion_perfilador)))
-                    conn.commit() 
-
-                    instruccion_sql = "SELECT id_perfil FROM perfiles_verticales WHERE nombre_perfil = '" + nombre_perfil + "';" 
-                    cursor = conn.cursor()    
-                    cursor.execute(instruccion_sql)
-                    id_perfil =cursor.fetchone()[0]
-                    conn.commit()       
-                    
-                    # DATOS FISICA
-                    df_temp            = df_datos[['presion_ctd','temperatura_ctd']]
-                    df_temp['qf_temp'] = 2
-                    json_temperatura   = df_temp.to_json()
-                    
-                    df_sal            = df_datos[['presion_ctd','salinidad_ctd']]
-                    df_sal['qf_sal']  = 2
-                    json_salinidad    = df_sal.to_json() 
-                    
-                    instruccion_sql = '''INSERT INTO datos_perfil_fisica (perfil,temperatura_perfil,salinidad_perfil)
-                    VALUES (%s,%s,%s) ON CONFLICT (perfil) DO UPDATE SET (temperatura_perfil,salinidad_perfil) = ROW(EXCLUDED.temperatura_perfil,EXCLUDED.salinidad_perfil);''' 
-                    
-                    datos_insercion = (int(id_perfil),json_temperatura,json_salinidad)
-                    
-                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                    cursor = conn.cursor()    
-                    cursor.execute(instruccion_sql,datos_insercion)
-                    conn.commit()  
-                    
-                    if 'par_ctd' in listado_variables:
-                        df_par           = df_datos[['presion_ctd','par_ctd']]
-                        df_par['qf_par'] = 2
-                        json_par         = df_par.to_json()   
-
-                        instruccion_sql = '''INSERT INTO datos_perfil_fisica (perfil,temperatura_perfil,salinidad_perfil,par_perfil)
-                        VALUES (%s,%s,%s,%s) ON CONFLICT (perfil) DO UPDATE SET (temperatura_perfil,salinidad_perfil,par_perfil) = ROW(EXCLUDED.temperatura_perfil,EXCLUDED.salinidad_perfil,EXCLUDED.par_perfil);''' 
-                    
-                        datos_insercion = (int(id_perfil),json_temperatura,json_salinidad,json_par)
+                        if nombre_archivo_cnv == nombre_archivo_btl:
                             
-                        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                        cursor = conn.cursor()    
-                        cursor.execute(instruccion_sql,datos_insercion)
-                        conn.commit()  
-                        
-                    
-                    # DATOS BIOGEOQUIMICA
-                    if 'oxigeno_ctd' in listado_variables:
-                        df_oxigeno           = df_datos[['presion_ctd','oxigeno_ctd']]
-                        df_oxigeno['qf_oxi'] = 2
-                        json_oxigeno         = df_oxigeno.to_json()
-
-                        instruccion_sql = '''INSERT INTO datos_perfil_biogeoquimica (perfil,oxigeno_perfil)
-                        VALUES (%s,%s) ON CONFLICT (perfil) DO UPDATE SET (oxigeno_perfil) = ROW(EXCLUDED.oxigeno_perfil);''' 
-                   
-                        datos_insercion = (int(id_perfil),json_oxigeno)
+                            configuracion_perfilador = 1 # Cambiar esto en el futuro
+                            
+                            # Lectura de la información contenida en el archivo como un dataframe
+                            # lectura_archivo = open(archivo_btl, "r")  
+                            # datos_archivo = lectura_archivo.readlines()
+                            
+                            datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines() 
+                                          
+                            datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
+                            
+                            df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)
+                                
+        
+                            # Busca la salida a la que corresponde el muestreo
+                            id_salida = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_muestreo].iloc[0]
+                            
+                            # Asigna el idenificador de la estacion correspondiente
+                            posicion_inicio    = nombre_archivo_cnv.find('e') + 1
+                            posicion_final     = nombre_archivo_cnv.find('.cnv')
+                            nombre_estacion    = nombre_archivo_cnv[posicion_inicio:posicion_final].upper() 
+                            id_estacion = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
                            
-                        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                        cursor = conn.cursor()    
-                        cursor.execute(instruccion_sql,datos_insercion)
-                        conn.commit()          
-             
-                    
-                    if 'fluorescencia_ctd' in listado_variables:
-                        df_fluor             = df_datos[['presion_ctd','fluorescencia_ctd']]
-                        df_fluor['qf_fluor'] = 2
-                        json_fluor           = df_fluor.to_json()
-
-                        instruccion_sql = '''INSERT INTO datos_perfil_biogeoquimica (perfil,fluorescencia_perfil)
-                        VALUES (%s,%s) ON CONFLICT (perfil) DO UPDATE SET (fluorescencia_perfil) = ROW(EXCLUDED.fluorescencia_perfil);''' 
-                   
-                        datos_insercion = (int(id_perfil),json_fluor)
+                            # Define el nombre del perfil
+                            nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
+                            
+                            # Obtén el identificador del perfil en la base de datos
+                            instruccion_sql = '''INSERT INTO perfiles_verticales (nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,configuracion_perfilador)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast,configuracion_perfilador) DO NOTHING;''' 
+                            
+                            nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
+                            
+                            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                            cursor = conn.cursor()    
+                            cursor.execute(instruccion_sql,(nombre_perfil,int(id_estacion),int(id_salida),int(cast_muestreo),fecha_muestreo,hora_muestreo,int(configuracion_perfilador)))
+                            conn.commit() 
+        
+                            instruccion_sql = "SELECT id_perfil FROM perfiles_verticales WHERE nombre_perfil = '" + nombre_perfil + "';" 
+                            cursor = conn.cursor()    
+                            cursor.execute(instruccion_sql)
+                            id_perfil =cursor.fetchone()[0]
+                            conn.commit()       
+                            
+                            # DATOS FISICA
+                            df_temp            = df_datos[['presion_ctd','temperatura_ctd']]
+                            df_temp['qf_temp'] = 2
+                            json_temperatura   = df_temp.to_json()
+                            
+                            df_sal            = df_datos[['presion_ctd','salinidad_ctd']]
+                            df_sal['qf_sal']  = 2
+                            json_salinidad    = df_sal.to_json() 
+                            
+                            instruccion_sql = '''INSERT INTO datos_perfil_fisica (perfil,temperatura_perfil,salinidad_perfil)
+                            VALUES (%s,%s,%s) ON CONFLICT (perfil) DO UPDATE SET (temperatura_perfil,salinidad_perfil) = ROW(EXCLUDED.temperatura_perfil,EXCLUDED.salinidad_perfil);''' 
+                            
+                            datos_insercion = (int(id_perfil),json_temperatura,json_salinidad)
+                            
+                            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                            cursor = conn.cursor()    
+                            cursor.execute(instruccion_sql,datos_insercion)
+                            conn.commit()  
+                            
+                            if 'par_ctd' in listado_variables:
+                                df_par           = df_datos[['presion_ctd','par_ctd']]
+                                df_par['qf_par'] = 2
+                                json_par         = df_par.to_json()   
+        
+                                instruccion_sql = '''INSERT INTO datos_perfil_fisica (perfil,temperatura_perfil,salinidad_perfil,par_perfil)
+                                VALUES (%s,%s,%s,%s) ON CONFLICT (perfil) DO UPDATE SET (temperatura_perfil,salinidad_perfil,par_perfil) = ROW(EXCLUDED.temperatura_perfil,EXCLUDED.salinidad_perfil,EXCLUDED.par_perfil);''' 
+                            
+                                datos_insercion = (int(id_perfil),json_temperatura,json_salinidad,json_par)
+                                    
+                                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                                cursor = conn.cursor()    
+                                cursor.execute(instruccion_sql,datos_insercion)
+                                conn.commit()  
+                                
+                            
+                            # DATOS BIOGEOQUIMICA
+                            if 'oxigeno_ctd' in listado_variables:
+                                df_oxigeno           = df_datos[['presion_ctd','oxigeno_ctd']]
+                                df_oxigeno['qf_oxi'] = 2
+                                json_oxigeno         = df_oxigeno.to_json()
+        
+                                instruccion_sql = '''INSERT INTO datos_perfil_biogeoquimica (perfil,oxigeno_perfil)
+                                VALUES (%s,%s) ON CONFLICT (perfil) DO UPDATE SET (oxigeno_perfil) = ROW(EXCLUDED.oxigeno_perfil);''' 
                            
-                        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                        cursor = conn.cursor()    
-                        cursor.execute(instruccion_sql,datos_insercion)
-                        conn.commit()  
-                        
-                    
-                    mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
- 
-                    
+                                datos_insercion = (int(id_perfil),json_oxigeno)
+                                   
+                                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                                cursor = conn.cursor()    
+                                cursor.execute(instruccion_sql,datos_insercion)
+                                conn.commit()          
+                     
+                            
+                            if 'fluorescencia_ctd' in listado_variables:
+                                df_fluor             = df_datos[['presion_ctd','fluorescencia_ctd']]
+                                df_fluor['qf_fluor'] = 2
+                                json_fluor           = df_fluor.to_json()
+        
+                                instruccion_sql = '''INSERT INTO datos_perfil_biogeoquimica (perfil,fluorescencia_perfil)
+                                VALUES (%s,%s) ON CONFLICT (perfil) DO UPDATE SET (fluorescencia_perfil) = ROW(EXCLUDED.fluorescencia_perfil);''' 
+                           
+                                datos_insercion = (int(id_perfil),json_fluor)
+                                   
+                                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                                cursor = conn.cursor()    
+                                cursor.execute(instruccion_sql,datos_insercion)
+                                conn.commit()  
+                                
+                            
+                            mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+         
+                            
         
             cursor.close()
             conn.close()   
