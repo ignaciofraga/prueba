@@ -1769,6 +1769,7 @@ def entrada_botellas():
                 texto_estado = 'Procesando la información de la estación ' + nombre_estacion
                 with st.spinner(texto_estado):
                                     
+                    st.text(archivo_btl)
                     # Lee los datos de cada archivo de botella
                     datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines()            
                     
