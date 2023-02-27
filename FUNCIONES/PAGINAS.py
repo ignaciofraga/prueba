@@ -1748,10 +1748,10 @@ def entrada_botellas():
             listado_archivos_btl = st.file_uploader("Arrastra o selecciona los archivos .btl", accept_multiple_files=True)   
         with col2:
             listado_archivos_cnv = st.file_uploader("Arrastra o selecciona los archivos .cnv", accept_multiple_files=True)   
+             
+        submit = st.form_submit_button("Añadir o modificar datos", clear_on_submit=True)                    
     
-        with st.form("my-form", clear_on_submit=True):
-         
-
+            if submit is True:
           
             # Conecta con la base de datos
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -1771,7 +1771,6 @@ def entrada_botellas():
                 with st.spinner(texto_estado):
                                     
                     # Lee los datos de cada archivo de botella
-                    nombre_archivo = archivo_subido.name
                     datos_archivo = archivo_subido.getvalue().decode('utf-8').splitlines()            
                     
                     # Comprueba que la fecha del archivo y de la salida coinciden
@@ -1851,8 +1850,10 @@ def entrada_botellas():
                     configuracion_perfilador = 1 # Cambiar esto en el futuro
                     
                     # Lectura de la información contenida en el archivo como un dataframe
-                    lectura_archivo = open(archivo_btl, "r")  
-                    datos_archivo = lectura_archivo.readlines()
+                    # lectura_archivo = open(archivo_btl, "r")  
+                    # datos_archivo = lectura_archivo.readlines()
+                    
+                    datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines() 
                                   
                     datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
                     
