@@ -1737,6 +1737,7 @@ def entrada_botellas():
     
         fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
     
+        st.text(programa_seleccionado)    
         tabla_estaciones_programa = df_estaciones[df_estaciones['programa']==int(programa_seleccionado)]
 
     
