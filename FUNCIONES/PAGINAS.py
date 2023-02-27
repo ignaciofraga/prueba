@@ -1707,7 +1707,8 @@ def entrada_botellas():
         with col1: 
             programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
             df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
-            abreviatura_programa      = df_programas['abreviatura'][df_programas['nombre_programa']==programa_seleccionado].iloc[0]            
+            abreviatura_programa      = df_programas['abreviatura'][df_programas['nombre_programa']==programa_seleccionado].iloc[0] 
+            id_programa               = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0] 
         
         with col2:
             tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
@@ -1737,8 +1738,8 @@ def entrada_botellas():
     
         fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
     
-        st.text(programa_seleccionado)    
-        tabla_estaciones_programa = df_estaciones[df_estaciones['programa']==int(programa_seleccionado)]
+        st.text(id_programa)    
+        tabla_estaciones_programa = df_estaciones[df_estaciones['programa']==int(id_programa)]
 
     
         # Despliega la extensión para subir los archivos .btl y .cnv
