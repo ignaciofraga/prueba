@@ -1762,9 +1762,10 @@ def entrada_botellas():
                 st.text(archivo_subido)
                 
                 # encuentra el nombre de la estación
-                posicion_inicio    = archivo_subido.find('e') + 1
-                posicion_final     = archivo_subido.find('.')
-                nombre_estacion    = archivo_subido[posicion_inicio:posicion_final].upper() #+ 'CO'                
+                nombre_archivo     = archivo_subido.name
+                posicion_inicio    = nombre_archivo.find('e') + 1
+                posicion_final     = nombre_archivo.find('.')
+                nombre_estacion    = nombre_archivo[posicion_inicio:posicion_final].upper() #+ 'CO'                
 
                 texto_estado = 'Procesando la información de la estación ' + nombre_estacion
                 with st.spinner(texto_estado):
