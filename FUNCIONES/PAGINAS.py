@@ -1870,7 +1870,7 @@ def entrada_botellas():
                             
                             # Asigna el idenificador de la estacion correspondiente
                             posicion_inicio    = nombre_archivo_cnv.find('e') + 1
-                            posicion_final     = nombre_archivo_cnv.find('.cnv')
+                            posicion_final     = nombre_archivo_cnv.find('.')
                             nombre_estacion    = nombre_archivo_cnv[posicion_inicio:posicion_final].upper() 
                             id_estacion = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
                            
@@ -1961,15 +1961,15 @@ def entrada_botellas():
                                 cursor.execute(instruccion_sql,datos_insercion)
                                 conn.commit()  
                                 
-                            
-                            mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_cnv,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
-         
+                            texto_exito = 'Archivo .cnv' + nombre_archivo_cnv + ' procesado correctamente'
+                            st.success(texto_exito)                             
+             
                             
         
             cursor.close()
             conn.close()   
         
-            st.form_submit_button("Procesar los archivos seleccionados") 
+
             
             
 
