@@ -1737,8 +1737,7 @@ def entrada_botellas():
         id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
     
         fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
-    
-        st.text(id_programa)    
+       
         tabla_estaciones_programa = df_estaciones[df_estaciones['programa']==int(id_programa)]
 
     
@@ -1759,6 +1758,8 @@ def entrada_botellas():
             cursor = conn.cursor() 
             
             for archivo_subido in listado_archivos_btl:
+                
+                st.text(archivo_subido)
                 
                 # encuentra el nombre de la estación
                 posicion_inicio    = archivo_subido.find('e') + 1
