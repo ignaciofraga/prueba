@@ -1759,9 +1759,7 @@ def entrada_botellas():
             cursor = conn.cursor() 
             
             for archivo_btl in listado_archivos_btl:
-             
-                st.text(archivo_btl)
-                
+                            
                 # encuentra el nombre de la estación
                 nombre_archivo_btl = archivo_btl.name
                 posicion_inicio    = nombre_archivo_btl.find('e') + 1
@@ -1860,7 +1858,7 @@ def entrada_botellas():
                             # lectura_archivo = open(archivo_btl, "r")  
                             # datos_archivo = lectura_archivo.readlines()
                             
-                            datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines() 
+                            datos_archivo = archivo_cnv.getvalue().decode('utf-8').splitlines() 
                                           
                             datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
                             
@@ -1964,7 +1962,7 @@ def entrada_botellas():
                                 conn.commit()  
                                 
                             
-                            mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+                            mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_cnv,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
          
                             
         
