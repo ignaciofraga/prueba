@@ -1861,6 +1861,8 @@ def entrada_botellas():
                             
                             df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)
                                 
+                            st.text(lat_muestreo)
+                            st.text(lon_muestreo)
         
                             # Busca la salida a la que corresponde el muestreo
                             id_salida = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_muestreo].iloc[0]
