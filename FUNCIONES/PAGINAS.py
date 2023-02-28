@@ -1842,8 +1842,6 @@ def entrada_botellas():
                         
                         
                         
-                        
-                        
                     ### DATOS DE PERFIL
                     
                     for archivo_cnv in listado_archivos_cnv:
@@ -1857,9 +1855,9 @@ def entrada_botellas():
                             
                             st.text(archivo_cnv)
                             
-                            datos_archivo = archivo_cnv.getvalue().decode('utf-8').splitlines() 
+                            datos_archivo_cnv = archivo_cnv.getvalue().decode('utf-8').splitlines() 
                                           
-                            datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
+                            datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
                             
                             df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)
                                 
