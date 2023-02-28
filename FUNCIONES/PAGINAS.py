@@ -1769,7 +1769,6 @@ def entrada_botellas():
                 texto_estado = 'Procesando la información de la estación ' + nombre_estacion
                 with st.spinner(texto_estado):
                                     
-                    st.text(archivo_btl)
                     # Lee los datos de cada archivo de botella
                     datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines()            
                     
@@ -1791,10 +1790,6 @@ def entrada_botellas():
             
                         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
                         datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-             
-                        # FUNCIONES_PROCESADO.inserta_datos_fisica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)
-
-                        # FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)   
              
                         qf_defecto = 1   
                                                 
@@ -1852,9 +1847,7 @@ def entrada_botellas():
                         if nombre_archivo_cnv == nombre_archivo_btl:
                             
                             configuracion_perfilador = 1 # Cambiar esto en el futuro
-                            
-                            st.text(archivo_cnv)
-                            
+                                                        
                             datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
                                           
                             datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
