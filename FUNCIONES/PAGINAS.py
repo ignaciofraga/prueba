@@ -1958,6 +1958,11 @@ def entrada_botellas():
                                 cursor.execute(instruccion_sql,datos_insercion)
                                 conn.commit()  
                                 
+                                
+                            if nombre_estacion == '2' and programa_seleccionado == 'RADIAL CORUÑA' : 
+                                st.text('hola')
+                                
+                                
                             texto_exito = 'Archivo .cnv' + nombre_archivo_cnv + ' procesado correctamente'
                             st.success(texto_exito)                             
              
