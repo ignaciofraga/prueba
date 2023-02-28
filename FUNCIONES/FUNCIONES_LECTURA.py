@@ -330,6 +330,8 @@ def lectura_archivo_perfiles(datos_archivo):
     hora_muestreo      = None
     datetime_muestreo  = None
     datetime_sistema   = None
+    lat_muestreo       = None
+    lon_muestreo       = None
     
     for ilinea in range(len(datos_archivo)):
         texto_linea = datos_archivo[ilinea]
@@ -343,13 +345,23 @@ def lectura_archivo_perfiles(datos_archivo):
                 except:
                     pass
                 
+            if texto_linea[0:12] == '** Latitude:': # Línea con latitud del muestreo
+                lat_muestreo  = float(texto_linea[12:19])
+                if texto_linea[-1] == 'S':
+                    lat_muestreo = lat_muestreo*-1
+
+            if texto_linea[0:13] == '** Longitude:': # Línea con latitud del muestreo
+                lon_muestreo  = float(texto_linea[13:20])
+                if texto_linea[-1] == 'W':
+                    lon_muestreo = lon_muestreo*-1                
+                                
             if texto_linea[0:22] == '* System UpLoad Time =': # Línea con hora del cast
                 listado_textos   = texto_linea.split('= ') 
-                datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
+                datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
                                         
             if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
                 listado_textos    = texto_linea.split('= ')  
-                datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
+                datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
                 
             if texto_linea[0:6] == '# name': # Línea con variable muestreada
                 posicion_inicio    = texto_linea.find('=') + 2
@@ -394,7 +406,7 @@ def lectura_archivo_perfiles(datos_archivo):
     fecha_muestreo = datetime_sistema.date()
     hora_muestreo  = datetime_sistema - datetime.timedelta(seconds=offset_tiempo)
 
-    return datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo    
+    return datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo    
 
 
     # # Predimensionamientos

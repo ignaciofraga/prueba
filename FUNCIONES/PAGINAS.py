@@ -1857,7 +1857,7 @@ def entrada_botellas():
                             
                             datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
                                           
-                            datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
+                            datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
                             
                             df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)
                                 
@@ -1959,8 +1959,64 @@ def entrada_botellas():
                                 conn.commit()  
                                 
                                 
-                            if nombre_estacion == '2' and programa_seleccionado == 'RADIAL CORUÑA' : 
-                                st.text('hola')
+                            if nombre_estacion == '2' and programa_seleccionado == 'RADIAL CORUÑA' :  # Estacion 2 del programa radiales, añadir muestreo correspondiente a la botella en superficie
+
+                                 # Genera dataframe con el muestreo de la estacion 2
+                                 pres_min   = min(df_datos['presion_ctd'])
+                                 df_botella = df_datos[df_datos['presion_ctd']==pres_min]
+                                 df_botella['latitud']  = lat_muestreo
+                                 df_botella['longitud'] = lon_muestreo
+                                 df_botella['prof_referencia']   = 0
+                                 df_botella['fecha_muestreo']    = fecha_muestreo
+                                 df_botella = df_botella.drop(columns=['c0S/m','sbeox0V','sbeox0ML/L','sigma-é00','flag'])
+                                                                  
+                                 # Asigna el idenificador de la estacion correspondiente
+                                 id_estacion                      = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
+                                
+                                 # Control de calidad y asignación del registro
+                                 df_botella,textos_aviso          = FUNCIONES_PROCESADO.control_calidad(df_botella,direccion_host,base_datos,usuario,contrasena,puerto)                               
+                                 df_botella['id_estacion_temp']   = id_estacion                    
+                                 df_botella                       = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+ 
+                                 # Añade el resto de parámetros 
+                                 df_botella['nombre_muestreo']    = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E2_P0' 
+                                 df_botella['estacion']           = id_estacion
+                                 df_botella['id_estacion_temp']   = id_estacion
+                                 df_botella['id_salida']          = id_salida
+                                 df_botella['programa']           = id_programa    
+                                 df_botella['num_cast']           = cast_muestreo 
+                                 
+                                 # Inserta datos físicos
+                                 instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
+                                           VALUES (%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf);''' 
+                                             
+                                 cursor.execute(instruccion_sql, (int(df_botella['id_muestreo'].iloc[0]),df_botella['temperatura_ctd'].iloc[0],int(qf_defecto),df_botella['salinidad_ctd'].iloc[0],int(qf_defecto)))
+                                 conn.commit()                            
+                                 
+                                 # PAR (si existe)
+                                 if io_par == 1:
+                                     
+                                     instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,par_ctd,par_ctd_qf)
+                                           VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (par_ctd,par_ctd_qf) = ROW(EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
+                                     
+                                     cursor.execute(instruccion_sql, (int(df_botella['id_muestreo'].iloc[0]),df_botella['par_ctd'].iloc[0],int(qf_defecto)))
+                                     conn.commit()
+                                                
+                                 # Fluorescencia (si existe)
+                                 if io_fluor == 1:                
+                                     instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,fluorescencia_ctd,fluorescencia_ctd_qf)
+                                           VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (fluorescencia_ctd,fluorescencia_ctd_qf) = ROW(EXCLUDED.fluorescencia_ctd,EXCLUDED.fluorescencia_ctd_qf);''' 
+                                             
+                                     cursor.execute(instruccion_sql, (int(df_botella['id_muestreo'].iloc[0]),df_botella['fluorescencia_ctd'].iloc[0],int(qf_defecto)))
+                                     conn.commit()           
+                      
+                                 # Oxígeno (si existe)
+                                 if io_O2 == 1:                
+                                     instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,oxigeno_ctd,oxigeno_ctd_qf)
+                                           VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (oxigeno_ctd,oxigeno_ctd_qf) = ROW(EXCLUDED.oxigeno_ctd,EXCLUDED.oxigeno_ctd_qf);''' 
+                                             
+                                     cursor.execute(instruccion_sql, (int(df_botella['id_muestreo'].iloc[0]),df_botella['oxigeno_ctd'].iloc[0],int(qf_defecto)))                              
+                                     conn.commit()  
                                 
                                 
                             texto_exito = 'Archivo .cnv' + nombre_archivo_cnv + ' procesado correctamente'

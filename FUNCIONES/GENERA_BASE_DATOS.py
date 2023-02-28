@@ -371,48 +371,50 @@ direccion_host = '193.146.155.99'
 
 
 
-# ####################################################
-# ## TABLA CON LOS PERFILES EN VERTICAL MUESTREADOS ##
-# ####################################################
+####################################################
+## TABLA CON LOS PERFILES EN VERTICAL MUESTREADOS ##
+####################################################
 
-# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-# cursor = conn.cursor()
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()
 
-# nombre_tabla = 'perfiles_verticales'
+nombre_tabla = 'perfiles_verticales'
 
-# # Borra la table si ya existía
-# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-# cursor.execute(instruccion_sql)
-# conn.commit()
+# Borra la table si ya existía
+instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+cursor.execute(instruccion_sql)
+conn.commit()
 
-# listado_variables = ('(id_perfil SERIAL PRIMARY KEY,'
-# ' nombre_perfil text,'
-# ' salida_mar int NOT NULL,'
-# ' estacion int NOT NULL,'
-# ' num_cast int,'
-# ' fecha_perfil date NOT NULL,'
-# ' hora_perfil time,'
-# ' configuracion_perfilador int NOT NULL,'
-# ) 
+listado_variables = ('(id_perfil SERIAL PRIMARY KEY,'
+' nombre_perfil text,'
+' salida_mar int NOT NULL,'
+' estacion int NOT NULL,'
+' latitud_muestreo NUMERIC (6, 4) NOT NULL,'
+' longitud_muestreo NUMERIC (6, 4) NOT NULL,'
+' num_cast int,'
+' fecha_perfil date NOT NULL,'
+' hora_perfil time,'
+' configuracion_perfilador int NOT NULL,'
+) 
 
-# listado_dependencias = ('FOREIGN KEY (estacion)'
-# 'REFERENCES estaciones (id_estacion)'
-# 'ON UPDATE CASCADE ON DELETE CASCADE,'
-# 'FOREIGN KEY (salida_mar)'
-# 'REFERENCES salidas_muestreos (id_salida)'
-# 'ON UPDATE CASCADE ON DELETE CASCADE,'
-# 'FOREIGN KEY (configuracion_perfilador)'
-# 'REFERENCES configuracion_perfilador (id_config_perfil)'
-# 'ON UPDATE CASCADE ON DELETE CASCADE'
-# )
+listado_dependencias = ('FOREIGN KEY (estacion)'
+'REFERENCES estaciones (id_estacion)'
+'ON UPDATE CASCADE ON DELETE CASCADE,'
+'FOREIGN KEY (salida_mar)'
+'REFERENCES salidas_muestreos (id_salida)'
+'ON UPDATE CASCADE ON DELETE CASCADE,'
+'FOREIGN KEY (configuracion_perfilador)'
+'REFERENCES configuracion_perfilador (id_config_perfil)'
+'ON UPDATE CASCADE ON DELETE CASCADE'
+)
 
-# listado_unicidades = (', UNIQUE (estacion,fecha_perfil,num_cast,configuracion_perfilador))')
+listado_unicidades = (', UNIQUE (estacion,fecha_perfil,num_cast,configuracion_perfilador))')
 
-# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
-# cursor.execute(instruccion_sql)
-# conn.commit()
-# cursor.close()
-# conn.close()
+instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+cursor.execute(instruccion_sql)
+conn.commit()
+cursor.close()
+conn.close()
 
 
 
