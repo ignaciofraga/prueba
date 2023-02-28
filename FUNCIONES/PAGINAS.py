@@ -1860,18 +1860,7 @@ def entrada_botellas():
                             datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
                             
                             df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)
-                                
-                            # st.text(lat_muestreo)
-                            # st.text(lon_muestreo)
-                            # nombre_perfil
-                            # int(id_estacion)
-                            # int(id_salida)
-                            # int(cast_muestreo)
-                            # fecha_muestreo
-                            # hora_muestreo
-                            # lon_muestreo
-                            # lat_muestreo,int(configuracion_perfilador)
-        
+                                        
                             # Busca la salida a la que corresponde el muestreo
                             id_salida = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_muestreo].iloc[0]
                             
@@ -1985,7 +1974,7 @@ def entrada_botellas():
                                 
                                  # Control de calidad y asignación del registro
                                  df_botella,textos_aviso          = FUNCIONES_PROCESADO.control_calidad(df_botella,direccion_host,base_datos,usuario,contrasena,puerto)                               
-                                 df_botella['id_estacion_temp']   = id_estacion                    
+                                 df_botella['id_estacion_temp']   = int(id_estacion)                    
                                  df_botella                       = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
                                  # Añade el resto de parámetros 
