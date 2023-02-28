@@ -65,6 +65,7 @@ for iarchivo in range(len(listado_archivos)):
     
     print('Leyendo los datos contenidos en el archivo excel')
     datos_radprof  = FUNCIONES_LECTURA.lectura_datos_radprof(nombre_archivo)
+    datos_radprof['prof_referencia'] = None
         
     # Realiza un control de calidad primario a los datos importados   
     print('Realizando control de calidad')
@@ -88,11 +89,10 @@ for iarchivo in range(len(listado_archivos)):
     
     # # # # # Introduce los datos en la base de datos
     print('Introduciendo los datos en la base de datos')
-    
-    FUNCIONES_PROCESADO.inserta_datos_fisica(datos_radprof_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
-    
-    FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_radprof_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
-    
+    FUNCIONES_PROCESADO.inserta_datos(datos_radprof_corregido,'fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_PROCESADO.inserta_datos(datos_radprof_corregido,'bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+
+ 
     
     # # # Actualiza estado
     # # print('Actualizando el estado de los procesos')

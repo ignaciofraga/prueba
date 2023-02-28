@@ -149,7 +149,12 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
     
     # Añade una columan con el QF de la temperatura, igual al de la salinidad
     datos_radiales['temperatura_ctd_qf'] = datos_radiales['salinidad_ctd_qf'] 
+ 
+    # Añade una columan con la hora, aunque sea nula
+    datos_radiales['hora_muestreo'] = None
     
+   
+ 
     # Añade una columna con la profundidad de referencia
     datos_radiales['prof_referencia'] = numpy.zeros(datos_radiales.shape[0],dtype=int)
     for idato in range(datos_radiales.shape[0]):
@@ -240,15 +245,8 @@ def lectura_datos_pelacus(nombre_archivo):
                                                   "NO3":"nitrato","NO3T_flag":"nitrato_qf","NO2":"nitrito","NO2_flag":"nitrito_qf","NH4":"amonio","NH4_flag":"amonio_qf","PO4":"fosfato","PO4_flag":"fosfato_qf","Cla":"clorofila_a"
                                                   })
 
+    datos_pelacus['botella'] = None
     
-    datos_pelacus['temperatura_ctd_qf'] = 9
-    datos_pelacus['salinidad_ctd_qf']   = 9
-    # Asigna qf a los datos disponibles 
-    for idato in range(datos_pelacus.shape[0]):
-        if datos_pelacus['temperatura_ctd'][idato]:
-            datos_pelacus['temperatura_ctd_qf'][idato]=2
-        if datos_pelacus['salinidad_ctd'][idato]:
-            datos_pelacus['salinidad_ctd_qf'][idato]=2            
 
 
     return datos_pelacus

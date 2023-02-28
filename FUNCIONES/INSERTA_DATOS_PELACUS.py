@@ -60,9 +60,10 @@ datos_pelacus_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_pelacus_cor
 
 # Introduce los datos en la base de datos
 print('Introduciendo los datos en la base de datos')
-FUNCIONES_PROCESADO.inserta_datos_fisica(datos_pelacus_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
-FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_pelacus_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
+FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'bgq',direccion_host,base_datos,usuario,contrasena,puerto)
 
+ 
 
 # FUNCIONES_AUXILIARES.actualiza_estado(datos_pelacus_corregido,id_programa,programa_muestreo,fecha_actualizacion,email_contacto,itipo_informacion,direccion_host,base_datos,usuario,contrasena,puerto)
 

@@ -63,7 +63,7 @@ for iarchivo in range(len(listado_archivos)):
     # Añade el identificador de la configuración del perfilador y la superficie (darle una vuelta a esto)
     datos_radiales['configuracion_perfilador'] = [None]*datos_radiales.shape[0]
     datos_radiales['configuracion_superficie'] = [None]*datos_radiales.shape[0]
-    
+    datos_radiales['prof_referencia']          = None
     
     
     #datos_radiales,texto_error = FUNCIONES_LECTURA.lectura_datos_estadillo(nombre_archivo,nombre_archivo)
@@ -89,10 +89,10 @@ for iarchivo in range(len(listado_archivos)):
    
     # # # # # Introduce los datos en la base de datos
     print('Introduciendo los datos en la base de datos')   
-    FUNCIONES_PROCESADO.inserta_datos_fisica(datos_radiales_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'bgq',direccion_host,base_datos,usuario,contrasena,puerto)
 
-    FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_radiales_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
-
+ 
 
 # #     # # Actualiza estado
 # #     # print('Actualizando el estado de los procesos')

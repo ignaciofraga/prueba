@@ -26,67 +26,7 @@ pandas.options.mode.chained_assignment = None
 def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
  
     textos_aviso = [] 
-    
-    # Recupera la tabla con los registros de muestreos físicos
-    con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    conn_psql          = create_engine(con_engine)
-    tabla_variables    = psql.read_sql('SELECT * FROM variables_procesado', conn_psql)  
-    conn_psql.dispose()
         
-    # Lee las variables de cada tipo a utilizar en el control de calidad
-    variables_muestreo = [x for x in tabla_variables['parametros_muestreo'] if str(x) != 'None']
-    variables_fisicas  = [x for x in tabla_variables['variables_fisicas'] if str(x) != 'None']    
-    variables_biogeoquimicas  = [x for x in tabla_variables['variables_biogeoquimicas'] if str(x) != 'None'] 
-        
-    listado_completo = variables_muestreo
-    
-    # Comprueba que las variables relacionadas con el muestreo están incluidas,añadiéndolas si no es así.
-    for ivariable_muestreo in range(len(variables_muestreo)):
-        if variables_muestreo[ivariable_muestreo] not in datos:
-            datos[variables_muestreo[ivariable_muestreo]] = None 
-            
-    # Mismo proceso para variables físicas existen,  
-    for ivariable_fisica in range(len(variables_fisicas)):
-        if variables_fisicas[ivariable_fisica] not in datos:
-            datos[variables_fisicas[ivariable_fisica]] = None 
-           
-        # Comprueba si ya existe la variable de control de calidad, si no es así añadirlo a la tabla 
-        qf_variable = variables_fisicas[ivariable_fisica] + '_qf'
-        if qf_variable not in datos:
-            datos[qf_variable] = 0
-            datos.astype({qf_variable : 'int'}).dtypes
-            datos[qf_variable] = None 
-        
-        listado_completo.extend([variables_fisicas[ivariable_fisica],qf_variable])
-            
-    # Mismo proceso para variables biogeoquimicas
-    for ivariable_biogeoquimica in range(len(variables_biogeoquimicas)):
-        if variables_biogeoquimicas[ivariable_biogeoquimica] not in datos:
-            datos[variables_biogeoquimicas[ivariable_biogeoquimica]] = None 
-        
-        # Comprueba si ya existe la variable de control de calidad, si no es así añadirlo a la tabla 
-        qf_variable = variables_biogeoquimicas[ivariable_biogeoquimica] + '_qf'
-        if qf_variable not in datos:
-            datos[qf_variable] = 0
-            datos.astype({qf_variable : 'int'}).dtypes
-            datos[qf_variable] = None 
-    
-        listado_completo.extend([variables_biogeoquimicas[ivariable_biogeoquimica],qf_variable])
-        
-    # Mismo proceso para las variables pH_metodo y cc_nutrientes
-    variables_control = ['ph_metodo','cc_nutrientes']
-    for ivariable_control in range(len(variables_control)):
-
-        if variables_control[ivariable_control] not in datos:
-
-            datos[variables_control[ivariable_control]] = None 
-            
-        listado_completo.extend([variables_control[ivariable_control]])
-    
-    
-    # Reordena las columnas del dataframe para que tengan el mismo orden que el listado de variables
-    datos = datos.reindex(columns=listado_completo)
-    
     datos = datos.replace({numpy.nan:None})
     
     # Eliminar los registros sin dato de latitud,longitud, profundidad o fecha 
@@ -120,23 +60,9 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
         datos['latitud'][idato] = round(datos['latitud'][idato],4)
         datos['presion_ctd'][idato] = round(datos['presion_ctd'][idato],2)      
 
-    # # # Cambia los valores -999 por None y asigna bandera de calidad correspondiente (por precaucion)
-    # # Variables fisicas
-    
-    for ivariable_fisica in range(len(variables_fisicas)):
-        # Valores negativos asigna None
-        datos[variables_fisicas[ivariable_fisica]][datos[variables_fisicas[ivariable_fisica]]<0] = None
-        # Valores nulos asigna un 9 en el QF
-        qf_variable = variables_fisicas[ivariable_fisica] + '_qf'
-        datos.loc[datos[variables_fisicas[ivariable_fisica]].isnull(),qf_variable] = 9
 
-    for ivariable_biogeoquimica in range(len(variables_biogeoquimicas)):
-        # Valores negativos asigna None
-        datos[variables_biogeoquimicas[ivariable_biogeoquimica]][datos[variables_biogeoquimicas[ivariable_biogeoquimica]]<0] = None
-        # Valores nulos asigna un 9 en el QF
-        qf_variable = variables_biogeoquimicas[ivariable_biogeoquimica] + '_qf'
-        datos.loc[datos[variables_biogeoquimicas[ivariable_biogeoquimica]].isnull(),qf_variable] = 9
-
+    # Cambia todos los -999 por None
+    datos = datos.replace(-999, None) 
 
     return datos,textos_aviso    
  
@@ -652,112 +578,89 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     return datos
 
 
+##################################################################
+######## FUNCION PARA INSERTAR DATOS EN LA BASE DE DATOS  ########
+##################################################################
 
-
-
-
-
-################################################################################
-######## FUNCION PARA INSERTAR LOS DATOS DE FISICA EN LA BASE DE DATOS  ########
-################################################################################
-
-def inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puerto):
+def inserta_datos(datos,tipo_datos,direccion_host,base_datos,usuario,contrasena,puerto):
   
-    # Recupera la tabla con los registros de muestreos físicos
-    con_engine                = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    conn_psql                 = create_engine(con_engine)
-    tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
+    if tipo_datos     == 'fisica':
+        variables     = 'variables_fisicas'
+        tabla_destino = 'datos_discretos_fisica'
     
-    # Genera un dataframe solo con las variales fisicas de los datos a importar 
-    datos_fisica = datos[['temperatura_ctd', 'temperatura_ctd_qf','salinidad_ctd','salinidad_ctd_qf','par_ctd','par_ctd_qf','turbidez_ctd','turbidez_ctd_qf','id_muestreo']]
-    datos_fisica = datos_fisica.rename(columns={"id_muestreo": "muestreo"})
-    
-    # # Si no existe ningún registro en la base de datos, introducir todos los datos disponibles
-    if tabla_registros_fisica.shape[0] == 0:
-        datos_fisica.set_index('muestreo',drop=True,append=False,inplace=True)
-        datos_fisica.to_sql('datos_discretos_fisica', conn_psql,if_exists='append')
+    elif tipo_datos   == 'bgq':
+        variables     = 'variables_biogeoquimicas'  
+        tabla_destino = 'datos_discretos_biogeoquimica'
         
-    
+    # Recupera la tabla con los registros de muestreos físicos
+    con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    conn_psql          = create_engine(con_engine)
+    tabla_variables    = psql.read_sql('SELECT * FROM variables_procesado', conn_psql) 
+    instruccion_sql    = 'SELECT * FROM ' + tabla_destino
+    tabla_registros    = psql.read_sql(instruccion_sql, conn_psql)
+    conn_psql.dispose()
+        
+    # Lee las variables de cada tipo a utilizar en el control de calidad
+    variables_bd  = [x for x in tabla_variables[variables] if str(x) != 'None']    
+  
+    # Busca qué variables están incluidas en los datos a importar
+    listado_variables_datos   = datos.columns.tolist()
+    listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
+    listado_adicional         = ['muestreo'] + listado_variables_comunes
+  
+    # Genera un dataframe solo con las variales fisicas de los datos a importar 
+    datos_insercion = datos.rename(columns={"id_muestreo": "muestreo"})
+  
+    # # Si no existe ningún registro en la base de datos, introducir todos los datos disponibles
+    if tabla_registros.shape[0] == 0:
+        
+        datos_insercion = datos_insercion[listado_adicional]
+        datos_insercion.set_index('muestreo',drop=True,append=False,inplace=True)
+        datos_insercion.to_sql(tabla_destino, conn_psql,if_exists='append')
+        
     # En caso contrario, comprobar qué parte de la información está en la base de datos
     else: 
-        # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
-        for idato in range(datos_fisica.shape[0]):
-            try:
-                tabla_registros_fisica = tabla_registros_fisica.drop(tabla_registros_fisica[tabla_registros_fisica.muestreo == int(datos_fisica['muestreo'][idato])].index)
-            except:
-                pass
-            
-        # Une ambos dataframes, el que contiene los datos nuevo y el que tiene los datos que ya están en la base de datos
-        datos_conjuntos = pandas.concat([tabla_registros_fisica, datos_fisica])
-            
-        # vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
-        # datos_conjuntos['muestreo'] = vector_identificadores
         
-        datos_conjuntos.set_index('muestreo',drop=True,append=False,inplace=True)
+        for idato in range(datos_insercion.shape[0]): # Dataframe con la interseccion de los datos nuevos y los disponibles en la base de datos, a partir de la variable muestreo
+         
+            df_temp  = tabla_registros[(tabla_registros['muestreo']==datos_insercion['muestreo'].iloc[idato])] 
+            
+            if df_temp.shape[0]>0:  # Muestreo ya incluido en la base de datos
+            
+                muestreo = df_temp['muestreo'].iloc[0]
+                
+                for ivariable in range(len(listado_variables_comunes)): # Reemplazar las variables disponibles en el muestreo correspondiente
+                        
+                    tabla_registros[listado_variables_comunes[ivariable]][tabla_registros['muestreo']==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]][datos_insercion['muestreo']==int(muestreo)]
+  
+            
+            else: # Nuevo muestreo
+                       
+                df_add = datos_insercion[datos_insercion['muestreo']==datos_insercion['muestreo'].iloc[idato]] # Genero un dataframe con cada línea de datos a añadir
+  
+                df_add = df_add[listado_adicional] # Recorto para que tenga sólo las variables a añadir
+            
+                tabla_registros = pandas.concat([tabla_registros, df_add]) # Combino ambos dataframes
+            
+        tabla_registros.set_index('muestreo',drop=True,append=False,inplace=True)
         
         # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
         cursor = conn.cursor()
-        instruccion_sql = "TRUNCATE datos_discretos_fisica;"
+        instruccion_sql = "TRUNCATE " + tabla_destino + ";"
         cursor.execute(instruccion_sql)
         conn.commit()
         cursor.close()
         conn.close() 
         
         # Inserta el dataframe resultante en la base de datos 
-        datos_conjuntos.to_sql('datos_discretos_fisica', conn_psql,if_exists='append')
-    
-
-    conn_psql.dispose() # Cierra la conexión con la base de datos 
-
-
-#######################################################################################
-######## FUNCION PARA INSERTAR LOS DATOS DE BIOGEOQUIMICA EN LA BASE DE DATOS  ########
-#######################################################################################
-
-
-def inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrasena,puerto):
+        tabla_registros.to_sql(tabla_destino, conn_psql,if_exists='append')
   
-    # Recupera la tabla con los registros de muestreos físicos
-    con_engine                = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    conn_psql                 = create_engine(con_engine)
-    tabla_registros_biogoquim = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn_psql)
-    
-    # Genera un dataframe solo con las variales biogeoquimicas de los datos a importar 
-    datos_biogeoquimica = datos[['id_muestreo','fluorescencia_ctd','fluorescencia_ctd_qf','oxigeno_ctd','oxigeno_ctd_qf','oxigeno_wk','oxigeno_wk_qf',
-                                 'ton','ton_qf','nitrato','nitrato_qf','nitrito','nitrito_qf','amonio','amonio_qf','fosfato','fosfato_qf','silicato','silicato_qf','tcarbn','tcarbn_qf','doc','doc_qf',
-                                 'cdom','cdom_qf','clorofila_a','clorofila_a_qf','alcalinidad','alcalinidad_qf','ph','ph_qf','ph_metodo','r_clor','r_clor_qf','r_per','r_per_qf','co3_temp']]    
-    datos_biogeoquimica = datos_biogeoquimica.rename(columns={"id_muestreo": "muestreo"})
-    
-    # Elimina, en el dataframe con los datos de la base de datos, los registros que ya están en los datos a importar
-    for idato in range(tabla_registros_biogoquim.shape[0]):
-        try:
-            tabla_registros_biogoquim = tabla_registros_biogoquim.drop(tabla_registros_biogoquim[tabla_registros_biogoquim.muestreo == int(datos_biogeoquimica['muestreo'][idato])].index)
-        except:
-            pass
-        
-    # Une ambos dataframes, el que contiene los datos nuevo y el que tiene los datos que ya están en la base de datos
-    datos_conjuntos = pandas.concat([tabla_registros_biogoquim, datos_biogeoquimica])
-        
-    # vector_identificadores            = numpy.arange(1,datos_conjuntos.shape[0]+1)    
-    # datos_conjuntos['muestreo'] = vector_identificadores
-    
-    datos_conjuntos.set_index('muestreo',drop=True,append=False,inplace=True)
-    
-    # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
-    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    cursor = conn.cursor()
-    instruccion_sql = "TRUNCATE datos_discretos_biogeoquimica;"
-    cursor.execute(instruccion_sql)
-    conn.commit()
-    cursor.close()
-    conn.close() 
-    
-    # Inserta el dataframe resultante en la base de datos 
-    datos_conjuntos.to_sql('datos_discretos_biogeoquimica', conn_psql,if_exists='append')
 
     conn_psql.dispose() # Cierra la conexión con la base de datos 
-    
+
+
+
 
 
 

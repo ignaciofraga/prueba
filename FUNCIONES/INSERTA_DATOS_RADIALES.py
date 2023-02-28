@@ -76,18 +76,9 @@ for iarchivo in range(len(listado_archivos)):
    
     # # # # # Introduce los datos en la base de datos
     print('Introduciendo los datos en la base de datos')
-    
-    FUNCIONES_PROCESADO.inserta_datos_fisica(datos_radiales_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'bgq',direccion_host,base_datos,usuario,contrasena,puerto)
 
-    FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos_radiales_corregido,direccion_host,base_datos,usuario,contrasena,puerto)
-
-
-#     # # Actualiza estado
-#     # print('Actualizando el estado de los procesos')
-#     # FUNCIONES_INSERCION.actualiza_estado(datos_radiales_corregido,fecha_actualizacion,id_programa,programa_muestreo,itipo_informacion,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
-
-#     # print('Procesado del año ', nombre_archivo[-9:-5], ' terminado')
-    
-# print('Fin del procesado de todos los datos disponibles')
+ 
   
     
