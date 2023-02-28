@@ -408,7 +408,7 @@ listado_dependencias = ('FOREIGN KEY (estacion)'
 'ON UPDATE CASCADE ON DELETE CASCADE'
 )
 
-listado_unicidades = (', UNIQUE (estacion,fecha_perfil,num_cast,configuracion_perfilador))')
+listado_unicidades = (', UNIQUE (estacion,fecha_perfil,num_cast))')
 
 instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
 cursor.execute(instruccion_sql)
