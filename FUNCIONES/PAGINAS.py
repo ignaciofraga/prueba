@@ -1861,8 +1861,16 @@ def entrada_botellas():
                             
                             df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)
                                 
-                            st.text(lat_muestreo)
-                            st.text(lon_muestreo)
+                            # st.text(lat_muestreo)
+                            # st.text(lon_muestreo)
+                            # nombre_perfil
+                            # int(id_estacion)
+                            # int(id_salida)
+                            # int(cast_muestreo)
+                            # fecha_muestreo
+                            # hora_muestreo
+                            # lon_muestreo
+                            # lat_muestreo,int(configuracion_perfilador)
         
                             # Busca la salida a la que corresponde el muestreo
                             id_salida = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_muestreo].iloc[0]
@@ -1878,7 +1886,7 @@ def entrada_botellas():
                             
                             # Obtén el identificador del perfil en la base de datos
                             instruccion_sql = '''INSERT INTO perfiles_verticales (nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,longitud_muestreo,latitud_muestreo,configuracion_perfilador)
-                            VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast) DO NOTHING;''' 
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast) DO NOTHING;''' 
                             
                             nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
                             
