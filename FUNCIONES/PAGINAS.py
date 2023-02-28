@@ -1773,7 +1773,7 @@ def entrada_botellas():
                 
                 st.text(archivo_cnv)
                 
-                datos_archivo_cnv = archivo_cnv.getvalue().decode('utf-8').splitlines() 
+                datos_archivo_cnv = archivo_cnv.getvalue().decode().splitlines() 
                               
                 datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
                 
