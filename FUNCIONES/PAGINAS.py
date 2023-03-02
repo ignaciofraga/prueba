@@ -1929,10 +1929,6 @@ def entrada_botellas():
                                  
                                  # Elimina las filas correspondientes al comienzo del descenso
                                  df_botella = df_temp.drop([0])
-                                 
-                                 gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_botella)
-                                 gridOptions = gb.build()
-                                 st_aggrid.AgGrid(df_botella,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
 
                                  
                                  df_botella['latitud']                = lat_muestreo
@@ -1953,6 +1949,12 @@ def entrada_botellas():
                                  df_botella['id_estacion_temp']       = int(id_estacion) 
                                  df_botella['id_salida']              = id_salida
                                  
+                           
+                                                            
+                                 gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_botella)
+                                 gridOptions = gb.build()
+                                 st_aggrid.AgGrid(df_botella,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
+ 
                            
                                  
                                  df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
