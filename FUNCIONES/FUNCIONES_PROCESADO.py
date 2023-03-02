@@ -482,15 +482,15 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == datos['id_estacion_temp'].iloc[idato]]['nombre_estacion'].iloc[0]
             
             nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'].iloc[idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
-            if datos['num_cast'][idato] is not None:
+            if datos['num_cast'].iloc[idato] is not None:
                 nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'].iloc[idato]))
             else:
                 nombre_muestreo = nombre_muestreo + '_C1' 
                 
-            if datos['botella'][idato] is not None:
+            if datos['botella'].iloc[idato] is not None:
                 nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'].iloc[idato])) 
             else:
-                if datos['prof_referencia'][idato] is not None: 
+                if datos['prof_referencia'].iloc[idato] is not None: 
                     nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['prof_referencia'].iloc[idato]))
                 else:
                     nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'].iloc[idato])) 
