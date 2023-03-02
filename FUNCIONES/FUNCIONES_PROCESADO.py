@@ -871,11 +871,13 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         for ipunto in range(df_seleccion.shape[0]): 
             st.text(df_seleccion['presion_ctd'].iloc[ipunto])
             st.text(df_seleccion['botella'].iloc[ipunto])            
-        #     if df_seleccion['botella'].iloc[ipunto] is None:
-        #         nombre_muestreos[ipunto] = 'Prof.' + str(int(df_seleccion['presion_ctd'].iloc[ipunto]))
-        #     else:
-        #         nombre_muestreos[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
-        #     ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
+            if df_seleccion['botella'].iloc[ipunto] is None:
+                nombre_muestreos.iloc[ipunto] = 'Prof.' + str(int(df_seleccion['presion_ctd'].iloc[ipunto]))
+            else:
+                nombre_muestreos.iloc[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
+            
+            st.text(df_seleccion['botella'].iloc[ipunto])
+            ax.annotate(nombre_muestreos.iloc[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
                 
         # # Ajusta el rango de las x 
         # custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
