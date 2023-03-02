@@ -756,14 +756,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
         fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0] - datetime.timedelta(days=meses_offset*30)
         fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1] + datetime.timedelta(days=meses_offset*30)  
-    
-        # Muestra una tabla con las configuraciones 
-        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_seleccion)
-        gridOptions = gb.build()
-        st_aggrid.AgGrid(df_seleccion,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
-   
-    
-    
+        
         if fecha_minima.year < fecha_maxima.year:
             listado_meses_1 = numpy.arange(fecha_minima.month,13)
             listado_meses_2 = numpy.arange(1,fecha_maxima.month+1)
@@ -808,10 +801,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         with st.expander(texto_rango,expanded=False):            
             
             st.write("Selecciona el rango del gráfico")  
-                 
-            # df_seleccion             = df_seleccion.replace(numpy.nan, None) 
-            # df_datos_buenos          = df_datos_buenos.replace(numpy.nan, None) 
-            
+                             
             # Selecciona el rango del gráfico
             min_seleccion = numpy.nanmin(numpy.array(df_seleccion[variable_seleccionada]))
             max_seleccion = numpy.nanmax(numpy.array(df_seleccion[variable_seleccionada]))
@@ -884,8 +874,6 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
         for ipunto in range(df_seleccion.shape[0]):    
-            st.text(df_seleccion['presion_ctd'].iloc[ipunto])
-            st.text(df_seleccion['botella'].iloc[ipunto])
             if df_seleccion['botella'].iloc[ipunto] is None:
                 nombre_muestreos[ipunto] = 'Prof.' + str(int(df_seleccion['presion_ctd'].iloc[ipunto]))
             else:
