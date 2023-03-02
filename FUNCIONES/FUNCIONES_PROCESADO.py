@@ -724,14 +724,12 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     qf_variable_seleccionada = variable_seleccionada + '_qf'
 
     # Recupera los datos disponibles de la misma estación, para la misma variable
-    listado_muestreos_estacion = df_muestreos['id_muestreo'][df_muestreos['estacion']==indice_estacion]
-    df_disponible_bgq_bd        = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos_estacion)]   
-    df_disponible_bgq_bd        = df_disponible_bgq_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
-    df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bgq_bd, on="id_muestreo")
+    listado_muestreos_estacion = df_muestreos['muestreo'][df_muestreos['estacion']==indice_estacion]
+    df_disponible_bgq_bd        = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos_estacion)]                                                 
+    df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bgq_bd, on="muestreo")
 
     df_disponible_fis_bd        = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos_estacion)]   
-    df_disponible_fis_bd        = df_disponible_fis_bd.rename(columns={"muestreo": "id_muestreo"}) # Para igualar los nombres de columnas                                               
-    df_disponible_bd            = pandas.merge(df_disponible_bd, df_disponible_fis_bd, on="id_muestreo")
+    df_disponible_bd            = pandas.merge(df_disponible_bd, df_disponible_fis_bd, on="muestreo")
 
     # Borra los dataframes que ya no hagan falta para ahorrar memoria
     del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos,df_disponible_bgq_bd,df_disponible_fis_bd)

@@ -1750,7 +1750,7 @@ def entrada_botellas():
             with col2:
                 listado_archivos_cnv = st.file_uploader("Arrastra o selecciona los archivos .cnv", accept_multiple_files=True)   
                  
-            submit = st.form_submit_button("Añadir o modificar datos")                    
+            submit = st.form_submit_button("Procesar los archivos añadidos")                    
     
         if submit is True:
                                              
@@ -1792,11 +1792,6 @@ def entrada_botellas():
              
                         FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
                         FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
-             
-            
-            
-                        texto_exito = 'Archivo .btl ' + archivo_btl.name + ' procesado correctamente'
-                        st.success(texto_exito) 
                         
                     else:
                     
@@ -1884,15 +1879,11 @@ def entrada_botellas():
                                  FUNCIONES_PROCESADO.inserta_datos(df_botella,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
                                  FUNCIONES_PROCESADO.inserta_datos(df_botella,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)               
                                 
-                            texto_exito = 'Archivo .cnv ' +  archivo_cnv.name + ' procesado correctamente'
-                            st.success(texto_exito)                             
-             
-                            
-        
-  
-        
 
-            
+                texto_exito = 'Estación ' + nombre_estacion + ' procesada correctamente. Información subida a la base de datos'
+                st.success(texto_exito)                            
+             
+
             
 
     # Control de calidad 
