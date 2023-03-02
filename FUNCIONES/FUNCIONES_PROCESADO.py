@@ -562,7 +562,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 if datos['botella'].iloc[idato] is not None:
                     nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'].iloc[idato])) 
                 else:
-                    if datos['prof_referencia'][idato] is not None: 
+                    if datos['prof_referencia'].iloc[idato] is not None: 
                         nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['prof_referencia'].iloc[idato]))
                     else:
                         nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'].iloc[idato])) 
