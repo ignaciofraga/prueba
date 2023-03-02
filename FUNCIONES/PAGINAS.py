@@ -1760,7 +1760,9 @@ def entrada_botellas():
                 nombre_archivo_btl = archivo_btl.name
                 posicion_inicio    = nombre_archivo_btl.find('e') + 1
                 posicion_final     = nombre_archivo_btl.find('.')
-                nombre_estacion    = nombre_archivo_btl[posicion_inicio:posicion_final].upper() #+ 'CO'                
+                nombre_estacion    = nombre_archivo_btl[posicion_inicio:posicion_final].upper() #+ 'CO' 
+                id_estacion        = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
+               
 
                 texto_estado = 'Procesando la información de la estación ' + nombre_estacion
                 with st.spinner(texto_estado):
@@ -1817,16 +1819,7 @@ def entrada_botellas():
                             datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
                                           
                             datos_perfil,df_perfiles,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
-                                                                    
-                            # Busca la salida a la que corresponde el muestreo
-                            id_salida = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_muestreo].iloc[0]
-                            
-                            # Asigna el idenificador de la estacion correspondiente
-                            posicion_inicio    = nombre_archivo_cnv.find('e') + 1
-                            posicion_final     = nombre_archivo_cnv.find('.')
-                            nombre_estacion    = nombre_archivo_cnv[posicion_inicio:posicion_final].upper() 
-                            id_estacion = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
-                           
+                                                                                                
                             # Define el nombre del perfil
                             nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
                             

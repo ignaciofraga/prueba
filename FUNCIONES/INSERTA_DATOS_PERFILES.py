@@ -72,46 +72,49 @@ for isalida in range(1):
         posicion_final     = archivo.find('.')
         nombre_estacion    = archivo[posicion_inicio:posicion_final].upper() #+ 'CO' 
         
-        if nombre_estacion == '2': 
-            print(archivo)
-            
+        id_estacion = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
+
+                            
     
-            
-            # Lectura de la información contenida en el archivo como un dataframe
-            lectura_archivo = open(archivo, "r")  
-            datos_archivo = lectura_archivo.readlines()
-                          
-            datos_perfil,df_perfiles,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
-            
-            
-            # Define el nombre del perfil
-            nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
-            
-            # Obtén el identificador del perfil en la base de datos
-            instruccion_sql = '''INSERT INTO perfiles_verticales (nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,longitud_muestreo,latitud_muestreo,configuracion_perfilador)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast) DO NOTHING;''' 
-            
-            nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
-            
-            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-            cursor = conn.cursor()    
-            cursor.execute(instruccion_sql,(nombre_perfil,int(1),int(1),int(cast_muestreo),fecha_muestreo,hora_muestreo,lon_muestreo,lat_muestreo,int(configuracion_perfilador)))
-            conn.commit() 
-           
-            instruccion_sql = "SELECT perfil FROM perfiles_verticales WHERE nombre_perfil = '" + nombre_perfil + "';" 
-            cursor = conn.cursor()    
-            cursor.execute(instruccion_sql)
-            id_perfil =cursor.fetchone()[0]
-            conn.commit()                  
-            
-            
-            
-            
-            df_perfiles['perfil'] = id_perfil
-            
-            
-            FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-            
+        print(archivo)
+        
+
+        
+        # Lectura de la información contenida en el archivo como un dataframe
+        lectura_archivo = open(archivo, "r")  
+        datos_archivo = lectura_archivo.readlines()
+                      
+        datos_perfil,df_perfiles,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
+        
+        
+        # Define el nombre del perfil
+        nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
+        
+        # Obtén el identificador del perfil en la base de datos
+        instruccion_sql = '''INSERT INTO perfiles_verticales (nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,longitud_muestreo,latitud_muestreo,configuracion_perfilador)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast) DO NOTHING;''' 
+        
+        nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
+        
+        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        cursor = conn.cursor()    
+        cursor.execute(instruccion_sql,(nombre_perfil,int(id_estacion),int(1166),int(cast_muestreo),fecha_muestreo,hora_muestreo,lon_muestreo,lat_muestreo,int(configuracion_perfilador)))
+        conn.commit() 
+       
+        instruccion_sql = "SELECT perfil FROM perfiles_verticales WHERE nombre_perfil = '" + nombre_perfil + "';" 
+        cursor = conn.cursor()    
+        cursor.execute(instruccion_sql)
+        id_perfil =cursor.fetchone()[0]
+        conn.commit()                  
+        
+        
+        
+        
+        df_perfiles['perfil'] = id_perfil
+        
+        
+        FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+        
             
             
             #df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)

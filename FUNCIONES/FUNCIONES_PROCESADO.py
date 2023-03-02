@@ -625,7 +625,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
         
         datos_insercion = datos_insercion[listado_adicional]
         datos_insercion.set_index(puntero,drop=True,append=False,inplace=True)
-        datos_insercion.to_sql(tabla_destino, conn_psql,if_exists='replace')
+        datos_insercion.to_sql(tabla_destino, conn_psql,if_exists='append')
         
     # En caso contrario, comprobar qué parte de la información está en la base de datos
     else: 
@@ -663,7 +663,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
         conn.close() 
         
         # Inserta el dataframe resultante en la base de datos 
-        tabla_registros.to_sql(tabla_destino, conn_psql,if_exists='replace')
+        tabla_registros.to_sql(tabla_destino, conn_psql,if_exists='append')
   
 
     conn_psql.dispose() # Cierra la conexión con la base de datos 
