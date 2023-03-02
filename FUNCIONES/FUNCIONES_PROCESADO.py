@@ -512,28 +512,28 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
         for idato in range(datos.shape[0]):
 
-            if datos['botella'][idato] is not None:        
-                if datos['hora_muestreo'][idato] is not None:          
-                    df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['botella']==datos['botella'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato])]
+            if datos['botella'].iloc[idato] is not None:        
+                if datos['hora_muestreo'].iloc[idato] is not None:          
+                    df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['botella']==datos['botella'].iloc[idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'].iloc[idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'].iloc[idato])]
     
                 else:
-                    df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['botella']==datos['botella'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato])]
+                    df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['botella']==datos['botella'].iloc[idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'].iloc[idato])]
             else:
                 if datos['hora_muestreo'][idato] is not None:          
-                    df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato])]
+                    df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'].iloc[idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'].iloc[idato])]
     
                 else:
-                    df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'][idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'][idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'][idato])]
+                    df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'].iloc[idato])]
                
             
             if df_temp.shape[0]> 0:
-                datos['id_muestreo'] [idato]      =  df_temp['id_muestreo'].iloc[0]    
-                datos['io_nuevo_muestreo'][idato] = 0
+                datos['id_muestreo'].iloc[idato]       =  df_temp['id_muestreo'].iloc[0]    
+                datos['io_nuevo_muestreo'].iloc[idato] = 0
                 
             else:
-                datos['io_nuevo_muestreo'][idato] = 1
-                ultimo_registro_bd                = ultimo_registro_bd + 1
-                datos['id_muestreo'][idato]       = ultimo_registro_bd 
+                datos['io_nuevo_muestreo'].iloc[idato] = 1
+                ultimo_registro_bd                     = ultimo_registro_bd + 1
+                datos['id_muestreo'].iloc[idato]       = ultimo_registro_bd 
             
         
         if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
@@ -567,7 +567,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                     else:
                         nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'][idato])) 
                  
-                exporta_registros['nombre_muestreo'][idato]  = nombre_muestreo
+                exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
         
             # # Inserta el dataframe resultante en la base de datos 
             exporta_registros.set_index('id_muestreo',drop=True,append=False,inplace=True)
