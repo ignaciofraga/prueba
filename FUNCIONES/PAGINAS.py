@@ -1971,7 +1971,7 @@ def entrada_botellas():
                                  id_estacion                      = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
                                 
                                  # Control de calidad y asignación del registro
-                                 df_botella,textos_aviso          = FUNCIONES_PROCESADO.control_calidad(df_botella,direccion_host,base_datos,usuario,contrasena,puerto)                               
+                                 #df_botella,textos_aviso          = FUNCIONES_PROCESADO.control_calidad(df_botella,direccion_host,base_datos,usuario,contrasena,puerto)                               
                                  df_botella['id_estacion_temp']   = int(id_estacion) 
                                  df_botella['id_salida']          = id_salida
                                  df_botella                       = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
