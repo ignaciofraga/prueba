@@ -1770,7 +1770,8 @@ def entrada_botellas():
                 with st.spinner(texto_estado):
                                     
                     # Lee los datos de cada archivo de botella
-                    datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines()            
+                    #datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines()
+                    datos_archivo = archivo_btl.getvalue().decode('ISO-8859-1').splitlines()
                     
                     # Comprueba que la fecha del archivo y de la salida coinciden
                     fecha_salida_texto    = nombre_archivo_btl[0:8]
