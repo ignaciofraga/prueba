@@ -1936,9 +1936,7 @@ def entrada_botellas():
                                  df_botella['prof_referencia']        = 0
                                  df_botella['fecha_muestreo']         = fecha_muestreo
                                  df_botella = df_botella.drop(columns = ['c0S/m','sbeox0V','sbeox0ML/L','sigma-é00','flag'])
-                                 # Añade botella y hora de muestreo (nulas) para evitar errores en el procesado
-                                 df_botella['botella']                = None
-                                 df_botella['hora_muestreo']          = None
+
                                                                  
                                  
                                     
@@ -1949,7 +1947,10 @@ def entrada_botellas():
                                  df_botella['id_estacion_temp']       = int(id_estacion) 
                                  df_botella['id_salida']              = id_salida
                                  
-                           
+                                 # Añade botella y hora de muestreo (nulas) para evitar errores en el procesado
+                                 df_botella['botella']                = None
+                                 df_botella['hora_muestreo']          = None
+                            
                                                             
                                  gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_botella)
                                  gridOptions = gb.build()
