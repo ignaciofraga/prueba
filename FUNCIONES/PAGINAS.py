@@ -1969,13 +1969,18 @@ def entrada_botellas():
                                  # Añade botella y hora de muestreo (nulas) para evitar errores en el procesado
                                  df_botella['botella']                = None
                                  df_botella['hora_muestreo']          = None
-                                                                  
+                                                                 
+                                 
+                                    
                                  # Asigna el idenificador de la estacion correspondiente
                                  id_estacion                          = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
                                 
                                  # Control de calidad y asignación del registro
                                  df_botella['id_estacion_temp']       = int(id_estacion) 
                                  df_botella['id_salida']              = id_salida
+                                 
+                                 st.text(df_botella)
+                                 
                                  df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
                                  # Añade el resto de parámetros 
