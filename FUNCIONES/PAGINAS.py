@@ -1916,8 +1916,7 @@ def entrada_botellas():
         df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
         df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
                          
-        # compón un dataframe con la información de muestreo y datos biogeoquímicos
-        df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
+        # compón un dataframe con la información de muestreo y datos biogeoquímicos                                            
         df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
         df_datos_disponibles  = pandas.merge(df_datos_disponibles, df_datos_fisicos, on="muestreo")
          
