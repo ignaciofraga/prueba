@@ -1854,7 +1854,7 @@ def entrada_botellas():
                             cursor.close()
                             conn.close() 
                             
-                            df_perfiles['perfil'] = id_perfil
+                            df_perfiles['perfil'] = int(id_perfil)
                             
                             # # Muestra una tabla con las configuraciones 
                             # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_perfiles)
