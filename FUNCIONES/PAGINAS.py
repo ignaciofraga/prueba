@@ -1753,11 +1753,7 @@ def entrada_botellas():
             submit = st.form_submit_button("Añadir o modificar datos")                    
     
         if submit is True:
-          
-            # Conecta con la base de datos
-            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-            cursor = conn.cursor() 
-                                   
+                                             
             for archivo_btl in listado_archivos_btl:
                             
                 # encuentra el nombre de la estación
@@ -1834,6 +1830,10 @@ def entrada_botellas():
                             # Define el nombre del perfil
                             nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
                             
+                            # Conecta con la base de datos
+                            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                            cursor = conn.cursor() 
+                            
                             # Obtén el identificador del perfil en la base de datos
                             instruccion_sql = '''INSERT INTO perfiles_verticales (nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,longitud_muestreo,latitud_muestreo,configuracion_perfilador)
                             VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast) DO NOTHING;''' 
@@ -1850,6 +1850,9 @@ def entrada_botellas():
                             cursor.execute(instruccion_sql)
                             id_perfil =cursor.fetchone()[0]
                             conn.commit()       
+                            
+                            cursor.close()
+                            conn.close() 
                             
                             df_perfiles['perfil'] = id_perfil
                             
@@ -1900,8 +1903,7 @@ def entrada_botellas():
              
                             
         
-            cursor.close()
-            conn.close()   
+  
         
 
             
