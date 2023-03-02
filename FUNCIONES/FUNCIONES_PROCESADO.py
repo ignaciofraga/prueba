@@ -733,10 +733,10 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     df_disponible_fis_bd        = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos_estacion)]   
     df_disponible_bd            = pandas.merge(df_disponible_bd, df_disponible_fis_bd, on="muestreo")
     
-    # Muestra una tabla con las configuraciones 
-    gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_disponible_bd)
-    gridOptions = gb.build()
-    st_aggrid.AgGrid(df_disponible_bd,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
+    # # Muestra una tabla con las configuraciones 
+    # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_disponible_bd)
+    # gridOptions = gb.build()
+    # st_aggrid.AgGrid(df_disponible_bd,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
 
 
     # Borra los dataframes que ya no hagan falta para ahorrar memoria
@@ -750,15 +750,18 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         texto_error = "La base de datos no contiene información para la variable, salida y estación seleccionadas"
         st.warning(texto_error, icon="⚠️")
 
-    # elif df_datos_buenos[variable_seleccionada].isnull().all():
-    #     texto_error = "La base de datos no contiene datos de la variable, salida y estación seleccionadas considerados como buenos"
-    #     st.warning(texto_error, icon="⚠️")
     else:
 
         # Determina los meses que marcan el rango de busqueda
         df_seleccion    = df_seleccion.sort_values('fecha_muestreo')
         fecha_minima    = df_seleccion['fecha_muestreo'].iloc[0] - datetime.timedelta(days=meses_offset*30)
         fecha_maxima    = df_seleccion['fecha_muestreo'].iloc[-1] + datetime.timedelta(days=meses_offset*30)  
+    
+        # Muestra una tabla con las configuraciones 
+        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_seleccion)
+        gridOptions = gb.build()
+        st_aggrid.AgGrid(df_seleccion,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
+   
     
     
         if fecha_minima.year < fecha_maxima.year:
@@ -810,8 +813,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             # df_datos_buenos          = df_datos_buenos.replace(numpy.nan, None) 
             
             # Selecciona el rango del gráfico
-            min_val = min(df_datos_buenos[variable_seleccionada].dropna().min(),df_seleccion[variable_seleccionada].dropna().min())
-            max_val = max(df_datos_buenos[variable_seleccionada].dropna().max(),df_seleccion[variable_seleccionada].dropna().max())
+            min_val = numpy.nanmin(df_datos_buenos[variable_seleccionada].dropna().min(),df_seleccion[variable_seleccionada].dropna().min())
+            max_val = numpy.nanmax(df_datos_buenos[variable_seleccionada].dropna().max(),df_seleccion[variable_seleccionada].dropna().max())
             #min_val = min(min(df_datos_buenos[variable_seleccionada]),min(df_seleccion[variable_seleccionada]))
             #max_val = max(max(df_datos_buenos[variable_seleccionada]),max(df_seleccion[variable_seleccionada]))
    
