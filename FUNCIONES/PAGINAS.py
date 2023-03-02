@@ -1966,7 +1966,9 @@ def entrada_botellas():
                                  df_botella['prof_referencia']        = 0
                                  df_botella['fecha_muestreo']         = fecha_muestreo
                                  df_botella = df_botella.drop(columns = ['c0S/m','sbeox0V','sbeox0ML/L','sigma-é00','flag'])
+                                 # Añade botella y hora de muestreo (nulas) para evitar errores en el procesado
                                  df_botella['botella']                = None
+                                 df_botella['hora_muestreo']          = None
                                                                   
                                  # Asigna el idenificador de la estacion correspondiente
                                  id_estacion                          = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
