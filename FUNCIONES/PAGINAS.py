@@ -1947,6 +1947,7 @@ def entrada_botellas():
                                  df_botella['botella']                = None
                                  df_botella['hora_muestreo']          = None
                           
+                                 st.text(1)
                                  df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
                                  # # Añade el resto de parámetros 
@@ -1954,10 +1955,10 @@ def entrada_botellas():
                                  
                                  # df_botella['programa']               = id_programa    
                                  # df_botella['num_cast']               = cast_muestreo 
-                                 
+                                 st.text(2)
                                  FUNCIONES_PROCESADO.inserta_datos(df_botella,'fisica',direccion_host,base_datos,usuario,contrasena,puerto)
                                  FUNCIONES_PROCESADO.inserta_datos(df_botella,'bgq',direccion_host,base_datos,usuario,contrasena,puerto)
-
+                                 st.text(3)
                                  
                                  # # Inserta datos físicos
                                  # instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
