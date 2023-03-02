@@ -818,17 +818,12 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             if df_datos_buenos.shape[0] > 0:
                 min_bd    = numpy.nanmin(numpy.array(df_datos_buenos[variable_seleccionada]))
                 max_bd    = numpy.nanmax(numpy.array(df_datos_buenos[variable_seleccionada]))
+                min_val   = min(min_bd,min_seleccion)
+                max_val   = max(max_bd,max_seleccion)
             else:
-                min_bd    = None 
-                max_bd    = None 
+                min_val    = min_seleccion 
+                max_val    = min_seleccion 
                 
-            st.text(min_seleccion)
-            st.text(min_bd)
-            
-            min_val = numpy.nanmin(numpy.array([min_seleccion,min_bd]))
-            max_val = numpy.nanmax(numpy.array([max_seleccion,max_bd]))
-            #min_val = min(min(df_datos_buenos[variable_seleccionada]),min(df_seleccion[variable_seleccionada]))
-            #max_val = max(max(df_datos_buenos[variable_seleccionada]),max(df_seleccion[variable_seleccionada]))
    
             if io_malos:
                 df_datos_malos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_malo]
