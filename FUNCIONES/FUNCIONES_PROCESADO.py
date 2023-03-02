@@ -742,9 +742,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         texto_error = "La base de datos no contiene información para la variable, salida y estación seleccionadas"
         st.warning(texto_error, icon="⚠️")
 
-    elif df_datos_buenos[variable_seleccionada].isnull().all():
-        texto_error = "La base de datos no contiene datos de la variable, salida y estación seleccionadas considerados como buenos"
-        st.warning(texto_error, icon="⚠️")
+    # elif df_datos_buenos[variable_seleccionada].isnull().all():
+    #     texto_error = "La base de datos no contiene datos de la variable, salida y estación seleccionadas considerados como buenos"
+    #     st.warning(texto_error, icon="⚠️")
     else:
 
         # Determina los meses que marcan el rango de busqueda
