@@ -479,25 +479,25 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         # # añade el nombre del muestreo
         exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
         for idato in range(exporta_registros.shape[0]):    
-            nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == datos['id_estacion_temp'][idato]]['nombre_estacion'].iloc[0]
+            nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == datos['id_estacion_temp'].iloc[idato]]['nombre_estacion'].iloc[0]
             
-            nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'][idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
+            nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'].iloc[idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
             if datos['num_cast'][idato] is not None:
-                nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'][idato]))
+                nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'].iloc[idato]))
             else:
                 nombre_muestreo = nombre_muestreo + '_C1' 
                 
             if datos['botella'][idato] is not None:
-                nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'][idato])) 
+                nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'].iloc[idato])) 
             else:
                 if datos['prof_referencia'][idato] is not None: 
-                    nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['prof_referencia'][idato]))
+                    nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['prof_referencia'].iloc[idato]))
                 else:
-                    nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'][idato])) 
+                    nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'].iloc[idato])) 
                 
-            exporta_registros['nombre_muestreo'][idato]  = nombre_muestreo
+            exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
 
-            datos['muestreo'] [idato]                 = idato + 1
+            datos['muestreo'].iloc[idato]                 = idato + 1
             
             
         # Inserta en base de datos        
@@ -551,21 +551,21 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             # Añade el nombre del muestreo
             exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
             for idato in range(exporta_registros.shape[0]):    
-                nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == datos['id_estacion_temp'][idato]]['nombre_estacion'].iloc[0]
+                nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == datos['id_estacion_temp'].iloc[idato]]['nombre_estacion'].iloc[0]
               
-                nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'][idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
+                nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'].iloc[idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
                 if datos['num_cast'][idato] is not None:
-                    nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'][idato]))
+                    nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'].iloc[idato]))
                 else:
                     nombre_muestreo = nombre_muestreo + '_C1'     
                 
                 if datos['botella'][idato] is not None:
-                    nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'][idato])) 
+                    nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'].iloc[idato])) 
                 else:
                     if datos['prof_referencia'][idato] is not None: 
-                        nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['prof_referencia'][idato]))
+                        nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['prof_referencia'].iloc[idato]))
                     else:
-                        nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'][idato])) 
+                        nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'].iloc[idato])) 
                  
                 exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
         
