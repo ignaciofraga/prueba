@@ -859,21 +859,21 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         ### DATOS PROCESADOS ###        
         ax.plot(df_seleccion[variable_seleccionada],df_seleccion['presion_ctd'],'.r',label='PROCESADO' )
         
-        ### FORMATO,ETIQUETAS Y NOMBRES DE EJES ###
-        texto_eje = variables_procesado[indice_variable] + '(' + variables_unidades[indice_variable] + ')'
-        ax.set(xlabel=texto_eje)
-        ax.set(ylabel='Presion (db)')
-        ax.invert_yaxis()
-        #ax.set_xlim([vmin_rango, vmax_rango])
-        rango_profs = ax.get_ylim()
-        # Añade el nombre de cada punto
-        nombre_muestreos = [None]*df_seleccion.shape[0]
-        for ipunto in range(df_seleccion.shape[0]):    
-            if df_seleccion['botella'].iloc[ipunto] is None:
-                nombre_muestreos[ipunto] = 'Prof.' + str(int(df_seleccion['presion_ctd'].iloc[ipunto]))
-            else:
-                nombre_muestreos[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
-            ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
+        # ### FORMATO,ETIQUETAS Y NOMBRES DE EJES ###
+        # texto_eje = variables_procesado[indice_variable] + '(' + variables_unidades[indice_variable] + ')'
+        # ax.set(xlabel=texto_eje)
+        # ax.set(ylabel='Presion (db)')
+        # ax.invert_yaxis()
+        # #ax.set_xlim([vmin_rango, vmax_rango])
+        # rango_profs = ax.get_ylim()
+        # # Añade el nombre de cada punto
+        # nombre_muestreos = [None]*df_seleccion.shape[0]
+        # for ipunto in range(df_seleccion.shape[0]):    
+        #     if df_seleccion['botella'].iloc[ipunto] is None:
+        #         nombre_muestreos[ipunto] = 'Prof.' + str(int(df_seleccion['presion_ctd'].iloc[ipunto]))
+        #     else:
+        #         nombre_muestreos[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
+        #     ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
                 
         # # Ajusta el rango de las x 
         # custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
