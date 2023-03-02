@@ -1959,30 +1959,30 @@ def entrada_botellas():
                             if nombre_estacion == '2' and programa_seleccionado == 'RADIAL CORUÑA' :  # Estacion 2 del programa radiales, añadir muestreo correspondiente a la botella en superficie
 
                                  # Genera dataframe con el muestreo de la estacion 2
-                                 pres_min   = min(df_datos['presion_ctd'])
-                                 df_botella = df_datos[df_datos['presion_ctd']==pres_min]
-                                 df_botella['latitud']  = lat_muestreo
-                                 df_botella['longitud'] = lon_muestreo
-                                 df_botella['prof_referencia']   = 0
-                                 df_botella['fecha_muestreo']    = fecha_muestreo
-                                 df_botella = df_botella.drop(columns=['c0S/m','sbeox0V','sbeox0ML/L','sigma-é00','flag'])
+                                 pres_min                             = min(df_datos['presion_ctd'])
+                                 df_botella                           = df_datos[df_datos['presion_ctd']==pres_min]
+                                 df_botella['latitud']                = lat_muestreo
+                                 df_botella['longitud']               = lon_muestreo
+                                 df_botella['prof_referencia']        = 0
+                                 df_botella['fecha_muestreo']         = fecha_muestreo
+                                 df_botella = df_botella.drop(columns = ['c0S/m','sbeox0V','sbeox0ML/L','sigma-é00','flag'])
+                                 df_botella['botella']                = None
                                                                   
                                  # Asigna el idenificador de la estacion correspondiente
-                                 id_estacion                      = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
+                                 id_estacion                          = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
                                 
                                  # Control de calidad y asignación del registro
-                                 #df_botella,textos_aviso          = FUNCIONES_PROCESADO.control_calidad(df_botella,direccion_host,base_datos,usuario,contrasena,puerto)                               
-                                 df_botella['id_estacion_temp']   = int(id_estacion) 
-                                 df_botella['id_salida']          = id_salida
-                                 df_botella                       = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+                                 df_botella['id_estacion_temp']       = int(id_estacion) 
+                                 df_botella['id_salida']              = id_salida
+                                 df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
                                  # Añade el resto de parámetros 
-                                 df_botella['nombre_muestreo']    = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E2_P0' 
-                                 df_botella['estacion']           = id_estacion
-                                 df_botella['id_estacion_temp']   = id_estacion
+                                 df_botella['nombre_muestreo']        = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E2_P0' 
+                                 df_botella['estacion']               = id_estacion
+                                 df_botella['id_estacion_temp']       = id_estacion
                                  
-                                 df_botella['programa']           = id_programa    
-                                 df_botella['num_cast']           = cast_muestreo 
+                                 df_botella['programa']               = id_programa    
+                                 df_botella['num_cast']               = cast_muestreo 
                                  
                                  FUNCIONES_PROCESADO.inserta_datos(df_botella,'fisica',direccion_host,base_datos,usuario,contrasena,puerto)
                                  FUNCIONES_PROCESADO.inserta_datos(df_botella,'bgq',direccion_host,base_datos,usuario,contrasena,puerto)
