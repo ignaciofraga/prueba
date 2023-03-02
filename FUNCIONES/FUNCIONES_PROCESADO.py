@@ -818,11 +818,11 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             if df_datos_buenos.shape[0] > 0:
                 min_bd    = numpy.nanmin(numpy.array(df_datos_buenos[variable_seleccionada]))
                 max_bd    = numpy.nanmax(numpy.array(df_datos_buenos[variable_seleccionada]))
-                min_val   = min(min_bd,min_seleccion)
-                max_val   = max(max_bd,max_seleccion)
+                min_val   = 0.9*min(min_bd,min_seleccion)
+                max_val   = 1.1*max(max_bd,max_seleccion)
             else:
-                min_val    = min_seleccion 
-                max_val    = min_seleccion 
+                min_val    = 0.9*min_seleccion 
+                max_val    = 1.1*min_seleccion 
                 
    
             if io_malos:
@@ -883,7 +883,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         rango_profs = ax.get_ylim()
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
-        for ipunto in range(df_seleccion.shape[0]):            
+        for ipunto in range(df_seleccion.shape[0]):    
+            st.text(df_seleccion['botella'].iloc[ipunto])
+            st.text(df_seleccion['botella'].iloc[ipunto])
             if df_seleccion['botella'].iloc[ipunto] is None:
                 nombre_muestreos[ipunto] = 'Prof.' + str(int(df_seleccion['presion_ctd'].iloc[ipunto]))
             else:
