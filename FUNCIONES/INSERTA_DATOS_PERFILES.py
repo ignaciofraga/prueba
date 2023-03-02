@@ -81,40 +81,71 @@ for isalida in range(1):
             lectura_archivo = open(archivo, "r")  
             datos_archivo = lectura_archivo.readlines()
                           
-            datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
+            datos_perfil,df_perfiles,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
             
-            df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)
+            
+            # Define el nombre del perfil
+            nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
+            
+            # Obtén el identificador del perfil en la base de datos
+            instruccion_sql = '''INSERT INTO perfiles_verticales (nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,longitud_muestreo,latitud_muestreo,configuracion_perfilador)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast) DO NOTHING;''' 
+            
+            nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
+            
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()    
+            cursor.execute(instruccion_sql,(nombre_perfil,int(1),int(1),int(cast_muestreo),fecha_muestreo,hora_muestreo,lon_muestreo,lat_muestreo,int(configuracion_perfilador)))
+            conn.commit() 
+           
+            instruccion_sql = "SELECT perfil FROM perfiles_verticales WHERE nombre_perfil = '" + nombre_perfil + "';" 
+            cursor = conn.cursor()    
+            cursor.execute(instruccion_sql)
+            id_perfil =cursor.fetchone()[0]
+            conn.commit()                  
+            
+            
+            
+            
+            df_perfiles['perfil'] = id_perfil
+            
+            
+            FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+            
+            
+            
+            #df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)
 
-            # Genera dataframe con el muestreo de la estacion 2
-            pres_min   = min(df_datos['presion_ctd'])
-            df_botella = df_datos[df_datos['presion_ctd']==pres_min]
-            df_botella['latitud']  = lat_muestreo
-            df_botella['longitud'] = lon_muestreo
-            df_botella['prof_referencia']   = 0
-            df_botella['fecha_muestreo']    = fecha_muestreo
-            df_botella = df_botella.drop(columns=['c0S/m','sbeox0V','sbeox0ML/L','sigma-é00','flag'])
+            # # Genera dataframe con el muestreo de la estacion 2
+            # pres_min   = min(df_datos['presion_ctd'])
+            # df_botella = df_datos[df_datos['presion_ctd']==pres_min]
+            # df_botella['latitud']  = lat_muestreo
+            # df_botella['longitud'] = lon_muestreo
+            # df_botella['prof_referencia']   = 0
+            # df_botella['fecha_muestreo']    = fecha_muestreo
+            # df_botella = df_botella.drop(columns=['c0S/m','sbeox0V','sbeox0ML/L','sigma-é00','flag'])
             
-            # Busca la salida a la que corresponde el muestreo
-            id_salida = tabla_salidas_programa['id_salida'][tabla_salidas_programa['fecha_salida']==fecha_muestreo].iloc[0]
-            
-            
-            # Asigna el idenificador de la estacion correspondiente
-            id_estacion                      = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
+            # # Busca la salida a la que corresponde el muestreo
+            # id_salida = tabla_salidas_programa['id_salida'][tabla_salidas_programa['fecha_salida']==fecha_muestreo].iloc[0]
             
             
-            # Control de calidad y asignación del registro
-            df_botella,textos_aviso          = FUNCIONES_PROCESADO.control_calidad(df_botella,direccion_host,base_datos,usuario,contrasena,puerto)            
+            # # Asigna el idenificador de la estacion correspondiente
+            # id_estacion                      = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
+            
+            
+            # # Control de calidad y asignación del registro
+            # df_botella,textos_aviso          = FUNCIONES_PROCESADO.control_calidad(df_botella,direccion_host,base_datos,usuario,contrasena,puerto)            
 
-            df_botella['id_estacion_temp']   = id_estacion
+            # df_botella['id_estacion_temp']   = id_estacion
 
-            df_botella                       = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            # df_botella                       = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-            df_botella['nombre_muestreo']    = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E2_P0' 
-            df_botella['estacion']           = id_estacion
-            df_botella['id_estacion_temp']   = id_estacion
-            df_botella['id_salida']          = id_salida
-            df_botella['programa']           = id_programa    
-            df_botella['num_cast']           = cast_muestreo 
+            # df_botella['nombre_muestreo']    = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E2_P0' 
+            # df_botella['estacion']           = id_estacion
+            # df_botella['id_estacion_temp']   = id_estacion
+            # df_botella['id_salida']          = id_salida
+            # df_botella['programa']           = id_programa    
+            # df_botella['num_cast']           = cast_muestreo 
         # plt.figure(isalida)
         # plt.plot(df_datos['temperatura_ctd'],df_datos['presion_ctd'])                
   

@@ -355,11 +355,11 @@ def lectura_archivo_perfiles(datos_archivo):
                                 
             if texto_linea[0:22] == '* System UpLoad Time =': # Línea con hora del cast
                 listado_textos   = texto_linea.split('= ') 
-                datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
+                datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
                                         
             if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
                 listado_textos    = texto_linea.split('= ')  
-                datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
+                datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
                 
             if texto_linea[0:6] == '# name': # Línea con variable muestreada
                 posicion_inicio    = texto_linea.find('=') + 2
@@ -403,8 +403,58 @@ def lectura_archivo_perfiles(datos_archivo):
     #Extrae la fecha y hora de muestreo
     fecha_muestreo = datetime_sistema.date()
     hora_muestreo  = datetime_sistema - datetime.timedelta(seconds=offset_tiempo)
+    
+    
+    # Pasa los datos a un dataframe
+    datos_perfil = pandas.DataFrame(datos_perfil, columns = listado_variables)
+        
+    # Genera un segundo dataframe con los datos ya en json
+    df_perfiles        = pandas.DataFrame()
+    
+    df_temp            = datos_perfil[['presion_ctd','temperatura_ctd']]
+    df_temp['qf_temp'] = 2
+    json_temperatura   = df_temp.to_json()
+    
+    df_sal            = datos_perfil[['presion_ctd','salinidad_ctd']]
+    df_sal['qf_sal']  = 2
+    json_salinidad    = df_sal.to_json()     
+    
+    df_perfiles = pandas.DataFrame([[json_temperatura,json_salinidad]], columns=['temperatura_ctd','salinidad_ctd'])
+    
+    try:
+        df_par                 = datos_perfil[['presion_ctd','par_ctd']]
+        df_par['qf_par']       = 2
+        json_par               = df_par.to_json()   
+        
+        df_perfiles['par_ctd'] = json_par
+        
+    except:
+        pass
 
-    return datos_perfil,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo    
+    try:
+        df_fluor                         = datos_perfil[['presion_ctd','fluorescencia_ctd']]
+        df_fluor['fluorescencia_ctd']    = 2
+        json_fluor                       = df_fluor.to_json()   
+        
+        df_perfiles['fluorescencia_ctd'] = json_fluor
+        
+    except:
+        pass
+    
+    
+    try:
+        df_oxi                           = datos_perfil[['presion_ctd','oxigeno_ctd']]
+        df_oxi['oxigeno_ctd']            = 2
+        json_oxi                         = df_oxi.to_json()   
+        
+        df_perfiles['oxigeno_ctd'] = json_oxi
+        
+    except:
+        pass
+    
+    
+
+    return datos_perfil,df_perfiles,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo    
 
 
     # # Predimensionamientos

@@ -385,7 +385,7 @@ instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
 cursor.execute(instruccion_sql)
 conn.commit()
 
-listado_variables = ('(id_perfil SERIAL PRIMARY KEY,'
+listado_variables = ('(perfil SERIAL PRIMARY KEY,'
 ' nombre_perfil text,'
 ' salida_mar int NOT NULL,'
 ' estacion int NOT NULL,'
@@ -495,7 +495,7 @@ cursor.execute(instruccion_sql)
 conn.commit()
 
 # Crea la tabla de nuevo
-listado_variables = ('(id_muestreo int PRIMARY KEY,'
+listado_variables = ('(muestreo int PRIMARY KEY,'
 ' nombre_muestreo text,'
 ' fecha_muestreo date NOT NULL,'
 ' hora_muestreo time,'
@@ -658,7 +658,7 @@ listado_variables = ('(muestreo int PRIMARY KEY,'
 ) 
 
 listado_dependencias = ('FOREIGN KEY (muestreo)'
-'REFERENCES muestreos_discretos (id_muestreo)'
+'REFERENCES muestreos_discretos (muestreo)'
 'ON UPDATE CASCADE ON DELETE CASCADE,'
 'FOREIGN KEY (cc_nutrientes)'
 'REFERENCES control_calidad_nutrientes (id_control)'
@@ -706,7 +706,7 @@ listado_variables = ('(muestreo int PRIMARY KEY,'
 ) 
 
 listado_dependencias = ('FOREIGN KEY (muestreo)'
-'REFERENCES muestreos_discretos (id_muestreo)'
+'REFERENCES muestreos_discretos (muestreo)'
 )
 
 # listado_dependencias = ('FOREIGN KEY (muestreo)'
@@ -810,14 +810,14 @@ conn.commit()
 
 # Crea la tabla de nuevo
 listado_variables = ('(perfil int PRIMARY KEY,'
-' temperatura_perfil json,'
-' salinidad_perfil json,'
-' par_perfil json,'
+' temperatura_ctd json,'
+' salinidad_ctd json,'
+' par_ctd json,'
 
 ) 
 
 listado_dependencias = ('FOREIGN KEY (perfil)'
-'REFERENCES perfiles_verticales (id_perfil)'
+'REFERENCES perfiles_verticales (perfil)'
 'ON UPDATE CASCADE ON DELETE CASCADE'
 )
 
@@ -845,12 +845,12 @@ conn.commit()
 
 # Crea la tabla de nuevo
 listado_variables = ('(perfil int PRIMARY KEY,'
-' oxigeno_perfil json,'
-' fluorescencia_perfil json,'
+' oxigeno_ctd json,'
+' fluorescencia_ctd json,'
 ) 
 
 listado_dependencias = ('FOREIGN KEY (perfil)'
-'REFERENCES perfiles_verticales (id_perfil)'
+'REFERENCES perfiles_verticales (perfil)'
 'ON UPDATE CASCADE ON DELETE CASCADE'
 )
 

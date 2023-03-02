@@ -76,8 +76,8 @@ for iarchivo in range(len(listado_archivos)):
    
     # # # # # Introduce los datos en la base de datos
     print('Introduciendo los datos en la base de datos')
-    FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-    FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
 
  
   

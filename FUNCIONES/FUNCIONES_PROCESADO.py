@@ -464,7 +464,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
     tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
        
-    datos['id_muestreo']  = numpy.zeros(datos.shape[0],dtype=int)
+    datos['muestreo']  = numpy.zeros(datos.shape[0],dtype=int)
     
     # si no hay ningun valor en la tabla de registro, meter directamente todos los datos registrados
     if tabla_muestreos.shape[0] == 0:
@@ -473,7 +473,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','latitud','longitud']]
         # añade el indice de cada registro
         indices_registros                    = numpy.arange(1,(exporta_registros.shape[0]+1))    
-        exporta_registros['id_muestreo']     = indices_registros
+        exporta_registros['muestreo']     = indices_registros
         # renombra la columna con información de la estación muestreada
         exporta_registros                    = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
         # # añade el nombre del muestreo
@@ -497,17 +497,17 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 
             exporta_registros['nombre_muestreo'][idato]  = nombre_muestreo
 
-            datos['id_muestreo'] [idato]                 = idato + 1
+            datos['muestreo'] [idato]                 = idato + 1
             
             
         # Inserta en base de datos        
-        exporta_registros.set_index('id_muestreo',drop=True,append=False,inplace=True)
+        exporta_registros.set_index('muestreo',drop=True,append=False,inplace=True)
         exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append') 
     
     # En caso contrario hay que ver registro a registro, si ya está incluido en la base de datos
     else:
     
-        ultimo_registro_bd         = max(tabla_muestreos['id_muestreo'])
+        ultimo_registro_bd         = max(tabla_muestreos['muestreo'])
         datos['io_nuevo_muestreo'] = numpy.ones(datos.shape[0],dtype=int)
 
         for idato in range(datos.shape[0]):
@@ -527,13 +527,13 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                
             
             if df_temp.shape[0]> 0:
-                datos['id_muestreo'].iloc[idato]       =  df_temp['id_muestreo'].iloc[0]    
+                datos['muestreo'].iloc[idato]          = df_temp['muestreo'].iloc[0]    
                 datos['io_nuevo_muestreo'].iloc[idato] = 0
                 
             else:
                 datos['io_nuevo_muestreo'].iloc[idato] = 1
                 ultimo_registro_bd                     = ultimo_registro_bd + 1
-                datos['id_muestreo'].iloc[idato]       = ultimo_registro_bd 
+                datos['muestreo'].iloc[idato]       = ultimo_registro_bd 
             
         
         if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
@@ -541,7 +541,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
             nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
             # Mantén sólo las columnas que interesan
-            exporta_registros = nuevos_muestreos[['id_muestreo','id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','latitud','longitud']]
+            exporta_registros = nuevos_muestreos[['muestreo','id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','latitud','longitud']]
                         
             # Cambia el nombre de la columna de estaciones
             exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
@@ -570,7 +570,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
         
             # # Inserta el dataframe resultante en la base de datos 
-            exporta_registros.set_index('id_muestreo',drop=True,append=False,inplace=True)
+            exporta_registros.set_index('muestreo',drop=True,append=False,inplace=True)
             exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append')    
     
     conn_psql.dispose() # Cierra la conexión con la base de datos  
@@ -578,19 +578,31 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     return datos
 
 
-##################################################################
-######## FUNCION PARA INSERTAR DATOS EN LA BASE DE DATOS  ########
-##################################################################
+############################################################################
+######## FUNCION PARA INSERTAR DATOS DISCRETOS EN LA BASE DE DATOS  ########
+############################################################################
 
-def inserta_datos(datos,tipo_datos,direccion_host,base_datos,usuario,contrasena,puerto):
+def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,contrasena,puerto):
   
-    if tipo_datos     == 'fisica':
+    if tipo_datos     == 'discreto_fisica':
         variables     = 'variables_fisicas'
         tabla_destino = 'datos_discretos_fisica'
+        puntero       = 'muestreo'
     
-    elif tipo_datos   == 'bgq':
+    elif tipo_datos   == 'discreto_bgq':
         variables     = 'variables_biogeoquimicas'  
         tabla_destino = 'datos_discretos_biogeoquimica'
+        puntero       = 'muestreo'
+        
+    elif tipo_datos   == 'perfil_fisica':
+        variables     = 'variables_fisicas'  
+        tabla_destino = 'datos_perfil_fisica'
+        puntero       = 'perfil'            
+            
+    elif tipo_datos   == 'perfil_bgq':
+        variables     = 'variables_biogeoquimicas'  
+        tabla_destino = 'datos_perfil_biogeoquimica'
+        puntero       = 'perfil'
         
     # Recupera la tabla con los registros de muestreos físicos
     con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
@@ -604,18 +616,15 @@ def inserta_datos(datos,tipo_datos,direccion_host,base_datos,usuario,contrasena,
     variables_bd  = [x for x in tabla_variables[variables] if str(x) != 'None']    
   
     # Busca qué variables están incluidas en los datos a importar
-    listado_variables_datos   = datos.columns.tolist()
+    listado_variables_datos   = datos_insercion.columns.tolist()
     listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
-    listado_adicional         = ['muestreo'] + listado_variables_comunes
-  
-    # Genera un dataframe solo con las variales fisicas de los datos a importar 
-    datos_insercion = datos.rename(columns={"id_muestreo": "muestreo"})
-  
+    listado_adicional         = [puntero] + listado_variables_comunes
+    
     # # Si no existe ningún registro en la base de datos, introducir todos los datos disponibles
     if tabla_registros.shape[0] == 0:
         
         datos_insercion = datos_insercion[listado_adicional]
-        datos_insercion.set_index('muestreo',drop=True,append=False,inplace=True)
+        datos_insercion.set_index(puntero,drop=True,append=False,inplace=True)
         datos_insercion.to_sql(tabla_destino, conn_psql,if_exists='append')
         
     # En caso contrario, comprobar qué parte de la información está en la base de datos
@@ -623,26 +632,26 @@ def inserta_datos(datos,tipo_datos,direccion_host,base_datos,usuario,contrasena,
         
         for idato in range(datos_insercion.shape[0]): # Dataframe con la interseccion de los datos nuevos y los disponibles en la base de datos, a partir de la variable muestreo
          
-            df_temp  = tabla_registros[(tabla_registros['muestreo']==datos_insercion['muestreo'].iloc[idato])] 
+            df_temp  = tabla_registros[(tabla_registros[puntero]==datos_insercion[puntero].iloc[idato])] 
             
             if df_temp.shape[0]>0:  # Muestreo ya incluido en la base de datos
             
-                muestreo = df_temp['muestreo'].iloc[0]
+                muestreo = df_temp[puntero].iloc[0]
                 
                 for ivariable in range(len(listado_variables_comunes)): # Reemplazar las variables disponibles en el muestreo correspondiente
                         
-                    tabla_registros[listado_variables_comunes[ivariable]][tabla_registros['muestreo']==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]][datos_insercion['muestreo']==int(muestreo)]
+                    tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]][datos_insercion[puntero]==int(muestreo)]
   
             
             else: # Nuevo muestreo
                        
-                df_add = datos_insercion[datos_insercion['muestreo']==datos_insercion['muestreo'].iloc[idato]] # Genero un dataframe con cada línea de datos a añadir
+                df_add = datos_insercion[datos_insercion[puntero]==datos_insercion[puntero].iloc[idato]] # Genero un dataframe con cada línea de datos a añadir
   
                 df_add = df_add[listado_adicional] # Recorto para que tenga sólo las variables a añadir
             
                 tabla_registros = pandas.concat([tabla_registros, df_add]) # Combino ambos dataframes
             
-        tabla_registros.set_index('muestreo',drop=True,append=False,inplace=True)
+        tabla_registros.set_index(puntero,drop=True,append=False,inplace=True)
         
         # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -658,6 +667,8 @@ def inserta_datos(datos,tipo_datos,direccion_host,base_datos,usuario,contrasena,
   
 
     conn_psql.dispose() # Cierra la conexión con la base de datos 
+
+
 
 
 
