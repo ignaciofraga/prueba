@@ -1821,9 +1821,7 @@ def entrada_botellas():
                             datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
                                           
                             datos_perfil,df_perfiles,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
-                            
-                            df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)
-                                        
+                                                                    
                             # Busca la salida a la que corresponde el muestreo
                             id_salida = df_salidas_seleccion['id_salida'][df_salidas_seleccion['fecha_salida']==fecha_muestreo].iloc[0]
                             
@@ -1863,8 +1861,8 @@ def entrada_botellas():
                             if nombre_estacion == '2' and programa_seleccionado == 'RADIAL CORUÑA' :  # Estacion 2 del programa radiales, añadir muestreo correspondiente a la botella en superficie
 
                                  # Genera dataframe con el muestreo de la estacion 2
-                                 pres_min                             = min(df_datos['presion_ctd'])
-                                 df_temp                              = df_datos[df_datos['presion_ctd']==pres_min]
+                                 pres_min                             = min(datos_perfil['presion_ctd'])
+                                 df_temp                              = datos_perfil[datos_perfil['presion_ctd']==pres_min]
                                  
                                  # Elimina la fila correspondiente al comienzo del descenso
                                  df_botella = df_temp.drop([0])
