@@ -1789,48 +1789,13 @@ def entrada_botellas():
                         # Asigna el identificador de la salida al mar
                         datos_botellas ['id_salida'] =  id_salida
             
-                        # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-                        datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+                        # # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+                        # datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
-                        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-                        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+                        # FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+                        # FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'bgq',direccion_host,base_datos,usuario,contrasena,puerto)
              
-                
-                        # qf_defecto = 1   
-                                                
-                        # for idato in range(datos_botellas.shape[0]):
-
-                        #     # Inserta datos físicos
-                        #     instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf)
-                        #               VALUES (%s,%s,%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (temperatura_ctd,temperatura_ctd_qf,salinidad_ctd,salinidad_ctd_qf) = ROW(EXCLUDED.temperatura_ctd,EXCLUDED.temperatura_ctd_qf,EXCLUDED.salinidad_ctd,EXCLUDED.salinidad_ctd_qf);''' 
-                                        
-                        #     cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo'][idato]),datos_botellas['temperatura_ctd'][idato],int(qf_defecto),datos_botellas['salinidad_ctd'][idato],int(qf_defecto)))
-                        #     conn.commit()                            
-                            
-                        #     # PAR (si existe)
-                        #     if io_par == 1:
-                                
-                        #         instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,par_ctd,par_ctd_qf)
-                        #               VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (par_ctd,par_ctd_qf) = ROW(EXCLUDED.par_ctd,EXCLUDED.par_ctd_qf);''' 
-                                
-                        #         cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo'].iloc[idato]),datos_botellas['par_ctd'].iloc[idato],int(qf_defecto)))
-                        #         conn.commit()
-                                           
-                        #     # Fluorescencia (si existe)
-                        #     if io_fluor == 1:                
-                        #         instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,fluorescencia_ctd,fluorescencia_ctd_qf)
-                        #               VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (fluorescencia_ctd,fluorescencia_ctd_qf) = ROW(EXCLUDED.fluorescencia_ctd,EXCLUDED.fluorescencia_ctd_qf);''' 
-                                        
-                        #         cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo'][idato]),datos_botellas['fluorescencia_ctd'][idato],int(qf_defecto)))
-                        #         conn.commit()           
-                 
-                        #     # Oxígeno (si existe)
-                        #     if io_O2 == 1:                
-                        #         instruccion_sql = '''INSERT INTO datos_discretos_biogeoquimica (muestreo,oxigeno_ctd,oxigeno_ctd_qf)
-                        #               VALUES (%s,%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (oxigeno_ctd,oxigeno_ctd_qf) = ROW(EXCLUDED.oxigeno_ctd,EXCLUDED.oxigeno_ctd_qf);''' 
-                                        
-                        #         cursor.execute(instruccion_sql, (int(datos_botellas['id_muestreo'][idato]),datos_botellas['oxigeno_ctd'][idato],int(qf_defecto)))                              
-                        #         conn.commit()     
+            
             
                         texto_exito = 'Archivo .btl' + archivo_btl.name + ' procesado correctamente'
                         st.success(texto_exito) 
@@ -1960,7 +1925,10 @@ def entrada_botellas():
 
                                  # Genera dataframe con el muestreo de la estacion 2
                                  pres_min                             = min(df_datos['presion_ctd'])
-                                 df_botella                           = df_datos[df_datos['presion_ctd']==pres_min]
+                                 df_temp                              = df_datos[df_datos['presion_ctd']==pres_min]
+                                 
+                                 # Elimina las filas correspondientes al comienzo del descenso
+                                 df_botella = df_temp.drop([0])
                                  
                                  gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_botella)
                                  gridOptions = gb.build()
