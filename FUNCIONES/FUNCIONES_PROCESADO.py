@@ -874,9 +874,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             if df_seleccion['botella'].iloc[ipunto] is None:
                 st.text(df_seleccion['presion_ctd'].iloc[ipunto])
                 st.text(str(int(df_seleccion['presion_ctd'].iloc[ipunto])))
-                nombre_muestreos.iloc[ipunto] = 'Prof.' + str(int(df_seleccion['presion_ctd'].iloc[ipunto]))
+                nombre_muestreos[ipunto] = 'Prof.' + str(int(df_seleccion['presion_ctd'].iloc[ipunto]))
             else:
-                nombre_muestreos.iloc[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
+                nombre_muestreos[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
             
             st.text(df_seleccion['botella'].iloc[ipunto])
             ax.annotate(nombre_muestreos.iloc[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
