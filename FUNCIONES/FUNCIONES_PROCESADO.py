@@ -684,6 +684,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     import matplotlib.pyplot as plt
     from FUNCIONES.FUNCIONES_AUXILIARES import menu_seleccion   
     from FUNCIONES.FUNCIONES_AUXILIARES import init_connection 
+    
+    import st_aggrid 
 
     # Recupera los datos de conexión
     direccion_host   = st.secrets["postgres"].host
@@ -730,6 +732,12 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
 
     df_disponible_fis_bd        = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos_estacion)]   
     df_disponible_bd            = pandas.merge(df_disponible_bd, df_disponible_fis_bd, on="muestreo")
+    
+    # Muestra una tabla con las configuraciones 
+    gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_disponible_bd)
+    gridOptions = gb.build()
+    st_aggrid.AgGrid(df_disponible_bd,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
+
 
     # Borra los dataframes que ya no hagan falta para ahorrar memoria
     del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos,df_disponible_bgq_bd,df_disponible_fis_bd)
