@@ -1856,10 +1856,10 @@ def entrada_botellas():
                             
                             df_perfiles['perfil'] = int(id_perfil)
                             
-                            # # Muestra una tabla con las configuraciones 
-                            # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_perfiles)
-                            # gridOptions = gb.build()
-                            # st_aggrid.AgGrid(df_perfiles,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
+                            # Muestra una tabla con las configuraciones 
+                            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_perfiles)
+                            gridOptions = gb.build()
+                            st_aggrid.AgGrid(df_perfiles,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
 
                             
                             FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
