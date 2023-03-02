@@ -1787,11 +1787,11 @@ def entrada_botellas():
                         # Asigna el identificador de la salida al mar
                         datos_botellas ['id_salida'] =  id_salida
             
-                        # # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-                        # datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+                        # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+                        datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
-                        # FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-                        # FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+                        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+                        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
              
             
             
@@ -1848,16 +1848,9 @@ def entrada_botellas():
                             conn.close() 
                             
                             df_perfiles['perfil'] = int(id_perfil)
-                            
-                            # Muestra una tabla con las configuraciones 
-                            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_perfiles)
-                            gridOptions = gb.build()
-                            st_aggrid.AgGrid(df_perfiles,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
-
-                            
+                                                        
                             FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
                             FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_bgq',direccion_host,base_datos,usuario,contrasena,puerto)               
-                                
                                 
                                 
                             if nombre_estacion == '2' and programa_seleccionado == 'RADIAL CORUÑA' :  # Estacion 2 del programa radiales, añadir muestreo correspondiente a la botella en superficie

@@ -114,7 +114,7 @@ for isalida in range(1):
         
         
         FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-        
+        FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_bgq',direccion_host,base_datos,usuario,contrasena,puerto)        
             
             
             #df_datos = pandas.DataFrame(datos_perfil, columns = listado_variables)
