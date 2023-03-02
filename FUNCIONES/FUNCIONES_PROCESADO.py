@@ -843,8 +843,8 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 vmax_rango  = st.number_input('Valor máximo gráfico:',value=max_val,key='vmax_graf1')        
 
 
-        ##Reemplaza nan por None
-        #df_seleccion             = df_seleccion.replace(numpy.nan, None)            
+        #Reemplaza nan por None
+        df_seleccion             = df_seleccion.replace(numpy.nan, None)            
 
     
         ################# GRAFICOS ################
