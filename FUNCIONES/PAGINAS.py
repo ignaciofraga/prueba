@@ -1961,6 +1961,12 @@ def entrada_botellas():
                                  # Genera dataframe con el muestreo de la estacion 2
                                  pres_min                             = min(df_datos['presion_ctd'])
                                  df_botella                           = df_datos[df_datos['presion_ctd']==pres_min]
+                                 
+                                 gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_botella)
+                                 gridOptions = gb.build()
+                                 st_aggrid.AgGrid(df_botella,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
+
+                                 
                                  df_botella['latitud']                = lat_muestreo
                                  df_botella['longitud']               = lon_muestreo
                                  df_botella['prof_referencia']        = 0
@@ -1979,7 +1985,7 @@ def entrada_botellas():
                                  df_botella['id_estacion_temp']       = int(id_estacion) 
                                  df_botella['id_salida']              = id_salida
                                  
-                                 st.text(df_botella)
+                           
                                  
                                  df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
