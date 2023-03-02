@@ -1927,46 +1927,33 @@ def entrada_botellas():
                                  pres_min                             = min(df_datos['presion_ctd'])
                                  df_temp                              = df_datos[df_datos['presion_ctd']==pres_min]
                                  
-                                 # Elimina las filas correspondientes al comienzo del descenso
+                                 # Elimina la fila correspondiente al comienzo del descenso
                                  df_botella = df_temp.drop([0])
 
-                                 
+                                 # Asigna los datos correspondientes
                                  df_botella['latitud']                = lat_muestreo
                                  df_botella['longitud']               = lon_muestreo
                                  df_botella['prof_referencia']        = 0
                                  df_botella['fecha_muestreo']         = fecha_muestreo
                                  df_botella = df_botella.drop(columns = ['c0S/m','sbeox0V','sbeox0ML/L','sigma-é00','flag'])
-
-                                                                 
-                                 
-                                    
-                                 # Asigna el idenificador de la estacion correspondiente
                                  id_estacion                          = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
-                                
-                                 # Control de calidad y asignación del registro
                                  df_botella['id_estacion_temp']       = int(id_estacion) 
-                                 df_botella['id_salida']              = id_salida
-                                 
-                                 # Añade botella y hora de muestreo (nulas) para evitar errores en el procesado
-                                 df_botella['botella']                = None
-                                 df_botella['hora_muestreo']          = None
-                            
-                                                            
-                                 gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_botella)
-                                 gridOptions = gb.build()
-                                 st_aggrid.AgGrid(df_botella,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
- 
-                           
-                                 
-                                 df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
- 
-                                 # Añade el resto de parámetros 
+                                 df_botella['id_salida']              = id_salida 
                                  df_botella['nombre_muestreo']        = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E2_P0' 
-                                 df_botella['estacion']               = id_estacion
-                                 df_botella['id_estacion_temp']       = id_estacion
                                  
                                  df_botella['programa']               = id_programa    
                                  df_botella['num_cast']               = cast_muestreo 
+                                 # Añade botella y hora de muestreo (nulas) para evitar errores en el procesado
+                                 df_botella['botella']                = None
+                                 df_botella['hora_muestreo']          = None
+                          
+                                 df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+ 
+                                 # # Añade el resto de parámetros 
+                                 # df_botella['nombre_muestreo']        = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E2_P0' 
+                                 
+                                 # df_botella['programa']               = id_programa    
+                                 # df_botella['num_cast']               = cast_muestreo 
                                  
                                  FUNCIONES_PROCESADO.inserta_datos(df_botella,'fisica',direccion_host,base_datos,usuario,contrasena,puerto)
                                  FUNCIONES_PROCESADO.inserta_datos(df_botella,'bgq',direccion_host,base_datos,usuario,contrasena,puerto)
