@@ -787,7 +787,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 color_malos  = st.color_picker('Color', '#00CCCC',label_visibility="collapsed")
             with col3:
                 io_rango      = st.checkbox('Buenos(intervalo)', value=True)
-                io_dudosos    = st.checkbox('Dudosos', value=False)
+                io_dudosos    = st.checkbox('Dudosos', value=True)
             with col4:
                 color_rango   = st.color_picker('Color', '#404040',label_visibility="collapsed")
                 color_dudosos = st.color_picker('Color', '#00f900',label_visibility="collapsed")
