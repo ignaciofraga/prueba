@@ -869,13 +869,14 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
         for ipunto in range(df_seleccion.shape[0]):     
-            st.text(df_seleccion['presion_ctd'].iloc[ipunto])
-            st.text(df_seleccion['botella'].iloc[ipunto])
             if df_seleccion['botella'].iloc[ipunto] is None:
                 nombre_muestreos[ipunto] = 'Prof.' + str(int(df_seleccion['presion_ctd'].iloc[ipunto]))
             else:
                 nombre_muestreos[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
+            st.text(ipunto)
             st.text(nombre_muestreos[ipunto])
+            st.text(df_seleccion[variable_seleccionada].iloc[ipunto])
+            st.text(df_seleccion['presion_ctd'].iloc[ipunto])
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
                 
         # # Ajusta el rango de las x 
