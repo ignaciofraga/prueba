@@ -877,7 +877,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             st.text(nombre_muestreos[ipunto])
             st.text(df_seleccion[variable_seleccionada].iloc[ipunto])
             st.text(df_seleccion['presion_ctd'].iloc[ipunto])
-            #ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
+            ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
                 
         # # Ajusta el rango de las x 
         # custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
