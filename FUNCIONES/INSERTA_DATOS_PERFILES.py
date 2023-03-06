@@ -36,7 +36,7 @@ direccion_host = '193.146.155.99'
 nombre_programa = 'RADIAL CORUÑA'
 
 anho = 2020
-anho = 2021
+anho = 2023
 ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
 tipo_salida   = 'MENSUAL' 
 configuracion_perfilador = 1
@@ -68,7 +68,7 @@ for isalida in range(1):
     
     #### DATOS DE BOTELLEROS    
     
-    ruta_botelleros = listado_salidas[isalida] + 'btl+PAR+flscufa'
+    ruta_botelleros = listado_salidas[isalida] + 'btl+PAR+flscufa+O2'
     os.chdir(ruta_botelleros)
     for archivo in glob("*.btl"):
         
@@ -202,6 +202,7 @@ for isalida in range(1):
               df_botella['temperatura_ctd_qf']     = 1
               df_botella['salinidad_ctd_qf']       = 1
               df_botella['fluorescencia_ctd_qf']   = 1
+              df_botella['par_ctd_qf']             = 1
       
               df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 

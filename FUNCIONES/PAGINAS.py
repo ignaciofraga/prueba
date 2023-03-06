@@ -1898,6 +1898,7 @@ def entrada_botellas():
                                  df_botella['temperatura_ctd_qf']     = 1
                                  df_botella['salinidad_ctd_qf']       = 1
                                  df_botella['fluorescencia_ctd_qf']   = 1
+                                 df_botella['par_ctd_qf']             = 1
                             
                           
                                  df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)

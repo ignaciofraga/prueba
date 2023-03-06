@@ -355,11 +355,17 @@ def lectura_archivo_perfiles(datos_archivo):
                                 
             if texto_linea[0:22] == '* System UpLoad Time =': # Línea con hora del cast
                 listado_textos   = texto_linea.split('= ') 
-                datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
+                try:
+                    datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
+                except:
+                    datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
                                         
             if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
                 listado_textos    = texto_linea.split('= ')  
-                datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
+                try:
+                    datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
+                except:
+                    datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
                 
             if texto_linea[0:6] == '# name': # Línea con variable muestreada
                 posicion_inicio    = texto_linea.find('=') + 2
@@ -650,11 +656,17 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
                     
             if texto_linea[0:22] == '* System UpLoad Time =': # Línea con hora del cast
                 listado_textos   = texto_linea.split('= ') 
-                datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
-                            
+                try:
+                    datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
+                except:
+                    datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
+                    
             if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
                 listado_textos    = texto_linea.split('= ')  
-                datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
+                try:
+                    datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
+                except:
+                    datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
                 offset_tiempo     = (datetime_sistema - datetime_muestreo).seconds
                 fecha_muestreo_archivo = datetime_muestreo.date()
 
