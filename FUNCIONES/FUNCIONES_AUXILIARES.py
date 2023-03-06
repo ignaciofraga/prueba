@@ -424,7 +424,7 @@ def consulta_botellas():
         # Elimina las columnas que no interesan
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
     
-        # Mueve os identificadores de muestreo al final del dataframe
+        # Mueve los identificadores de muestreo al final del dataframe
         listado_cols = df_exporta.columns.tolist()
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))    
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
@@ -434,6 +434,12 @@ def consulta_botellas():
         
         # Ordena los valores por fechas
         df_exporta = df_exporta.sort_values('fecha_muestreo')
+
+        # Elimina las columnas sin datos        
+        nan_value = float("NaN")
+        df_exporta.replace("", nan_value, inplace=True)
+        df_exporta.dropna(how='all', axis=1, inplace=True)
+        
     
         ## Botón para exportar los resultados
         nombre_archivo =  'DATOS_BOTELLAS.xlsx'

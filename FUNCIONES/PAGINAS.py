@@ -1971,12 +1971,20 @@ def entrada_botellas():
 
 
 def consulta_botellas():
-        
-    FUNCIONES_AUXILIARES.consulta_botellas()
+   
+    # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
+    acciones     = ['Consultar datos de botellas', 'Consultar datos de perfiles']
+    tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
+    
+
+    # Consulta datos de botellas
+    if tipo_accion == acciones[0]: 
+           
+        FUNCIONES_AUXILIARES.consulta_botellas()
 
 
-
-
+    # # Consulta datos de perfiles
+    # if tipo_accion == acciones[1]:
 
 
 
