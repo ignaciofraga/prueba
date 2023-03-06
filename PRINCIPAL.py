@@ -54,7 +54,7 @@ if FUNCIONES_AUXILIARES.log_in() is True:
             paginas = {"INICIO": PAGINAS.principal,
                      "CONSULTA PROGRAMA ANALIZADOS": PAGINAS.consulta_estado, 
                      "CONSULTA PROCESOS EN CURSO": PAGINAS.consulta_procesos,
-                     "CONSULTA DATOS BOTELLAS":PAGINAS.consulta_botellas
+                     "CONSULTA DATOS":PAGINAS.consulta_datos
                       }           
             
         # if st.session_state["usuario"] == 'Usuario externo':
@@ -67,8 +67,8 @@ if FUNCIONES_AUXILIARES.log_in() is True:
             paginas = {"INICIO": PAGINAS.principal_radiales,
                         "SALIDAS AL MAR": PAGINAS.entrada_salidas_mar,
                         "CONDICIONES AMBIENTALES":PAGINAS.entrada_condiciones_ambientales,
-                        "INTRODUCIR DATOS BOTELLAS":PAGINAS.entrada_botellas,
-                        "CONSULTA DATOS BOTELLAS":PAGINAS.consulta_botellas}
+                        "ENTRADA DATOS":PAGINAS.entrada_archivos_roseta,
+                        "CONSULTA DATOS":PAGINAS.consulta_datos}
         
         seleccion = st.sidebar.selectbox("Elige la página a mostrar: ",tuple(paginas.keys()))
         

@@ -1672,7 +1672,7 @@ def entrada_condiciones_ambientales():
 ##################### PÁGINA DE ENTRADA DE DATOS DE BOTELLAS ##################
 ###############################################################################    
 
-def entrada_botellas():
+def entrada_archivos_roseta():
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host   = st.secrets["postgres"].host
@@ -1682,14 +1682,14 @@ def entrada_botellas():
     puerto           = st.secrets["postgres"].port
     
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    acciones     = ['Añadir datos de botellas', 'Realizar control de calidad de datos de botellas']
+    acciones     = ['Añadir datos de botellas y perfiles', 'Realizar control de calidad de datos de botellas']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
     
 
     # Añade datos de botellas
     if tipo_accion == acciones[0]: 
         
-        st.subheader('Entrada de datos procedentes de botellas') 
+        st.subheader('Entrada de datos procedentes de botellas y perfiles') 
     
         # Recupera tablas con informacion utilizada en el procesado
         conn                = init_connection()
@@ -1970,7 +1970,7 @@ def entrada_botellas():
 # ###############################################################################    
 
 
-def consulta_botellas():
+def consulta_datos():
    
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
     acciones     = ['Consultar datos de botellas', 'Consultar datos de perfiles']
