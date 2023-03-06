@@ -1983,10 +1983,10 @@ def consulta_botellas():
         FUNCIONES_AUXILIARES.consulta_botellas()
 
 
-    # # Consulta datos de perfiles
-    # if tipo_accion == acciones[1]:
+    # Consulta datos de perfiles
+    if tipo_accion == acciones[1]:
 
-
+        FUNCIONES_AUXILIARES.consulta_perfiles()
 
 
 
