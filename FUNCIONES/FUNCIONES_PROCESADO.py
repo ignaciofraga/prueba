@@ -883,7 +883,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             ax.plot(df_datos_dudosos[variable_seleccionada],df_datos_dudosos['presion_ctd'],'.',color=color_dudosos,label='DUDOSO')    
 
         # Representa los datos con QF No evaluado si se seleccionó esta opción   
-        if io_dudosos:
+        if io_no_eval:
             ax.plot(df_datos_no_eval[variable_seleccionada],df_datos_no_eval['presion_ctd'],'.',color=color_no_eval,label='NO EVALUADO')    
 
 
