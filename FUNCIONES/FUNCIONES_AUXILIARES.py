@@ -793,123 +793,87 @@ def consulta_perfiles():
     df_perfiles_seleccion  = df_perfiles[df_perfiles['salida_mar']==int(id_salida_seleccionada)]
     df_datos_combinado     = pandas.merge(df_datos_fisicos, df_datos_biogeoquimicos, on="perfil")
     
-    # Dataframe con los colores con los que representar cada estacion
-    data       = [['2', '#b50000'], ['3A', '#70ba07'], ['3B','#0085b5'], ['3C', '#5b00b5'], ['4', '#9d9d9e']]
-    df_colores = pandas.DataFrame(data, columns=['estacion', 'color'])
-    
-    # Listados de variables, unidades y abreviaturas a representar
-    listado_variables = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
-    listado_unidades  = ['(degC)','(PSU)','(\u03BCE/m2s)','(\u03BCg/L)','(\u03BCmol/kg)']
-    listado_titulos   = ['Temp.','Sal.','PAR','Fluor.','Oxigeno']
-    
-    listado_variables_adicionales = ['hora_perfil','fecha_perfil','latitud_muestreo','longitud_muestreo','estacion']
-    
-    import io
-    buffer = io.BytesIO()
-    
-    with pandas.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-    
-        # Genera un gráfico con tants subplots como variables
-        fig, axs = plt.subplots(1, len(listado_variables),sharey='all')
+    # Comprueba si hay datos disponibles
+    if df_datos_combinado.shape[0] == 0:
         
-        # Bucle por cada perfil disponible
-        for iperfil in range(df_perfiles_seleccion.shape[0]):
+        texto_error = "La base de datos no contiene información de perfiles para la salida seleccionada"
+        st.warning(texto_error, icon="⚠️")
+        
+    else:
+    
+        # Dataframe con los colores con los que representar cada estacion
+        data       = [['2', '#b50000'], ['3A', '#70ba07'], ['3B','#0085b5'], ['3C', '#5b00b5'], ['4', '#9d9d9e']]
+        df_colores = pandas.DataFrame(data, columns=['estacion', 'color'])
+        
+        # Listados de variables, unidades y abreviaturas a representar
+        listado_variables = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
+        listado_unidades  = ['(degC)','(PSU)','(\u03BCE/m2s)','(\u03BCg/L)','(\u03BCmol/kg)']
+        listado_titulos   = ['Temp.','Sal.','PAR','Fluor.','Oxigeno']
+        
+        listado_variables_adicionales = ['hora_perfil','fecha_perfil','latitud_muestreo','longitud_muestreo','estacion']
+        
+        import io
+        buffer = io.BytesIO()
+        
+        with pandas.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+        
+            # Genera un gráfico con tants subplots como variables
+            fig, axs = plt.subplots(1, len(listado_variables),sharey='all')
             
-            # Extrae los datos de ese perfil
-            df_perfil   = df_datos_combinado[df_datos_combinado['perfil']==df_perfiles_seleccion['perfil'].iloc[iperfil]]
+            # Bucle por cada perfil disponible
+            for iperfil in range(df_perfiles_seleccion.shape[0]):
+                
+                # Extrae los datos de ese perfil
+                df_perfil   = df_datos_combinado[df_datos_combinado['perfil']==df_perfiles_seleccion['perfil'].iloc[iperfil]]
+                
+                # Asigna el nombre y color de la estación 
+                id_estacion     = df_perfiles_seleccion['estacion'].iloc[iperfil]
+                nombre_estacion = df_estaciones['nombre_estacion'][df_estaciones['id_estacion']==int(id_estacion)].iloc[0]
+                color_estacion  = df_colores['color'][df_colores['estacion']==nombre_estacion].iloc[0]
             
-            # Asigna el nombre y color de la estación 
-            id_estacion     = df_perfiles_seleccion['estacion'].iloc[iperfil]
-            nombre_estacion = df_estaciones['nombre_estacion'][df_estaciones['id_estacion']==int(id_estacion)].iloc[0]
-            color_estacion  = df_colores['color'][df_colores['estacion']==nombre_estacion].iloc[0]
+                # Representa los datos de cada variable
+                for ivariable in range(len(listado_variables)):
+                    str_datos   = df_perfil[listado_variables[ivariable]].iloc[0]
+                    json_datos  = json.loads(str_datos)
+                    df_datos    =  pandas.DataFrame.from_dict(json_datos)
+                  
+                    axs[ivariable].plot(df_datos[listado_variables[ivariable]],df_datos['presion_ctd'],linewidth=2,color=color_estacion,label=nombre_estacion)
+            
+                    # Almacena los resultados para luego exportar a un excel
+                    
+                    if ivariable == 0:
+                        df_exporta = df_datos
+                        # Añade variables adicionales
+                        for ivar_adicional in range(len(listado_variables_adicionales)):
+                            df_exporta[listado_variables_adicionales[ivar_adicional]] = df_perfiles[listado_variables_adicionales[ivar_adicional]][df_perfiles['perfil']==df_perfiles_seleccion['perfil'].iloc[iperfil]].iloc[0]
+                            first_column = df_exporta.pop(listado_variables_adicionales[ivar_adicional])
+                            df_exporta.insert(0, listado_variables_adicionales[ivar_adicional], first_column)
+                        df_exporta['estacion'] = nombre_estacion
+                    else:
+                        df_exporta = pandas.concat([df_exporta, df_datos], axis=1)
+            
+                # Elimina columnas duplicadas (presion_ctd) y exporta a un excel
+                df_exporta  = df_exporta.loc[:,~df_exporta.columns.duplicated()].copy()
+                nombre_hoja = 'ESTACION '+ nombre_estacion
+                df_exporta.to_excel(writer, index=False, sheet_name=nombre_hoja)
+    
+            
+            # Ajusta parámetros de los gráficos
+            for igrafico in range(len(listado_variables)):
+                texto_eje = listado_titulos[igrafico] + listado_unidades[igrafico] 
+                axs[igrafico].set(xlabel=texto_eje)
+                axs[igrafico].invert_yaxis()
+                if igrafico == 0:
+                    axs[igrafico].set(ylabel='Presion (db)')
+                    
+            # Añade la leyenda
+            axs[2].legend(loc='upper center',bbox_to_anchor=(0.5, 1.1),ncol=len(listado_variables), fancybox=True,fontsize=7)
+            
+            st.pyplot(fig)
         
-            # Representa los datos de cada variable
-            for ivariable in range(len(listado_variables)):
-                str_datos   = df_perfil[listado_variables[ivariable]].iloc[0]
-                json_datos  = json.loads(str_datos)
-                df_datos    =  pandas.DataFrame.from_dict(json_datos)
-              
-                axs[ivariable].plot(df_datos[listado_variables[ivariable]],df_datos['presion_ctd'],linewidth=2,color=color_estacion,label=nombre_estacion)
+        writer.save()
         
-                # Almacena los resultados para luego exportar a un excel
-                
-                if ivariable == 0:
-                    df_exporta = df_datos
-                    # Añade variables adicionales
-                    for ivar_adicional in range(len(listado_variables_adicionales)):
-                        df_exporta[listado_variables_adicionales[ivar_adicional]] = df_perfiles[listado_variables_adicionales[ivar_adicional]][df_perfiles['perfil']==df_perfiles_seleccion['perfil'].iloc[iperfil]].iloc[0]
-                        first_column = df_exporta.pop(listado_variables_adicionales[ivar_adicional])
-                        df_exporta.insert(0, listado_variables_adicionales[ivar_adicional], first_column)
-                    df_exporta['estacion'] = nombre_estacion
-                else:
-                    df_exporta = pandas.concat([df_exporta, df_datos], axis=1)
+        st.download_button(label="DESCARGA LOS DATOS MOSTRADOS",data=buffer,file_name="PERFILES.xlsx",mime="application/vnd.ms-excel")
         
-            # Elimina columnas duplicadas (presion_ctd) y exporta a un excel
-            df_exporta  = df_exporta.loc[:,~df_exporta.columns.duplicated()].copy()
-            nombre_hoja = 'ESTACION '+ nombre_estacion
-            df_exporta.to_excel(writer, index=False, sheet_name=nombre_hoja)
-
-        
-        # Ajusta parámetros de los gráficos
-        for igrafico in range(len(listado_variables)):
-            texto_eje = listado_titulos[igrafico] + listado_unidades[igrafico] 
-            axs[igrafico].set(xlabel=texto_eje)
-            axs[igrafico].invert_yaxis()
-            if igrafico == 0:
-                axs[igrafico].set(ylabel='Presion (db)')
-                
-        # Añade la leyenda
-        axs[2].legend(loc='upper center',bbox_to_anchor=(0.5, 1.1),ncol=len(listado_variables), fancybox=True,fontsize=7)
-        
-        st.pyplot(fig)
-    
-    writer.save()
-    
-    st.download_button(label="DESCARGA LOS DATOS MOSTRADOS",data=buffer,file_name="PERFILES.xlsx",mime="application/vnd.ms-excel")
-    
 
     
-    # # Vuelca los datos de cada estación
-    # dataframe_estaciones.to_excel(writer, sheet_name='RESUMEN_ESTACIONES')
-    
-    # # Añade los gráficos de cada variable
-    # worksheet = writer.sheets['RESUMEN_ESTACIONES']
-    
-    # # Elimina las columnas que no interesan
-    # df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
-
-    # # Mueve los identificadores de muestreo al final del dataframe
-    # listado_cols = df_exporta.columns.tolist()
-    # listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))    
-    # listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
-    # listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
-    # listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
-    # df_exporta = df_exporta[listado_cols]
-    
-    # # Ordena los valores por fechas
-    # df_exporta = df_exporta.sort_values('fecha_muestreo')
-
-    # # Elimina las columnas sin datos        
-    # nan_value = float("NaN")
-    # df_exporta.replace("", nan_value, inplace=True)
-    # df_exporta.dropna(how='all', axis=1, inplace=True)
-    
-
-    # ## Botón para exportar los resultados
-    # nombre_archivo =  'DATOS_BOTELLAS.xlsx'
-
-    # output = BytesIO()
-    # writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-    # df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
-    # # workbook = writer.book
-    # # worksheet = writer.sheets['DATOS']
-    # writer.save()
-    # datos_exporta = output.getvalue()
-
-    # st.download_button(
-    #     label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
-    #     data=datos_exporta,
-    #     file_name=nombre_archivo,
-    #     help= 'Descarga un archivo .csv con los datos solicitados',
-    #     mime="application/vnd.ms-excel"
-    # )
