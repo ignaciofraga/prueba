@@ -734,3 +734,98 @@ def actualiza_estado(datos,id_programa,nombre_programa,fecha_actualizacion,email
         conn.commit() 
         
     
+    
+###############################################################################
+##################### PÁGINA DE CONSULTA DE DATOS DE PERFILES #################
+###############################################################################    
+
+
+def consulta_perfiles():
+           
+    import matplotlib.pyplot as plt
+    import json
+    
+    st.subheader('Consulta los datos de perfiles disponibles') 
+
+    # Recupera tablas con informacion utilizada en el procesado
+    conn                    = init_connection()
+    df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    df_programas            = psql.read_sql('SELECT * FROM programas', conn)
+    df_perfiles             = psql.read_sql('SELECT * FROM perfiles_verticales', conn)
+    df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_perfil_fisica', conn)
+    df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_perfil_biogeoquimica', conn)
+    df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
+    conn.close()    
+    
+    id_radiales             = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+    df_salidas_seleccion    = df_salidas[df_salidas['programa']==int(id_radiales)]
+    
+    # Despliega menús de selección del tipo de salida, año y fecha               
+    col1, col2= st.columns(2,gap="small")
+ 
+     
+    with col1:
+        tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
+        df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+    
+        indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+        df_salidas_seleccion['id_temp'] = indices_dataframe
+        df_salidas_seleccion.set_index('id_temp',drop=True,append=False,inplace=True)
+        
+        # Define los años con salidas asociadas
+        df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
+        for idato in range(df_salidas_seleccion.shape[0]):
+            df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+        df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
+        
+        listado_anhos              = df_salidas_seleccion['año'].unique()
+    
+    with col2:
+        anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
+        df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+
+    # A partir del programa y año elegido, selecciona uno o varios muestreos   
+    salida_seleccionada             = st.select('Muestreo',(df_salidas_seleccion['nombre_salida'])) 
+    id_salida_seleccionada          = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida_seleccionada].iloc[0]
+    
+    
+    df_perfiles_seleccion  = df_perfiles[df_perfiles['salida_mar']==int(id_salida_seleccionada)]
+    df_datos_combinado     = pandas.merge(df_datos_fisicos, df_datos_biogeoquimicos, on="perfil")
+    
+    # initialize list of lists
+    data       = [['2', '#b50000'], ['3A', '#70ba07'], ['3B','#0085b5'], ['3C', '#5b00b5'], ['4', '#9d9d9e']]
+    df_colores = pandas.DataFrame(data, columns=['estacion', 'color'])
+    
+    listado_variables = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
+    listado_unidades  = ['(degC)','(PSU)','(\u03BCE/m2s)','(\u03BCg/L)','(\u03BCmol/kg)']
+    listado_titulos   = ['Temp.','Sal.','PAR','Fluor.','Oxigeno']
+    
+    fig, axs = plt.subplots(1, len(listado_variables),sharey='all')
+    
+    for iperfil in range(df_perfiles_seleccion.shape[0]):
+        
+        df_perfil   = df_datos_combinado[df_datos_combinado['perfil']==df_perfiles_seleccion['perfil'].iloc[iperfil]]
+        
+        id_estacion     = df_perfiles_seleccion['estacion'].iloc[iperfil]
+        nombre_estacion = df_estaciones['nombre_estacion'][df_estaciones['id_estacion']==int(id_estacion)].iloc[0]
+        color_estacion  = df_colores['color'][df_colores['estacion']==nombre_estacion].iloc[0]
+    
+        for ivariable in range(len(listado_variables)):
+            str_datos   = df_perfil[listado_variables[ivariable]].iloc[0]
+            json_datos  = json.loads(str_datos)
+            df_datos    =  pandas.DataFrame.from_dict(json_datos)
+          
+            axs[ivariable].plot(df_datos[listado_variables[ivariable]],df_datos['presion_ctd'],linewidth=2,color=color_estacion,label=nombre_estacion)
+    
+    # Ajusta parámetros de los gráficos
+    for igrafico in range(len(listado_variables)):
+        texto_eje = listado_titulos[igrafico] + listado_unidades[igrafico] 
+        axs[igrafico].set(xlabel=texto_eje)
+        axs[igrafico].invert_yaxis()
+        if igrafico == 0:
+            axs[igrafico].set(ylabel='Presion (db)')
+            
+    # Añade la leyenda
+    axs[2].legend(loc='upper center',bbox_to_anchor=(0.5, 1.1),ncol=len(listado_variables), fancybox=True,fontsize=7)
+    
+    st.pyplot(fig)

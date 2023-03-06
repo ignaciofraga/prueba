@@ -439,7 +439,7 @@ def lectura_archivo_perfiles(datos_archivo):
 
     try:
         df_fluor                         = datos_perfil[['presion_ctd','fluorescencia_ctd']]
-        df_fluor['fluorescencia_ctd']    = 2
+        df_fluor['fluorescencia_ctd_qf'] = 2
         json_fluor                       = df_fluor.to_json()   
         
         df_perfiles['fluorescencia_ctd'] = json_fluor
@@ -450,7 +450,7 @@ def lectura_archivo_perfiles(datos_archivo):
     
     try:
         df_oxi                           = datos_perfil[['presion_ctd','oxigeno_ctd']]
-        df_oxi['oxigeno_ctd']            = 2
+        df_oxi['oxigeno_ctd_qf']         = 2
         json_oxi                         = df_oxi.to_json()   
         
         df_perfiles['oxigeno_ctd'] = json_oxi
