@@ -836,9 +836,9 @@ def consulta_perfiles():
                     df_exporta = df_datos
                 else:
                     df_exporta = pandas.concat([df_exporta, df_datos], axis=1)
-                    #df_exporta[listado_variables[ivariable]+'_qf'] = df_datos[listado_variables[ivariable]+'_qf']
         
-            # Exporta a un excel
+            # Elimina columnas duplicadas (presion_ctd) y exporta a un excel
+            df_exporta = df_exporta.loc[:,~df_exporta.columns.duplicated()].copy()
             df_exporta.to_excel(writer, index=False, sheet_name=nombre_estacion)
 
         
