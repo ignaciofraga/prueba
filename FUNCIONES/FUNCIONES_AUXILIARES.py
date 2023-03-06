@@ -792,11 +792,9 @@ def consulta_perfiles():
     
     df_perfiles_seleccion  = df_perfiles[df_perfiles['salida_mar']==int(id_salida_seleccionada)]
     df_datos_combinado     = pandas.merge(df_datos_fisicos, df_datos_biogeoquimicos, on="perfil")
-    
-    st.text(df_datos_combinado.shape[0])
-    
+        
     # Comprueba si hay datos disponibles
-    if df_datos_combinado.shape[0] == 0:
+    if df_perfiles_seleccion.shape[0] == 0:
         
         texto_error = "La base de datos no contiene información de perfiles para la salida seleccionada"
         st.warning(texto_error, icon="⚠️")
