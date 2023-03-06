@@ -243,7 +243,7 @@ def consulta_botellas():
     df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
     conn.close()    
     
-    id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+    id_radiales             = int(df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0])
     
     # Despliega menús de selección del programa, tipo de salida, año y fecha               
     col1, col2, col3= st.columns(3,gap="small")
@@ -757,7 +757,7 @@ def consulta_perfiles():
     df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
     conn.close()    
     
-    id_radiales             = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+    id_radiales             = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
     df_salidas_seleccion    = df_salidas[df_salidas['programa']==int(id_radiales)]
     
     st.text(id_radiales)
