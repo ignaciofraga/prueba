@@ -760,6 +760,9 @@ def consulta_perfiles():
     id_radiales             = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
     df_salidas_seleccion    = df_salidas[df_salidas['programa']==int(id_radiales)]
     
+    st.text(id_radiales)
+    st.text(salidas_seleccion)
+    
     # Despliega menús de selección del tipo de salida, año y fecha               
     col1, col2= st.columns(2,gap="small")
  
