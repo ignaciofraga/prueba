@@ -840,12 +840,14 @@ def consulta_perfiles():
                         df_exporta[listado_variables_adicionales[ivar_adicional]] = df_perfiles[listado_variables_adicionales[ivar_adicional]][df_perfiles['perfil']==df_perfiles_seleccion['perfil'].iloc[iperfil]].iloc[0]
                         first_column = df_exporta.pop(listado_variables_adicionales[ivar_adicional])
                         df_exporta.insert(0, listado_variables_adicionales[ivar_adicional], first_column)
+                    df_exporta['estacion'] = nombre_estacion
                 else:
                     df_exporta = pandas.concat([df_exporta, df_datos], axis=1)
         
             # Elimina columnas duplicadas (presion_ctd) y exporta a un excel
-            df_exporta = df_exporta.loc[:,~df_exporta.columns.duplicated()].copy()
-            df_exporta.to_excel(writer, index=False, sheet_name=nombre_estacion)
+            df_exporta  = df_exporta.loc[:,~df_exporta.columns.duplicated()].copy()
+            nombre_hoja = 'ESTACION '+ nombre_estacion
+            df_exporta.to_excel(writer, index=False, sheet_name=df_exporta)
 
         
         # Ajusta parámetros de los gráficos
