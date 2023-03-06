@@ -36,7 +36,7 @@ direccion_host = '193.146.155.99'
 nombre_programa = 'RADIAL CORUÑA'
 
 anho = 2020
-anho = 2023
+anho = 2022
 ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
 tipo_salida   = 'MENSUAL' 
 configuracion_perfilador = 1
@@ -63,13 +63,17 @@ ruta_datos = ruta_archivos + '/' + str(anho) + '/*/'
 listado_salidas = glob(ruta_datos, recursive = True)
 
 # Mantén sólo la parte de fechas
-#for isalida in range(len(listado_salidas)):
-for isalida in range(1):    
+for isalida in range(len(listado_salidas)):
+#for isalida in range(1):    
     
     #### DATOS DE BOTELLEROS    
     
-    ruta_botelleros = listado_salidas[isalida] + 'btl+PAR+flscufa+O2'
-    os.chdir(ruta_botelleros)
+    try:
+        ruta_botelleros = listado_salidas[isalida] + 'btl+PAR+flscufa+O2'
+        os.chdir(ruta_botelleros)
+    except:
+        ruta_botelleros = listado_salidas[isalida] + 'btl+PAR+flscufa'        
+        os.chdir(ruta_botelleros)
     for archivo in glob("*.btl"):
         
     

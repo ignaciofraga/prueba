@@ -197,19 +197,21 @@ def lectura_datos_pelacus(nombre_archivo):
     datos_pelacus['fecha'] =  pandas.to_datetime(datos_pelacus['fecha'], format='%d%m%Y').dt.date
              
     # Genera una columna con la profundidad. Usar el valor real (si existe) o la teórica en caso contrario
-    datos_pelacus['presion_ctd'] = datos_pelacus['Prof_teor.']
-    for idato in range(datos_pelacus.shape[0]):
-        if numpy.isnan(datos_pelacus['Prof_real'][idato]) is False:
-            datos_pelacus['presion_ctd'][idato] = datos_pelacus['Prof_real'][idato]
-
-    # datos_pelacus['presion_ctd'] = numpy.zeros(datos_pelacus.shape[0])
+    # datos_pelacus['presion_ctd'] = datos_pelacus['Prof_real.']
     # for idato in range(datos_pelacus.shape[0]):
-    #     if datos_pelacus['Prof_real'][idato] is not None:
+    #     if numpy.isnan(datos_pelacus['Prof_real'][idato]) is False:
     #         datos_pelacus['presion_ctd'][idato] = datos_pelacus['Prof_real'][idato]
-    #     if datos_pelacus['Prof_real'][idato] is None and datos_pelacus['Prof_teor.'][idato] is not None:
-    #         datos_pelacus['presion_ctd'][idato] = datos_pelacus['Prof_teor.'][idato]        
-    #     if datos_pelacus['Prof_real'][idato] is None and datos_pelacus['Prof_teor.'][idato] is None:
-    #         datos_pelacus['presion_ctd'][idato] = -999   
+            
+    #         print(datos_pelacus['Prof_real'][idato])
+
+    datos_pelacus['presion_ctd'] = numpy.zeros(datos_pelacus.shape[0])
+    for idato in range(datos_pelacus.shape[0]):
+        if datos_pelacus['Prof_real'][idato] is not None:
+            datos_pelacus['presion_ctd'][idato] = datos_pelacus['Prof_real'][idato]
+        if datos_pelacus['Prof_real'][idato] is None and datos_pelacus['Prof_teor.'][idato] is not None:
+            datos_pelacus['presion_ctd'][idato] = datos_pelacus['Prof_teor.'][idato]        
+        if datos_pelacus['Prof_real'][idato] is None and datos_pelacus['Prof_teor.'][idato] is None:
+            datos_pelacus['presion_ctd'][idato] = -999   
             
     # Asigna la profundidad teórica como la de referencia
     datos_pelacus['prof_referencia'] = datos_pelacus['Prof_teor.']

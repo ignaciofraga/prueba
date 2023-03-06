@@ -25,7 +25,7 @@ id_config_sup     = 1
 id_config_per     = 1
 
 # Rutas de los archivos a importar  
-archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx' 
+archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2022.xlsx' 
 
 # Tipo de información a introducir
 itipo_informacion = 2 # 1-nuevo muestreo 2-dato nuevo (analisis laboratorio)  3-dato re-analizado (control calidad)   
@@ -60,8 +60,8 @@ datos_pelacus_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_pelacus_cor
 
 # Introduce los datos en la base de datos
 print('Introduciendo los datos en la base de datos')
-FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
 
  
 
