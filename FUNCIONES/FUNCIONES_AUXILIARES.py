@@ -785,7 +785,7 @@ def consulta_perfiles():
         df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
 
     # A partir del programa y año elegido, selecciona uno o varios muestreos   
-    salida_seleccionada             = st.select('Muestreo',(df_salidas_seleccion['nombre_salida'])) 
+    salida_seleccionada             = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida'])) 
     id_salida_seleccionada          = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida_seleccionada].iloc[0]
     
     
