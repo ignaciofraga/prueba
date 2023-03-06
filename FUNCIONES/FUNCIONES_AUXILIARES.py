@@ -830,11 +830,13 @@ def consulta_perfiles():
                 axs[ivariable].plot(df_datos[listado_variables[ivariable]],df_datos['presion_ctd'],linewidth=2,color=color_estacion,label=nombre_estacion)
         
                 # Almacena los resultados para luego exportar a un excel
+                
+                #df_exporta = pandas.concat([df1, df4], axis=1)
                 if ivariable == 0:
                     df_exporta = df_datos
                 else:
-                    df_exporta[listado_variables[ivariable]] = df_datos[listado_variables[ivariable]]
-                    df_exporta[listado_variables[ivariable]+'_qf'] = df_datos[listado_variables[ivariable]+'_qf']
+                    df_exporta = pandas.concat([df_exporta, df_datos], axis=1)
+                    #df_exporta[listado_variables[ivariable]+'_qf'] = df_datos[listado_variables[ivariable]+'_qf']
         
             # Exporta a un excel
             df_exporta.to_excel(writer, index=False, sheet_name=nombre_estacion)
