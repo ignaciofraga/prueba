@@ -839,6 +839,8 @@ def consulta_perfiles():
         
             # Elimina columnas duplicadas (presion_ctd) y exporta a un excel
             df_exporta = df_exporta.loc[:,~df_exporta.columns.duplicated()].copy()
+            df_exporta['fecha'] = df_perfiles['fecha_perfil'][df_perfiles['perfil']==df_perfiles_seleccion['perfil'].iloc[iperfil]]
+            df_exporta['hora']  = df_perfiles['hora_perfil'][df_perfiles['perfil']==df_perfiles_seleccion['perfil'].iloc[iperfil]]
             df_exporta.to_excel(writer, index=False, sheet_name=nombre_estacion)
 
         
