@@ -842,9 +842,9 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             
             col1, col2, col3, col4 = st.columns(4,gap="small")
             with col2:
-                vmin_rango  = st.number_input('Valor mínimo gráfico:',value=min_val,key='vmin_graf1')
+                vmin_rango  = st.number_input('Valor mínimo eje x:',value=min_val,key='vmin_graf1')
             with col3:
-                vmax_rango  = st.number_input('Valor máximo gráfico:',value=max_val,key='vmax_graf1')        
+                vmax_rango  = st.number_input('Valor máximo eje x:',value=max_val,key='vmax_graf1')        
 
 
         #Reemplaza nan por None
@@ -883,7 +883,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         ax.set(xlabel=texto_eje)
         ax.set(ylabel='Presion (db)')
         ax.invert_yaxis()
-        #ax.set_xlim([vmin_rango, vmax_rango])
+        ax.set_xlim([vmin_rango, vmax_rango])
         rango_profs = ax.get_ylim()
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*df_seleccion.shape[0]
@@ -892,51 +892,47 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 nombre_muestreos[ipunto] = 'Prof.' + str(int(df_seleccion['presion_ctd'].iloc[ipunto]))
             else:
                 nombre_muestreos[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
-            st.text(ipunto)
-            st.text(nombre_muestreos[ipunto])
-            st.text(df_seleccion[variable_seleccionada].iloc[ipunto])
-            st.text(df_seleccion['presion_ctd'].iloc[ipunto])
             ax.annotate(nombre_muestreos[ipunto], (df_seleccion[variable_seleccionada].iloc[ipunto], df_seleccion['presion_ctd'].iloc[ipunto]))
                 
-        # # Ajusta el rango de las x 
-        # custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
-        # ax.set_xticks(custom_ticks)
-        # ax.set_xticklabels(custom_ticks)
-        # ax.set_xlim([vmin_rango, vmax_rango])
-        # ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))   
+        # Ajusta el rango de las x 
+        custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
+        ax.set_xticks(custom_ticks)
+        ax.set_xticklabels(custom_ticks)
+        ax.set_xlim([vmin_rango, vmax_rango])
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))   
 
-        # # Reduce el tamaño de los ejes
-        # ax.tick_params(axis='both', which='major', labelsize=8)
+        # Reduce el tamaño de los ejes
+        ax.tick_params(axis='both', which='major', labelsize=8)
 
-        # # Añade la leyenda
-        # ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
+        # Añade la leyenda
+        ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
                
-        # io_plot = 0
-        # if not df_seleccion['oxigeno_ctd'].isnull().all(): 
-        #     az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#006633',label='OXIMETRO')
-        #     io_plot = 1
+        io_plot = 0
+        if not df_seleccion['oxigeno_ctd'].isnull().all(): 
+            az.plot(df_seleccion['oxigeno_ctd'],df_seleccion['presion_ctd'],'.',color='#006633',label='OXIMETRO')
+            io_plot = 1
                 
-        # if not df_seleccion['oxigeno_wk'].isnull().all(): 
-        #     az.plot(df_seleccion['oxigeno_wk'],df_seleccion['presion_ctd'],'.',color='#00CC66',label='WINKLER')
-        #     io_plot = 1
+        if not df_seleccion['oxigeno_wk'].isnull().all(): 
+            az.plot(df_seleccion['oxigeno_wk'],df_seleccion['presion_ctd'],'.',color='#00CC66',label='WINKLER')
+            io_plot = 1
             
-        # if io_plot == 1:
-        #     az.set(xlabel='Oxigeno (\u03BCmol/kg)')
-        #     az.yaxis.set_visible(False)
-        #     az.invert_yaxis()
-        #     az.set_ylim(rango_profs)
+        if io_plot == 1:
+            az.set(xlabel='Oxigeno (\u03BCmol/kg)')
+            az.yaxis.set_visible(False)
+            az.invert_yaxis()
+            az.set_ylim(rango_profs)
             
-        #     # Ajusta el rango de las x
-        #     rango_oxigenos = az.get_xlim()
-        #     num_intervalos = 2
-        #     val_intervalo  =  (math.ceil(rango_oxigenos[-1]) - math.floor(rango_oxigenos[0]))/num_intervalos
-        #     az.set_xlim([math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])])
-        #     az.set_xticks(numpy.arange(math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])+val_intervalo,val_intervalo))
-        #     az.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
-        #     az.tick_params(axis='both', which='major', labelsize=8)
+            # Ajusta el rango de las x
+            rango_oxigenos = az.get_xlim()
+            num_intervalos = 2
+            val_intervalo  =  (math.ceil(rango_oxigenos[-1]) - math.floor(rango_oxigenos[0]))/num_intervalos
+            az.set_xlim([math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])])
+            az.set_xticks(numpy.arange(math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])+val_intervalo,val_intervalo))
+            az.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+            az.tick_params(axis='both', which='major', labelsize=8)
           
-        #     # Añade la leyenda
-        #     az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
+            # Añade la leyenda
+            az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
 
             
         st.pyplot(fig)
