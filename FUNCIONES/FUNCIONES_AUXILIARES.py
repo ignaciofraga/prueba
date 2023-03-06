@@ -802,6 +802,8 @@ def consulta_perfiles():
     listado_unidades  = ['(degC)','(PSU)','(\u03BCE/m2s)','(\u03BCg/L)','(\u03BCmol/kg)']
     listado_titulos   = ['Temp.','Sal.','PAR','Fluor.','Oxigeno']
     
+    listado_variables_adicionales = ['hora_perfil','fecha_perfil','latitud_muestreo','longitud_muestreo','estacion']
+    
     import io
     buffer = io.BytesIO()
     
@@ -831,16 +833,18 @@ def consulta_perfiles():
         
                 # Almacena los resultados para luego exportar a un excel
                 
-                #df_exporta = pandas.concat([df1, df4], axis=1)
                 if ivariable == 0:
                     df_exporta = df_datos
+                    # Añade variables adicionales
+                    for ivar_adicional in range(len(listado_variables_adicionales)):
+                        df_exporta[listado_variables_adicionales[ivar_adicional]] = df_perfiles[listado_variables_adicionales[ivar_adicional]][df_perfiles['perfil']==df_perfiles_seleccion['perfil'].iloc[iperfil]].iloc[0]
+                        first_column = df_exporta.pop(listado_variables_adicionales[ivar_adicional])
+                        df_exporta.insert(0, listado_variables_adicionales[ivar_adicional], first_column)
                 else:
                     df_exporta = pandas.concat([df_exporta, df_datos], axis=1)
         
             # Elimina columnas duplicadas (presion_ctd) y exporta a un excel
             df_exporta = df_exporta.loc[:,~df_exporta.columns.duplicated()].copy()
-            df_exporta['fecha'] = df_perfiles['fecha_perfil'][df_perfiles['perfil']==df_perfiles_seleccion['perfil'].iloc[iperfil]].iloc[0]
-            df_exporta['hora']  = df_perfiles['hora_perfil'][df_perfiles['perfil']==df_perfiles_seleccion['perfil'].iloc[iperfil]].iloc[0]
             df_exporta.to_excel(writer, index=False, sheet_name=nombre_estacion)
 
         
