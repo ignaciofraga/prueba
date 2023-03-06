@@ -847,7 +847,7 @@ def consulta_perfiles():
             # Elimina columnas duplicadas (presion_ctd) y exporta a un excel
             df_exporta  = df_exporta.loc[:,~df_exporta.columns.duplicated()].copy()
             nombre_hoja = 'ESTACION '+ nombre_estacion
-            df_exporta.to_excel(writer, index=False, sheet_name=df_exporta)
+            df_exporta.to_excel(writer, index=False, sheet_name=nombre_hoja)
 
         
         # Ajusta parámetros de los gráficos
