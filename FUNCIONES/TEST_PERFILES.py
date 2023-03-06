@@ -56,13 +56,15 @@ id_salida_seleccionada = 1166
 df_perfiles_seleccion  = df_perfiles[df_perfiles['salida_mar']==int(id_salida_seleccionada)]
 df_datos_combinado     = pandas.merge(df_datos_fisicos, df_datos_biogeoquimicos, on="perfil")
 
+# Listados de variables
+listado_variables = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
+listado_unidades  = ['(degC)','(PSU)','(\u03BCE/m2s)','(\u03BCg/L)','(\u03BCmol/kg)']
+listado_titulos   = ['Temp.','Sal.','PAR','Fluor.','Oxigeno']
+
 # initialize list of lists
 data       = [['2', '#b50000'], ['3A', '#70ba07'], ['3B','#0085b5'], ['3C', '#5b00b5'], ['4', '#9d9d9e']]
 df_colores = pandas.DataFrame(data, columns=['estacion', 'color'])
 
-listado_variables = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
-listado_unidades  = ['(degC)','(PSU)','(\u03BCE/m2s)','(\u03BCg/L)','(\u03BCmol/kg)']
-listado_titulos   = ['Temp.','Sal.','PAR','Fluor.','Oxigeno']
 
 fig, axs = plt.subplots(1, len(listado_variables),sharey='all')
 
@@ -91,6 +93,14 @@ for igrafico in range(len(listado_variables)):
         
 # Añade la leyenda
 axs[2].legend(loc='upper center',bbox_to_anchor=(0.5, 1.1),ncol=len(listado_variables), fancybox=True,fontsize=7)
+
+
+
+
+
+
+
+
 
     # # Añade el nombre de cada punto
     # nombre_muestreos = [None]*df_seleccion.shape[0]
