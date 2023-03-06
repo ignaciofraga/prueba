@@ -380,8 +380,8 @@ conn.close()
 
 
 parametros_muestreo      = ['nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','num_cast','presion_ctd','prof_referencia','botella','configuracion_perfilador','configuracion_superficie','programa','latitud','longitud']
-variables_biogeoquimicas = ['oxigeno_ctd','fluorescencia_ctd','oxigeno_wk','ton','silicato','nitrato','nitrito','amonio','fosfato','clorofila_a','tcarbn','doc','cdom','alcalinidad','ph','r_clor','r_per','co3_temp']
-variables_fisicas        = ['temperatura_ctd','salinidad_ctd','par_ctd','turbidez_ctd']
+variables_biogeoquimicas = ['oxigeno_ctd','fluorescencia_ctd','oxigeno_wk','ton','silicato','nitrato','nitrito','amonio','fosfato','clorofila_a','tcarbn','doc','cdom','alcalinidad','ph','r_clor','r_per','co3_temp','fluorescencia_ctd_qf','oxigeno_ctd_qf','oxigeno_wk_qf','ton_qf','nitrato_qf','nitrito_qf','amonio_qf','fosfato_qf','silicato_qf','tcarbn_qf','doc_qf','cdom_qf','clorofila_a_qf','alcalinidad_qf','ph_qf','r_clor_qf','r_per_qf']
+variables_fisicas        = ['temperatura_ctd','salinidad_ctd','par_ctd','turbidez_ctd','temperatura_ctd_qf','salinidad_ctd_qf','par_ctd_qf','turbidez_ctd_qf']
 
 index                    = numpy.arange(0,len(variables_biogeoquimicas)) 
 datos_variables = pandas.DataFrame(

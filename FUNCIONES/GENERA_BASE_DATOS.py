@@ -810,9 +810,9 @@ conn.commit()
 
 # Crea la tabla de nuevo
 listado_variables = ('(perfil int PRIMARY KEY,'
-' temperatura_ctd json,'
-' salinidad_ctd json,'
-' par_ctd json,'
+' temperatura_ctd text,'
+' salinidad_ctd text,'
+' par_ctd text,'
 
 ) 
 
@@ -845,8 +845,8 @@ conn.commit()
 
 # Crea la tabla de nuevo
 listado_variables = ('(perfil int PRIMARY KEY,'
-' oxigeno_ctd json,'
-' fluorescencia_ctd json,'
+' oxigeno_ctd text,'
+' fluorescencia_ctd text,'
 ) 
 
 listado_dependencias = ('FOREIGN KEY (perfil)'

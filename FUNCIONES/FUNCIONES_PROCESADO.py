@@ -63,6 +63,22 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
 
     # Cambia todos los -999 por None
     datos = datos.replace(-999, None) 
+    
+    # # Añade las columnas con datos de qf=9 en aquellas variables que no estén incluidas
+    # con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    # conn_psql          = create_engine(con_engine)
+    # tabla_variables    = psql.read_sql('SELECT * FROM variables_procesado', conn_psql)    
+    # conn_psql.dispose()
+        
+    # listado_variables_fisicas = tabla_variables['variables_fisicas']
+    # for variable in listado_variables_fisicas:
+    #     if variable is not None and variable.endswith("_qf") and variable not in datos.columns.tolist(): 
+    #         datos[variable] = 9 
+
+    # listado_variables_bgq = tabla_variables['variables_biogeoquimicas']
+    # for variable in listado_variables_bgq:
+    #     if variable is not None and variable.endswith("_qf") and variable not in datos.columns.tolist(): 
+    #         datos[variable] = 9     
 
     return datos,textos_aviso    
  
@@ -624,9 +640,10 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     if tabla_registros.shape[0] == 0:
         
         datos_insercion = datos_insercion[listado_adicional]
+        
         datos_insercion.set_index(puntero,drop=True,append=False,inplace=True)
         datos_insercion.to_sql(tabla_destino, conn_psql,if_exists='append')
-        
+                        
     # En caso contrario, comprobar qué parte de la información está en la base de datos
     else: 
         
@@ -640,8 +657,9 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
                 
                 for ivariable in range(len(listado_variables_comunes)): # Reemplazar las variables disponibles en el muestreo correspondiente
                         
-                    tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]][datos_insercion[puntero]==int(muestreo)]
-  
+                    #tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]][datos_insercion[puntero]==int(muestreo)]
+                    tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]].iloc[idato]
+
             
             else: # Nuevo muestreo
                        
@@ -650,7 +668,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
                 df_add = df_add[listado_adicional] # Recorto para que tenga sólo las variables a añadir
             
                 tabla_registros = pandas.concat([tabla_registros, df_add]) # Combino ambos dataframes
-            
+                   
         tabla_registros.set_index(puntero,drop=True,append=False,inplace=True)
         
         # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
@@ -667,6 +685,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
   
 
     conn_psql.dispose() # Cierra la conexión con la base de datos 
+
 
 
 

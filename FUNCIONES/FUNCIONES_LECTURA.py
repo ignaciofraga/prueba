@@ -355,11 +355,11 @@ def lectura_archivo_perfiles(datos_archivo):
                                 
             if texto_linea[0:22] == '* System UpLoad Time =': # Línea con hora del cast
                 listado_textos   = texto_linea.split('= ') 
-                datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
+                datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
                                         
             if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
                 listado_textos    = texto_linea.split('= ')  
-                datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
+                datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
                 
             if texto_linea[0:6] == '# name': # Línea con variable muestreada
                 posicion_inicio    = texto_linea.find('=') + 2
@@ -633,35 +633,35 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
             
 
             if texto_linea[0:12] == '** Latitude:': # Línea con latitud del muestreo
-                lat_muestreo  = float(texto_linea[12:19])
-                if texto_linea[-1] == 'S':
-                    lat_muestreo = lat_muestreo*-1
+                try:
+                    lat_muestreo  = float(texto_linea[12:19])
+                    if texto_linea[-1] == 'S':
+                        lat_muestreo = lat_muestreo*-1
+                except:
+                    lat_muestreo = None
 
             if texto_linea[0:13] == '** Longitude:': # Línea con latitud del muestreo
-                lon_muestreo  = float(texto_linea[13:20])
-                if texto_linea[-1] == 'W':
-                    lon_muestreo = lon_muestreo*-1
+                try:
+                    lon_muestreo  = float(texto_linea[13:20])
+                    if texto_linea[-1] == 'W':
+                        lon_muestreo = lon_muestreo*-1
+                except:
+                    lon_muestreo = None
                     
             if texto_linea[0:22] == '* System UpLoad Time =': # Línea con hora del cast
                 listado_textos   = texto_linea.split('= ') 
-                datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
+                datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
                             
             if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
                 listado_textos    = texto_linea.split('= ')  
-                datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
+                datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
                 offset_tiempo     = (datetime_sistema - datetime_muestreo).seconds
+                fecha_muestreo_archivo = datetime_muestreo.date()
 
             if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
 #                cast_muestreo = int(texto_linea[8:len(texto_linea)])
                 cast_muestreo = int(texto_linea[8:12])
-            if texto_linea[0:8] == '** Date:': # Línea con la fecha
-#                fecha_muestreo_archivo = texto_linea[8:len(texto_linea)]
-                fecha_muestreo_archivo = texto_linea[8:16]
-                try: 
-                    fecha_muestreo_archivo = datetime.datetime.strptime(fecha_muestreo_archivo, '%d/%m/%y').date()
-                except:
-                    pass
-    
+            
         else:
     
             # Separa las cabeceras de las medidas de oxigeno si existen y están juntas 
@@ -763,18 +763,18 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
                        columns =['botella', 'hora_muestreo' , 'salinidad_ctd','temperatura_ctd','presion_ctd'])
         
         # Añade columnas con el QF de T y S
-        datos_botellas['temperatura_ctd_qf'] = 1
-        datos_botellas['salinidad_ctd_qf']   = 1
+        datos_botellas['temperatura_ctd_qf'] = int(1)
+        datos_botellas['salinidad_ctd_qf']   = int(1)
         
         if io_par == 1:
             datos_botellas['par_ctd']              =  datos_PAR
-            datos_botellas['par_ctd_qf']           = 1
+            datos_botellas['par_ctd_qf']           = int(1)
         if io_fluor == 1:
             datos_botellas['fluorescencia_ctd']    =  datos_fluor
-            datos_botellas['fluorescencia_ctd_qf'] = 1
+            datos_botellas['fluorescencia_ctd_qf'] = int(1)
         if io_O2 == 1:
             datos_botellas['oxigeno_ctd']          =  datos_O2
-            datos_botellas['oxigeno_ctd_qf']       = 1
+            datos_botellas['oxigeno_ctd_qf']       = int(1)
             
             
         # Añade una columna con la profundidad de referencia

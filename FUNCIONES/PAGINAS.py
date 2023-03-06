@@ -1780,13 +1780,23 @@ def entrada_botellas():
                         ### DATOS DE BOTELLERO ###
                         mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_btl,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
            
+                        # Asigna lat/lon de la estación si esa información no etá incluia en el .btl
+                        for imuestreo in range(datos_botellas.shape[0]):
+                            if datos_botellas['latitud'].iloc[imuestreo] is None:
+                                datos_botellas['latitud'].iloc[imuestreo] = tabla_estaciones_programa['latitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
+                            if datos_botellas['longitud'].iloc[imuestreo] is None:
+                                datos_botellas['longitud'].iloc[imuestreo] = tabla_estaciones_programa['longitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
+                     
+           
+            
+           
+                        # Asigna identificadores de salida al mar y estación
+                        datos_botellas['id_estacion_temp'] = datos_botellas['estacion']
+                        datos_botellas ['id_salida']       =  id_salida
+                        
                         # Aplica control de calidad
-                        datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
-                        datos_botellas['id_estacion_temp']         =    datos_botellas['estacion']
-            
-                        # Asigna el identificador de la salida al mar
-                        datos_botellas ['id_salida'] =  id_salida
-            
+                        datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
+           
                         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
                         datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
@@ -1855,14 +1865,23 @@ def entrada_botellas():
                                  df_temp                              = datos_perfil[datos_perfil['presion_ctd']==pres_min]
                                  
                                  # Elimina la fila correspondiente al comienzo del descenso
-                                 df_botella = df_temp.drop([0])
+                                 if df_temp.shape[0] > 1:
+                                    df_botella = df_temp.drop([0])
+                                 else:
+                                    df_botella = df_temp
 
                                  # Asigna los datos correspondientes
                                  df_botella['latitud']                = lat_muestreo
                                  df_botella['longitud']               = lon_muestreo
                                  df_botella['prof_referencia']        = 0
                                  df_botella['fecha_muestreo']         = fecha_muestreo
-                                 df_botella = df_botella.drop(columns = ['c0S/m','sbeox0V','sbeox0ML/L','sigma-é00','flag'])
+                                 df_botella = df_botella.drop(columns = ['c0S/m','sigma-é00','flag'])
+                                 try:
+                                     df_botella = df_botella.drop(columns = ['sbeox0V','sbeox0ML/L'])
+                                     df_botella['oxigeno_ctd_qf']   = 1
+                                 except:
+                                     pass   
+                                 
                                  id_estacion                          = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
                                  df_botella['id_estacion_temp']       = int(id_estacion) 
                                  df_botella['id_salida']              = id_salida 
@@ -1870,9 +1889,16 @@ def entrada_botellas():
                                  
                                  df_botella['programa']               = id_programa    
                                  df_botella['num_cast']               = cast_muestreo 
+                                 
                                  # Añade botella y hora de muestreo (nulas) para evitar errores en el procesado
                                  df_botella['botella']                = None
                                  df_botella['hora_muestreo']          = None
+                          
+                                 # Añade qf 
+                                 df_botella['temperatura_ctd_qf']     = 1
+                                 df_botella['salinidad_ctd_qf']       = 1
+                                 df_botella['fluorescencia_ctd_qf']   = 1
+                            
                           
                                  df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  

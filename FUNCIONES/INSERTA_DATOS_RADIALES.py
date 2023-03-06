@@ -45,8 +45,8 @@ from os import listdir
 from os.path import isfile, join
 listado_archivos = [f for f in listdir(directorio_datos) if isfile(join(directorio_datos, f))]
 
-for iarchivo in range(len(listado_archivos)):
-#for iarchivo in range(1):
+#for iarchivo in range(len(listado_archivos)):
+for iarchivo in range(1):
 
     nombre_archivo = directorio_datos + '/' + listado_archivos[iarchivo]
     
@@ -81,6 +81,3 @@ for iarchivo in range(len(listado_archivos)):
     FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
     FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
 
- 
-  
-    
