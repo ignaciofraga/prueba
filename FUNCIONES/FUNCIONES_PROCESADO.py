@@ -729,7 +729,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'].iloc[0]
     id_dato_bueno             = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Bueno'].iloc[0]
     id_dato_dudoso            = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Dudoso'].iloc[0]
-
+    id_dato_no_eval           = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='No evaluado'].iloc[0]
 
     listado_variables_fisicas       = df_datos_fisicos.columns.values.tolist()
     listado_variables_biogeoquimica = df_datos_biogeoquimicos.columns.values.tolist()
@@ -797,7 +797,7 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             st.write("Selecciona los datos a mostrar según su bandera de calidad")    
         
             # Selecciona mostrar o no datos malos y dudosos
-            col1, col2, col3, col4 = st.columns(4,gap="small")
+            col1, col2, col3, col4, col5, col6 = st.columns(6,gap="small")
             with col1:
                 io_buenos   = st.checkbox('Buenos', value=True)
                 io_malos    = st.checkbox('Malos', value=False) 
@@ -810,6 +810,11 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
             with col4:
                 color_rango   = st.color_picker('Color', '#404040',label_visibility="collapsed")
                 color_dudosos = st.color_picker('Color', '#00f900',label_visibility="collapsed")
+            with col5:
+                io_no_eval    = st.checkbox('No evaluados', value=True)
+            with col6:
+                color_no_eval = st.color_picker('Color', '#03b6fc',label_visibility="collapsed")
+
             
         texto_rango = 'Ajustar rango del gráfico ' + variable_seleccionada.upper() + ' vs PROFUNDIDAD'
         with st.expander(texto_rango,expanded=False):            
@@ -834,8 +839,11 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
                 min_val = min(min_val,df_datos_malos[variable_seleccionada].min())
             if io_dudosos:
                 df_datos_dudosos = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_dudoso]
-                min_val = min(min_val,df_datos_dudosos[variable_seleccionada].min())            
-
+                min_val = min(min_val,df_datos_dudosos[variable_seleccionada].min())   
+            if io_no_eval:
+                df_datos_no_eval = df_disponible_bd[df_disponible_bd[qf_variable_seleccionada]==id_dato_no_eval]
+                min_val = min(min_val,df_datos_no_eval[variable_seleccionada].min())  
+                
             rango   = (max_val-min_val)
             min_val = max(0,round(min_val - 0.025*rango,2))
             max_val = round(max_val + 0.025*rango,2)
@@ -873,6 +881,11 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
         # Representa los datos con QF dudoso si se seleccionó esta opción   
         if io_dudosos:
             ax.plot(df_datos_dudosos[variable_seleccionada],df_datos_dudosos['presion_ctd'],'.',color=color_dudosos,label='DUDOSO')    
+
+        # Representa los datos con QF No evaluado si se seleccionó esta opción   
+        if io_dudosos:
+            ax.plot(df_datos_no_eval[variable_seleccionada],df_datos_no_eval['presion_ctd'],'.',color=color_no_eval,label='NO EVALUADO')    
+
 
 
         ### DATOS PROCESADOS ###        
