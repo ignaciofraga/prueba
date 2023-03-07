@@ -2628,30 +2628,42 @@ def referencias_nutrientes():
 
 
 
-        edited_df = st.experimental_data_editor(tabla_rmns, num_rows="dynamic",key="data_editor")
+
+        tabla_rmns_modificada = st.experimental_data_editor(tabla_rmns, num_rows="dynamic",key="data_editor")
         st.write("Here's the session state:")
         st.write(st.session_state["data_editor"])
 
 
+        col1, col2 = st.columns(2,gap="small")
+            
+        with col1:
+            if st.button('Actualizar la tabla de RMNs'):
 
-
-        # Botón para descargar las salidas disponibles
-        nombre_archivo =  'DATOS_RMNs.xlsx'
+                # Inserta el dataframe resultante en la base de datos 
+                conn_psql  = create_engine(con_engine)
+                tabla_rmns_modificada.to_sql('rmn_nutrientes', conn_psql,if_exists='append')
+                conn_psql.dispose()
     
-        output = BytesIO()
-        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-        tabla_rmns.to_excel(writer, index=False, sheet_name='DATOS')
 
-        writer.save()
-        df_salida = output.getvalue()
+        with col2:    
+
+            # Botón para descargar las salidas disponibles
+            nombre_archivo =  'DATOS_RMNs.xlsx'
     
-        st.download_button(
-            label="DESCARGA EXCEL CON LOS RMNs ALMACENADOS",
-            data=df_salida,
-            file_name=nombre_archivo,
-            help= 'Descarga un archivo .csv con los datos solicitados',
-            mime="application/vnd.ms-excel"
-        )
+            output = BytesIO()
+            writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+            tabla_rmns.to_excel(writer, index=False, sheet_name='DATOS')
+
+            writer.save()
+            df_salida = output.getvalue()
+    
+            st.download_button(
+                label="DESCARGA EXCEL CON LOS RMNs ALMACENADOS",
+                data=df_salida,
+                file_name=nombre_archivo,
+                help= 'Descarga un archivo .csv con los datos solicitados',
+                mime="application/vnd.ms-excel"
+                )
         
  
 
