@@ -2626,7 +2626,9 @@ def referencias_nutrientes():
         # gridOptions = gb.build()
         # st_aggrid.AgGrid(tabla_rmns,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
 
-
+        conn_psql  = create_engine(con_engine)
+        tabla_rmns = psql.read_sql('SELECT * FROM rmn_nutrientes_2', conn_psql)
+        conn_psql.dispose()
 
 
         tabla_rmns_modificada = st.experimental_data_editor(tabla_rmns, num_rows="dynamic",key="data_editor")
@@ -2651,7 +2653,7 @@ def referencias_nutrientes():
 
                 # Inserta el dataframe resultante en la base de datos 
                 conn_psql  = create_engine(con_engine)
-                tabla_rmns_modificada.to_sql('rmn_nutrientes', conn_psql,if_exists='append')
+                tabla_rmns_modificada.to_sql('rmn_nutrientes_2', conn_psql,if_exists='append')
                 conn_psql.dispose()
     
 
