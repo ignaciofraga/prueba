@@ -2522,7 +2522,7 @@ def referencias_nutrientes():
     puerto           = st.secrets["postgres"].port
 
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    acciones     = ['Añadir referencias manualmente','Añadir referencias desde Excel','Consultar referencias disponibles']
+    acciones     = ['Importar referencias desde Excel','Consultar o añadir referencias disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
 
     # Recupera la tabla con los RMNs utilizados 
@@ -2532,68 +2532,48 @@ def referencias_nutrientes():
     conn_psql.dispose()
         
     # Acciones 0 y 1, importar informacion
-    if tipo_accion == acciones[0] or tipo_accion == acciones[1]:
+    if tipo_accion == acciones[0]:
         
         with st.form("Formulario", clear_on_submit=False):
         
             # Despliega un formulario para introducir la información
             nombre_rmn    = st.text_input('Nombre del RMN',value="")
+ 
+            archivo_refs             = st.file_uploader("Arrastra o selecciona los archivos con las referencias", accept_multiple_files=False)
+            if archivo_refs is not None:
     
-            # Entrada manual de datos
-            if tipo_accion == acciones[0]:
-    
-                col1, col2 = st.columns(2,gap="small")
-                with col1:
-                    salinidad_rmn_bajo = st.number_input('Salinidad RMN bajo:',format='%f')
-                    ton_rmn_bajo       = st.number_input('TON RMN bajo:',format='%f')
-                    nitrito_rmn_bajo   = st.number_input('Nitrito RMN bajo:',format='%f')
-                    silicato_rmn_bajo  = st.number_input('Silicato RMN bajo:',format='%f')
-                    fosfato_rmn_bajo   = st.number_input('Fosfato RMN bajo:',format='%f')            
-                with col2:
-                    salinidad_rmn_alto = st.number_input('Salinidad RMN alto:',format='%f')
-                    ton_rmn_alto       = st.number_input('TON RMN alto:',format='%f')
-                    nitrito_rmn_alto   = st.number_input('Nitrito RMN alto:',format='%f')
-                    silicato_rmn_alto  = st.number_input('Silicato RMN alto:',format='%f')
-                    fosfato_rmn_alto   = st.number_input('Fosfato RMN alto:',format='%f') 
-                    
-            # Importacion de datos desde excel
-            if tipo_accion == acciones[1]:
+                # Lectura del archivo con las referencias
+                df_referencias        = pandas.read_excel(archivo_refs)  
                 
-                archivo_refs             = st.file_uploader("Arrastra o selecciona los archivos con las referencias", accept_multiple_files=False)
-                if archivo_refs is not None:
-        
-                    # Lectura del archivo con las referencias
-                    df_referencias        = pandas.read_excel(archivo_refs)  
-                    
-                    df_referencias_bajo = df_referencias[df_referencias['tipo']=='bajo']
-                    salinidad_rmn_bajo  = df_referencias_bajo['salinidad'].iloc[0]
-                    ton_rmn_bajo        = df_referencias_bajo['ton'].iloc[0]
-                    nitrito_rmn_bajo    = df_referencias_bajo['nitrito'].iloc[0]
-                    silicato_rmn_bajo   = df_referencias_bajo['silicato'].iloc[0]
-                    fosfato_rmn_bajo    = df_referencias_bajo['fosfato'].iloc[0]                    
+                df_referencias_bajo = df_referencias[df_referencias['tipo']=='bajo']
+                salinidad_rmn_bajo  = df_referencias_bajo['salinidad'].iloc[0]
+                ton_rmn_bajo        = df_referencias_bajo['ton'].iloc[0]
+                nitrito_rmn_bajo    = df_referencias_bajo['nitrito'].iloc[0]
+                silicato_rmn_bajo   = df_referencias_bajo['silicato'].iloc[0]
+                fosfato_rmn_bajo    = df_referencias_bajo['fosfato'].iloc[0]                    
 
-                    df_referencias_alto = df_referencias[df_referencias['tipo']=='alto']
-                    salinidad_rmn_alto  = df_referencias_alto['salinidad'].iloc[0]
-                    ton_rmn_alto        = df_referencias_alto['ton'].iloc[0]
-                    nitrito_rmn_alto    = df_referencias_alto['nitrito'].iloc[0]
-                    silicato_rmn_alto   = df_referencias_alto['silicato'].iloc[0]
-                    fosfato_rmn_alto    = df_referencias_alto['fosfato'].iloc[0]                      
+                df_referencias_alto = df_referencias[df_referencias['tipo']=='alto']
+                salinidad_rmn_alto  = df_referencias_alto['salinidad'].iloc[0]
+                ton_rmn_alto        = df_referencias_alto['ton'].iloc[0]
+                nitrito_rmn_alto    = df_referencias_alto['nitrito'].iloc[0]
+                silicato_rmn_alto   = df_referencias_alto['silicato'].iloc[0]
+                fosfato_rmn_alto    = df_referencias_alto['fosfato'].iloc[0]                      
 
-            texto_observaciones    = st.text_input('Observaciones',value="")
-            observaciones          = json.dumps(texto_observaciones)
+        texto_observaciones    = st.text_input('Observaciones',value="")
+        observaciones          = json.dumps(texto_observaciones)
 
-            io_envio = st.form_submit_button("Añadir RMN a la base de datos")  
-    
+        io_envio = st.form_submit_button("Añadir RMN a la base de datos")  
+
         if io_envio:    
             
             # Comprueba si hay una referencia con el mismo nombre 
             df_temporal = tabla_rmns[tabla_rmns['nombre_rmn']==nombre_rmn]
             
             if df_temporal.shape[0] != 0:
-  
+      
                 # Busca el índice del registro con ese nombre
                 indice_rmn = int(tabla_rmns['id_rmn'][tabla_rmns['nombre_rmn']==nombre_rmn].iloc[0])
-  
+      
                 # Tipo proceso
                 tipo_proceso = 'actualizados'
             else:
@@ -2602,7 +2582,7 @@ def referencias_nutrientes():
                 
                 # Tipo proceso
                 tipo_proceso = 'introducidos'                
-  
+      
             instruccion_sql = "INSERT INTO rmn_nutrientes (id_rmn,nombre_rmn, salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones) = ROW(EXCLUDED.salinidad_rmn_bajo,EXCLUDED.ton_rmn_bajo,EXCLUDED.nitrito_rmn_bajo,EXCLUDED.silicato_rmn_bajo,EXCLUDED.fosfato_rmn_bajo,EXCLUDED.salinidad_rmn_alto,EXCLUDED.ton_rmn_alto,EXCLUDED.nitrito_rmn_alto,EXCLUDED.silicato_rmn_alto,EXCLUDED.fosfato_rmn_alto,EXCLUDED.observaciones);"                            
             valores = [indice_rmn,nombre_rmn,salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones]
         
@@ -2615,17 +2595,8 @@ def referencias_nutrientes():
             texto_exito = 'Datos  del RMN ' + nombre_rmn + ' ' + tipo_proceso + ' correctamente'
             st.success(texto_exito)
 
-    # Accion 2, mostrar los RMNs disponibles en la base de datos    
-    if tipo_accion == acciones[2]:
-
-        # # Elimina las columnas que no interesa mostrar
-        # tabla_rmns = tabla_rmns.drop(columns=['id_rmn'])
-    
-        # # Muestra una tabla con las salidas realizadas
-        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(tabla_rmns)
-        # gridOptions = gb.build()
-        # st_aggrid.AgGrid(tabla_rmns,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
-
+    # Accion 2, mostrar los RMNs disponibles en la base de datos y/o modificarlos   
+    if tipo_accion == acciones[1]:
 
         with st.form("Formulario", clear_on_submit=False):
 
@@ -2658,55 +2629,6 @@ def referencias_nutrientes():
             st.experimental_rerun()
 
 
-
-
-        # col1, col2 = st.columns(2,gap="small")
-            
-        # with col1:
-        #     if st.button('Actualizar la tabla de RMNs'):
-                    
-        #         # Inserta uno a uno los registros
-        #         instruccion_sql = '''INSERT INTO rmn_nutrientes (id_rmn,nombre_rmn,salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones)
-        #         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (id_rmn,salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones) = ROW(EXCLUDED.id_rmn,EXCLUDED.salinidad_rmn_bajo,EXCLUDED.ton_rmn_bajo,EXCLUDED.nitrito_rmn_bajo,EXCLUDED.silicato_rmn_bajo,EXCLUDED.fosfato_rmn_bajo,EXCLUDED.salinidad_rmn_alto,EXCLUDED.ton_rmn_alto,EXCLUDED.nitrito_rmn_alto,EXCLUDED.silicato_rmn_alto,EXCLUDED.fosfato_rmn_alto,EXCLUDED.observaciones);''' 
-                
-        #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        #         cursor = conn.cursor()
-                
-        #         with st.spinner('Actualizando la base de datos'):
-                
-        #             for idato in range(tabla_rmns_modificada.shape[0]):
-    
-        #                 cursor.execute(instruccion_sql,(int(tabla_rmns_modificada['id_rmn'].iloc[idato]),tabla_rmns_modificada['nombre_rmn'].iloc[idato],tabla_rmns_modificada['salinidad_rmn_bajo'].iloc[idato],tabla_rmns_modificada['ton_rmn_bajo'].iloc[idato],tabla_rmns_modificada['nitrito_rmn_bajo'].iloc[idato],tabla_rmns_modificada['silicato_rmn_bajo'].iloc[idato],tabla_rmns_modificada['fosfato_rmn_bajo'].iloc[idato],tabla_rmns_modificada['salinidad_rmn_alto'].iloc[idato],tabla_rmns_modificada['ton_rmn_alto'].iloc[idato],tabla_rmns_modificada['nitrito_rmn_alto'].iloc[idato],tabla_rmns_modificada['silicato_rmn_alto'].iloc[idato],tabla_rmns_modificada['fosfato_rmn_alto'].iloc[idato],tabla_rmns_modificada['observaciones'].iloc[idato]))
-        #                 conn.commit() 
-                
-        #             cursor.close()
-        #             conn.close()
-
-        #         texto_exito = 'Referencias actualizadas correctamente'
-        #         st.success(texto_exito)
-    
-
-        # with col2:    
-
-        #     # Botón para descargar las salidas disponibles
-        #     nombre_archivo =  'DATOS_RMNs.xlsx'
-    
-        #     output = BytesIO()
-        #     writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-        #     tabla_rmns.to_excel(writer, index=False, sheet_name='DATOS')
-
-        #     writer.save()
-        #     df_salida = output.getvalue()
-    
-        #     st.download_button(
-        #         label="DESCARGA EXCEL CON LOS RMNs ALMACENADOS",
-        #         data=df_salida,
-        #         file_name=nombre_archivo,
-        #         help= 'Descarga un archivo .csv con los datos solicitados',
-        #         mime="application/vnd.ms-excel"
-        #         )
-        
- 
 
 # ###############################################################################
 # ################## PÁGINA DE ENTRADA DE ESTADILLOS #################
