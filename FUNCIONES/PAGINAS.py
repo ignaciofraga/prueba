@@ -2644,22 +2644,37 @@ def referencias_nutrientes():
             
         with col1:
             if st.button('Actualizar la tabla de RMNs'):
-
-                # Modifica indices de la tabla
-                tabla_rmns_modificada.set_index('id_rmn',drop=True,append=False,inplace=True)                
-
-                # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+                    
+                # Inserta uno a uno los registros
+                instruccion_sql = '''INSERT INTO rmn_nutrientes (id_rmn,nombre_rmn,salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (id_rmn,salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones) = ROW(EXCLUDED.id_rmn,EXCLUDED.salinidad_rmn_bajo,EXCLUDED.ton_rmn_bajo,EXCLUDED.nitrito_rmn_bajo,EXCLUDED.silicato_rmn_bajo,EXCLUDED.fosfato_rmn_bajo,EXCLUDED.salinidad_rmn_alto,EXCLUDED.ton_rmn_alto,EXCLUDED.nitrito_rmn_alto,EXCLUDED.silicato_rmn_alto,EXCLUDED.fosfato_rmn_alto,EXCLUDED.observaciones);''' 
+                
                 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                 cursor = conn.cursor()
-                cursor.execute("TRUNCATE rmn_nutrientes;")
-                conn.commit()
+                
+                for idato in range(tabla_rmns_modificada.shape[0]):
+    
+                    cursor.execute(instruccion_sql,(int(tabla_rmns_modificada['id_rmn'].iloc[idato]),tabla_rmns_modificada['nombre_rmn'].iloc[idato],tabla_rmns_modificada['salinidad_rmn_bajo'].iloc[idato],tabla_rmns_modificada['ton_rmn_bajo'].iloc[idato],tabla_rmns_modificada['nitrito_rmn_bajo'].iloc[idato],tabla_rmns_modificada['silicato_rmn_bajo'].iloc[idato],tabla_rmns_modificada['fosfato_rmn_bajo'].iloc[idato],tabla_rmns_modificada['salinidad_rmn_alto'].iloc[idato],tabla_rmns_modificada['ton_rmn_alto'].iloc[idato],tabla_rmns_modificada['nitrito_rmn_alto'].iloc[idato],tabla_rmns_modificada['silicato_rmn_alto'].iloc[idato],tabla_rmns_modificada['fosfato_rmn_alto'].iloc[idato],tabla_rmns_modificada['observaciones'].iloc[idato]))
+                    conn.commit() 
+                
                 cursor.close()
-                conn.close() 
+                conn.close()
+
+                # # Modifica indices de la tabla
+                # tabla_rmns_modificada.set_index('id_rmn',drop=True,append=False,inplace=True)                
+
+                # # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+                # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                # cursor = conn.cursor()
+                # cursor.execute("TRUNCATE rmn_nutrientes;")
+                # conn.commit()
+                # cursor.close()
+                # conn.close() 
                
-                # Inserta el dataframe resultante en la base de datos 
-                conn_psql  = create_engine(con_engine)
-                tabla_rmns_modificada.to_sql('rmn_nutrientes', conn_psql,if_exists='append')
-                conn_psql.dispose()
+                # # Inserta el dataframe resultante en la base de datos 
+                # conn_psql  = create_engine(con_engine)
+                # tabla_rmns_modificada.to_sql('rmn_nutrientes', conn_psql,if_exists='append')
+                # conn_psql.dispose()
 
 
                 # # Inserta el dataframe resultante en la base de datos 

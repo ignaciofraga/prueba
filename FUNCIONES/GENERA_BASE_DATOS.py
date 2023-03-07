@@ -1280,44 +1280,44 @@ direccion_host = '193.146.155.99'
 
 
 
-################################################################
-## TABLA CON LOS RMNs UTILIZADOS EN EL ANALISIS DE NUTRIENTES ##
-################################################################
+# ################################################################
+# ## TABLA CON LOS RMNs UTILIZADOS EN EL ANALISIS DE NUTRIENTES ##
+# ################################################################
 
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()
 
-nombre_tabla = 'rmn_nutrientes_2'
+# nombre_tabla = 'rmn_nutrientes'
 
-# Borra la table si ya existía
-instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
-cursor.execute(instruccion_sql)
-conn.commit()
+# # Borra la table si ya existía
+# instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+# cursor.execute(instruccion_sql)
+# conn.commit()
 
-# Crea la tabla de nuevo
-listado_variables = ('(id_rmn int PRIMARY KEY,'
-' nombre_rmn text NOT NULL,'
-' salinidad_rmn_bajo NUMERIC (5, 3) NOT NULL,'
-' ton_rmn_bajo NUMERIC (5, 3) NOT NULL,'
-' nitrito_rmn_bajo NUMERIC (5, 3) NOT NULL,'
-' silicato_rmn_bajo NUMERIC (5, 3) NOT NULL,'
-' fosfato_rmn_bajo NUMERIC (5, 3) NOT NULL,'
-' salinidad_rmn_alto NUMERIC (5, 3) NOT NULL,'
-' ton_rmn_alto NUMERIC (5, 3) NOT NULL,'
-' nitrito_rmn_alto NUMERIC (5, 3) NOT NULL,'
-' silicato_rmn_alto NUMERIC (5, 3) NOT NULL,'
-' fosfato_rmn_alto NUMERIC (5, 3) NOT NULL,'
-' observaciones text'
-) 
+# # Crea la tabla de nuevo
+# listado_variables = ('(id_rmn int PRIMARY KEY,'
+# ' nombre_rmn text NOT NULL,'
+# ' salinidad_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+# ' ton_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+# ' nitrito_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+# ' silicato_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+# ' fosfato_rmn_bajo NUMERIC (5, 3) NOT NULL,'
+# ' salinidad_rmn_alto NUMERIC (5, 3) NOT NULL,'
+# ' ton_rmn_alto NUMERIC (5, 3) NOT NULL,'
+# ' nitrito_rmn_alto NUMERIC (5, 3) NOT NULL,'
+# ' silicato_rmn_alto NUMERIC (5, 3) NOT NULL,'
+# ' fosfato_rmn_alto NUMERIC (5, 3) NOT NULL,'
+# ' observaciones text'
+# ) 
 
-listado_unicidades = (', UNIQUE (nombre_rmn))')
+# listado_unicidades = (', UNIQUE (nombre_rmn))')
 
-instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
 
-cursor.execute(instruccion_sql)
-conn.commit()
-cursor.close()
-conn.close()
+# cursor.execute(instruccion_sql)
+# conn.commit()
+# cursor.close()
+# conn.close()
 
 
 
