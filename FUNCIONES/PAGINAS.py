@@ -2655,7 +2655,7 @@ def referencias_nutrientes():
             texto_exito = 'Referencias actualizadas correctamente'
             st.success(texto_exito)            
 
-
+            st.experimental_rerun()
 
 
 
