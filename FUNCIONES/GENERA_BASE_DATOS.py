@@ -1307,7 +1307,7 @@ listado_variables = ('(id_rmn int PRIMARY KEY,'
 ' nitrito_rmn_alto NUMERIC (5, 3) NOT NULL,'
 ' silicato_rmn_alto NUMERIC (5, 3) NOT NULL,'
 ' fosfato_rmn_alto NUMERIC (5, 3) NOT NULL,'
-' observaciones json'
+' observaciones text'
 ) 
 
 listado_unicidades = (', UNIQUE (nombre_rmn))')

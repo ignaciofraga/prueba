@@ -2654,7 +2654,7 @@ def referencias_nutrientes():
 
                 # Inserta el dataframe resultante en la base de datos 
                 conn_psql  = create_engine(con_engine)
-                tabla_rmns_modificada.to_sql('rmn_nutrientes_2', conn_psql,if_exists='append')
+                tabla_rmns_modificada.to_sql('rmn_nutrientes_2', conn_psql,if_exists='replace')
                 conn_psql.dispose()
     
 
