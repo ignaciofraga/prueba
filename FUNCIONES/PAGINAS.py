@@ -2630,8 +2630,15 @@ def referencias_nutrientes():
 
 
         tabla_rmns_modificada = st.experimental_data_editor(tabla_rmns, num_rows="dynamic",key="data_editor")
-        st.write("Here's the session state:")
-        st.write(st.session_state["data_editor"])
+        # st.write("Here's the session state:")
+        # st.write(st.session_state["data_editor"])
+
+        # Muestra una tabla con las salidas realizadas
+        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(tabla_rmns_modificada)
+        gridOptions = gb.build()
+        st_aggrid.AgGrid(tabla_rmns_modificada,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+
+
 
 
         col1, col2 = st.columns(2,gap="small")
