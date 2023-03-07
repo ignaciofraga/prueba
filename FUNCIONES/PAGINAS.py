@@ -2618,17 +2618,21 @@ def referencias_nutrientes():
     # Accion 2, mostrar los RMNs disponibles en la base de datos    
     if tipo_accion == acciones[2]:
 
-        # Elimina las columnas que no interesa mostrar
-        tabla_rmns = tabla_rmns.drop(columns=['id_rmn'])
+        # # Elimina las columnas que no interesa mostrar
+        # tabla_rmns = tabla_rmns.drop(columns=['id_rmn'])
     
-        ## Renombra las columnas
-        #tabla_rmns = tabla_rmns.rename(columns={'nombre_rmn':'Nombre','participantes_no_comisionados':'Participantes no comisionados'})
-    
+        # # Muestra una tabla con las salidas realizadas
+        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(tabla_rmns)
+        # gridOptions = gb.build()
+        # st_aggrid.AgGrid(tabla_rmns,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
 
-        # Muestra una tabla con las salidas realizadas
-        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(tabla_rmns)
-        gridOptions = gb.build()
-        st_aggrid.AgGrid(tabla_rmns,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+
+
+        edited_df = st.experimental_data_editor(tabla_rmns, num_rows="dynamic",key="data_editor")
+        st.write("Here's the session state:")
+        st.write(st.session_state["data_editor"])
+
+
 
 
         # Botón para descargar las salidas disponibles
