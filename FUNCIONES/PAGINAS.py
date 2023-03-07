@@ -2646,6 +2646,9 @@ def referencias_nutrientes():
         with col1:
             if st.button('Actualizar la tabla de RMNs'):
 
+                # Modifica indices de la tabla
+                tabla_rmns_modificada.set_index('id_rmn',drop=True,append=False,inplace=True)                
+
                 # Inserta el dataframe resultante en la base de datos 
                 conn_psql  = create_engine(con_engine)
                 tabla_rmns_modificada.to_sql('rmn_nutrientes', conn_psql,if_exists='append')
