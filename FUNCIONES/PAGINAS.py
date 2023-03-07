@@ -2652,10 +2652,24 @@ def referencias_nutrientes():
                 # Modifica indices de la tabla
                 tabla_rmns_modificada.set_index('id_rmn',drop=True,append=False,inplace=True)                
 
+                # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()
+                cursor.execute("TRUNCATE rmn_nutrientes_2;")
+                conn.commit()
+                cursor.close()
+                conn.close() 
+               
                 # Inserta el dataframe resultante en la base de datos 
                 conn_psql  = create_engine(con_engine)
-                tabla_rmns_modificada.to_sql('rmn_nutrientes_2', conn_psql,if_exists='replace')
+                tabla_rmns_modificada.to_sql('rmn_nutrientes_2', conn_psql,if_exists='append')
                 conn_psql.dispose()
+
+
+                # # Inserta el dataframe resultante en la base de datos 
+                # conn_psql  = create_engine(con_engine)
+                # tabla_rmns_modificada.to_sql('rmn_nutrientes_2', conn_psql,if_exists='replace')
+                # conn_psql.dispose()
     
 
         with col2:    
