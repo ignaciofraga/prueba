@@ -1,7 +1,7 @@
 matplotlib==3.6.2
 openpyxl==3.0.10
 psycopg2-binary==2.9.3
-streamlit == 1.19.0
+streamlit == 1.20.0
 streamlit-aggrid==0.3.2
 sqlalchemy==1.4.40
 xlsxwriter==3.0.3
