@@ -8,7 +8,6 @@ Created on Thu Dec  1 08:08:39 2022
 import numpy
 import pandas
 import datetime
-from pyproj import Proj
 import math
 import psycopg2
 import pandas.io.sql as psql

@@ -8,17 +8,14 @@ Created on Wed Jun  8 17:55:43 2022
 import numpy
 import pandas
 import datetime
-from pyproj import Proj
-import math
 import psycopg2
 import pandas.io.sql as psql
 from sqlalchemy import create_engine
-import json
 import re
-#import FUNCIONES_PROCESADO
 
 
-from matplotlib.ticker import FormatStrFormatter
+
+
 
 pandas.options.mode.chained_assignment = None
 
