@@ -138,10 +138,11 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 
 def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto):
 
+    # Consulta las estaciones disponibles en la base de datos    
     con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql        = create_engine(con_engine)
     tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql) 
-    
+        
     # Cambia nombres a minusculas para comparar 
     tabla_estaciones['nombre_estacion'] = tabla_estaciones['nombre_estacion'].apply(lambda x:x.lower())
     
@@ -158,6 +159,16 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     estaciones_programa['id_temp'] = indices_dataframe
     estaciones_programa.set_index('id_temp',drop=True,append=False,inplace=True)
     
+    io_lat = 0
+    io_lon = 0
+    listado_variables = datos.columns.tolist()
+    if 'latitud' not in listado_variables:
+        datos['latitud'] = [None]*datos.shape[0]
+        io_lat           = 1
+    if 'longitud' not in listado_variables:
+        datos['longitud'] = [None]*datos.shape[0]
+        io_lon            = 1    
+        
     # Genera un dataframe con las estaciones incluidas en el muestreo
     estaciones_muestreadas                      = datos['estacion'].unique()
     estaciones_muestreadas                      = pandas.DataFrame(data=estaciones_muestreadas,columns=['estacion'])  
@@ -179,24 +190,32 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     # Encuentra el identificador asociado a cada estacion en la base de datos
     for iestacion in range(estaciones_muestreadas.shape[0]):
         
-        df_temporal = tabla_estaciones[tabla_estaciones['nombre_estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]
+        df_temporal = estaciones_programa[estaciones_programa['nombre_estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]
     
         # Estacion ya incluida en la base de datos. Recuperar identificador
         if df_temporal.shape[0]>0:
             estaciones_muestreadas['id_estacion'][iestacion]       = df_temporal['id_estacion'].iloc[0]
             
+            # Asigna lat/lon a la medida si ésta no la tenía
+            if io_lat == 1:
+                datos['latitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['latitud_estacion'].iloc[0] 
+            if io_lon == 1:
+                datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['longitud_estacion'].iloc[0] 
+            
+             
         # Nueva estación, asignar orden creciente de identificador
         else:
             estaciones_muestreadas['id_estacion'][iestacion]       = id_ultima_estacion_bd + iconta_nueva_estacion
             estaciones_muestreadas['io_nueva_estacion'][iestacion] = 1           
             iconta_nueva_estacion                                 = iconta_nueva_estacion + 1
-            
+  
+            # Determina la lat/lon de la estacion a partir de los valores de los registros asociados
+            estaciones_muestreadas['latitud_estacion'][iestacion]  = (datos['latitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
+            estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
+          
         # Asigna el identificador de estación a los datos importados
         datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]=estaciones_muestreadas['id_estacion'][iestacion]
             
-        # Determina la lat/lon de la estacion a partir de los valores de los registros asociados
-        estaciones_muestreadas['latitud_estacion'][iestacion]  = (datos['latitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
-        estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
 
 
     # Añade en la base de datos las nuevas estaciones    
@@ -236,232 +255,144 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
     con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql        = create_engine(con_engine)
     tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
+    tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn_psql)
     conn_psql.dispose()
 
     datos['id_salida']  = numpy.zeros(datos.shape[0],dtype=int)
+    
+    # Contadores e identificadores 
+    if tabla_salidas['id_salida'].shape[0]>0:
+        id_ultima_salida_bd = max(tabla_salidas['id_salida'])
+    else:
+        id_ultima_salida_bd = 0
+    iconta_nueva_salida     = 1
+    
+    # listado con los nombres de meses
+    meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']
+           
+    # Extrae el mes y año de cada salida al mar
+    datos['mes'] = numpy.zeros(datos.shape[0])
+    datos['año'] = numpy.zeros(datos.shape[0])
+    for idato in range(datos.shape[0]):
+        datos['mes'].iloc[idato] =  datos['fecha_muestreo'].iloc[idato].month    
+        datos['año'].iloc[idato] =  datos['fecha_muestreo'].iloc[idato].year 
+    
  
-    # PELACUS
-    if id_programa == 1:        
+    if tipo_salida == 'ANUAL':
 
-        datos['año_salida']  = numpy.zeros(datos.shape[0],dtype=int)
-
-        for idato in range(datos.shape[0]):
-            datos['año_salida'][idato] = datos['fecha_muestreo'][idato].year
-            
-        anhos_salidas_mar = datos['año_salida'].unique()
-        fecha_salida      = [None]*len(anhos_salidas_mar)
-        fecha_llegada     = [None]*len(anhos_salidas_mar)
-        for ianho in range(len(anhos_salidas_mar)):
-            
-            subset         = datos[datos['año_salida']==anhos_salidas_mar[ianho]]
-            fechas_anuales = subset['fecha_muestreo'].unique()
-            fecha_salida[ianho] = min(fechas_anuales)
-            fecha_llegada[ianho] = max(fechas_anuales)
-            
-            identificador_estaciones_muestreadas = list(subset['id_estacion_temp'].unique())
-            estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
-            for iestacion in range(len(estaciones_muestreadas)):
-                estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
-            json_estaciones        = json.dumps(estaciones_muestreadas)
-        
-
-
-            # instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
-            # VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.estaciones);''' 
-
-            instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
-            VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;''' 
-                               
-            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-            cursor = conn.cursor()
-
-            nombre_salida = nombre_programa + ' ' + str(anhos_salidas_mar[ianho]) 
-          
-            cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,fecha_salida[ianho],fecha_llegada[ianho],json_estaciones))
-            conn.commit()
-            
-            # Recupera el identificador de la salida al mar
-            instruccion_sql = "SELECT id_salida FROM salidas_muestreos WHERE nombre_salida = '" + nombre_salida + "';"
-            cursor.execute(instruccion_sql)
-            id_salida =cursor.fetchone()[0]
-            conn.commit()
-
-            datos['id_salida'][datos['año_salida']==anhos_salidas_mar[ianho]] = id_salida
-            
-            cursor.close()
-            conn.close()
-
-        datos = datos.drop(columns=['año_salida']) 
-
-    # RADIALES CORUÑA
-    if id_programa == 3 :
-    
-        # Encuentra las fechas de muestreo únicas
-        fechas_salidas_mar = datos['fecha_muestreo'].unique()
-        
-        # Asigna nombre a la salida
-        meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']
-           
-        # Listado con los identificadores de buque en función de la configuración del perfilador
-        id_buque              = [1,2,3,2]
-        
-        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,buque,estaciones,configuracion_perfilador,configuracion_superficie)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''
-            #UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,buque,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.buque,EXCLUDED.estaciones);''' 
-                
-        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        cursor = conn.cursor()
-        for isalida in range(len(fechas_salidas_mar)):
-            
-            # Encuentra las estaciones muestreadas
-            subset_salida                        = datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]
-            identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
-            estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
-            for iestacion in range(len(estaciones_muestreadas)):
-                estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
-            json_estaciones        = json.dumps(estaciones_muestreadas)
-            
-            id_configuracion_perfilador = int(list(subset_salida['configuracion_perfilador'].unique())[0])
-            id_configuracion_superficie = int(list(subset_salida['configuracion_superficie'].unique())[0])
-            if id_configuracion_perfilador:
-                buque                       = int(id_buque[id_configuracion_perfilador-1])
-            else:
-                buque = None
-          
-            nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_salidas_mar[isalida].month-1]) + ' ' +  str(fechas_salidas_mar[isalida].year)
-          
-            cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_salidas_mar[isalida],fechas_salidas_mar[isalida],buque,json_estaciones,id_configuracion_perfilador,id_configuracion_superficie))
-            conn.commit()
-            
-            # Recupera el identificador de la salida al mar
-            instruccion_sql_recupera = "SELECT id_salida FROM salidas_muestreos WHERE nombre_salida = '" + nombre_salida + "';"
-            cursor.execute(instruccion_sql_recupera)
-            id_salida =cursor.fetchone()[0]
-            conn.commit()
-    
-            datos['id_salida'][datos['fecha_muestreo']==fechas_salidas_mar[isalida]] = id_salida
-            
-        cursor.close()
-        conn.close()
-
-    # RADIALES CANTABRICO
-    if id_programa == 4 :
-    
-        # Extrae el mes y año de cada salida al mar
-        datos['mes'] = numpy.zeros(datos.shape[0])
-        datos['año'] = numpy.zeros(datos.shape[0])
-        for idato in range(datos.shape[0]):
-            datos['mes'].iloc[idato] =  datos['fecha_muestreo'].iloc[idato].month    
-            datos['año'].iloc[idato] =  datos['fecha_muestreo'].iloc[idato].year 
-    
-    
         anhos_salida_mar = datos['año'].unique()
-
         
-        # Asigna nombre a la salida
-        meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']
-           
-        
-        
-        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        cursor = conn.cursor()
-        
-        for ianho in range(len(anhos_salida_mar)):
-        
+        for ianho in range(len(anhos_salida_mar)):    
+ 
             subset_anual     = datos[datos['año']==anhos_salida_mar[ianho]] 
-            meses_salida_mar = subset_anual['mes'].unique()
-        
-            for isalida in range(len(meses_salida_mar)):
+            
+            # Busca las fechas de salida y llegada
+            fechas_anuales   = subset_anual['fecha_muestreo'].unique()
+            fecha_salida     = min(fechas_anuales)
+            fecha_llegada    = max(fechas_anuales)            
+            
+            df_temporal = tabla_salidas[tabla_salidas['fecha_salida']==fecha_salida]
+    
+            # Salida ya incluida en la base de datos. Recuperar identificador
+            if df_temporal.shape[0]>0:
+                id_salida = df_temporal['id_salida'].iloc[0]
                 
+            # Salida no incluida. Añadirla a la base de datos.
+            else:
+            
+                id_salida           = id_ultima_salida_bd + iconta_nueva_salida
+                iconta_nueva_salida = iconta_nueva_salida + 1
+            
                 # Encuentra las estaciones muestreadas
-                subset_salida                        = subset_anual[subset_anual['mes']==meses_salida_mar[isalida]]
+                subset_salida                        = datos[datos['año']==anhos_salida_mar[ianho]]
                 identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
                 estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
                 for iestacion in range(len(estaciones_muestreadas)):
                     estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
                 json_estaciones        = json.dumps(estaciones_muestreadas)
-                
-                nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[int(meses_salida_mar[isalida]-1)]) + ' ' +  str(int(anhos_salida_mar[ianho]))
-                
-                if subset_salida['hora_muestreo'].unique()[0] is None:
-                    
-                    # instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
-                    #     VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.estaciones);''' 
-
-                    instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
-                        VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;''' 
-                            
-                            
-                    cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,min(subset_salida['fecha_muestreo']),max(subset_salida['fecha_muestreo']),json_estaciones))
-
-                else:
-                    
-                    # instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,hora_salida,hora_retorno,estaciones)
-                    #     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,hora_salida,hora_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_salida,EXCLUDED.hora_retorno,EXCLUDED.estaciones);''' 
-
-                    instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,hora_salida,hora_retorno,estaciones)
-                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;''' 
-                          
-                                    
-                    cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,min(subset_salida['fecha_muestreo']),max(subset_salida['fecha_muestreo']),min(subset_salida['hora_muestreo']),max(subset_salida['hora_muestreo']),json_estaciones))
-                
+                   
+                # Define nombre
+                nombre_salida = nombre_programa + ' ' + str(anhos_salida_mar[ianho])
+          
+                # Inserta en la base de datos
+                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()                      
+                instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''        
+                cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,fecha_salida,fecha_llegada,json_estaciones))
                 conn.commit()
+                cursor.close()
+                conn.close()
                 
-                # Recupera el identificador de la salida al mar
-                instruccion_sql_recupera = "SELECT id_salida FROM salidas_muestreos WHERE nombre_salida = '" + nombre_salida + "';"
-                cursor.execute(instruccion_sql_recupera)
-                #print(cursor.fetchall(),nombre_salida)
-                id_salida =cursor.fetchone()[0]
-                conn.commit()
-        
-                datos['id_salida'][(datos['año']==anhos_salida_mar[ianho]) & (datos['mes']==meses_salida_mar[isalida])] = id_salida
-                
+            # Asigna el id de la salida al dataframe
+            datos['id_salida'][datos['año']==anhos_salida_mar[ianho]] = id_salida
+    
             
-        cursor.close()
-        conn.close()    
+    if tipo_salida == 'MENSUAL' : # Programa radiales Coruña
 
+        anhos_salida_mar = datos['año'].unique()
         
-    # RADPROF
-    if id_programa == 5:
+        for ianho in range(len(anhos_salida_mar)):    
+ 
+            subset_anual     = datos[datos['año']==anhos_salida_mar[ianho]] 
+            
+            if id_programa == 3: # PROGRAMA RADIALES CORUÑA. busco las salidas por fechas únicas (salidas de 1 día)
+            
+                fechas_salidas_mar = subset_anual['fecha_muestreo'].unique()
+                fechas_partida     = fechas_salidas_mar
+                fechas_regreso     = fechas_salidas_mar
+            
+            if id_programa == 4: # PROGRAMA RADIALES CANTABRICO. busco las salidas por meses únicos (salidas de más de 1 día, no vale criterio anterior)
+            
+                meses_salida_mar = subset_anual['mes'].unique()        
+                fechas_partida   = []
+                fechas_regreso   = []
+                for imes in range(len(meses_salida_mar)):            
+                    subset_mensual    = subset_anual[subset_anual['mes']==meses_salida_mar[imes]]
+                    fechas_partida    = fechas_partida + [min(subset_mensual['fecha_muestreo'])]
+                    fechas_regreso    = fechas_regreso + [max(subset_mensual['fecha_muestreo'])]       
         
-        fecha_salida  = min(datos['fecha_muestreo'])
-        fecha_llegada = max(datos['fecha_muestreo'])
+            for isalida in range(len(fechas_partida)):            
+    
+                df_temporal = tabla_salidas[tabla_salidas['fecha_salida']==fechas_partida[isalida]]
         
-        identificador_estaciones_muestreadas = list(datos['id_estacion_temp'].unique())
-        estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
-        for iestacion in range(len(estaciones_muestreadas)):
-            estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
-        json_estaciones        = json.dumps(estaciones_muestreadas)
-    
-    
-        # instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
-        # VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO UPDATE SET (nombre_salida,nombre_programa,tipo_salida,fecha_retorno,estaciones) = ROW(EXCLUDED.nombre_salida,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_retorno,EXCLUDED.estaciones);''' 
-
-        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
-        VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;''' 
-
-    
-        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        cursor = conn.cursor()
-    
-        nombre_salida = nombre_programa + ' ' + str(fecha_salida.year) 
-      
-        cursor.execute(instruccion_sql, (nombre_salida,int(id_programa),nombre_programa,tipo_salida,fecha_salida,fecha_llegada,json_estaciones))
-        conn.commit()
-        
-        # Recupera el identificador de la salida al mar
-        instruccion_sql = "SELECT id_salida FROM salidas_muestreos WHERE nombre_salida = '" + nombre_salida + "';"
-        cursor.execute(instruccion_sql)
-        id_salida =cursor.fetchone()[0]
-        conn.commit()
-    
-        datos['id_salida'] = id_salida
-        
-        cursor.close()
-        conn.close()
+                # Salida ya incluida en la base de datos. Recuperar identificador
+                if df_temporal.shape[0]>0:
+                    id_salida = df_temporal['id_salida'].iloc[0]
+                    
+                # Salida no incluida. Añadirla a la base de datos.
+                else:
                 
-    
-
+                    id_salida           = id_ultima_salida_bd + iconta_nueva_salida
+                    iconta_nueva_salida = iconta_nueva_salida + 1
+                
+                    # Encuentra las estaciones muestreadas
+                    subset_salida                        = datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]
+                    identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
+                    estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
+                    for iestacion in range(len(estaciones_muestreadas)):
+                        estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
+                    json_estaciones        = json.dumps(estaciones_muestreadas)
+                       
+                    # Define nombre
+                    nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_salidas_mar[isalida].month-1]) + ' ' +  str(fechas_salidas_mar[isalida].year)
+              
+                    # Inserta en la base de datos
+                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                    cursor = conn.cursor()                      
+                    instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''        
+                    cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_salidas_mar[isalida],fechas_salidas_mar[isalida],json_estaciones))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+                    
+                # Asigna el id de la salida al dataframe
+                if id_programa == 3:
+                    datos['id_salida'][datos['fecha_muestreo']==fechas_salidas_mar[isalida]] = id_salida
+                if id_programa == 4:                
+                    datos['id_salida'][(datos['año']==anhos_salida_mar[ianho]) & (datos['mes']==fechas_partida[isalida].month)] = id_salida
+      
     return datos
 
 

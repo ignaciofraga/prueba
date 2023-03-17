@@ -58,10 +58,10 @@ datos_pelacus_corregido = FUNCIONES_PROCESADO.evalua_salidas(datos_pelacus_corre
 print('Identificando el registro correspondiente a cada medida')
 datos_pelacus_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_pelacus_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# Introduce los datos en la base de datos
-print('Introduciendo los datos en la base de datos')
-FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+# # Introduce los datos en la base de datos
+# print('Introduciendo los datos en la base de datos')
+# FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+# FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
 
  
 
