@@ -1049,6 +1049,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     
             st.dataframe(datos_procesados)
             if datos_procesados['ph'].isnull().all() is False: 
+                
+                st.text('hols')
                 ### GRAFICO NITRATO vs pH
             
                 if io_buenos:
