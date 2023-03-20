@@ -1047,7 +1047,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                     nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
                 ax.annotate(nombre_muestreos[ipunto], (datos_procesados['nitrato'].iloc[ipunto], datos_procesados['fosfato'].iloc[ipunto]))
     
-            
+            st.dataframe(datos_procesados)
             if datos_procesados['ph'].isnull().all() is False: 
                 ### GRAFICO NITRATO vs pH
             
