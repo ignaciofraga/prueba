@@ -659,6 +659,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         min_seleccion = min(value for value in datos_procesados[variable_procesada] if value is not None)
         max_seleccion = max(value for value in datos_procesados[variable_procesada] if value is not None)
         
+        
         # min_seleccion = numpy.nanmin(numpy.array(datos_procesados[variable_procesada]))
         # max_seleccion = numpy.nanmax(numpy.array(datos_procesados[variable_procesada]))
         df_datos_buenos = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_bueno]
