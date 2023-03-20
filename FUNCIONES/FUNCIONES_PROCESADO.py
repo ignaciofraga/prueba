@@ -915,18 +915,21 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         # ### GRAFICOS ESPECIFICOS PARA LAS POSIBLES VARIABLES        
         if variable_procesada == 'fosfato':
             
-            datos_disponibles_fosfato = datos_disponibles_bd[datos_disponibles_bd['fosfato'].notna()]
-            datos_disponibles_fosfato = datos_disponibles_fosfato[datos_disponibles_fosfato['nitrato'].notna()]
+            # datos_disponibles_fosfato = datos_disponibles_bd[datos_disponibles_bd['fosfato'].notna()]
+            # datos_disponibles_fosfato = datos_disponibles_fosfato[datos_disponibles_fosfato['nitrato'].notna()]
             
-            st.dataframe(datos_disponibles_fosfato)
+            # st.dataframe(datos_disponibles_fosfato)
             
             with st.expander("Ajustar rango del gráfico FOSFATO vs NITRATO",expanded=False):            
                 
                 st.write("Selecciona el rango del gráfico")  
+                
+                min_val_x,max_val_x = rango_datos(datos_procesados,datos_disponibles_bd,'nitrato',df_indices_calidad,io_malos,io_dudosos,io_no_eval)
+               
               
-                # Selecciona los rangos del gráfico
-                min_val_x = 0.95*min(datos_disponibles_fosfato['nitrato'].min(),datos_procesados['nitrato'].min())
-                max_val_x = 1.05*max(datos_disponibles_fosfato['nitrato'].max(),datos_procesados['nitrato'].max())
+                # # Selecciona los rangos del gráfico
+                # min_val_x = 0.95*min(datos_disponibles_fosfato['nitrato'].min(),datos_procesados['nitrato'].min())
+                # max_val_x = 1.05*max(datos_disponibles_fosfato['nitrato'].max(),datos_procesados['nitrato'].max())
                    
                 col1, col2, col3, col4 = st.columns(4,gap="small")
                 with col2:
@@ -934,9 +937,12 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 with col3:
                     vmax_rango_x  = st.number_input('Valor máximo eje x:',value=max_val_x,key='vmax_x_graf_fosf')  
  
-                min_val_y = 0.95*min(datos_disponibles_fosfato['fosfato'].min(),datos_procesados['fosfato'].min())
-                max_val_y = 1.05*max(datos_disponibles_fosfato['fosfato'].max(),datos_procesados['fosfato'].max())
+                # min_val_y = 0.95*min(datos_disponibles_fosfato['fosfato'].min(),datos_procesados['fosfato'].min())
+                # max_val_y = 1.05*max(datos_disponibles_fosfato['fosfato'].max(),datos_procesados['fosfato'].max())
                    
+                min_val_y,max_val_y = rango_datos(datos_procesados,datos_disponibles_bd,'fosfato',df_indices_calidad,io_malos,io_dudosos,io_no_eval)
+               
+                
                 col1, col2, col3, col4 = st.columns(4,gap="small")
                 with col2:
                     vmin_rango_y  = st.number_input('Valor mínimo eje y:',value=min_val_y,key='vmin_y_graf_fosf')
