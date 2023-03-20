@@ -681,9 +681,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         return min_val,max_val
     
     
-    
-    
-    
+
     
 
     id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'].iloc[0]
@@ -693,6 +691,10 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
 
     qf_variable_procesada     = variable_procesada + '_qf'
 
+    df_datos_no_eval = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_no_eval]
+    df_datos_malos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_malo]
+    df_datos_dudosos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_dudoso]
+    df_datos_buenos = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_bueno]
     
 
     # comprueba si hay datos de la variable a analizar en la salida seleccionada
