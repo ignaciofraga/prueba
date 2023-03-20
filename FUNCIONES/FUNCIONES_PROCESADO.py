@@ -747,9 +747,6 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     
         ### GRAFICO CON LA VARIABLE ANALIZADA EN FUNCION DE LA PROFUNDIDAD Y OXIGENO   
         # Representa un gráfico con la variable seleccionada junto a los oxígenos 
-        #cm = 1/2.54  # centimeters in inches
-        #plt.figure(figsize=(17/2.54, 15/2.54)
-
         fig, (ax, az) = plt.subplots(1, 2, figsize=(20/2.54, 18/2.54), gridspec_kw = {'wspace':0.2, 'hspace':0}, width_ratios=[3, 1])
  
         ### DATOS DISPONIBLES PREVIAMENTE ###
@@ -844,81 +841,80 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     
  
         # ### GRAFICOS ESPECIFICOS PARA LAS POSIBLES VARIABLES        
-
-        
-
-        # if variable_seleccionada == 'fosfato':
+        if variable_procesada == 'fosfato':
             
-        #     with st.expander("Ajustar rango del gráfico FOSFATO vs NITRATO",expanded=False):            
+            with st.expander("Ajustar rango del gráfico FOSFATO vs NITRATO",expanded=False):            
                 
-        #         st.write("Selecciona el rango del gráfico")  
-                
-        #         # Selecciona los rangos del gráfico
-        #         min_val_x = 0.95*min(df_disponible_bd['nitrato'].min(),df_seleccion['nitrato'].min())
-        #         max_val_x = 1.05*max(df_disponible_bd['nitrato'].max(),df_seleccion['nitrato'].max())
+                st.write("Selecciona el rango del gráfico")  
+              
+                # Selecciona los rangos del gráfico
+                min_val_x = 0.95*min(datos_disponibles_bd['nitrato'].min(),datos_procesados['nitrato'].min())
+                max_val_x = 1.05*max(datos_disponibles_bd['nitrato'].max(),datos_procesados['nitrato'].max())
                    
-        #         col1, col2, col3, col4 = st.columns(4,gap="small")
-        #         with col2:
-        #             vmin_rango_x  = st.number_input('Valor mínimo eje x:',value=min_val_x,key='vmin_x_graf_fosf')
-        #         with col3:
-        #             vmax_rango_x  = st.number_input('Valor máximo eje x:',value=max_val_x,key='vmax_x_graf_fosf')  
+                col1, col2, col3, col4 = st.columns(4,gap="small")
+                with col2:
+                    vmin_rango_x  = st.number_input('Valor mínimo eje x:',value=min_val_x,key='vmin_x_graf_fosf')
+                with col3:
+                    vmax_rango_x  = st.number_input('Valor máximo eje x:',value=max_val_x,key='vmax_x_graf_fosf')  
  
-        #         min_val_y = 0.95*min(df_disponible_bd['fosfato'].min(),df_seleccion['fosfato'].min())
-        #         max_val_y = 1.05*max(df_disponible_bd['fosfato'].max(),df_seleccion['fosfato'].max())
+                min_val_y = 0.95*min(datos_disponibles_bd['fosfato'].min(),datos_procesados['fosfato'].min())
+                max_val_y = 1.05*max(datos_disponibles_bd['fosfato'].max(),datos_procesados['fosfato'].max())
                    
-        #         col1, col2, col3, col4 = st.columns(4,gap="small")
-        #         with col2:
-        #             vmin_rango_y  = st.number_input('Valor mínimo eje y:',value=min_val_y,key='vmin_y_graf_fosf')
-        #         with col3:
-        #             vmax_rango_y  = st.number_input('Valor máximo eje y:',value=max_val_y,key='vmax_y_graf_fosf') 
+                col1, col2, col3, col4 = st.columns(4,gap="small")
+                with col2:
+                    vmin_rango_y  = st.number_input('Valor mínimo eje y:',value=min_val_y,key='vmin_y_graf_fosf')
+                with col3:
+                    vmax_rango_y  = st.number_input('Valor máximo eje y:',value=max_val_y,key='vmax_y_graf_fosf') 
             
             
     
-        #     ### GRAFICO FOSFATO vs NITRATO 
-        #     fig, ax = plt.subplots()       
+            ### GRAFICO FOSFATO vs NITRATO 
+            fig, ax = plt.subplots(figsize=(20/2.54, 18/2.54))       
             
-        #     if io_buenos:
-        #         ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
+            if io_buenos:
+                ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
             
-        #     # Representa los datos dentro del intervalo de meses en otro color
-        #     if io_rango:
-        #         ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
+            # Representa los datos dentro del intervalo de meses en otro color
+            if io_rango:
+                ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
             
-        #     # Representa los datos con QF malos si se seleccionó esta opción   
-        #     if io_malos:
-        #         ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
+            # Representa los datos con QF malos si se seleccionó esta opción   
+            if io_malos:
+                ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
 
-        #     # Representa los datos con QF dudoso si se seleccionó esta opción   
-        #     if io_dudosos:
-        #         ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
+            # Representa los datos con QF dudoso si se seleccionó esta opción   
+            if io_dudosos:
+                ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
                                   
-        #     ax.plot(df_seleccion['nitrato'],df_seleccion['fosfato'],'.r' )
+            ax.plot(datos_procesados['nitrato'],datos_procesados['fosfato'],'.r' )
 
-        #     ax.set(xlabel='Nitrato (\u03BCmol/kg)')
-        #     ax.set(ylabel='Fosfato (\u03BCmol/kg)')
+            ax.set(xlabel='Nitrato (\u03BCmol/kg)')
+            ax.set(ylabel='Fosfato (\u03BCmol/kg)')
     
 
-        #     # Reduce el tamaño y ajusta el rango y formato de los ejes
-        #     ax.tick_params(axis='both', which='major', labelsize=8)
-        #     ax.set_xlim([vmin_rango_x, vmax_rango_x])
-        #     ax.set_ylim([vmin_rango_y, vmax_rango_y])
-        #     ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
-        #     ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+            # Reduce el tamaño y ajusta el rango y formato de los ejes
+            ax.tick_params(axis='both', which='major', labelsize=8)
+            ax.set_xlim([vmin_rango_x, vmax_rango_x])
+            ax.set_ylim([vmin_rango_y, vmax_rango_y])
+            ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
     
     
     
-        #     # Añade el nombre de cada punto
-        #     nombre_muestreos = [None]*df_seleccion.shape[0]
-        #     for ipunto in range(df_seleccion.shape[0]):
-        #         if df_seleccion['botella'].iloc[ipunto] is None:
-        #             nombre_muestreos[ipunto] = 'Prof.' + str(df_seleccion['presion_ctd'].iloc[ipunto])
-        #         else:
-        #             nombre_muestreos[ipunto] = 'Bot.' + str(int(df_seleccion['botella'].iloc[ipunto]))
-        #         ax.annotate(nombre_muestreos[ipunto], (df_seleccion['nitrato'].iloc[ipunto], df_seleccion['fosfato'].iloc[ipunto]))
+            # Añade el nombre de cada punto
+            nombre_muestreos = [None]*datos_procesados.shape[0]
+            for ipunto in range(datos_procesados.shape[0]):
+                if datos_procesados['botella'].iloc[ipunto] is None:
+                    nombre_muestreos[ipunto] = 'Prof.' + str(datos_procesados['presion_ctd'].iloc[ipunto])
+                else:
+                    nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
+                ax.annotate(nombre_muestreos[ipunto], (datos_procesados['nitrato'].iloc[ipunto], datos_procesados['fosfato'].iloc[ipunto]))
            
-        #     st.pyplot(fig)
+            # st.pyplot(fig)
         
-        
+            buf = BytesIO()
+            fig.savefig(buf, format="png")
+            st.image(buf)        
 
 
 

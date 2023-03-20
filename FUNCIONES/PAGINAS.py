@@ -1708,11 +1708,6 @@ def entrada_archivos_roseta():
     
         # Recupera tablas con informacion utilizada en el procesado
         df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas = carga_datos_entrada_archivo_roseta()
-        # conn                = init_connection()
-        # df_salidas          = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        # df_programas        = psql.read_sql('SELECT * FROM programas', conn)
-        # df_estaciones       = psql.read_sql('SELECT * FROM estaciones', conn)
-        # conn.close()    
         
         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
 
@@ -1981,10 +1976,6 @@ def entrada_archivos_roseta():
             
         FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset,tabla_insercion)
 
-        
-        #FUNCIONES_PROCESADO.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades)
-
-
 
 
 
@@ -2028,7 +2019,25 @@ def consulta_datos():
 
 
 def procesado_nutrientes():
-         
+    
+    # Función para cargar en caché los datos a utilizar
+    @st.cache_data
+    def carga_datos_procesado_nutrientes():
+        conn                      = init_connection()
+        df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+        df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
+        df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+        df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+        df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+        df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
+        df_rmns                   = psql.read_sql('SELECT * FROM rmn_nutrientes', conn)
+        conn.close()
+        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns
+        
+
+
+     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host   = st.secrets["postgres"].host
     base_datos       = st.secrets["postgres"].dbname
@@ -2037,15 +2046,8 @@ def procesado_nutrientes():
     puerto           = st.secrets["postgres"].port
     
    
-    # Recupera tablas con informacion utilizada en el procesado
-    conn                    = init_connection()
-    df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-    df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
-    df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-    df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-    df_rmns                 = psql.read_sql('SELECT * FROM rmn_nutrientes', conn)
-    conn.close()     
-    
+    df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns = carga_datos_procesado_nutrientes()
+
     
  
     # Combina la información de muestreos y salidas en un único dataframe 
@@ -2224,20 +2226,68 @@ def procesado_nutrientes():
     # control de calidad de salidas previamente disponibles
     if tipo_accion == acciones[2]: 
         
-        st.subheader('Control de calidad de datos de nutrientes')
+        st.subheader('Control de calidad de datos procedentes de botellas')    
+    
+        # Define las variables a utilizar
 
-        # compón un dataframe con la información de muestreo y datos biogeoquímicos
-        df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
+        variable_tabla         = ['datos_discretos_biogeoquimica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica']
+        
+        # Toma los datos de la caché    
+        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns = carga_datos_procesado_nutrientes()
+        
+        # Mantén sólo las salidas de radiales
+        id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+        df_salidas  = df_salidas[df_salidas['programa']==int(id_radiales)]
+        
+        # Combina la información de muestreos y salidas en un único dataframe 
+        df_muestreos          = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
+        df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="id_salida")
+        df_muestreos          = df_muestreos.rename(columns={"id_salida": "salida_mar"}) # Deshaz el cambio de nombre
+                         
+        # compón un dataframe con la información de muestreo y datos biogeoquímicos                                            
         df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
-        
+        df_datos_disponibles  = pandas.merge(df_datos_disponibles, df_datos_fisicos, on="muestreo")
+         
         # Añade columna con información del año
-        df_datos_disponibles['año']                = numpy.zeros(df_datos_disponibles.shape[0],dtype=int)
-        for idato in range(df_datos_disponibles.shape[0]):
-            df_datos_disponibles['año'].iloc[idato] = (df_datos_disponibles['fecha_muestreo'].iloc[idato]).year
+        df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
         
+        # Borra los dataframes que ya no hagan falta para ahorrar memoria
+        del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos)
         
         # procesa ese dataframe
-        FUNCIONES_PROCESADO.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades)
+        io_control_calidad = 1
+        indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada = FUNCIONES_AUXILIARES.menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
+                                                   
+        # Recupera el nombre "completo" de la variable y sus unidades
+        indice_variable          = variables_procesado_bd.index(variable_seleccionada)
+        nombre_completo_variable = variables_procesado[indice_variable] 
+        unidades_variable        = variables_unidades[indice_variable]
+        tabla_insercion          = variable_tabla[indice_variable]
+                                                                              
+        # Selecciona los datos correspondientes al programa, estación, salida y cast seleccionados
+        datos_procesados     = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion) & (df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
+
+        df_datos_disponibles = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion)]
+            
+        FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset,tabla_insercion)
+
+
+        
+        
+        # st.subheader('Control de calidad de datos de nutrientes')
+
+        # # compón un dataframe con la información de muestreo y datos biogeoquímicos
+        # df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
+        # df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
+        
+        # # Añade columna con información del año
+        # df_datos_disponibles['año']                = numpy.zeros(df_datos_disponibles.shape[0],dtype=int)
+        # for idato in range(df_datos_disponibles.shape[0]):
+        #     df_datos_disponibles['año'].iloc[idato] = (df_datos_disponibles['fecha_muestreo'].iloc[idato]).year
+        
+        
+        # # procesa ese dataframe
+        # FUNCIONES_PROCESADO.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades)
 
         
 
