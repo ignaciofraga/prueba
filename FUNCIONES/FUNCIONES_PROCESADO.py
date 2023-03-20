@@ -1078,8 +1078,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 az.tick_params(axis='both', which='major', labelsize=8)
                 az.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
                 az.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-                az.set_xlim([vmin_rango_x_g2, vmax_rango_x_g2])
-                az.set_ylim([vmin_rango_y_g2, vmax_rango_y_g2])
+                # az.set_xlim([vmin_rango_x_g2, vmax_rango_x_g2])
+                # az.set_ylim([vmin_rango_y_g2, vmax_rango_y_g2])
             
             
                 # Añade el nombre de cada punto
