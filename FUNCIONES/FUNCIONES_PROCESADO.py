@@ -745,8 +745,11 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         ################# GRAFICOS ################
     
         ### GRAFICO CON LA VARIABLE ANALIZADA EN FUNCION DE LA PROFUNDIDAD Y OXIGENO   
-        # Representa un gráfico con la variable seleccionada junto a los oxígenos   
-        fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.2, 'hspace':0}, width_ratios=[3, 1])
+        # Representa un gráfico con la variable seleccionada junto a los oxígenos 
+        #cm = 1/2.54  # centimeters in inches
+        #plt.figure(figsize=(17/2.54, 15/2.54)
+
+        fig, (ax, az) = plt.subplots(1, 2, gridspec_kw = {'wspace':0.2, 'hspace':0}, width_ratios=[3, 1],figsize=(17/2.54, 15/2.54))
  
         ### DATOS DISPONIBLES PREVIAMENTE ###
         # Representa los datos disponibles de un color
