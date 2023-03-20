@@ -205,7 +205,7 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
         meses_offset = 0
     
 
-    return indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada
+    return indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada
     #return indice_programa,anho_seleccionado,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset
 
 

@@ -628,7 +628,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
 ###############################################################################
 ###### FUNCION PARA REALIZAR CONTROL DE CALDIAD DE DATOS BIOGEOQUIMICOS #######
 ###############################################################################
-def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable_procesada,nombre_completo_variable_procesada,unidades_variable,df_indices_calidad,meses_offset):
+def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable_procesada,nombre_completo_variable_procesada,unidades_variable,df_indices_calidad,meses_offset,tabla_insercion,salida_seleccionada):
 
     import streamlit as st
     import matplotlib.pyplot as plt
@@ -1142,14 +1142,10 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                       
             indice_validacion = df_indices_calidad['indice'].tolist()
             texto_indice      = df_indices_calidad['descripcion'].tolist()
-            qf_asignado       = numpy.zeros(datos_procesados.shape[0])
            
             for idato in range(datos_procesados.shape[0]):
-               
-                enunciado          = 'QF del muestreo ' + nombre_muestreos[idato]
-                valor_asignado     = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
-                #qf_asignado[idato] = indice_validacion[texto_indice.index(valor_asignado)]
-           
+                enunciado                                           = 'QF del muestreo ' + nombre_muestreos[idato]
+                valor_asignado                                      = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
                 datos_procesados[qf_variable_procesada].iloc[idato] = int(indice_validacion[texto_indice.index(valor_asignado)])
             
            
@@ -1157,7 +1153,17 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     
             if io_envio:
             
-                return  datos_procesados   
+                direccion_host   = st.secrets["postgres"].host
+                base_datos       = st.secrets["postgres"].dbname
+                usuario          = st.secrets["postgres"].user
+                contrasena       = st.secrets["postgres"].password
+                puerto           = st.secrets["postgres"].port    
+            
+                inserta_datos(datos_procesados,tabla_insercion,direccion_host,base_datos,usuario,contrasena,puerto)
+                
+                texto_exito = 'Datos de la salida ' + salida_seleccionada + ' añadidos o modificados correctamente'
+                st.success(texto_exito)
+        
             
         #     with st.spinner('Actualizando la base de datos'):
            
@@ -1185,8 +1191,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         #         cursor.close()
         #         conn.close()   
     
-        #     texto_exito = 'Datos de salida ' + salida_seleccionada + ' añadidos o modificados correctamente'
-        #     st.success(texto_exito)
+
    
 
 
