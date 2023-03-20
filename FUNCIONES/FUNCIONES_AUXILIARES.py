@@ -23,7 +23,7 @@ pandas.options.mode.chained_assignment = None
 ###############################################################################
 
 # Funcion para recuperar los parámetros de conexión a partir de los "secrets" establecidos en Streamlit
-@st.cache_resource
+#@st.cache_resource
 def init_connection():
     return psycopg2.connect(**st.secrets["postgres"])
 
