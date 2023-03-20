@@ -157,6 +157,7 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
 
         
         listado_salidas           = df_prog_anho_sel['salida_mar'].unique()
+        st.text(listado_salidas)
         df_salidas_muestreadas    = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
         df_salidas_muestreadas    = df_salidas_muestreadas.sort_values('fecha_salida',ascending=False)
         salida_seleccionada       = st.selectbox('Salida',(df_salidas_muestreadas['nombre_salida']))
