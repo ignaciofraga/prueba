@@ -628,14 +628,10 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
 ###############################################################################
 ###### FUNCION PARA REALIZAR CONTROL DE CALDIAD DE DATOS BIOGEOQUIMICOS #######
 ###############################################################################
-def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable_procesada,variable_procesada_bd,variable_unidades,df_indices_calidad,meses_offset):
+def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable_procesada,nombre_completo_variable_procesada,unidades_variable,df_indices_calidad,meses_offset):
 
     import streamlit as st
     import matplotlib.pyplot as plt
-
-
-
-    
 
     id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'].iloc[0]
     id_dato_bueno             = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Bueno'].iloc[0]
@@ -643,21 +639,6 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     id_dato_no_eval           = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='No evaluado'].iloc[0]
 
     qf_variable_procesada     = variable_procesada + '_qf'
-
-    # # Recupera los datos disponibles de la misma estación, para la misma variable
-    # listado_muestreos_estacion = df_muestreos['muestreo'][df_muestreos['estacion']==indice_estacion]
-    # df_disponible_bgq_bd        = df_datos_biogeoquimicos[df_datos_biogeoquimicos['muestreo'].isin(listado_muestreos_estacion)]                                                 
-    # df_disponible_bd            = pandas.merge(df_muestreos, df_disponible_bgq_bd, on="muestreo")
-
-    # df_disponible_fis_bd        = df_datos_fisicos[df_datos_fisicos['muestreo'].isin(listado_muestreos_estacion)]   
-    # df_disponible_bd            = pandas.merge(df_disponible_bd, df_disponible_fis_bd, on="muestreo")
-    
-
-    # # Borra los dataframes que ya no hagan falta para ahorrar memoria
-    # del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos,df_disponible_bgq_bd,df_disponible_fis_bd)
-
-    # # Genera un dataframe sólo con los datos "buenos"        
-    # df_datos_buenos = datos_disponibles[datos_disponibles[qf_variable_procesada]==id_dato_bueno]
 
     # comprueba si hay datos de la variable a analizar en la salida seleccionada
     if datos_disponibles_bd[variable_procesada].isnull().all():
@@ -792,7 +773,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         ax.plot(datos_procesados[variable_procesada],datos_procesados['presion_ctd'],'.r',label='PROCESADO' )
         
         ### FORMATO,ETIQUETAS Y NOMBRES DE EJES ###
-        texto_eje = variable_procesada_bd + '(' + variable_unidades + ')'
+        texto_eje = nombre_completo_variable_procesada + '(' + unidades_variable + ')'
         ax.set(xlabel=texto_eje)
         ax.set(ylabel='Presion (db)')
         ax.invert_yaxis()
