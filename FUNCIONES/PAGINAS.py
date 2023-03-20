@@ -1946,6 +1946,8 @@ def entrada_archivos_roseta():
         id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
         df_salidas  = df_salidas[df_salidas['programa']==int(id_radiales)]
         
+        st.text(df_salidas)
+        
         # Combina la información de muestreos y salidas en un único dataframe 
         df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
         df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
@@ -1963,7 +1965,8 @@ def entrada_archivos_roseta():
         # procesa ese dataframe
         io_control_calidad = 1
         df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = FUNCIONES_AUXILIARES.menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
-        
+                                                                                                                                 
+            
         
         #FUNCIONES_PROCESADO.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades)
 
