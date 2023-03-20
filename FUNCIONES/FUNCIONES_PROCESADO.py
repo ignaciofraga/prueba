@@ -636,6 +636,9 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     
     def rango_datos(datos_procesados,datos_disponibles_bd,variable_procesada,df_indices_calidad,io_malos,io_dudosos,io_no_eval):
 
+        fmin                      = 0.9
+        fmax                      = 1.1       
+
         id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'].iloc[0]
         id_dato_bueno             = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Bueno'].iloc[0]
         id_dato_dudoso            = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Dudoso'].iloc[0]
@@ -648,35 +651,35 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         if df_datos_buenos.shape[0] > 0:
             min_bd    = numpy.nanmin(numpy.array(df_datos_buenos[variable_procesada]))
             max_bd    = numpy.nanmax(numpy.array(df_datos_buenos[variable_procesada]))
-            min_val   = 0.9*min(min_bd,min_seleccion)
-            max_val   = 1.1*max(max_bd,max_seleccion)
+            min_val   = fmin*min(min_bd,min_seleccion)
+            max_val   = fmax*max(max_bd,max_seleccion)
         else:
-            min_val    = 0.9*min_seleccion 
-            max_val    = 1.1*min_seleccion 
+            min_val    = fmin*min_seleccion 
+            max_val    = fmax*min_seleccion 
            
         if io_malos:
             df_datos_malos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_malo]
             if df_datos_malos.shape[0] > 0:
                 min_bd         = numpy.nanmin(numpy.array(df_datos_malos[variable_procesada]))
                 max_bd         = numpy.nanmax(numpy.array(df_datos_malos[variable_procesada]))
-                min_val        = 0.9*min(min_val,min_seleccion)
-                max_val        = 1.1*max(max_val,max_seleccion)  
+                min_val        = fmin*min(min_val,min_seleccion)
+                max_val        = fmax*max(max_val,max_seleccion)  
     
         if io_dudosos:
             df_datos_dudosos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_dudoso]
             if df_datos_dudosos.shape[0] > 0:
                 min_bd           = numpy.nanmin(numpy.array(df_datos_dudosos[variable_procesada]))
                 max_bd           = numpy.nanmax(numpy.array(df_datos_dudosos[variable_procesada]))
-                min_val          = 0.9*min(min_val,min_seleccion)
-                max_val          = 1.1*max(max_val,max_seleccion) 
+                min_val          = fmin*min(min_val,min_seleccion)
+                max_val          = fmax*max(max_val,max_seleccion) 
             
         if io_no_eval:
             df_datos_no_eval = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_no_eval]
             if df_datos_no_eval.shape[0] > 0:
                 min_bd           = numpy.nanmin(numpy.array(df_datos_no_eval[variable_procesada]))
                 max_bd           = numpy.nanmax(numpy.array(df_datos_no_eval[variable_procesada]))
-                min_val          = 0.9*min(min_val,min_seleccion)
-                max_val          = 1.1*max(max_val,max_seleccion)
+                min_val          = fmin*min(min_val,min_seleccion)
+                max_val          = fmax*max(max_val,max_seleccion)
 
         return min_val,max_val
     
@@ -761,45 +764,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             
             min_val,max_val = rango_datos(datos_procesados,datos_disponibles_bd,variable_procesada,df_indices_calidad,io_malos,io_dudosos,io_no_eval)
            
-                             
-            # # Selecciona el rango del gráfico
-            # min_seleccion = numpy.nanmin(numpy.array(datos_procesados[variable_procesada]))
-            # max_seleccion = numpy.nanmax(numpy.array(datos_procesados[variable_procesada]))
-            # if df_datos_buenos.shape[0] > 0:
-            #     min_bd    = numpy.nanmin(numpy.array(df_datos_buenos[variable_procesada]))
-            #     max_bd    = numpy.nanmax(numpy.array(df_datos_buenos[variable_procesada]))
-            #     min_val   = 0.9*min(min_bd,min_seleccion)
-            #     max_val   = 1.1*max(max_bd,max_seleccion)
-            # else:
-            #     min_val    = 0.9*min_seleccion 
-            #     max_val    = 1.1*min_seleccion 
-               
- 
-            # if io_malos:
-            #     df_datos_malos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_malo]
-            #     if df_datos_malos.shape[0] > 0:
-            #         min_bd         = numpy.nanmin(numpy.array(df_datos_malos[variable_procesada]))
-            #         max_bd         = numpy.nanmax(numpy.array(df_datos_malos[variable_procesada]))
-            #         min_val        = 0.9*min(min_val,min_seleccion)
-            #         max_val        = 1.1*max(max_val,max_seleccion)  
-
-
-            # if io_dudosos:
-            #     df_datos_dudosos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_dudoso]
-            #     if df_datos_dudosos.shape[0] > 0:
-            #         min_bd           = numpy.nanmin(numpy.array(df_datos_dudosos[variable_procesada]))
-            #         max_bd           = numpy.nanmax(numpy.array(df_datos_dudosos[variable_procesada]))
-            #         min_val          = 0.9*min(min_val,min_seleccion)
-            #         max_val          = 1.1*max(max_val,max_seleccion) 
-                
-            # if io_no_eval:
-            #     df_datos_no_eval = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_no_eval]
-            #     if df_datos_no_eval.shape[0] > 0:
-            #         min_bd           = numpy.nanmin(numpy.array(df_datos_no_eval[variable_procesada]))
-            #         max_bd           = numpy.nanmax(numpy.array(df_datos_no_eval[variable_procesada]))
-            #         min_val          = 0.9*min(min_val,min_seleccion)
-            #         max_val          = 1.1*max(max_val,max_seleccion)
-  
+                               
             rango   = (max_val-min_val)
             min_val = max(0,round(min_val - 0.025*rango,2))
             max_val = round(max_val + 0.025*rango,2)
@@ -914,32 +879,21 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
  
         # ### GRAFICOS ESPECIFICOS PARA LAS POSIBLES VARIABLES        
         if variable_procesada == 'fosfato':
-            
-            # datos_disponibles_fosfato = datos_disponibles_bd[datos_disponibles_bd['fosfato'].notna()]
-            # datos_disponibles_fosfato = datos_disponibles_fosfato[datos_disponibles_fosfato['nitrato'].notna()]
-            
-            # st.dataframe(datos_disponibles_fosfato)
-            
+                        
             with st.expander("Ajustar rango del gráfico FOSFATO vs NITRATO",expanded=False):            
                 
                 st.write("Selecciona el rango del gráfico")  
                 
                 min_val_x,max_val_x = rango_datos(datos_procesados,datos_disponibles_bd,'nitrato',df_indices_calidad,io_malos,io_dudosos,io_no_eval)
                
-              
-                # # Selecciona los rangos del gráfico
-                # min_val_x = 0.95*min(datos_disponibles_fosfato['nitrato'].min(),datos_procesados['nitrato'].min())
-                # max_val_x = 1.05*max(datos_disponibles_fosfato['nitrato'].max(),datos_procesados['nitrato'].max())
-                   
+             
                 col1, col2, col3, col4 = st.columns(4,gap="small")
                 with col2:
                     vmin_rango_x  = st.number_input('Valor mínimo eje x:',value=min_val_x,key='vmin_x_graf_fosf')
                 with col3:
                     vmax_rango_x  = st.number_input('Valor máximo eje x:',value=max_val_x,key='vmax_x_graf_fosf')  
  
-                # min_val_y = 0.95*min(datos_disponibles_fosfato['fosfato'].min(),datos_procesados['fosfato'].min())
-                # max_val_y = 1.05*max(datos_disponibles_fosfato['fosfato'].max(),datos_procesados['fosfato'].max())
-                   
+
                 min_val_y,max_val_y = rango_datos(datos_procesados,datos_disponibles_bd,'fosfato',df_indices_calidad,io_malos,io_dudosos,io_no_eval)
                
                 
