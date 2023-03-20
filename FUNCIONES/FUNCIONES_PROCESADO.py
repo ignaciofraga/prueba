@@ -733,6 +733,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 min_val = min(min_val,df_datos_no_eval[variable_procesada].min())  
                 st.dataframe(df_datos_no_eval)
                 
+            st.text(max_val)
+            st.text(min_val)
             rango   = (max_val-min_val)
             min_val = max(0,round(min_val - 0.025*rango,2))
             max_val = round(max_val + 0.025*rango,2)
