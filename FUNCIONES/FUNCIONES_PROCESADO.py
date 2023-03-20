@@ -906,7 +906,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             
     
             ### GRAFICO FOSFATO vs NITRATO 
-            fig, ax = plt.subplots(figsize=(20/2.54, 18/2.54))       
+            fig, ax = plt.subplots(figsize=(18/2.54, 16/2.54))       
             
             if io_buenos:
                 ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
@@ -943,8 +943,6 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 else:
                     nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
                 ax.annotate(nombre_muestreos[ipunto], (datos_procesados['nitrato'].iloc[ipunto], datos_procesados['fosfato'].iloc[ipunto]))
-           
-            fig.tight_layout()
         
             buf = BytesIO()
             fig.savefig(buf, format="png")
@@ -1083,8 +1081,6 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 else:
                     nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
                 az.annotate(nombre_muestreos[ipunto], (datos_procesados['nitrato'].iloc[ipunto], datos_procesados['ph'].iloc[ipunto]))
-     
-            fig.tight_layout()
 
             buf = BytesIO()
             fig.savefig(buf, format="png")
@@ -1162,9 +1158,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 else:
                     nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
                 plt.annotate(nombre_muestreos[ipunto], (datos_procesados['silicato'].iloc[ipunto], datos_procesados['alcalinidad'].iloc[ipunto]))
-           
-            plt.tight_layout() 
-           
+                      
             buf = BytesIO()
             fig.savefig(buf, format="png")
             st.image(buf) 
