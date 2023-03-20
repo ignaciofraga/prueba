@@ -2271,6 +2271,7 @@ def procesado_nutrientes():
            
         st.text('datos')
         st.text(datos_procesados.shape[0])
+        st.dataframe(datos_procesados)
         
         FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset,tabla_insercion)
 
