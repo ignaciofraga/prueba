@@ -1163,7 +1163,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                     nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
                 plt.annotate(nombre_muestreos[ipunto], (datos_procesados['silicato'].iloc[ipunto], datos_procesados['alcalinidad'].iloc[ipunto]))
            
-            fig.tight_layout() 
+            plt.tight_layout() 
            
             buf = BytesIO()
             fig.savefig(buf, format="png")
