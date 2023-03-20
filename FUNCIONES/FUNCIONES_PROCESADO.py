@@ -1134,6 +1134,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
 
             #fig, ax = plt.lots()       
             fig = plt.figure(figsize=(20/2.54, 18/2.54))
+            ax = fig.add_subplot(111)
             
             if io_buenos:
                 plt.plot(df_datos_buenos['silicato'],df_datos_buenos['alcalinidad'],'.',color=color_buenos,label='BUENO')
@@ -1153,15 +1154,14 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             
             plt.plot(datos_procesados['silicato'],datos_procesados['alcalinidad'],'.r' )
             
-            
-            plt.xlabel='Silicato (\u03BCmol/kg)'
-            plt.ylabel='Alcalinidad (\u03BCmol/kg)'
-            
-            plt.tick_params(axis='both', which='major', labelsize=8)
-            plt.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
-            plt.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
-            plt.xlim([vmin_rango_x, vmax_rango_x])
-            plt.ylim([vmin_rango_y, vmax_rango_y])
+            ax.set(xlabel='Silicato (\u03BCmol/kg)')
+            ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')           
+             
+            ax.tick_params(axis='both', which='major', labelsize=8)
+            ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+            ax.set_xlim([vmin_rango_x, vmax_rango_x])
+            ax.set_ylim([vmin_rango_y, vmax_rango_y])
     
             # Añade el nombre de cada punto
             nombre_muestreos = [None]*datos_procesados.shape[0]
