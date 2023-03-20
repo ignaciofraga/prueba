@@ -861,6 +861,10 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             with st.expander("Ajustar rango del gráfico FOSFATO vs NITRATO",expanded=False):            
                 
                 st.write("Selecciona el rango del gráfico")  
+                
+                st.dataframe(datos_disponibles_bd)
+                
+                st.dataframe(datos_procesados)
               
                 # Selecciona los rangos del gráfico
                 min_val_x = 0.95*min(datos_disponibles_bd['nitrato'].min(),datos_procesados['nitrato'].min())
