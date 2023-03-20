@@ -743,28 +743,6 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                     min_val          = 0.9*min(min_val,min_seleccion)
                     max_val          = 1.1*max(max_val,max_seleccion)
   
-    
-            
-            
-            
-            
-    
-            # if io_malos:
-            #     df_datos_malos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_malo]
-            #     min_val = min(min_val,df_datos_malos[variable_procesada].min())
- 
-            
-            # if io_dudosos:
-            #     df_datos_dudosos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_dudoso]
-            #     min_val = min(min_val,df_datos_dudosos[variable_procesada].min())
-
-            # if io_no_eval:
-            #     df_datos_no_eval = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_no_eval]
-            #     min_val = min(min_val,df_datos_no_eval[variable_procesada].min())  
-
-                
-            st.text(max_val)
-            st.text(min_val)
             rango   = (max_val-min_val)
             min_val = max(0,round(min_val - 0.025*rango,2))
             max_val = round(max_val + 0.025*rango,2)
