@@ -750,7 +750,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         #cm = 1/2.54  # centimeters in inches
         #plt.figure(figsize=(17/2.54, 15/2.54)
 
-        fig, (ax, az) = plt.subplots(1, 2, figsize=(17/2.54, 16/2.54), gridspec_kw = {'wspace':0.2, 'hspace':0}, width_ratios=[3, 1])
+        fig, (ax, az) = plt.subplots(1, 2, figsize=(20/2.54, 18/2.54), gridspec_kw = {'wspace':0.2, 'hspace':0}, width_ratios=[3, 1])
  
         ### DATOS DISPONIBLES PREVIAMENTE ###
         # Representa los datos disponibles de un color
