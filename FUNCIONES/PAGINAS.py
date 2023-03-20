@@ -1949,6 +1949,7 @@ def entrada_archivos_roseta():
         # Combina la información de muestreos y salidas en un único dataframe 
         df_muestreos          = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
         df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="id_salida")
+        df_muestreos          = df_muestreos.rename(columns={"id_salida": "salida_mar"}) # Deshaz el cambio de nombre
                          
         # compón un dataframe con la información de muestreo y datos biogeoquímicos                                            
         df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
