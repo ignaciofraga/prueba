@@ -650,6 +650,12 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
 
         # Selecciona el rango del gráfico
         st.dataframe(datos_procesados)
+        
+        
+        st.text(datos_procesados[variable_procesada])
+        
+        st.text(numpy.array(datos_procesados[variable_procesada]))
+        
         min_seleccion = numpy.nanmin(numpy.array(datos_procesados[variable_procesada]))
         max_seleccion = numpy.nanmax(numpy.array(datos_procesados[variable_procesada]))
         df_datos_buenos = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_bueno]
