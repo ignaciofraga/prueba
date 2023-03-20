@@ -1047,12 +1047,6 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                     nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
                 ax.annotate(nombre_muestreos[ipunto], (datos_procesados['nitrato'].iloc[ipunto], datos_procesados['fosfato'].iloc[ipunto]))
     
-            st.dataframe(datos_procesados)
-            st.dataframe(df_datos_buenos)
-            if datos_procesados['ph'].isnull().all() is False: 
-                
-                st.text('hols')
-                ### GRAFICO NITRATO vs pH
             
             if io_buenos:
                 az.plot(df_datos_buenos['nitrato'],df_datos_buenos['ph'],'.',color=color_buenos,label='BUENO')
@@ -1069,21 +1063,18 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             if io_dudosos:
                 az.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['ph'],'.',color=color_dudosos,label='DUDOSO')    
                                   
-    
-            az.plot(datos_procesados['nitrato'],datos_procesados['ph'],'.',color='#C0C0C0')
- 
-    
-            # az.set(xlabel='Nitrato (\u03BCmol/kg)')
-            # az.set(ylabel='pH')
-            # az.yaxis.tick_right()
-            # az.yaxis.set_label_position("right") 
+            az.plot(datos_procesados['nitrato'],datos_procesados['ph'],'.',color='.r')
+   
+            az.set(xlabel='Nitrato (\u03BCmol/kg)')
+            az.set(ylabel='pH')
+            az.yaxis.tick_right()
+            az.yaxis.set_label_position("right") 
             
-            # az.tick_params(axis='both', which='major', labelsize=8)
-            # az.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
-            # az.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-            # az.set_xlim([vmin_rango_x_g2, vmax_rango_x_g2])
-            # az.set_ylim([vmin_rango_y_g2, vmax_rango_y_g2])
-        
+            az.tick_params(axis='both', which='major', labelsize=8)
+            az.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+            az.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+            az.set_xlim([vmin_rango_x_g2, vmax_rango_x_g2])
+            az.set_ylim([vmin_rango_y_g2, vmax_rango_y_g2])
         
             # Añade el nombre de cada punto
             nombre_muestreos = [None]*datos_procesados.shape[0]
