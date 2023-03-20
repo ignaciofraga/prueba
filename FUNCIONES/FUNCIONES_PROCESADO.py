@@ -14,6 +14,7 @@ import pandas.io.sql as psql
 from sqlalchemy import create_engine
 import json
 import seawater
+import streamlit
 
 from matplotlib.ticker import FormatStrFormatter
 
@@ -634,8 +635,6 @@ def control_calidad_biogeoquimica(datos_procesados,variables_procesado,variables
     from FUNCIONES.FUNCIONES_AUXILIARES import menu_seleccion   
     from FUNCIONES.FUNCIONES_AUXILIARES import init_connection 
     
-    import st_aggrid 
-
     # Recupera los datos de conexión
     direccion_host   = st.secrets["postgres"].host
     base_datos       = st.secrets["postgres"].dbname

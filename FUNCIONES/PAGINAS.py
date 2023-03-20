@@ -15,7 +15,6 @@ import numpy
 import psycopg2
 from PIL import Image
 from dateutil.relativedelta import relativedelta
-import matplotlib.dates as mdates
 import json
 import time
 #from random import randint
