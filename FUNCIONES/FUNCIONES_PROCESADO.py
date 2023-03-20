@@ -1174,8 +1174,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                     cursor.close()
                     conn.close()   
     
-            texto_exito = 'QF de la ' + nombre_completo_variable_procesada + ' asignadas o modificadas correctamente'
-            st.success(texto_exito)
+                texto_exito = 'QF de la ' + nombre_completo_variable_procesada + ' asignadas o modificadas correctamente'
+                st.success(texto_exito)
    
 
 
