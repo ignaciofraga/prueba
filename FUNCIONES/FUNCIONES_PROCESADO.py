@@ -1055,19 +1055,19 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 ### GRAFICO NITRATO vs pH
             
             if io_buenos:
-                az.plot(df_datos_buenos['nitrato'],df_datos_buenos['pH'],'.',color=color_buenos,label='BUENO')
+                az.plot(df_datos_buenos['nitrato'],df_datos_buenos['ph'],'.',color=color_buenos,label='BUENO')
             
             # Representa los datos dentro del intervalo de meses en otro color
             if io_rango:
-                az.plot(df_rango_temporal['nitrato'],df_rango_temporal['pH'],'.',color=color_rango,label='BUENO (INTERVALO)')
+                az.plot(df_rango_temporal['nitrato'],df_rango_temporal['ph'],'.',color=color_rango,label='BUENO (INTERVALO)')
             
             # Representa los datos con QF malos si se seleccionó esta opción   
             if io_malos:
-                az.plot(df_datos_malos['nitrato'],df_datos_malos['pH'],'.',color=color_malos,label='MALO')    
+                az.plot(df_datos_malos['nitrato'],df_datos_malos['ph'],'.',color=color_malos,label='MALO')    
 
             # Representa los datos con QF dudoso si se seleccionó esta opción   
             if io_dudosos:
-                az.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['pH'],'.',color=color_dudosos,label='DUDOSO')    
+                az.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['ph'],'.',color=color_dudosos,label='DUDOSO')    
                                   
     
             az.plot(datos_procesados['nitrato'],datos_procesados['ph'],'.',color='#C0C0C0')
