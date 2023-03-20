@@ -1678,13 +1678,14 @@ def entrada_archivos_roseta():
     def carga_datos_entrada_archivo_roseta():
         conn                      = init_connection()
         df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+        df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
         df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
         df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
         df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_programas              = psql.read_sql('SELECT * FROM programas', conn)
-        df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
+        df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
         conn.close()
-        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas
+        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad
         
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
@@ -1940,7 +1941,7 @@ def entrada_archivos_roseta():
         variables_unidades     = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
     
         # Toma los datos de la caché    
-        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas = carga_datos_entrada_archivo_roseta()
+        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
 
         # Mantén sólo las salidas de radiales
         id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
@@ -1966,10 +1967,10 @@ def entrada_archivos_roseta():
         indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada = FUNCIONES_AUXILIARES.menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
                                                                                                                                  
         # Selecciona los datos correspondientes al programa, estación, salida y cast seleccionados
-        df_seleccion = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion) & (df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
+        datos_procesados = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion) & (df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
             
-        
-        
+        FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,variables_procesado_bd[0],variables_unidades[0],df_indices_calidad,meses_offset)
+
         
         #FUNCIONES_PROCESADO.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades)
 
