@@ -636,7 +636,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     
     def rango_datos(datos_procesados,datos_disponibles_bd,variable_procesada,df_indices_calidad,io_malos,io_dudosos,io_no_eval):
 
-        if variable_procesada == 'ph':
+        if variable_procesada == 'ph' or variable_procesada == 'alcalinidad':
             fmin                      = 0.995
             fmax                      = 1.005         
         else:
