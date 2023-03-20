@@ -649,7 +649,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         id_dato_no_eval           = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='No evaluado'].iloc[0]
 
         # Selecciona el rango del gráfico
-        st.dataframe(datos_procesados)
+#        st.dataframe(datos_procesados)
         
         
         st.text(datos_procesados[variable_procesada])
