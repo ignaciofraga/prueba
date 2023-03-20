@@ -1039,7 +1039,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             ax.set_ylim([vmin_rango_y_g1, vmax_rango_y_g1])
     
             # Añade el nombre de cada punto
-            datos_procesados = [None]*datos_procesados.shape[0]
+            nombre_muestreos = [None]*datos_procesados.shape[0]
             for ipunto in range(datos_procesados.shape[0]):
                 if datos_procesados['botella'].iloc[ipunto] is None:
                     nombre_muestreos[ipunto] = 'Prof.' + str(datos_procesados['presion_ctd'].iloc[ipunto])
