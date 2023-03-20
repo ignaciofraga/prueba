@@ -1946,8 +1946,6 @@ def entrada_archivos_roseta():
         id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
         df_salidas  = df_salidas[df_salidas['programa']==int(id_radiales)]
         
-        st.text(df_salidas)
-        
         # Combina la información de muestreos y salidas en un único dataframe 
         df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
         df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
@@ -1960,7 +1958,7 @@ def entrada_archivos_roseta():
         df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
         
         # Borra los dataframes que ya no hagan falta para ahorrar memoria
-        del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos,df_salidas)
+        del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos)
         
         # procesa ese dataframe
         io_control_calidad = 1
