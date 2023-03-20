@@ -1063,7 +1063,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             if io_dudosos:
                 az.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['ph'],'.',color=color_dudosos,label='DUDOSO')    
                                   
-            az.plot(datos_procesados['nitrato'],datos_procesados['ph'],'.',color='.r')
+            az.plot(datos_procesados['nitrato'],datos_procesados['ph'],color='.r')
    
             az.set(xlabel='Nitrato (\u03BCmol/kg)')
             az.set(ylabel='pH')
