@@ -636,8 +636,12 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     
     def rango_datos(datos_procesados,datos_disponibles_bd,variable_procesada,df_indices_calidad,io_malos,io_dudosos,io_no_eval):
 
-        fmin                      = 0.95
-        fmax                      = 1.05       
+        if variable_procesada == 'ph':
+            fmin                      = 0.995
+            fmax                      = 1.005         
+        else:
+            fmin                      = 0.95
+            fmax                      = 1.05       
 
         id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'].iloc[0]
         id_dato_bueno             = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Bueno'].iloc[0]
