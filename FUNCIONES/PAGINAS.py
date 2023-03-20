@@ -2230,7 +2230,7 @@ def procesado_nutrientes():
     
         # Define las variables a utilizar
 
-        variable_tabla         = ['datos_discretos_biogeoquimica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica']
+        variable_tabla         = ['datos_discretos_biogeoquimica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica']
         
         # Toma los datos de la caché    
         df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns = carga_datos_procesado_nutrientes()
