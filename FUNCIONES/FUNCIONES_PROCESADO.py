@@ -1130,6 +1130,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 with col3:
                     vmax_rango_y  = st.number_input('Valor máximo alcalinidad:',value=max_val_y,key='vmax_alc')   
 
+
+
             #fig, ax = plt.lots()       
             fig = plt.figure(figsize=(20/2.54, 18/2.54))
             
