@@ -2272,9 +2272,15 @@ def procesado_nutrientes():
         st.text('datos')
         st.text(datos_procesados.shape[0])
         st.dataframe(datos_procesados)
-        
-        FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset,tabla_insercion)
+  
+        if not datos_procesados[variable_seleccionada].isnull().all():         
+  
+            FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset,tabla_insercion)
 
+        else:
+            
+            texto_error = "La base de datos no contiene información para la variable, salida y estación seleccionadas"
+            st.warning(texto_error, icon="⚠️")
 
         
         
