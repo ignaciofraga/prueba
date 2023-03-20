@@ -132,7 +132,17 @@ def estado_procesos(altura_tabla):
 #################################################################################
 ######## FUNCION PARA DESPLEGAR MENUS DE SELECCION DE SALIDA Y VARIABLE  ########
 #################################################################################
-def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas):
+def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,io_control_calidad):
+
+    import streamlit as st
+    from FUNCIONES.FUNCIONES_AUXILIARES import init_connection 
+
+    # Recupera los datos disponibles en la base de datos
+    conn                      = init_connection()
+    df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
+    df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+    conn.close()    
     
     # Despliega menús de selección de la variable, salida y la estación a controlar                
     col1, col2 = st.columns(2,gap="small")
@@ -174,8 +184,6 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
         indice_estacion              = df_estaciones_disponibles['id_estacion'][df_estaciones_disponibles['nombre_estacion']==estacion_seleccionada].iloc[0]
         
         df_prog_anho_sal_est_sel     = df_prog_anho_sal_sel[df_prog_anho_sal_sel['estacion']==indice_estacion]
-    
-    del(df_salidas,df_estaciones,df_programas)
     
     # Un poco diferente según se utilice el menú para control de calidad (con rango de meses) o no (sin él)
     if io_control_calidad == 1:

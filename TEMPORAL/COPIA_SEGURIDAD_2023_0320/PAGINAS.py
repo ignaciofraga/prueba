@@ -1673,20 +1673,6 @@ def entrada_condiciones_ambientales():
 
 def entrada_archivos_roseta():
     
-    # Función para cargar en caché los datos a utilizar
-    @st.cache_data
-    def carga_datos_entrada_archivo_roseta():
-        conn                      = init_connection()
-        df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-        df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-        df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
-        df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        df_programas              = psql.read_sql('SELECT * FROM programas', conn)
-        df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
-        conn.close()
-        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas
-        
-    
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host   = st.secrets["postgres"].host
     base_datos       = st.secrets["postgres"].dbname
@@ -1699,19 +1685,17 @@ def entrada_archivos_roseta():
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
     
 
-
     # Añade datos de botellas
     if tipo_accion == acciones[0]: 
         
         st.subheader('Entrada de datos procedentes de botellas y perfiles') 
     
         # Recupera tablas con informacion utilizada en el procesado
-        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas = carga_datos_entrada_archivo_roseta()
-        # conn                = init_connection()
-        # df_salidas          = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        # df_programas        = psql.read_sql('SELECT * FROM programas', conn)
-        # df_estaciones       = psql.read_sql('SELECT * FROM estaciones', conn)
-        # conn.close()    
+        conn                = init_connection()
+        df_salidas          = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_programas        = psql.read_sql('SELECT * FROM programas', conn)
+        df_estaciones       = psql.read_sql('SELECT * FROM estaciones', conn)
+        conn.close()    
         
         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
 
@@ -1931,6 +1915,18 @@ def entrada_archivos_roseta():
     # Control de calidad 
     if tipo_accion == acciones[1]: 
     
+        @st.cache_data
+        def test_call():   
+            # Recupera las tablas a utilizar como dataframes
+            conn                      = init_connection()
+            df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+            df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+            df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+            df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+            df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+            conn.close()
+            
+            return df_muestreos,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas
         
         st.subheader('Control de calidad de datos procedentes de botellas')    
     
@@ -1939,11 +1935,22 @@ def entrada_archivos_roseta():
         variables_procesado_bd = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
         variables_unidades     = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
     
-        # Toma los datos de la caché    
-        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas = carga_datos_entrada_archivo_roseta()
+    
+        # # Recupera las tablas a utilizar como dataframes
+        # conn                      = init_connection()
+        # df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+        # df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+        # df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+        # df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        # df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+        # conn.close()
+        
+        df_muestreos,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas = test_call()
+     
+        id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+        
 
         # Mantén sólo las salidas de radiales
-        id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
         df_salidas  = df_salidas[df_salidas['programa']==int(id_radiales)]
         
         # Combina la información de muestreos y salidas en un único dataframe 
@@ -1961,11 +1968,7 @@ def entrada_archivos_roseta():
         del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos,df_salidas)
         
         # procesa ese dataframe
-        io_control_calidad = 1
-        df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = FUNCIONES_AUXILIARES.menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
-        
-        
-        #FUNCIONES_PROCESADO.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades)
+        FUNCIONES_PROCESADO.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades)
 
 
 
