@@ -636,8 +636,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     
     def rango_datos(datos_procesados,datos_disponibles_bd,variable_procesada,df_indices_calidad,io_malos,io_dudosos,io_no_eval):
 
-        fmin                      = 0.9
-        fmax                      = 1.1       
+        fmin                      = 0.95
+        fmax                      = 1.05       
 
         id_dato_malo              = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Malo'].iloc[0]
         id_dato_bueno             = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Bueno'].iloc[0]
@@ -998,16 +998,13 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                         vmax_rango_x_g2  = st.number_input('Valor máximo nitrato:',value=max_val_x_g2,key='vmax_nit_2')  
      
                     min_val_y_g2,max_val_y_g2 = rango_datos(datos_procesados,datos_disponibles_bd,'ph',df_indices_calidad,io_malos,io_dudosos,io_no_eval)
-                    st.text(min_val_y_g2)
-                    st.text(max_val_y_g2)
+
 
                     col1, col2, col3, col4 = st.columns(4,gap="small")
                     with col2:
                         vmin_rango_y_g2  = st.number_input('Valor mínimo pH:',value=min_val_y_g2,key='vmin_ph')
                     with col3:
                         vmax_rango_y_g2  = st.number_input('Valor máximo pH:',value=max_val_y_g2,key='vmax_ph') 
-
-
 
                 fig, (ax, az) = plt.subplots(1, 2, figsize=(20/2.54, 18/2.54), gridspec_kw = {'wspace':0.2, 'hspace':0}, width_ratios=[1, 1])
  
