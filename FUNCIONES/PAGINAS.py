@@ -1945,7 +1945,7 @@ def entrada_archivos_roseta():
         # df_programas              = psql.read_sql('SELECT * FROM programas', conn)
         # conn.close()
         
-        df_muestreos,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas = test_call
+        df_muestreos,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas = test_call()
      
         id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
         
