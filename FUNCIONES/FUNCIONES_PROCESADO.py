@@ -1154,14 +1154,14 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             plt.plot(datos_procesados['silicato'],datos_procesados['alcalinidad'],'.r' )
             
             
-            plt.set(xlabel='Silicato (\u03BCmol/kg)')
-            plt.set(ylabel='Alcalinidad (\u03BCmol/kg)')
+            plt.xlabel='Silicato (\u03BCmol/kg)'
+            plt.ylabel='Alcalinidad (\u03BCmol/kg)'
             
             plt.tick_params(axis='both', which='major', labelsize=8)
             plt.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
             plt.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
-            plt.set_xlim([vmin_rango_x, vmax_rango_x])
-            plt.set_ylim([vmin_rango_y, vmax_rango_y])
+            plt.xlim([vmin_rango_x, vmax_rango_x])
+            plt.ylim([vmin_rango_y, vmax_rango_y])
     
             # Añade el nombre de cada punto
             nombre_muestreos = [None]*datos_procesados.shape[0]
