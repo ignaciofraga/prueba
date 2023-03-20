@@ -1915,6 +1915,19 @@ def entrada_archivos_roseta():
     # Control de calidad 
     if tipo_accion == acciones[1]: 
     
+        @st.cache_data
+        def test_call():   
+            # Recupera las tablas a utilizar como dataframes
+            conn                      = init_connection()
+            df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+            df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+            df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+            df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+            df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+            conn.close()
+            
+            return df_muestreos,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas
+        
         st.subheader('Control de calidad de datos procedentes de botellas')    
     
         # Define las variables a utilizar
@@ -1923,14 +1936,16 @@ def entrada_archivos_roseta():
         variables_unidades     = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
     
     
-        # Recupera las tablas a utilizar como dataframes
-        conn                      = init_connection()
-        df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-        df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-        df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
-        df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        df_programas              = psql.read_sql('SELECT * FROM programas', conn)
-        conn.close()
+        # # Recupera las tablas a utilizar como dataframes
+        # conn                      = init_connection()
+        # df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+        # df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+        # df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+        # df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        # df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+        # conn.close()
+        
+        df_muestreos,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas = test_call
      
         id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
         
