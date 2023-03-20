@@ -205,14 +205,14 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
     else:
         meses_offset = 0
     
-    # Selecciona los datos correspondientes a la estación y salida seleccionada
-    df_seleccion               = datos_procesados[(datos_procesados["programa"] == indice_programa) & (datos_procesados["año"] == anho_seleccionado) & (datos_procesados["estacion"] == indice_estacion) & (datos_procesados["salida_mar"] == indice_salida) & (datos_procesados["num_cast"] == cast_seleccionado)]
-    
-    return df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset
+
+    return indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada
+    #return indice_programa,anho_seleccionado,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset
 
 
 
-
+    ## Selecciona los datos correspondientes a la estación y salida seleccionada
+    #indice_programa,anho_seleccionado,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada
 
 
 
