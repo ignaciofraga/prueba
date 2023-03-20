@@ -1134,32 +1134,32 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             fig = plt.figure(figsize=(20/2.54, 18/2.54))
             
             if io_buenos:
-                fig.plot(df_datos_buenos['silicato'],df_datos_buenos['alcalinidad'],'.',color=color_buenos,label='BUENO')
+                plt.plot(df_datos_buenos['silicato'],df_datos_buenos['alcalinidad'],'.',color=color_buenos,label='BUENO')
             
             # Representa los datos dentro del intervalo de meses en otro color
             if io_rango:
-                fig.plot(df_rango_temporal['silicato'],df_rango_temporal['alcalinidad'],'.',color=color_rango,label='BUENO (INTERVALO)')
+                plt.plot(df_rango_temporal['silicato'],df_rango_temporal['alcalinidad'],'.',color=color_rango,label='BUENO (INTERVALO)')
             
             # Representa los datos con QF malos si se seleccionó esta opción   
             if io_malos:
-                fig.plot(df_datos_malos['silicato'],df_datos_malos['alcalinidad'],'.',color=color_malos,label='MALO')    
+                plt.plot(df_datos_malos['silicato'],df_datos_malos['alcalinidad'],'.',color=color_malos,label='MALO')    
 
             # Representa los datos con QF dudoso si se seleccionó esta opción   
             if io_dudosos:
-                fig.plot(df_datos_dudosos['silicato'],df_datos_dudosos['alcalinidad'],'.',color=color_dudosos,label='DUDOSO')    
+                plt.plot(df_datos_dudosos['silicato'],df_datos_dudosos['alcalinidad'],'.',color=color_dudosos,label='DUDOSO')    
                             
             
-            fig.plot(datos_procesados['silicato'],datos_procesados['alcalinidad'],'.r' )
+            plt.plot(datos_procesados['silicato'],datos_procesados['alcalinidad'],'.r' )
             
             
-            fig.set(xlabel='Silicato (\u03BCmol/kg)')
-            fig.set(ylabel='Alcalinidad (\u03BCmol/kg)')
+            plt.set(xlabel='Silicato (\u03BCmol/kg)')
+            plt.set(ylabel='Alcalinidad (\u03BCmol/kg)')
             
-            fig.tick_params(axis='both', which='major', labelsize=8)
-            fig.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
-            fig.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
-            fig.set_xlim([vmin_rango_x, vmax_rango_x])
-            fig.set_ylim([vmin_rango_y, vmax_rango_y])
+            plt.tick_params(axis='both', which='major', labelsize=8)
+            plt.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+            plt.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+            plt.set_xlim([vmin_rango_x, vmax_rango_x])
+            plt.set_ylim([vmin_rango_y, vmax_rango_y])
     
             # Añade el nombre de cada punto
             nombre_muestreos = [None]*datos_procesados.shape[0]
@@ -1168,7 +1168,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                     nombre_muestreos[ipunto] = 'Prof.' + str(datos_procesados['presion_ctd'].iloc[ipunto])
                 else:
                     nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
-                fig.annotate(nombre_muestreos[ipunto], (datos_procesados['silicato'].iloc[ipunto], datos_procesados['alcalinidad'].iloc[ipunto]))
+                plt.annotate(nombre_muestreos[ipunto], (datos_procesados['silicato'].iloc[ipunto], datos_procesados['alcalinidad'].iloc[ipunto]))
            
             # buf = BytesIO()
             # fig.savefig(buf, format="png")
