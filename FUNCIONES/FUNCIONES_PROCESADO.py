@@ -858,17 +858,16 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         # ### GRAFICOS ESPECIFICOS PARA LAS POSIBLES VARIABLES        
         if variable_procesada == 'fosfato':
             
+            datos_disponibles_fosfato = datos_disponibles_bd[datos_disponibles_bd['fosfato'].notna()]
+            datos_disponibles_fosfato = datos_disponibles_fosfato[datos_disponibles_fosfato['nitrato'].notna()]
+            
             with st.expander("Ajustar rango del gráfico FOSFATO vs NITRATO",expanded=False):            
                 
                 st.write("Selecciona el rango del gráfico")  
-                
-                st.dataframe(datos_disponibles_bd)
-                
-                st.dataframe(datos_procesados)
               
                 # Selecciona los rangos del gráfico
-                min_val_x = 0.95*min(datos_disponibles_bd['nitrato'].min(),datos_procesados['nitrato'].min())
-                max_val_x = 1.05*max(datos_disponibles_bd['nitrato'].max(),datos_procesados['nitrato'].max())
+                min_val_x = 0.95*min(datos_disponibles_fosfato['nitrato'].min(),datos_procesados['nitrato'].min())
+                max_val_x = 1.05*max(datos_disponibles_fosfato['nitrato'].max(),datos_procesados['nitrato'].max())
                    
                 col1, col2, col3, col4 = st.columns(4,gap="small")
                 with col2:
@@ -876,8 +875,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 with col3:
                     vmax_rango_x  = st.number_input('Valor máximo eje x:',value=max_val_x,key='vmax_x_graf_fosf')  
  
-                min_val_y = 0.95*min(datos_disponibles_bd['fosfato'].min(),datos_procesados['fosfato'].min())
-                max_val_y = 1.05*max(datos_disponibles_bd['fosfato'].max(),datos_procesados['fosfato'].max())
+                min_val_y = 0.95*min(datos_disponibles_fosfato['fosfato'].min(),datos_procesados['fosfato'].min())
+                max_val_y = 1.05*max(datos_disponibles_fosfato['fosfato'].max(),datos_procesados['fosfato'].max())
                    
                 col1, col2, col3, col4 = st.columns(4,gap="small")
                 with col2:
