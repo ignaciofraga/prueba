@@ -1130,7 +1130,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 with col3:
                     vmax_rango_y  = st.number_input('Valor máximo alcalinidad:',value=max_val_y,key='vmax_alc')   
 
-            fig, ax = plt.subplots()       
+            #fig, ax = plt.lots()       
+            fig, ax = plt.figure(figsize=(20/2.54, 18/2.54))
             
             if io_buenos:
                 ax.plot(df_datos_buenos['silicato'],df_datos_buenos['alcalinidad'],'.',color=color_buenos,label='BUENO')
