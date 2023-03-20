@@ -647,19 +647,9 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         id_dato_bueno             = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Bueno'].iloc[0]
         id_dato_dudoso            = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='Dudoso'].iloc[0]
         id_dato_no_eval           = df_indices_calidad['indice'][df_indices_calidad['descripcion']=='No evaluado'].iloc[0]
-
-        # Selecciona el rango del gráfico
-#        st.dataframe(datos_procesados)
-        
-        
-        st.text(datos_procesados[variable_procesada])
-        
-        st.text(numpy.array(datos_procesados[variable_procesada]))
         
         min_seleccion = min(value for value in datos_procesados[variable_procesada] if value is not None)
         max_seleccion = max(value for value in datos_procesados[variable_procesada] if value is not None)
-        
-        
         # min_seleccion = numpy.nanmin(numpy.array(datos_procesados[variable_procesada]))
         # max_seleccion = numpy.nanmax(numpy.array(datos_procesados[variable_procesada]))
         df_datos_buenos = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_bueno]
