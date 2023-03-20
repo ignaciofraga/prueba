@@ -1053,46 +1053,46 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 st.text('hols')
                 ### GRAFICO NITRATO vs pH
             
-                if io_buenos:
-                    az.plot(df_datos_buenos['nitrato'],df_datos_buenos['pH'],'.',color=color_buenos,label='BUENO')
-                
-                # Representa los datos dentro del intervalo de meses en otro color
-                if io_rango:
-                    az.plot(df_rango_temporal['nitrato'],df_rango_temporal['pH'],'.',color=color_rango,label='BUENO (INTERVALO)')
-                
-                # Representa los datos con QF malos si se seleccionó esta opción   
-                if io_malos:
-                    az.plot(df_datos_malos['nitrato'],df_datos_malos['pH'],'.',color=color_malos,label='MALO')    
+            if io_buenos:
+                az.plot(df_datos_buenos['nitrato'],df_datos_buenos['pH'],'.',color=color_buenos,label='BUENO')
+            
+            # Representa los datos dentro del intervalo de meses en otro color
+            if io_rango:
+                az.plot(df_rango_temporal['nitrato'],df_rango_temporal['pH'],'.',color=color_rango,label='BUENO (INTERVALO)')
+            
+            # Representa los datos con QF malos si se seleccionó esta opción   
+            if io_malos:
+                az.plot(df_datos_malos['nitrato'],df_datos_malos['pH'],'.',color=color_malos,label='MALO')    
+
+            # Representa los datos con QF dudoso si se seleccionó esta opción   
+            if io_dudosos:
+                az.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['pH'],'.',color=color_dudosos,label='DUDOSO')    
+                                  
     
-                # Representa los datos con QF dudoso si se seleccionó esta opción   
-                if io_dudosos:
-                    az.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['pH'],'.',color=color_dudosos,label='DUDOSO')    
-                                      
+            az.plot(datos_procesados['nitrato'],datos_procesados['ph'],'.',color='#C0C0C0')
+ 
+    
+            # az.set(xlabel='Nitrato (\u03BCmol/kg)')
+            # az.set(ylabel='pH')
+            # az.yaxis.tick_right()
+            # az.yaxis.set_label_position("right") 
+            
+            # az.tick_params(axis='both', which='major', labelsize=8)
+            # az.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+            # az.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+            # az.set_xlim([vmin_rango_x_g2, vmax_rango_x_g2])
+            # az.set_ylim([vmin_rango_y_g2, vmax_rango_y_g2])
         
-                az.plot(datos_procesados['nitrato'],datos_procesados['ph'],'.',color='#C0C0C0')
+        
+            # Añade el nombre de cada punto
+            nombre_muestreos = [None]*datos_procesados.shape[0]
+            for ipunto in range(datos_procesados.shape[0]):
+                if datos_procesados['botella'].iloc[ipunto] is None:
+                    nombre_muestreos[ipunto] = 'Prof.' + str(datos_procesados['presion_ctd'].iloc[ipunto])
+                else:
+                    nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
+                az.annotate(nombre_muestreos[ipunto], (datos_procesados['nitrato'].iloc[ipunto], datos_procesados['ph'].iloc[ipunto]))
      
-        
-                # az.set(xlabel='Nitrato (\u03BCmol/kg)')
-                # az.set(ylabel='pH')
-                # az.yaxis.tick_right()
-                # az.yaxis.set_label_position("right") 
-                
-                # az.tick_params(axis='both', which='major', labelsize=8)
-                # az.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
-                # az.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
-                # az.set_xlim([vmin_rango_x_g2, vmax_rango_x_g2])
-                # az.set_ylim([vmin_rango_y_g2, vmax_rango_y_g2])
-            
-            
-                # Añade el nombre de cada punto
-                nombre_muestreos = [None]*datos_procesados.shape[0]
-                for ipunto in range(datos_procesados.shape[0]):
-                    if datos_procesados['botella'].iloc[ipunto] is None:
-                        nombre_muestreos[ipunto] = 'Prof.' + str(datos_procesados['presion_ctd'].iloc[ipunto])
-                    else:
-                        nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
-                    az.annotate(nombre_muestreos[ipunto], (datos_procesados['nitrato'].iloc[ipunto], datos_procesados['ph'].iloc[ipunto]))
-         
     
 #            st.pyplot(fig)
  
