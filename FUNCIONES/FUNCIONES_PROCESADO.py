@@ -1048,6 +1048,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 ax.annotate(nombre_muestreos[ipunto], (datos_procesados['nitrato'].iloc[ipunto], datos_procesados['fosfato'].iloc[ipunto]))
     
             st.dataframe(datos_procesados)
+            st.dataframe(df_datos_buenos)
             if datos_procesados['ph'].isnull().all() is False: 
                 
                 st.text('hols')
