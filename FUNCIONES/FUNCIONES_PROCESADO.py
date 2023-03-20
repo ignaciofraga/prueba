@@ -720,25 +720,28 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
  
             if io_malos:
                 df_datos_malos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_malo]
-                min_bd         = numpy.nanmin(numpy.array(df_datos_malos[variable_procesada]))
-                max_bd         = numpy.nanmax(numpy.array(df_datos_malos[variable_procesada]))
-                min_val        = 0.9*min(min_val,min_seleccion)
-                max_val        = 1.1*max(max_val,max_seleccion)  
+                if df_datos_malos.shape[0] > 0:
+                    min_bd         = numpy.nanmin(numpy.array(df_datos_malos[variable_procesada]))
+                    max_bd         = numpy.nanmax(numpy.array(df_datos_malos[variable_procesada]))
+                    min_val        = 0.9*min(min_val,min_seleccion)
+                    max_val        = 1.1*max(max_val,max_seleccion)  
 
 
             if io_dudosos:
                 df_datos_dudosos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_dudoso]
-                min_bd           = numpy.nanmin(numpy.array(df_datos_dudosos[variable_procesada]))
-                max_bd           = numpy.nanmax(numpy.array(df_datos_dudosos[variable_procesada]))
-                min_val          = 0.9*min(min_val,min_seleccion)
-                max_val          = 1.1*max(max_val,max_seleccion) 
+                if df_datos_dudosos.shape[0] > 0:
+                    min_bd           = numpy.nanmin(numpy.array(df_datos_dudosos[variable_procesada]))
+                    max_bd           = numpy.nanmax(numpy.array(df_datos_dudosos[variable_procesada]))
+                    min_val          = 0.9*min(min_val,min_seleccion)
+                    max_val          = 1.1*max(max_val,max_seleccion) 
                 
             if io_no_eval:
                 df_datos_no_eval = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_no_eval]
-                min_bd           = numpy.nanmin(numpy.array(df_datos_no_eval[variable_procesada]))
-                max_bd           = numpy.nanmax(numpy.array(df_datos_no_eval[variable_procesada]))
-                min_val          = 0.9*min(min_val,min_seleccion)
-                max_val          = 1.1*max(max_val,max_seleccion)
+                if df_datos_no_eval.shape[0] > 0:
+                    min_bd           = numpy.nanmin(numpy.array(df_datos_no_eval[variable_procesada]))
+                    max_bd           = numpy.nanmax(numpy.array(df_datos_no_eval[variable_procesada]))
+                    min_val          = 0.9*min(min_val,min_seleccion)
+                    max_val          = 1.1*max(max_val,max_seleccion)
   
     
             
