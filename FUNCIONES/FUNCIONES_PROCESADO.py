@@ -1159,39 +1159,29 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 contrasena       = st.secrets["postgres"].password
                 puerto           = st.secrets["postgres"].port    
             
-                inserta_datos(datos_procesados,tabla_insercion,direccion_host,base_datos,usuario,contrasena,puerto)
+                # inserta_datos(datos_procesados,tabla_insercion,direccion_host,base_datos,usuario,contrasena,puerto)
                 
-                texto_exito = 'Datos de la salida ' + salida_seleccionada + ' añadidos o modificados correctamente'
-                st.success(texto_exito)
+                # texto_exito = 'Datos de la salida ' + salida_seleccionada + ' añadidos o modificados correctamente'
+                # st.success(texto_exito)
         
             
-        #     with st.spinner('Actualizando la base de datos'):
+                with st.spinner('Actualizando la base de datos'):
+               
+                    # Introducir los valores en la base de datos
+                    conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                    cursor = conn.cursor()  
+                    instruccion_sql = "UPDATE " + tabla_insercion + " SET " + qf_variable_procesada +  ' = %s WHERE muestreo = %s;'
            
-        #         # Introducir los valores en la base de datos
-        #         conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        #         cursor = conn.cursor()  
-       
-        #         for idato in range(df_seleccion.shape[0]):
+                    for idato in range(datos_procesados.shape[0]):
+        
+                        cursor.execute(instruccion_sql, (int(datos_procesados[qf_variable_procesada].iloc[idato]),int(datos_procesados['muestreo'].iloc[idato])))
+                        conn.commit() 
+        
+                    cursor.close()
+                    conn.close()   
     
-        #             if variable_seleccionada in listado_variables_fisicas:
-        #                 instruccion_sql = "UPDATE datos_discretos_fisica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
-        #                 cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['muestreo'].iloc[idato])))
-                
-        #             if variable_seleccionada in listado_variables_biogeoquimica: 
-        #                 if variable_seleccionada in listado_nutrientes:
-        #                     instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, cc_nutrientes = %s WHERE muestreo = %s;'
-        #                     cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(1),int(df_seleccion['muestreo'].iloc[idato])))
-                                    
-        #                 else:
-        #                     instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
-        #                     cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(qf_asignado[idato]),int(df_seleccion['muestreo'].iloc[idato])))
-                                 
-        #             conn.commit() 
-    
-        #         cursor.close()
-        #         conn.close()   
-    
-
+            texto_exito = 'Datos de la salida ' + salida_seleccionada + ' añadidos o modificados correctamente'
+            st.success(texto_exito)
    
 
 

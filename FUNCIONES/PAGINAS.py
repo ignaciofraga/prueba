@@ -1940,6 +1940,7 @@ def entrada_archivos_roseta():
         variables_procesado_bd = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
         variables_unidades     = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
         variable_tabla         = ['discreto_fisica','discreto_fisica','discreto_fisica','discreto_bgq','discreto_bgq']
+        variable_tabla         = ['datos_discretos_fisica','datos_discretos_fisica','datos_discretos_fisica','datos_discretos_bgq','datos_discretos_bgq']
     
         # Toma los datos de la caché    
         df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
