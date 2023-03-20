@@ -1070,14 +1070,14 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 az.plot(datos_procesados['nitrato'],datos_procesados['ph'],'.',color='#C0C0C0')
      
         
-                az.set(xlabel='Nitrato (\u03BCmol/kg)')
-                az.set(ylabel='pH')
-                az.yaxis.tick_right()
-                az.yaxis.set_label_position("right") 
+                # az.set(xlabel='Nitrato (\u03BCmol/kg)')
+                # az.set(ylabel='pH')
+                # az.yaxis.tick_right()
+                # az.yaxis.set_label_position("right") 
                 
-                az.tick_params(axis='both', which='major', labelsize=8)
-                az.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
-                az.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
+                # az.tick_params(axis='both', which='major', labelsize=8)
+                # az.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+                # az.yaxis.set_major_formatter(FormatStrFormatter('%.3f'))
                 # az.set_xlim([vmin_rango_x_g2, vmax_rango_x_g2])
                 # az.set_ylim([vmin_rango_y_g2, vmax_rango_y_g2])
             
