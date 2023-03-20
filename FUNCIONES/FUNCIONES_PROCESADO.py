@@ -1159,12 +1159,6 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 contrasena       = st.secrets["postgres"].password
                 puerto           = st.secrets["postgres"].port    
             
-                # inserta_datos(datos_procesados,tabla_insercion,direccion_host,base_datos,usuario,contrasena,puerto)
-                
-                # texto_exito = 'Datos de la salida ' + salida_seleccionada + ' añadidos o modificados correctamente'
-                # st.success(texto_exito)
-        
-            
                 with st.spinner('Actualizando la base de datos'):
                
                     # Introducir los valores en la base de datos
@@ -1180,7 +1174,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                     cursor.close()
                     conn.close()   
     
-            texto_exito = 'Datos de la salida ' + salida_seleccionada + ' añadidos o modificados correctamente'
+            texto_exito = 'QF de la ' + nombre_completo_variable_procesada + ' asignadas o modificadas correctamente'
             st.success(texto_exito)
    
 
