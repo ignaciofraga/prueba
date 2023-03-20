@@ -1094,9 +1094,9 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     
 #            st.pyplot(fig)
  
-                buf = BytesIO()
-                fig.savefig(buf, format="png")
-                st.image(buf)      
+            buf = BytesIO()
+            fig.savefig(buf, format="png")
+            st.image(buf)      
         
       
         
