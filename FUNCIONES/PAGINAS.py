@@ -1974,8 +1974,9 @@ def entrada_archivos_roseta():
         # Selecciona los datos correspondientes al programa, estación, salida y cast seleccionados
         datos_procesados = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion) & (df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
             
-        FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset)
+        datos_procesados = FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset)
 
+        st.dataframe(datos_procesados, use_container_width=True)
         
         #FUNCIONES_PROCESADO.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades)
 
