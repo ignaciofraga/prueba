@@ -861,6 +861,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             datos_disponibles_fosfato = datos_disponibles_bd[datos_disponibles_bd['fosfato'].notna()]
             datos_disponibles_fosfato = datos_disponibles_fosfato[datos_disponibles_fosfato['nitrato'].notna()]
             
+            st.dataframe(datos_disponibles_fosfato)
+            
             with st.expander("Ajustar rango del gráfico FOSFATO vs NITRATO",expanded=False):            
                 
                 st.write("Selecciona el rango del gráfico")  
