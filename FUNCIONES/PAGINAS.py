@@ -1674,7 +1674,7 @@ def entrada_condiciones_ambientales():
 def entrada_archivos_roseta():
     
     # Función para cargar en caché los datos a utilizar
-    @st.cache_data
+    @st.cache_data(show_spinner=False,ttl=600)
     def carga_datos_entrada_archivo_roseta():
         conn                      = init_connection()
         df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
@@ -2021,7 +2021,7 @@ def consulta_datos():
 def procesado_nutrientes():
     
     # Función para cargar en caché los datos a utilizar
-    @st.cache_data
+    @st.cache_data(show_spinner=False,ttl=600)
     def carga_datos_procesado_nutrientes():
         conn                      = init_connection()
         df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
@@ -2361,15 +2361,15 @@ def procesado_quimica():
 
 def entrada_datos_excel():
     
-    @st.cache_data
-    def carga_datos_entrada_datos_excel():
-        # Recupera los datos disponibles en la base de datos
-        conn                      = init_connection()
-        df_programas              = psql.read_sql('SELECT * FROM programas', conn)
-        variables_bd              = psql.read_sql('SELECT * FROM variables_procesado', conn)
-        conn.close()         
+    # @st.cache_data
+    # def carga_datos_entrada_datos_excel():
+    #     # Recupera los datos disponibles en la base de datos
+    #     conn                      = init_connection()
+    #     df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+    #     variables_bd              = psql.read_sql('SELECT * FROM variables_procesado', conn)
+    #     conn.close()         
     
-        return df_programas,variables_bd
+    #     return df_programas,variables_bd
 
     st.subheader('Portal de entrada de datos')
     
@@ -2408,23 +2408,21 @@ def entrada_datos_excel():
         
         df_datos_importacion  = pandas.read_excel(archivo_datos) 
                 
-        # corrige el formato de las fechas
+        # Corrige el formato de las fechas
         for idato in range(df_datos_importacion.shape[0]):
             df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
             if df_datos_importacion['fecha_muestreo'][idato]:
                 if isinstance(df_datos_importacion['hora_muestreo'][idato], str):
                     df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
 
+        # Cambia el nombre del identificador 
+        df_datos_importacion = df_datos_importacion.rename(columns={"ID": "id_externo"})
+
         # Identifica las variables que contiene el archivo
         variables_archivo = df_datos_importacion.columns.tolist()
         variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
         variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
-        
-        st.text('hola')
-        st.text(variables_bd['variables_biogeoquimicas'])
-        st.text(variables_archivo)
-        st.text('variables')
-        
+                
         # Realiza un control de calidad primario a los datos importados   
         datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
 
@@ -2442,11 +2440,7 @@ def entrada_datos_excel():
         # Encuentra el identificador asociado a cada registro
         with st.spinner('Asignando el registro correspondiente a cada medida'):
             datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-       
-        st.dataframe(datos_corregidos)
-        st.text(variables_fisica)
-        st.text(variables_bgq)
-       
+             
         # Añade datos físicos
         if len(variables_fisica)>0:
                             

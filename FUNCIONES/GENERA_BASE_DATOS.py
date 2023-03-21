@@ -497,6 +497,7 @@ direccion_host = '193.146.155.99'
 # # Crea la tabla de nuevo
 # listado_variables = ('(muestreo int PRIMARY KEY,'
 # ' nombre_muestreo text,'
+# ' id_externo text,'
 # ' fecha_muestreo date NOT NULL,'
 # ' hora_muestreo time,'
 # ' latitud_muestreo NUMERIC (6, 4) NOT NULL,'
