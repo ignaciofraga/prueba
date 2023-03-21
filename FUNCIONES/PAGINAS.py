@@ -2396,6 +2396,8 @@ def entrada_datos_excel():
         
         df_datos_importacion  = pandas.read_excel(archivo_datos) 
         
+        st.dataframe(df_datos_importacion)
+        
         # corrige el formato de las fechas
         for idato in range(df_datos_importacion.shape[0]):
             df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
