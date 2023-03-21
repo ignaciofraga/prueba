@@ -2265,6 +2265,7 @@ def procesado_nutrientes():
         unidades_variable        = variables_unidades[indice_variable]
         tabla_insercion          = variable_tabla[indice_variable]
                                                                     
+        st.text(indice_programa)
         st.text(indice_variable)
         st.text(nombre_completo_variable)
         st.text(unidades_variable)
