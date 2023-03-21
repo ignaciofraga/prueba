@@ -2208,7 +2208,7 @@ def procesado_nutrientes():
                     mime="application/vnd.ms-excel"
                 )              
        
-
+                st.experimental_singleton.clear()
                     
 
 
