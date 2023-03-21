@@ -2175,8 +2175,6 @@ def procesado_nutrientes():
                         
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
                 if io_add_data is True:
-                        
-                    datos_corregidos = datos_corregidos.rename(columns={"muestreo": "id_muestreo"})
                     
                     FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
                         
