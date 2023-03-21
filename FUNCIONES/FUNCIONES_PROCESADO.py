@@ -586,6 +586,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
     listado_adicional         = [puntero] + listado_variables_comunes
   
+    import streamlit as st
     st.dataframe(tabla_registros)
     st.dataframe(datos_insercion)  
   
