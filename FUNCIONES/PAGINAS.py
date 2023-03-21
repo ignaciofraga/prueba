@@ -2184,10 +2184,10 @@ def procesado_nutrientes():
                     st.success(texto_exito)
 
                 # Añade nombre de la columna
-                datos_corregidos = datos_corregidos.rename(columns={"id_estacion_temp": "estacion"})
+                #datos_corregidos = datos_corregidos.rename(columns={"id_estacion_temp": "estacion"})
                 
                 st.dataframe(datos_corregidos)
-                st.dataframe(estaciones)
+                st.dataframe(df_estaciones)
                 
                 datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
 
