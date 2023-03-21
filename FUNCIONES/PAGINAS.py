@@ -2382,20 +2382,24 @@ def entrada_datos_excel():
     
     # Recupera la informacion de la cache 
     df_programas,variables_bd = carga_datos_entrada_datos_excel()
-    
+       
     # Despliega menús de selección de la variable, salida y la estación a controlar                
     listado_tipos_salida               = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
     
-    col1, col2 = st.columns(2,gap="small")
-    with col1: 
-        programa_seleccionado = st.selectbox('Programa',(df_programas['nombre_programa']))
-
-    with col2: 
-        tipo_salida           = st.selectbox('Tipo de salida',(listado_tipos_salida))
+    with st.form("Formulario", clear_on_submit=False):
+    
+        col1, col2 = st.columns(2,gap="small")
+        with col1: 
+            programa_seleccionado = st.selectbox('Programa',(df_programas['nombre_programa']))
+    
+        with col2: 
+            tipo_salida           = st.selectbox('Tipo de salida',(listado_tipos_salida))
+            
+        archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
+            
+        io_envio                    = st.form_submit_button("Procesar el archivo subido")
         
-    archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
-        
-    if archivo_datos is not None:
+    if archivo_datos is not None and io_envio is True:
         
         df_datos_importacion  = pandas.read_excel(archivo_datos) 
                 
