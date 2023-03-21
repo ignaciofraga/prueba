@@ -2381,8 +2381,13 @@ def entrada_datos_excel():
     puerto           = st.secrets["postgres"].port
     
     # Recupera la informacion de la cache 
-    df_programas,variables_bd = carga_datos_entrada_datos_excel()
-       
+    #df_programas,variables_bd = carga_datos_entrada_datos_excel()
+    conn                      = init_connection()
+    df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+    variables_bd              = psql.read_sql('SELECT * FROM variables_procesado', conn)
+    conn.close()   
+    
+    
     # Despliega menús de selección de la variable, salida y la estación a controlar                
     listado_tipos_salida               = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
     
