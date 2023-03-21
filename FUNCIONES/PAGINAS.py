@@ -2127,6 +2127,9 @@ def procesado_nutrientes():
                         texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
                         st.warning(texto_error, icon="⚠️")                        
    
+            st.dataframe(datos_AA)
+   
+    
             # comprobación por si no hay ningún dato a procesar
             if datos_AA['io_procesado'].isnull().all():
                 texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
