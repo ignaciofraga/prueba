@@ -509,6 +509,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             listado_adicional         = ['muestreo','id_estacion_temp'] + listado_variables_comunes
             exporta_registros         = nuevos_muestreos[listado_adicional]
             
+            import streamlit as st
+            st.text(listado_adicional)
+            st.dataframe(exporta_registros)
  
             # Cambia el nombre de la columna de estaciones
             exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
