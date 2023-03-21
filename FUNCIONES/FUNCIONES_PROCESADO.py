@@ -585,7 +585,10 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     listado_variables_datos   = datos_insercion.columns.tolist()
     listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
     listado_adicional         = [puntero] + listado_variables_comunes
-    
+  
+    st.dataframe(tabla_registros)
+    st.dataframe(datos_insercion)  
+  
     # # Si no existe ningún registro en la base de datos, introducir todos los datos disponibles
     if tabla_registros.shape[0] == 0:
         
@@ -594,8 +597,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
         datos_insercion.set_index(puntero,drop=True,append=False,inplace=True)
         datos_insercion.to_sql(tabla_destino, conn_psql,if_exists='append')
                
-    st.dataframe(tabla_registros)
-    st.dataframe(datos_insercion)
+
             
     # En caso contrario, comprobar qué parte de la información está en la base de datos
     else: 
