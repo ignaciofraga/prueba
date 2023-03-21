@@ -593,7 +593,10 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
         
         datos_insercion.set_index(puntero,drop=True,append=False,inplace=True)
         datos_insercion.to_sql(tabla_destino, conn_psql,if_exists='append')
-                        
+               
+    st.dataframe(tabla_registros)
+    st.dataframe(datos_insercion)
+            
     # En caso contrario, comprobar qué parte de la información está en la base de datos
     else: 
         
