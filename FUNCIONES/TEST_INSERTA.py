@@ -13,6 +13,7 @@ pandas.options.mode.chained_assignment = None
 import datetime
 import pandas.io.sql as psql
 from sqlalchemy import create_engine
+import psycopg2
 
 # Parámetros de la base de datos
 base_datos     = 'COAC'
@@ -56,6 +57,8 @@ for idato in range(df_datos_importacion.shape[0]):
         if isinstance(df_datos_importacion['hora_muestreo'][idato], str):
             df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
 
+df_datos_importacion = df_datos_importacion.rename(columns={"ID": "id_externo"})
+
 # Identifica las variables que contiene el archivo
 variables_archivo = df_datos_importacion.columns.tolist()
 variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
@@ -79,6 +82,20 @@ datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_progra
 datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
 
+# Introducir los valores en la base de datos
+conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()  
+   
+instruccion_sql = "UPDATE muestreos_discretos SET salida_mar= %s WHERE muestreo = %s;"
+
+for idato in range(datos_corregidos.shape[0]):
+    
+    cursor.execute(instruccion_sql, (int(datos_corregidos['id_salida'].iloc[idato]),int(datos_corregidos['muestreo'].iloc[idato])))
+    conn.commit() 
+
+cursor.close()
+conn.close()   
+    
 
 # datos = datos_corregidos
 # import numpy

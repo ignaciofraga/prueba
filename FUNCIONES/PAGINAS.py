@@ -2021,7 +2021,7 @@ def consulta_datos():
 def procesado_nutrientes():
     
     # Función para cargar en caché los datos a utilizar
-    @st.cache_data(show_spinner=False,ttl=600)
+    @st.cache_data(show_spinner=False,ttl=300)
     def carga_datos_procesado_nutrientes():
         conn                      = init_connection()
         df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
@@ -2100,8 +2100,7 @@ def procesado_nutrientes():
             datos_AA              = pandas.read_excel(archivo_AA,skiprows=15)            
             datos_AA              = datos_AA.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
                   
-            # Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado
-            df_muestreos          = df_muestreos.rename(columns={"id_muestreo":"muestreo"}) # Para igualar los nombres de columnas                                               
+            # Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
             df_datos_disponibles  = pandas.merge(df_datos_fisicos, df_muestreos, on="muestreo")            
             
             # Encuentra las posiciones de las referencias de sw
@@ -2119,14 +2118,14 @@ def procesado_nutrientes():
             for idato in range(ref_inicial,ref_final):
                 if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
      
-                    id_temp = df_datos_disponibles['muestreo'][df_datos_disponibles['nombre_muestreo']==datos_AA['Sample ID'].iloc[idato]]
+                    id_temp = df_datos_disponibles['muestreo'][df_datos_disponibles['id_externo']==datos_AA['Sample ID'].iloc[idato]]
                         
                     if len(id_temp) > 0:
                         datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
                         datos_AA['io_procesado'].iloc[idato]  = 1
                     else:
                         texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
-                        #st.warning(texto_error, icon="⚠️")                        
+                        st.warning(texto_error, icon="⚠️")                        
    
             # comprobación por si no hay ningún dato a procesar
             if datos_AA['io_procesado'].isnull().all():
@@ -2416,7 +2415,11 @@ def entrada_datos_excel():
                     df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
 
         # Cambia el nombre del identificador 
-        df_datos_importacion = df_datos_importacion.rename(columns={"ID": "id_externo"})
+        try:
+            df_datos_importacion = df_datos_importacion.rename(columns={"ID": "id_externo"})
+        except:
+            texto_aviso = "Los datos importados no contienen identificador."
+            st.warning(texto_aviso, icon="⚠️")
 
         # Identifica las variables que contiene el archivo
         variables_archivo = df_datos_importacion.columns.tolist()
