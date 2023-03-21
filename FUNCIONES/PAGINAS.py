@@ -2435,6 +2435,7 @@ def entrada_datos_excel():
        
         st.dataframe(datos_corregidos)
         st.text(variables_fisica)
+        st.text(variables_bgq)
        
         # Añade datos físicos
         if len(variables_fisica)>0:
