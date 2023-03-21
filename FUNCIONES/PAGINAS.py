@@ -2189,7 +2189,7 @@ def procesado_nutrientes():
                     st.success(texto_exito)
 
                 # Descarga los datos como una hoja Excel        
-                listado_columnas        = ['nombre_muestreo','fecha_muestreo','hora_muestreo','botella','presion_ctd','ton','nitrato','nitrito','silicato','fosfato']
+                listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','botella','presion_ctd','salinidad_ctd','ton','nitrato','nitrito','silicato','fosfato']
                 datos_corregidos        = datos_corregidos[listado_columnas]
       
                 # Botón para descargar la información como Excel
