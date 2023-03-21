@@ -597,10 +597,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
         
     # En caso contrario, comprobar qué parte de la información está en la base de datos
     else: 
-    
-        import streamlit as st
-        st.dataframe(datos_insercion)  
-        
+            
         for idato in range(datos_insercion.shape[0]): # Dataframe con la interseccion de los datos nuevos y los disponibles en la base de datos, a partir de la variable muestreo
          
             df_temp  = tabla_registros[(tabla_registros[puntero]==datos_insercion[puntero].iloc[idato])] 
@@ -608,9 +605,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
             if df_temp.shape[0]>0:  # Muestreo ya incluido en la base de datos
             
                 muestreo = df_temp[puntero].iloc[0]
-                
-                st.dataframe(df_temp)
-                
+                                
                 for ivariable in range(len(listado_variables_comunes)): # Reemplazar las variables disponibles en el muestreo correspondiente
                         
                     #tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]][datos_insercion[puntero]==int(muestreo)]

@@ -2264,12 +2264,19 @@ def procesado_nutrientes():
         nombre_completo_variable = variables_procesado[indice_variable] 
         unidades_variable        = variables_unidades[indice_variable]
         tabla_insercion          = variable_tabla[indice_variable]
-                                                                              
+                                                                    
+        st.text(indice_variable)
+        st.text(nombre_completo_variable)
+        st.text(unidades_variable)
+        st.text(tabla_insercion)        
+            
         # Selecciona los datos correspondientes al programa, estación, salida y cast seleccionados
         datos_procesados     = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion) & (df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
 
         df_datos_disponibles = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion)]
              
+        st.dataframe(df_datos_disponibles)
+        
         if not datos_procesados[variable_seleccionada].isnull().all():         
   
             FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset,tabla_insercion)

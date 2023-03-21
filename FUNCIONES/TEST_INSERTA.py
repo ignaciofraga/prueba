@@ -45,56 +45,71 @@ con_engine      = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion
 conn            = create_engine(con_engine)
 df_programas    = psql.read_sql('SELECT * FROM programas', conn)
 variables_bd    = psql.read_sql('SELECT * FROM variables_procesado', conn)
+df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
+df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
+df_rmns                   = psql.read_sql('SELECT * FROM rmn_nutrientes', conn)
 conn.dispose() 
 
 
-df_datos_importacion  = pandas.read_excel(archivo_datos) 
 
-# corrige el formato de las fechas
-for idato in range(df_datos_importacion.shape[0]):
-    df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
-    if df_datos_importacion['fecha_muestreo'][idato]:
-        if isinstance(df_datos_importacion['hora_muestreo'][idato], str):
-            df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
+datos_combinados = pandas.merge(df_muestreos, df_datos_biogeoquimicos, on="muestreo")
 
-df_datos_importacion = df_datos_importacion.rename(columns={"ID": "id_externo"})
+df_salidas     = df_salidas.rename(columns={"id_salida": "salida_mar"})
+datos_combinados = pandas.merge(datos_combinados, df_salidas, on="salida_mar")
 
-# Identifica las variables que contiene el archivo
-variables_archivo = df_datos_importacion.columns.tolist()
-variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
-variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
+datos_radcan = datos_combinados[datos_combinados['programa']==4]
+# df_datos_importacion  = pandas.read_excel(archivo_datos) 
 
-# Realiza un control de calidad primario a los datos importados   
-datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
+# # corrige el formato de las fechas
+# for idato in range(df_datos_importacion.shape[0]):
+#     df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
+#     if df_datos_importacion['fecha_muestreo'][idato]:
+#         if isinstance(df_datos_importacion['hora_muestreo'][idato], str):
+#             df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
 
-# Recupera el identificador del programa de muestreo
-id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+# df_datos_importacion = df_datos_importacion.rename(columns={"ID": "id_externo"})
+
+# # Identifica las variables que contiene el archivo
+# variables_archivo = df_datos_importacion.columns.tolist()
+# variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
+# variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
+
+# # Realiza un control de calidad primario a los datos importados   
+# datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
+
+# # Recupera el identificador del programa de muestreo
+# id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
 
 
 
-# Encuentra la estación asociada a cada registro
-datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+# # Encuentra la estación asociada a cada registro
+# datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# Encuentra las salidas al mar correspondientes  
-datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+# # Encuentra las salidas al mar correspondientes  
+# datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
  
 
-datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+# datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
 
-# Introducir los valores en la base de datos
-conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()  
+# # Introducir los valores en la base de datos
+# conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()  
    
-instruccion_sql = "UPDATE muestreos_discretos SET salida_mar= %s WHERE muestreo = %s;"
+# instruccion_sql = "UPDATE muestreos_discretos SET salida_mar= %s WHERE muestreo = %s;"
 
-for idato in range(datos_corregidos.shape[0]):
+# for idato in range(datos_corregidos.shape[0]):
     
-    cursor.execute(instruccion_sql, (int(datos_corregidos['id_salida'].iloc[idato]),int(datos_corregidos['muestreo'].iloc[idato])))
-    conn.commit() 
+#     cursor.execute(instruccion_sql, (int(datos_corregidos['id_salida'].iloc[idato]),int(datos_corregidos['muestreo'].iloc[idato])))
+#     conn.commit() 
 
-cursor.close()
-conn.close()   
+# cursor.close()
+# conn.close()   
     
 
 # datos = datos_corregidos
