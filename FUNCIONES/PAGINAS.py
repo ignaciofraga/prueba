@@ -2126,10 +2126,7 @@ def procesado_nutrientes():
                     else:
                         texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
                         st.warning(texto_error, icon="⚠️")                        
-   
-            st.dataframe(datos_AA)
-   
-    
+       
             # comprobación por si no hay ningún dato a procesar
             if datos_AA['io_procesado'].isnull().all():
                 texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
@@ -2141,9 +2138,7 @@ def procesado_nutrientes():
                         
                 # Aplica la corrección de deriva (DRIFT)                 
                 datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias,variables_run,rendimiento_columna,temperatura_laboratorio)
-                
-                st.dataframe(datos_corregidos)
-                
+                                
                 # Calcula el NO3 como diferencia entre el TON y el NO2
                 datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
             
