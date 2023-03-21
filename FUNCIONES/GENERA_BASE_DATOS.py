@@ -655,6 +655,7 @@ direccion_host = '193.146.155.99'
 # ' rmn_procesado int,'
 # ' temp_lab_procesado int,'
 # ' rto_columna_procesado NUMERIC (4, 2),'
+# ' tubo_nutrientes text,
 # ) 
 
 # listado_dependencias = ('FOREIGN KEY (muestreo)'
