@@ -2360,6 +2360,16 @@ def procesado_quimica():
 
 
 def entrada_datos_excel():
+    
+    @st.cache_data
+    def carga_datos_entrada_datos_excel():
+        # Recupera los datos disponibles en la base de datos
+        conn                      = init_connection()
+        df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+        variables_bd              = psql.read_sql('SELECT * FROM variables_procesado', conn)
+        conn.close()         
+    
+        return df_programas,variables_bd
 
     st.subheader('Portal de entrada de datos')
     
@@ -2370,14 +2380,8 @@ def entrada_datos_excel():
     contrasena       = st.secrets["postgres"].password
     puerto           = st.secrets["postgres"].port
     
-
-
-    # Recupera los datos disponibles en la base de datos
-    conn                      = init_connection()
-    df_programas              = psql.read_sql('SELECT * FROM programas', conn)
-    variables_bd              = psql.read_sql('SELECT * FROM variables_procesado', conn)
-    conn.close()    
-    
+    # Recupera la informacion de la cache 
+    df_programas,variables_bd = carga_datos_entrada_datos_excel()
     
     # Despliega menús de selección de la variable, salida y la estación a controlar                
     listado_tipos_salida               = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
@@ -2389,7 +2393,6 @@ def entrada_datos_excel():
     with col2: 
         tipo_salida           = st.selectbox('Tipo de salida',(listado_tipos_salida))
         
-
     archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
         
     if archivo_datos is not None:
