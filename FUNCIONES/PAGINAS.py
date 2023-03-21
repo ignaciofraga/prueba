@@ -2178,7 +2178,7 @@ def procesado_nutrientes():
                     
                     FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
                         
-                    texto_exito = 'Datos añadidos correctamente'
+                    texto_exito = 'Información introducida correctamente en la base de datos'
                     st.success(texto_exito)
 
                 # Añade nombre de la estacion
