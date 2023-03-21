@@ -2183,12 +2183,8 @@ def procesado_nutrientes():
                     texto_exito = 'Datos añadidos correctamente'
                     st.success(texto_exito)
 
-                # Añade nombre de la columna
-                #datos_corregidos = datos_corregidos.rename(columns={"id_estacion_temp": "estacion"})
-                
-                st.dataframe(datos_corregidos)
-                st.dataframe(df_estaciones)
-                
+                # Añade nombre de la estacion
+                df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
                 datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
 
                 # Descarga los datos como una hoja Excel        
