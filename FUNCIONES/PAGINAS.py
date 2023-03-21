@@ -2183,6 +2183,9 @@ def procesado_nutrientes():
                     texto_exito = 'Datos añadidos correctamente'
                     st.success(texto_exito)
 
+                # Añade nombre de la columna
+                datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
+
                 # Descarga los datos como una hoja Excel        
                 listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','botella','presion_ctd','salinidad_ctd','ton','nitrato','nitrito','silicato','fosfato']
                 datos_corregidos        = datos_corregidos[listado_columnas]
