@@ -238,7 +238,10 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     # elimina la informacion cargada y que no se vaya a exportar, para liberar memoria
     del(estaciones_muestreadas,estaciones_programa,tabla_estaciones)
     
-    conn_psql.dispose() # Cierra la conexión con la base de datos 
+    conn_psql.dispose() # Cierra la conexión con la base de datos
+    
+    # Cambia el nombre de la columna "estacion" por "nombre_estacion"
+    datos = datos.rename(columns={"estacion":"nombre_estacion"})
     
     return datos  
 
@@ -411,14 +414,22 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     conn_psql        = create_engine(con_engine)
     tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
     tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
+    tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn_psql)
        
     datos['muestreo']  = numpy.zeros(datos.shape[0],dtype=int)
     
     # si no hay ningun valor en la tabla de registro, meter directamente todos los datos registrados
     if tabla_muestreos.shape[0] == 0:
     
-        # genera un dataframe con las variables que interesa introducir en la base de datos
-        exporta_registros                    = datos[['id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','latitud','longitud']]
+        # Mantén sólo las columnas que interesan
+        variables_bd  = [x for x in tabla_variables['parametros_muestreo'] if str(x) != 'None']
+        
+        # Busca qué variables están incluidas en los datos a importar
+        listado_variables_datos   = datos.columns.tolist()
+        listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
+        listado_adicional         = ['id_estacion_temp'] + listado_variables_comunes
+        exporta_registros         = datos[listado_adicional]
+
         # añade el indice de cada registro
         indices_registros                    = numpy.arange(1,(exporta_registros.shape[0]+1))    
         exporta_registros['muestreo']     = indices_registros
@@ -488,9 +499,17 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         
             # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
             nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
+            
             # Mantén sólo las columnas que interesan
-            exporta_registros = nuevos_muestreos[['muestreo','id_estacion_temp','fecha_muestreo','hora_muestreo','id_salida','presion_ctd','prof_referencia','botella','num_cast','latitud','longitud']]
-                        
+            variables_bd  = [x for x in tabla_variables['parametros_muestreo'] if str(x) != 'None']
+            
+            # Busca qué variables están incluidas en los datos a importar
+            listado_variables_datos   = datos.columns.tolist()
+            listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
+            listado_adicional         = ['muestreo','id_estacion_temp'] + listado_variables_comunes
+            exporta_registros         = nuevos_muestreos[listado_adicional]
+            
+ 
             # Cambia el nombre de la columna de estaciones
             exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
             # Indice temporal
