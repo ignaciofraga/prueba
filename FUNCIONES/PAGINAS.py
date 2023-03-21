@@ -2415,6 +2415,11 @@ def entrada_datos_excel():
         variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
         variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
         
+        st.text('hola')
+        st.text(variables_bd['variables_biogeoquimicas'])
+        st.text(variables_archivo)
+        st.text('variables')
+        
         # Realiza un control de calidad primario a los datos importados   
         datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
 
