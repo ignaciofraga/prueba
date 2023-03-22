@@ -62,7 +62,9 @@ datos_combinados = pandas.merge(df_muestreos, df_datos_biogeoquimicos, on="muest
 df_salidas     = df_salidas.rename(columns={"id_salida": "salida_mar"})
 datos_combinados = pandas.merge(datos_combinados, df_salidas, on="salida_mar")
 
-datos_radcan = datos_combinados[datos_combinados['programa']==4]
+datos_radcan  = datos_combinados[datos_combinados['programa']==4]
+datos_pelacus = datos_combinados[datos_combinados['programa']==1]
+
 # df_datos_importacion  = pandas.read_excel(archivo_datos) 
 
 # # corrige el formato de las fechas

@@ -11,6 +11,8 @@ import FUNCIONES_AUXILIARES
 import pandas
 pandas.options.mode.chained_assignment = None
 import datetime
+import numpy
+import math
 
 # Parámetros de la base de datos
 base_datos     = 'COAC'
@@ -32,8 +34,6 @@ itipo_informacion = 2 # 1-nuevo muestreo 2-dato nuevo (analisis laboratorio)  3-
 email_contacto    = 'prueba@ieo.csic.es'
 
 fecha_actualizacion = datetime.date.today()
-
-###### PROCESADO ########
 
 # Carga los datos
 print('Leyendo los datos contenidos en la excel')
@@ -58,10 +58,10 @@ datos_pelacus_corregido = FUNCIONES_PROCESADO.evalua_salidas(datos_pelacus_corre
 print('Identificando el registro correspondiente a cada medida')
 datos_pelacus_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_pelacus_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# # Introduce los datos en la base de datos
-# print('Introduciendo los datos en la base de datos')
-# FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-# FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+# Introduce los datos en la base de datos
+print('Introduciendo los datos en la base de datos')
+FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+FUNCIONES_PROCESADO.inserta_datos(datos_pelacus_corregido,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
 
  
 

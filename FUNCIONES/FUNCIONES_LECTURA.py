@@ -12,6 +12,7 @@ import psycopg2
 import pandas.io.sql as psql
 from sqlalchemy import create_engine
 import re
+import math
 
 
 
@@ -193,13 +194,54 @@ def lectura_datos_pelacus(nombre_archivo):
     # Convierte las fechas de DATE a formato correcto
     datos_pelacus['fecha'] =  pandas.to_datetime(datos_pelacus['fecha'], format='%d%m%Y').dt.date
              
-    # Genera una columna con la profundidad. Usar el valor real (si existe) o la teórica en caso contrario
-    # datos_pelacus['presion_ctd'] = datos_pelacus['Prof_real.']
-    # for idato in range(datos_pelacus.shape[0]):
-    #     if numpy.isnan(datos_pelacus['Prof_real'][idato]) is False:
-    #         datos_pelacus['presion_ctd'][idato] = datos_pelacus['Prof_real'][idato]
+    datos_pelacus['ton_qf']    = 9
+    datos_pelacus['cast_temp'] = [None]*datos_pelacus.shape[0]
+    for idato in range(datos_pelacus.shape[0]):
+        if isinstance(datos_pelacus['cast'].iloc[idato], str) and datos_pelacus['cast'].iloc[idato][0:5] == 'PEL03':
+            listado_palabras = datos_pelacus['cast'].iloc[idato].split('_')
+            texto_busqueda   = listado_palabras[1]
+        else:
+            texto_busqueda = datos_pelacus['cast'].iloc[idato]
+        try:
+            datos_pelacus['cast_temp'].iloc[idato] = int("".join(filter(str.isdigit, texto_busqueda)))
+        except:
+            datos_pelacus['cast_temp'].iloc[idato] = datos_pelacus['cast'].iloc[idato] 
+    
+        if math.isnan(datos_pelacus['cast_temp'].iloc[idato]): 
+            datos_pelacus['cast_temp'].iloc[idato] = 1
             
-    #         print(datos_pelacus['Prof_real'][idato])
+        if math.isnan(datos_pelacus['NO3T_flag'].iloc[idato]):
+            if not math.isnan(datos_pelacus['NO3'].iloc[idato]):
+                datos_pelacus['NO3T_flag'].iloc[idato] = 1
+        if math.isnan(datos_pelacus['NO3'].iloc[idato]):
+            datos_pelacus['NO3T_flag'].iloc[idato] = 9
+                
+        if math.isnan(datos_pelacus['NO2_flag'].iloc[idato]):
+            if not math.isnan(datos_pelacus['NO2'].iloc[idato]):
+                datos_pelacus['NO2_flag'].iloc[idato] = 1
+        if math.isnan(datos_pelacus['NO2'].iloc[idato]):
+            datos_pelacus['NO2_flag'].iloc[idato] = 9
+    
+        if math.isnan(datos_pelacus['NH4_flag'].iloc[idato]):
+            if not math.isnan(datos_pelacus['NH4'].iloc[idato]):
+                datos_pelacus['NH4_flag'].iloc[idato] = 1
+        if math.isnan(datos_pelacus['NH4'].iloc[idato]):
+            datos_pelacus['NH4_flag'].iloc[idato] = 9
+    
+        if math.isnan(datos_pelacus['PO4_flag'].iloc[idato]):
+            if not math.isnan(datos_pelacus['PO4'].iloc[idato]):
+                datos_pelacus['PO4_flag'].iloc[idato] = 1
+        if math.isnan(datos_pelacus['PO4'].iloc[idato]):
+            datos_pelacus['PO4_flag'].iloc[idato] = 9
+    
+        if math.isnan(datos_pelacus['SiO2_flag'].iloc[idato]):
+            if not math.isnan(datos_pelacus['SiO2'].iloc[idato]):
+                datos_pelacus['SiO2_flag'].iloc[idato] = 1
+        if math.isnan(datos_pelacus['SiO2'].iloc[idato]):
+            datos_pelacus['SiO2_flag'].iloc[idato] = 9
+            
+        if not isinstance(datos_pelacus['cast'].iloc[idato], str) and math.isnan(datos_pelacus['cast'].iloc[idato]) is True:    
+            datos_pelacus['cast'].iloc[idato] = 1
 
     datos_pelacus['presion_ctd'] = numpy.zeros(datos_pelacus.shape[0])
     for idato in range(datos_pelacus.shape[0]):
@@ -237,12 +279,13 @@ def lectura_datos_pelacus(nombre_archivo):
                 datos_pelacus['hora'][idato] = datetime.datetime.strptime(datos_pelacus['hora'][idato], '%H:%M').time()
             except:
                 pass
-            
+
     # Renombra las columnas para mantener una denominación homogénea
-    datos_pelacus = datos_pelacus.rename(columns={"campaña":"programa","fecha":"fecha_muestreo","hora":"hora_muestreo","estación":"estacion",
+    datos_pelacus = datos_pelacus.drop(columns=['cast',"campaña"])           
+    datos_pelacus = datos_pelacus.rename(columns={"fecha":"fecha_muestreo","hora":"hora_muestreo","estación":"estacion",
                                                   "Latitud":"latitud","Longitud":"longitud","t_CTD":"temperatura_ctd","Sal_CTD":"salinidad_ctd","SiO2":"silicato","SiO2_flag":"silicato_qf",
-                                                  "NO3":"nitrato","NO3T_flag":"nitrato_qf","NO2":"nitrito","NO2_flag":"nitrito_qf","NH4":"amonio","NH4_flag":"amonio_qf","PO4":"fosfato","PO4_flag":"fosfato_qf","Cla":"clorofila_a"
-                                                  })
+                                                  "NO3":"nitrato","NO3T_flag":"nitrato_qf","NO2":"nitrito","NO2_flag":"nitrito_qf","NH4":"amonio","NH4_flag":"amonio_qf","PO4":"fosfato","PO4_flag":"fosfato_qf","Cla":"clorofila_a",
+                                                  "cast_temp":"cast"})
 
     datos_pelacus['botella'] = None
     
