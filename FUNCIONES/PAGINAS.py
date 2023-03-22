@@ -2243,6 +2243,8 @@ def procesado_nutrientes():
         # Toma los datos de la caché    
         df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns = carga_datos_procesado_nutrientes()
         
+        st.dataframe(df_muestreos)
+        
         # # Mantén sólo las salidas de radiales
         # id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
         # df_salidas  = df_salidas[df_salidas['programa']==int(id_radiales)]

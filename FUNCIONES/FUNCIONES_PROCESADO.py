@@ -427,7 +427,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         # Busca qué variables están incluidas en los datos a importar
         listado_variables_datos   = datos.columns.tolist()
         listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
-        listado_adicional         = ['id_estacion_temp'] + listado_variables_comunes
+        listado_adicional         = ['id_estacion_temp','id_salida'] + listado_variables_comunes
         exporta_registros         = datos[listado_adicional]
 
         # añade el indice de cada registro
@@ -506,7 +506,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             # Busca qué variables están incluidas en los datos a importar
             listado_variables_datos   = datos.columns.tolist()
             listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
-            listado_adicional         = ['muestreo','id_estacion_temp'] + listado_variables_comunes
+            listado_adicional         = ['muestreo','id_estacion_temp','id_salida'] + listado_variables_comunes
             exporta_registros         = nuevos_muestreos[listado_adicional]
              
             # Cambia el nombre de la columna de estaciones

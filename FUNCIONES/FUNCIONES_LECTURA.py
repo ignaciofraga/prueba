@@ -130,6 +130,8 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
 #    datos_radiales['num_cast'] = [None]*datos_radiales.shape[0]
         
     datos_radiales = datos_radiales.drop(columns=['CTDOXY_CAL','CTDOXY_CAL_FLAG_W','CTDFLOUR_SCUFA', 'CTDFLUOR_AFL','CTDFLUOR_SP','CTDFLOUR_SCUFA_FLAG_W','CTDFLUOR_AFL_FLAG_W','CTDFLUOR_SP_FLAG_W','PHTS25P0_UNPUR','PHTS25P0_UNPUR_FLAG_W','PHTS25P0_PUR','PHTS25P0_PUR_FLAG_W'])
+    datos_radiales = datos_radiales.drop(columns=['configuracion_perfilador','configuracion_superficie'])
+
      
     # Renombra las columnas para mantener un mismo esquema de nombres   
     datos_radiales = datos_radiales.rename(columns={"DATE": "fecha_muestreo", "STNNBR": "estacion", 'EXPOCODE':'nombre_muestreo',
@@ -259,13 +261,13 @@ def lectura_datos_pelacus(nombre_archivo):
   
     # Asigna el valor del cast. Si es un texto no asigna valor
     
-    datos_pelacus['num_cast'] = numpy.ones(datos_pelacus.shape[0],dtype=int)
-    for idato in range(datos_pelacus.shape[0]):
-        try: # Si es entero
-            texto       = datos_pelacus['cast'][idato]      
-            datos_pelacus['num_cast'][idato] = int(re.findall(r'\d+',texto)[0])            
-        except:
-            datos_pelacus['num_cast'][idato] = None
+    # datos_pelacus['num_cast'] = numpy.ones(datos_pelacus.shape[0],dtype=int)
+    # for idato in range(datos_pelacus.shape[0]):
+    #     try: # Si es entero
+    #         texto       = datos_pelacus['cast'][idato]      
+    #         datos_pelacus['num_cast'][idato] = int(re.findall(r'\d+',texto)[0])            
+    #     except:
+    #         datos_pelacus['num_cast'][idato] = None
 
     # # Asigna el identificador de cada muestreo siguiendo las indicaciones de EXPOCODE. 
     # datos_pelacus['nombre_muestreo'] = [None]*datos_pelacus.shape[0]
@@ -285,7 +287,7 @@ def lectura_datos_pelacus(nombre_archivo):
     datos_pelacus = datos_pelacus.rename(columns={"fecha":"fecha_muestreo","hora":"hora_muestreo","estación":"estacion",
                                                   "Latitud":"latitud","Longitud":"longitud","t_CTD":"temperatura_ctd","Sal_CTD":"salinidad_ctd","SiO2":"silicato","SiO2_flag":"silicato_qf",
                                                   "NO3":"nitrato","NO3T_flag":"nitrato_qf","NO2":"nitrito","NO2_flag":"nitrito_qf","NH4":"amonio","NH4_flag":"amonio_qf","PO4":"fosfato","PO4_flag":"fosfato_qf","Cla":"clorofila_a",
-                                                  "cast_temp":"cast"})
+                                                  "cast_temp":"num_cast"})
 
     datos_pelacus['botella'] = None
     
