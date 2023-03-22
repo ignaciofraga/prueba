@@ -2181,7 +2181,7 @@ def procesado_nutrientes():
                     for ivar in range(len(variables_run)):
                         qf_var = variables_run[ivar] + '_qf'
                         datos_corregidos[qf_var] = numpy.ones(datos_corregidos.shape[0],dtype=int)
-                        
+                    datos_corregidos['nitrato_qf'] = numpy.ones(datos_corregidos.shape[0],dtype=int)    
                     
                     FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
                         
