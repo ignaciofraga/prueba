@@ -1114,7 +1114,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         # Gráficos particulares para cada variable
         elif variable_procesada == 'silicato':
 
-            if not datos_procesados['ALCALINIDAD'].isnull().all():              
+            if not datos_procesados['alcalinidad'].isnull().all():              
 
                 ### GRAFICO SILICATO vs ALCALINIDAD  
                 
