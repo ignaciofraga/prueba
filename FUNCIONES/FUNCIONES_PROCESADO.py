@@ -723,6 +723,14 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     df_datos_dudosos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_dudoso]
     df_datos_buenos = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_bueno]
     
+    st.text('no eval')
+    st.dataframe(df_datos_no_eval)
+    st.text('malos')
+    st.dataframe(df_datos_malos)
+    st.text('dudosos')
+    st.dataframe(df_datos_dudosos)
+    st.text('buenso')
+    st.dataframe(df_datos_buenos)
 
     # comprueba si hay datos de la variable a analizar en la salida seleccionada
     if datos_disponibles_bd[variable_procesada].isnull().all():
