@@ -2073,7 +2073,8 @@ def procesado_nutrientes():
         
         st.subheader('Procesado de datos de nutrientes')
         
-        variables_run = ['ton','nitrito','silicato','fosfato']    
+        variables_run = ['ton','nitrito','silicato','fosfato'] 
+
     
         with st.form("Formulario", clear_on_submit=False):
               
@@ -2175,6 +2176,12 @@ def procesado_nutrientes():
                         
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
                 if io_add_data is True:
+                    
+                    # Añade qf a los datos, asignando a las variables procesadas un qf de valor 1 (no evaluado)
+                    for ivar in range(len(variables_run)):
+                        qf_var = variables_run[ivar] + '_qf'
+                        datos_corregidos[qf_var] = numpy.ones(datos_corregidos.shape[0],dtype=int)
+                        
                     
                     FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
                         

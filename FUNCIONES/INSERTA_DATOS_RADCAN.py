@@ -45,7 +45,7 @@ fecha_actualizacion = datetime.date.today()
 # Listado de archivos disponibles
 
 listado_archivos = ['RADCAN_2020.xlsx','RADCAN_2019.xlsx','RADCAN_2012-2013-2014.xlsx']
-#listado_archivos = ['RADCAN_2019.xlsx']
+listado_archivos = ['RADCAN_2020.xlsx']
 
 for iarchivo in range(len(listado_archivos)):
 #for iarchivo in range(3,5):
@@ -76,14 +76,17 @@ for iarchivo in range(len(listado_archivos)):
     datos_radiales['nitrato'] = datos_radiales['ton'] - datos_radiales['nitrito'] 
     datos_radiales['nitrato_qf'] = 1 
     
-    if 'ton_qf' not in datos_radiales.columns.tolist():
-        datos_radiales['ton_qf'] = int(1)
-    if 'nitrito_qf' not in datos_radiales.columns.tolist():
-        datos_radiales['nitrito_qf'] = int(1)
-    if 'silicato_qf' not in datos_radiales.columns.tolist():
-        datos_radiales['silicato_qf'] = int(1)
-    if 'fosfato_qf' not in datos_radiales.columns.tolist():
-        datos_radiales['fosfato_qf'] = int(1)
+    listado = ['ton_qf','nitrito_qf','silicato_qf','fosfato_qf']
+    for ivar in range(len(listado)):
+        if listado[ivar] not in datos_radiales.columns.tolist():
+            datos_radiales[listado[ivar]] = int(1)
+
+    for idato in range(datos_radiales.shape[0]):
+        if datos_radiales['nitrito_qf'].iloc[idato] == 2 and datos_radiales['ton_qf'].iloc[idato] == 2:
+            datos_radiales['nitrato_qf'].iloc[idato] = 2
+        
+    
+        
     
     #datos_radiales,texto_error = FUNCIONES_LECTURA.lectura_datos_estadillo(nombre_archivo,nombre_archivo)
         
