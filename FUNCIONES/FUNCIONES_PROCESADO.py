@@ -685,7 +685,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             max_val    = fmax*min_seleccion 
            
         if io_malos:
-            df_datos_malos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_malo]
+            df_datos_malos = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_malo]
             if df_datos_malos.shape[0] > 0:
                 min_bd         = numpy.nanmin(numpy.array(df_datos_malos[variable_procesada]))
                 max_bd         = numpy.nanmax(numpy.array(df_datos_malos[variable_procesada]))
@@ -693,7 +693,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 max_val        = fmax*max(max_val,max_seleccion)  
     
         if io_dudosos:
-            df_datos_dudosos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_dudoso]
+            df_datos_dudosos = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_dudoso]
             if df_datos_dudosos.shape[0] > 0:
                 min_bd           = numpy.nanmin(numpy.array(df_datos_dudosos[variable_procesada]))
                 max_bd           = numpy.nanmax(numpy.array(df_datos_dudosos[variable_procesada]))
@@ -701,7 +701,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 max_val          = fmax*max(max_val,max_seleccion) 
             
         if io_no_eval:
-            df_datos_no_eval = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_no_eval]
+            df_datos_no_eval = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_no_eval]
             if df_datos_no_eval.shape[0] > 0:
                 min_bd           = numpy.nanmin(numpy.array(df_datos_no_eval[variable_procesada]))
                 max_bd           = numpy.nanmax(numpy.array(df_datos_no_eval[variable_procesada]))
@@ -718,9 +718,9 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
 
     qf_variable_procesada     = variable_procesada + '_qf'
 
-    df_datos_no_eval = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_no_eval]
-    df_datos_malos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_malo]
-    df_datos_dudosos = datos_disponibles_bd[datos_disponibles_bd[variable_procesada]==id_dato_dudoso]
+    df_datos_no_eval = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_no_eval]
+    df_datos_malos = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_malo]
+    df_datos_dudosos = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_dudoso]
     df_datos_buenos = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_bueno]
     
     st.text('no eval')

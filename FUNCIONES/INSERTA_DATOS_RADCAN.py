@@ -77,13 +77,13 @@ for iarchivo in range(len(listado_archivos)):
     datos_radiales['nitrato_qf'] = 1 
     
     if 'ton_qf' not in datos_radiales.columns.tolist():
-        datos_radiales['ton_qf'] = 1
+        datos_radiales['ton_qf'] = int(1)
     if 'nitrito_qf' not in datos_radiales.columns.tolist():
-        datos_radiales['nitrito_qf'] = 1
+        datos_radiales['nitrito_qf'] = int(1)
     if 'silicato_qf' not in datos_radiales.columns.tolist():
-        datos_radiales['silicato_qf'] = 1
+        datos_radiales['silicato_qf'] = int(1)
     if 'fosfato_qf' not in datos_radiales.columns.tolist():
-        datos_radiales['fosfato_qf'] = 1
+        datos_radiales['fosfato_qf'] = int(1)
     
     #datos_radiales,texto_error = FUNCIONES_LECTURA.lectura_datos_estadillo(nombre_archivo,nombre_archivo)
         
