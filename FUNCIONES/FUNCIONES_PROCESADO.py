@@ -723,15 +723,6 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     df_datos_dudosos = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_dudoso]
     df_datos_buenos = datos_disponibles_bd[datos_disponibles_bd[qf_variable_procesada]==id_dato_bueno]
     
-    st.text('no eval')
-    st.dataframe(df_datos_no_eval)
-    st.text('malos')
-    st.dataframe(df_datos_malos)
-    st.text('dudosos')
-    st.dataframe(df_datos_dudosos)
-    st.text('buenso')
-    st.dataframe(df_datos_buenos)
-
     # comprueba si hay datos de la variable a analizar en la salida seleccionada
     if datos_disponibles_bd[variable_procesada].isnull().all():
         texto_error = "La base de datos no contiene información para la variable, salida y estación seleccionadas"
@@ -1026,7 +1017,6 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                         vmax_rango_x_g2  = st.number_input('Valor máximo nitrato:',value=max_val_x_g2,key='vmax_nit_2')  
      
                     min_val_y_g2,max_val_y_g2 = rango_datos(datos_procesados,datos_disponibles_bd,'ph',df_indices_calidad,io_malos,io_dudosos,io_no_eval)
-
 
                     col1, col2, col3, col4 = st.columns(4,gap="small")
                     with col2:
