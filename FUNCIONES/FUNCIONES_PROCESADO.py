@@ -585,7 +585,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     listado_variables_datos   = datos_insercion.columns.tolist()
     listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
     listado_adicional         = [puntero] + listado_variables_comunes
-    
+        
     # # Si no existe ningún registro en la base de datos, introducir todos los datos disponibles
     if tabla_registros.shape[0] == 0:
         
@@ -611,7 +611,6 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
                     #tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]][datos_insercion[puntero]==int(muestreo)]
                     tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]].iloc[idato]
 
-            
             else: # Nuevo muestreo
                        
                 df_add = datos_insercion[datos_insercion[puntero]==datos_insercion[puntero].iloc[idato]] # Genero un dataframe con cada línea de datos a añadir
