@@ -1114,74 +1114,76 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         # Gráficos particulares para cada variable
         elif variable_procesada == 'silicato':
 
-            ### GRAFICO SILICATO vs ALCALINIDAD  
-            
-            with st.expander("Ajustar rango del gráfico SILICATO vs ALCALINIDAD",expanded=False):            
+            if not datos_procesados['ALCALINIDAD'].isnull().all():              
+
+                ### GRAFICO SILICATO vs ALCALINIDAD  
                 
-                st.write("Selecciona el rango del gráfico")  
-                
-                # Selecciona los rangos del gráfico
-                min_val_x,max_val_x = rango_datos(datos_procesados,datos_disponibles_bd,'silicato',df_indices_calidad,io_malos,io_dudosos,io_no_eval)
-
-                col1, col2, col3, col4 = st.columns(4,gap="small")
-                with col2:
-                    vmin_rango_x  = st.number_input('Valor mínimo silicato:',value=min_val_x,key='vmin_sil')
-                with col3:
-                    vmax_rango_x  = st.number_input('Valor máximo silicato:',value=max_val_x,key='vmax_sil')  
- 
-                min_val_y,max_val_y = rango_datos(datos_procesados,datos_disponibles_bd,'alcalinidad',df_indices_calidad,io_malos,io_dudosos,io_no_eval)
-
-                col1, col2, col3, col4 = st.columns(4,gap="small")
-                with col2:
-                    vmin_rango_y  = st.number_input('Valor mínimo alcalinidad:',value=min_val_y,key='vmin_alc')
-                with col3:
-                    vmax_rango_y  = st.number_input('Valor máximo alcalinidad:',value=max_val_y,key='vmax_alc')   
-
-
-
-            #fig, ax = plt.lots()       
-            fig = plt.figure(figsize=(20/2.54, 18/2.54))
-            ax = fig.add_subplot(111)
-            
-            if io_buenos:
-                plt.plot(df_datos_buenos['silicato'],df_datos_buenos['alcalinidad'],'.',color=color_buenos,label='BUENO')
-            
-            # Representa los datos dentro del intervalo de meses en otro color
-            if io_rango:
-                plt.plot(df_rango_temporal['silicato'],df_rango_temporal['alcalinidad'],'.',color=color_rango,label='BUENO (INTERVALO)')
-            
-            # Representa los datos con QF malos si se seleccionó esta opción   
-            if io_malos:
-                plt.plot(df_datos_malos['silicato'],df_datos_malos['alcalinidad'],'.',color=color_malos,label='MALO')    
-
-            # Representa los datos con QF dudoso si se seleccionó esta opción   
-            if io_dudosos:
-                plt.plot(df_datos_dudosos['silicato'],df_datos_dudosos['alcalinidad'],'.',color=color_dudosos,label='DUDOSO')    
-                            
-            
-            plt.plot(datos_procesados['silicato'],datos_procesados['alcalinidad'],'.r' )
-            
-            ax.set(xlabel='Silicato (\u03BCmol/kg)')
-            ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')           
-             
-            ax.tick_params(axis='both', which='major', labelsize=8)
-            ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
-            ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
-            ax.set_xlim([vmin_rango_x, vmax_rango_x])
-            ax.set_ylim([vmin_rango_y, vmax_rango_y])
+                with st.expander("Ajustar rango del gráfico SILICATO vs ALCALINIDAD",expanded=False):            
+                    
+                    st.write("Selecciona el rango del gráfico")  
+                    
+                    # Selecciona los rangos del gráfico
+                    min_val_x,max_val_x = rango_datos(datos_procesados,datos_disponibles_bd,'silicato',df_indices_calidad,io_malos,io_dudosos,io_no_eval)
     
-            # Añade el nombre de cada punto
-            nombre_muestreos = [None]*datos_procesados.shape[0]
-            for ipunto in range(datos_procesados.shape[0]):
-                if datos_procesados['botella'].iloc[ipunto] is None:
-                    nombre_muestreos[ipunto] = 'Prof.' + str(datos_procesados['presion_ctd'].iloc[ipunto])
-                else:
-                    nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
-                plt.annotate(nombre_muestreos[ipunto], (datos_procesados['silicato'].iloc[ipunto], datos_procesados['alcalinidad'].iloc[ipunto]))
-                      
-            buf = BytesIO()
-            fig.savefig(buf, format="png")
-            st.image(buf) 
+                    col1, col2, col3, col4 = st.columns(4,gap="small")
+                    with col2:
+                        vmin_rango_x  = st.number_input('Valor mínimo silicato:',value=min_val_x,key='vmin_sil')
+                    with col3:
+                        vmax_rango_x  = st.number_input('Valor máximo silicato:',value=max_val_x,key='vmax_sil')  
+     
+                    min_val_y,max_val_y = rango_datos(datos_procesados,datos_disponibles_bd,'alcalinidad',df_indices_calidad,io_malos,io_dudosos,io_no_eval)
+    
+                    col1, col2, col3, col4 = st.columns(4,gap="small")
+                    with col2:
+                        vmin_rango_y  = st.number_input('Valor mínimo alcalinidad:',value=min_val_y,key='vmin_alc')
+                    with col3:
+                        vmax_rango_y  = st.number_input('Valor máximo alcalinidad:',value=max_val_y,key='vmax_alc')   
+    
+    
+    
+                #fig, ax = plt.lots()       
+                fig = plt.figure(figsize=(20/2.54, 18/2.54))
+                ax = fig.add_subplot(111)
+                
+                if io_buenos:
+                    plt.plot(df_datos_buenos['silicato'],df_datos_buenos['alcalinidad'],'.',color=color_buenos,label='BUENO')
+                
+                # Representa los datos dentro del intervalo de meses en otro color
+                if io_rango:
+                    plt.plot(df_rango_temporal['silicato'],df_rango_temporal['alcalinidad'],'.',color=color_rango,label='BUENO (INTERVALO)')
+                
+                # Representa los datos con QF malos si se seleccionó esta opción   
+                if io_malos:
+                    plt.plot(df_datos_malos['silicato'],df_datos_malos['alcalinidad'],'.',color=color_malos,label='MALO')    
+    
+                # Representa los datos con QF dudoso si se seleccionó esta opción   
+                if io_dudosos:
+                    plt.plot(df_datos_dudosos['silicato'],df_datos_dudosos['alcalinidad'],'.',color=color_dudosos,label='DUDOSO')    
+                                
+                
+                plt.plot(datos_procesados['silicato'],datos_procesados['alcalinidad'],'.r' )
+                
+                ax.set(xlabel='Silicato (\u03BCmol/kg)')
+                ax.set(ylabel='Alcalinidad (\u03BCmol/kg)')           
+                 
+                ax.tick_params(axis='both', which='major', labelsize=8)
+                ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f')) 
+                ax.yaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+                ax.set_xlim([vmin_rango_x, vmax_rango_x])
+                ax.set_ylim([vmin_rango_y, vmax_rango_y])
+        
+                # Añade el nombre de cada punto
+                nombre_muestreos = [None]*datos_procesados.shape[0]
+                for ipunto in range(datos_procesados.shape[0]):
+                    if datos_procesados['botella'].iloc[ipunto] is None:
+                        nombre_muestreos[ipunto] = 'Prof.' + str(datos_procesados['presion_ctd'].iloc[ipunto])
+                    else:
+                        nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
+                    plt.annotate(nombre_muestreos[ipunto], (datos_procesados['silicato'].iloc[ipunto], datos_procesados['alcalinidad'].iloc[ipunto]))
+                          
+                buf = BytesIO()
+                fig.savefig(buf, format="png")
+                st.image(buf) 
 
     
     
