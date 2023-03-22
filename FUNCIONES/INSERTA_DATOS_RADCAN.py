@@ -65,6 +65,16 @@ for iarchivo in range(len(listado_archivos)):
     datos_radiales['configuracion_superficie'] = [None]*datos_radiales.shape[0]
     datos_radiales['prof_referencia']          = None
     
+    # Corrige valores de nutrientes <0 
+    datos_radiales['TON'][datos_radiales['TON']<0]=0
+    datos_radiales['nitrito'][datos_radiales['nitrito']<0]=0
+    datos_radiales['fosfato'][datos_radiales['fosfato']<0]=0
+    datos_radiales['silicato'][datos_radiales['silicato']<0]=0
+    
+    # Cambia nombres del TON y TON_QF
+    datos_radiales = datos_radiales.rename(columns={"TON":"ton","TON_qf":"ton_qf"})
+    datos_radiales['nitrato'] = datos_radiales['ton'] - datos_radiales['nitrito'] 
+    
     
     #datos_radiales,texto_error = FUNCIONES_LECTURA.lectura_datos_estadillo(nombre_archivo,nombre_archivo)
         
