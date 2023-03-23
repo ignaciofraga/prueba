@@ -833,7 +833,7 @@ def consulta_perfiles():
                 # Representa los datos de cada variable
                 for ivariable in range(len(listado_variables)):
                     
-                    encabezados_tablas = encabezados_tablas + [listado_variables[ivariable] +  listado_unidades_tabla[ivariable]]
+                    
                     
                     if df_perfil[listado_variables[ivariable]].iloc[0] is not None:
                         str_datos   = df_perfil[listado_variables[ivariable]].iloc[0]
@@ -855,9 +855,11 @@ def consulta_perfiles():
                     else:
                         df_exporta = pandas.concat([df_exporta, df_datos], axis=1)
             
-                # Cambia el nombre de las columnas
-                st.text(encabezados_tablas)
-                df_exporta.columns = encabezados_tablas
+                    # Cambia el nombre de las columnas        
+                    nombre_encabezado = listado_variables[ivariable] +  listado_unidades_tabla[ivariable]
+                    df_exporta        = df_exporta.rename(columns={listado_variables[ivariable]: nombre_encabezado})
+            
+
             
                 # Elimina columnas duplicadas (presion_ctd) y exporta a un excel
                 df_exporta  = df_exporta.loc[:,~df_exporta.columns.duplicated()].copy()
