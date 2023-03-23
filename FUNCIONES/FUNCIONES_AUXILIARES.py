@@ -833,7 +833,7 @@ def consulta_perfiles():
                 # Representa los datos de cada variable
                 for ivariable in range(len(listado_variables)):
                     
-                    encabezados_tablas = encabezados_tablas + [listado_variables[ivariable]] + [listado_unidades_tabla[ivariable]]
+                    encabezados_tablas = encabezados_tablas + [listado_variables[ivariable] +  listado_unidades_tabla[ivariable]]
                     
                     if df_perfil[listado_variables[ivariable]].iloc[0] is not None:
                         str_datos   = df_perfil[listado_variables[ivariable]].iloc[0]
