@@ -814,7 +814,7 @@ def consulta_perfiles():
         with pandas.ExcelWriter(buffer, engine='xlsxwriter') as writer:
         
             # Genera un gráfico con tants subplots como variables
-            fig, axs = plt.subplots(1, len(listado_variables),sharey='all')
+            fig, axs = plt.subplots(1, len(listado_variables),figsize=(20/2.54, 18/2.54),sharey='all')
             
             # Bucle por cada perfil disponible
             for iperfil in range(df_perfiles_seleccion.shape[0]):
@@ -835,7 +835,7 @@ def consulta_perfiles():
                         json_datos  = json.loads(str_datos)
                         df_datos    =  pandas.DataFrame.from_dict(json_datos)
                       
-                        axs[ivariable].plot(df_datos[listado_variables[ivariable]],df_datos['presion_ctd'],linewidth=2,color=color_estacion,label=nombre_estacion)
+                        axs[ivariable].plot(df_datos[listado_variables[ivariable]],df_datos['presion_ctd'],linewidth=0.5,color=color_estacion,label=nombre_estacion)
                 
                     # Almacena los resultados para luego exportar a un excel
                     
@@ -867,7 +867,9 @@ def consulta_perfiles():
             # Añade la leyenda
             axs[2].legend(loc='upper center',bbox_to_anchor=(0.5, 1.1),ncol=len(listado_variables), fancybox=True,fontsize=7)
             
-            st.pyplot(fig)
+            buf = BytesIO()
+            fig.savefig(buf, format="png")
+            st.image(buf)  
         
         writer.save()
         
