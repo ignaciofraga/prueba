@@ -2183,9 +2183,7 @@ def procesado_nutrientes():
                 
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
                 if io_add_data is True:
-                    
-                    st.dataframe(datos_corregidos)
-                    
+                                        
                     FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
                         
                     texto_exito = 'Información introducida correctamente en la base de datos'
@@ -2216,8 +2214,8 @@ def procesado_nutrientes():
                     mime="application/vnd.ms-excel"
                 )              
        
-                st.experimental_singleton.clear()
-                    
+                st.cache_resource.clear()
+                              
 
 
 
