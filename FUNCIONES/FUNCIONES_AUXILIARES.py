@@ -307,7 +307,7 @@ def consulta_botellas():
                 
     # Recorta el dataframe de datos físicos con las variables seleccionadas
     df_datos_fisicos_seleccion = df_datos_fisicos.loc[:, listado_variables]
-                
+                    
     listado_variables =['muestreo']
                 
     with st.expander("Variables biogeoquímicas",expanded=False):
@@ -403,10 +403,13 @@ def consulta_botellas():
         # conserva los datos de las salidas seleccionadas
         df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
  
+        st.dataframe(df_salidas_seleccion)   
+ 
         # Recupera los muestreos correspondientes a las salidas seleccionadas
         df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(identificadores_salidas)]
         df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"id_muestreo": "muestreo"})
 
+        st.dataframe(df_muestreos_seleccionados)
 
         # Asocia las coordenadas y nombre de estación de cada muestreo
         df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
@@ -414,6 +417,8 @@ def consulta_botellas():
                       
         # Asocia las propiedades físicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos_seleccion, on="muestreo")
+        
+        st.dataframe(df_muestreos_seleccionados)
                      
         # Asocia las propiedades biogeoquimicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
