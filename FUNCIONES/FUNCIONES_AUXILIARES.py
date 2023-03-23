@@ -405,6 +405,9 @@ def consulta_botellas():
  
         st.dataframe(df_salidas_seleccion)   
  
+        st.dataframe(df_muestreos)  
+        st.text(identificadores_salidas)
+ 
         # Recupera los muestreos correspondientes a las salidas seleccionadas
         df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(identificadores_salidas)]
         df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"id_muestreo": "muestreo"})
