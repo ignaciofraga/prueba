@@ -855,6 +855,7 @@ def consulta_perfiles():
                     else:
                         df_exporta = pandas.concat([df_exporta, df_datos], axis=1)
             
+            
                     # Cambia el nombre de las columnas        
                     nombre_encabezado = listado_variables[ivariable] +  listado_unidades_tabla[ivariable]
                     df_exporta        = df_exporta.rename(columns={listado_variables[ivariable]: nombre_encabezado})
