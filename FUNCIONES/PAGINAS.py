@@ -2370,16 +2370,6 @@ def procesado_quimica():
 
 def entrada_datos_excel():
     
-    # @st.cache_data
-    # def carga_datos_entrada_datos_excel():
-    #     # Recupera los datos disponibles en la base de datos
-    #     conn                      = init_connection()
-    #     df_programas              = psql.read_sql('SELECT * FROM programas', conn)
-    #     variables_bd              = psql.read_sql('SELECT * FROM variables_procesado', conn)
-    #     conn.close()         
-    
-    #     return df_programas,variables_bd
-
     st.subheader('Portal de entrada de datos')
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación

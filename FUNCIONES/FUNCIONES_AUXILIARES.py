@@ -224,18 +224,26 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
 
 def consulta_botellas():
            
+    # Función para cargar en caché los datos a utilizar
+    @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
+    def carga_datos_consulta_botellas():
+        conn                    = init_connection()
+        df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_programas            = psql.read_sql('SELECT * FROM programas', conn)
+        df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+        df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+        df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+        df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
+        conn.close() 
+        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas
+           
     st.subheader('Consulta los datos de botellas disponibles') 
 
-    # Recupera tablas con informacion utilizada en el procesado
-    conn                    = init_connection()
-    df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-    df_programas            = psql.read_sql('SELECT * FROM programas', conn)
-    df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-    df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
-    df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-    df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
-    conn.close()    
-    
+
+    # carga de la caché los datos 
+    df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas = carga_datos_consulta_botellas()
+
+
     id_radiales             = int(df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0])
     
     # Despliega menús de selección del programa, tipo de salida, año y fecha               
