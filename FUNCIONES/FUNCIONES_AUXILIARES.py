@@ -802,9 +802,10 @@ def consulta_perfiles():
         df_colores = pandas.DataFrame(data, columns=['estacion', 'color'])
         
         # Listados de variables, unidades y abreviaturas a representar
-        listado_variables = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
-        listado_unidades  = ['(degC)','(PSU)','(\u03BCE/m2s)','(\u03BCg/L)','(\u03BCmol/kg)']
-        listado_titulos   = ['Temp.','Sal.','PAR','Fluor.','Oxigeno']
+        listado_variables         = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
+        listado_unidades_grafico  = ['(degC)','(PSU)','(\u03BCE/m2s)','(\u03BCg/L)','(\u03BCmol/kg)']
+        listado_unidades_tabla    = ['(degC)','(PSU)','(µE/m2s)','(µg/L)','(µmol/kg)']
+        listado_titulos           = ['Temp.','Sal.','PAR','Fluor.','Oxigeno']
         
         listado_variables_adicionales = ['hora_perfil','fecha_perfil','latitud_muestreo','longitud_muestreo','estacion']
         
@@ -827,8 +828,12 @@ def consulta_perfiles():
                 nombre_estacion = df_estaciones['nombre_estacion'][df_estaciones['id_estacion']==int(id_estacion)].iloc[0]
                 color_estacion  = df_colores['color'][df_colores['estacion']==nombre_estacion].iloc[0]
             
+                encabezados_tablas = []
+            
                 # Representa los datos de cada variable
                 for ivariable in range(len(listado_variables)):
+                    
+                    encabezados_tablas = encabezados_tablas + [listado_variables[ivariable]] + [listado_unidades_tabla[ivariable]]
                     
                     if df_perfil[listado_variables[ivariable]].iloc[0] is not None:
                         str_datos   = df_perfil[listado_variables[ivariable]].iloc[0]
@@ -850,6 +855,9 @@ def consulta_perfiles():
                     else:
                         df_exporta = pandas.concat([df_exporta, df_datos], axis=1)
             
+                # Cambia el nombre de las columnas
+                df_exporta.columns = encabezados_tablas
+            
                 # Elimina columnas duplicadas (presion_ctd) y exporta a un excel
                 df_exporta  = df_exporta.loc[:,~df_exporta.columns.duplicated()].copy()
                 nombre_hoja = 'ESTACION '+ nombre_estacion
@@ -858,7 +866,7 @@ def consulta_perfiles():
             
             # Ajusta parámetros de los gráficos
             for igrafico in range(len(listado_variables)):
-                texto_eje = listado_titulos[igrafico] + listado_unidades[igrafico] 
+                texto_eje = listado_titulos[igrafico] + listado_unidades_grafico[igrafico] 
                 axs[igrafico].set(xlabel=texto_eje)
                 axs[igrafico].invert_yaxis()
                 if igrafico == 0:
