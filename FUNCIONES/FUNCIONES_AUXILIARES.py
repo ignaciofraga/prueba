@@ -829,12 +829,14 @@ def consulta_perfiles():
             
                 # Representa los datos de cada variable
                 for ivariable in range(len(listado_variables)):
-                    str_datos   = df_perfil[listado_variables[ivariable]].iloc[0]
-                    json_datos  = json.loads(str_datos)
-                    df_datos    =  pandas.DataFrame.from_dict(json_datos)
-                  
-                    axs[ivariable].plot(df_datos[listado_variables[ivariable]],df_datos['presion_ctd'],linewidth=2,color=color_estacion,label=nombre_estacion)
-            
+                    
+                    if df_perfil[listado_variables[ivariable]].iloc[0] is not None:
+                        str_datos   = df_perfil[listado_variables[ivariable]].iloc[0]
+                        json_datos  = json.loads(str_datos)
+                        df_datos    =  pandas.DataFrame.from_dict(json_datos)
+                      
+                        axs[ivariable].plot(df_datos[listado_variables[ivariable]],df_datos['presion_ctd'],linewidth=2,color=color_estacion,label=nombre_estacion)
+                
                     # Almacena los resultados para luego exportar a un excel
                     
                     if ivariable == 0:
