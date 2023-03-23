@@ -64,7 +64,9 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
 
     # Cambia todos los -999 por None
     datos = datos.replace(-999, None) 
-    
+    #datos  = datos.replace({-999: None})
+    #datos = datos.replace(-999, datos.replace([-999], [None])
+
     # # Añade las columnas con datos de qf=9 en aquellas variables que no estén incluidas
     # con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     # conn_psql          = create_engine(con_engine)
@@ -192,6 +194,8 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     for iestacion in range(estaciones_muestreadas.shape[0]):
         
         df_temporal = estaciones_programa[estaciones_programa['nombre_estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]
+    
+        #print(df_temporal)
     
         # Estacion ya incluida en la base de datos. Recuperar identificador
         if df_temporal.shape[0]>0:

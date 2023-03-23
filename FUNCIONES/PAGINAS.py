@@ -2174,14 +2174,17 @@ def procesado_nutrientes():
                     #reduce los decimales 
                     datos_corregidos[variables_procesado_bd[ivariable_procesada]]=round(datos_corregidos[variables_procesado_bd[ivariable_procesada]],3)
                         
-                # Añade los datos a la base de datos si se seleccionó esta opción                        
-                if io_add_data is True:
-                    
                     # Añade qf a los datos, asignando a las variables procesadas un qf de valor 1 (no evaluado)
                     for ivar in range(len(variables_run)):
                         qf_var = variables_run[ivar] + '_qf'
                         datos_corregidos[qf_var] = numpy.ones(datos_corregidos.shape[0],dtype=int)
-                    datos_corregidos['nitrato_qf'] = numpy.ones(datos_corregidos.shape[0],dtype=int)    
+                    datos_corregidos['nitrato_qf'] = numpy.ones(datos_corregidos.shape[0],dtype=int)   
+                
+                
+                # Añade los datos a la base de datos si se seleccionó esta opción                        
+                if io_add_data is True:
+                    
+                    st.dataframe(datos_corregidos)
                     
                     FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
                         

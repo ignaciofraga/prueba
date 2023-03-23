@@ -64,7 +64,7 @@ datos_combinados = pandas.merge(datos_combinados, df_salidas, on="salida_mar")
 
 datos_radcan  = datos_combinados[datos_combinados['programa']==4]
 datos_pelacus = datos_combinados[datos_combinados['programa']==1]
-
+datos_radcor  = datos_combinados[datos_combinados['programa']==3]
 # df_datos_importacion  = pandas.read_excel(archivo_datos) 
 
 # # corrige el formato de las fechas

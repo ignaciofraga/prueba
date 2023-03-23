@@ -30,7 +30,7 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
     ## CARGA LA INFORMACION CONTENIDA EN EL EXCEL
     
     # Importa el .xlsx
-    datos_radiales = pandas.read_excel(nombre_archivo, 'data')
+    datos_radiales = pandas.read_excel(nombre_archivo, 'data',index_col=None)
     
     # Elimina la primera fila, con unidades de las distintas variables
     datos_radiales = datos_radiales.iloc[1: , :]
@@ -144,8 +144,13 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
                                                     "R_CLOR":"r_clor","R_CLOR_FLAG_W":"r_clor_qf","R_PER":"r_per","R_PER_FLAG_W":"r_per_qf","CO3_TMP":"co3_temp"
                                                     })    
     
-    datos_radiales['TON']    = datos_radiales['nitrato'] + datos_radiales['nitrito']
-    datos_radiales['TON_qf'] = 2
+    # Ojo con esto, cuando una de las medidas está mal, estropea
+    datos_radiales['ton']    = [None]*datos_radiales.shape[0]
+    datos_radiales['ton_qf'] = 9
+    for idato in range(datos_radiales.shape[0]):
+       if datos_radiales['nitrato_qf'][idato] == 2 and datos_radiales['nitrito_qf'][idato] == 2:
+           datos_radiales['ton'][idato]    = datos_radiales['nitrato'][idato] + datos_radiales['nitrito'][idato]
+           datos_radiales['ton_qf'][idato] = 2
     
     # Añade una columan con el QF de la temperatura, igual al de la salinidad
     datos_radiales['temperatura_ctd_qf'] = datos_radiales['salinidad_ctd_qf'] 
