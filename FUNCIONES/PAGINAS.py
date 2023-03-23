@@ -2214,7 +2214,7 @@ def procesado_nutrientes():
                     mime="application/vnd.ms-excel"
                 )              
        
-                st.cache_resource.clear()
+                st.cache_data.clear()
                               
 
 
