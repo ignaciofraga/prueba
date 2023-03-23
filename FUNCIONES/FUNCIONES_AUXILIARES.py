@@ -856,6 +856,7 @@ def consulta_perfiles():
                         df_exporta = pandas.concat([df_exporta, df_datos], axis=1)
             
                 # Cambia el nombre de las columnas
+                st.text(encabezados_tablas)
                 df_exporta.columns = encabezados_tablas
             
                 # Elimina columnas duplicadas (presion_ctd) y exporta a un excel
