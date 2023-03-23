@@ -2021,7 +2021,7 @@ def consulta_datos():
 def procesado_nutrientes():
     
     # Función para cargar en caché los datos a utilizar
-    @st.cache_data(show_spinner=False,ttl=300)
+    @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
     def carga_datos_procesado_nutrientes():
         conn                      = init_connection()
         df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
