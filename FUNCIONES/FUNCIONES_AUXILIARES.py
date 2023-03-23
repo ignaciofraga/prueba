@@ -835,7 +835,7 @@ def consulta_perfiles():
                         json_datos  = json.loads(str_datos)
                         df_datos    =  pandas.DataFrame.from_dict(json_datos)
                       
-                        axs[ivariable].plot(df_datos[listado_variables[ivariable]],df_datos['presion_ctd'],linewidth=0.5,color=color_estacion,label=nombre_estacion)
+                        axs[ivariable].plot(df_datos[listado_variables[ivariable]],df_datos['presion_ctd'],linewidth=1,color=color_estacion,label=nombre_estacion)
                 
                     # Almacena los resultados para luego exportar a un excel
                     
