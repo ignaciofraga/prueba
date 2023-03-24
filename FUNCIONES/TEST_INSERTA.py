@@ -45,26 +45,54 @@ con_engine      = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion
 conn            = create_engine(con_engine)
 df_programas    = psql.read_sql('SELECT * FROM programas', conn)
 variables_bd    = psql.read_sql('SELECT * FROM variables_procesado', conn)
-df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
-df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
-df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-df_programas              = psql.read_sql('SELECT * FROM programas', conn)
-df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
-df_rmns                   = psql.read_sql('SELECT * FROM rmn_nutrientes', conn)
+# df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+# df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
+# df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+# df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+# df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+# df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+# df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
+# df_rmns                   = psql.read_sql('SELECT * FROM rmn_nutrientes', conn)
+df_variables              = psql.read_sql('SELECT * FROM variables_procesado', conn)
 conn.dispose() 
 
 
 
-datos_combinados = pandas.merge(df_muestreos, df_datos_biogeoquimicos, on="muestreo")
+# Añade unidades al nombre de cada variable
+listado_variables_bd     = df_variables['parametros_muestreo'].tolist() + df_variables['variables_fisicas'].tolist()  + df_variables['variables_biogeoquimicas'].tolist() 
+listado_variables_uds_bd = [] 
 
-df_salidas     = df_salidas.rename(columns={"id_salida": "salida_mar"})
-datos_combinados = pandas.merge(datos_combinados, df_salidas, on="salida_mar")
+for ivariable in range(df_variables.shape[0]):
+    if df_variables['parametros_muestreo'][ivariable] is not None: 
+        if df_variables['unidades_muestreo'][ivariable] is not None: 
+            listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['parametros_muestreo'].iloc[ivariable] + '(' + df_variables['unidades_muestreo'].iloc[ivariable] + ')']
+        else:
+            listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['parametros_muestreo'].iloc[ivariable]]
 
-datos_radcan  = datos_combinados[datos_combinados['programa']==4]
-datos_pelacus = datos_combinados[datos_combinados['programa']==1]
-datos_radcor  = datos_combinados[datos_combinados['programa']==3]
+for ivariable in range(df_variables.shape[0]):
+    if df_variables['variables_fisicas'][ivariable] is not None: 
+        if df_variables['unidades_fisica'][ivariable] is not None: 
+            listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['variables_fisicas'].iloc[ivariable] + '(' + df_variables['unidades_fisica'].iloc[ivariable] + ')']
+        else:
+            listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['variables_fisicas'].iloc[ivariable]]
+
+for ivariable in range(df_variables.shape[0]):
+    if df_variables['variables_biogeoquimicas'][ivariable] is not None: 
+        if df_variables['unidades_bgq'][ivariable] is not None: 
+            listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['variables_biogeoquimicas'].iloc[ivariable] + '(' + df_variables['unidades_bgq'].iloc[ivariable] + ')']
+        else:
+            listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['variables_biogeoquimicas'].iloc[ivariable]]
+   
+
+
+# datos_combinados = pandas.merge(df_muestreos, df_datos_biogeoquimicos, on="muestreo")
+
+# df_salidas     = df_salidas.rename(columns={"id_salida": "salida_mar"})
+# datos_combinados = pandas.merge(datos_combinados, df_salidas, on="salida_mar")
+
+# datos_radcan  = datos_combinados[datos_combinados['programa']==4]
+# datos_pelacus = datos_combinados[datos_combinados['programa']==1]
+# datos_radcor  = datos_combinados[datos_combinados['programa']==3]
 # df_datos_importacion  = pandas.read_excel(archivo_datos) 
 
 # # corrige el formato de las fechas
