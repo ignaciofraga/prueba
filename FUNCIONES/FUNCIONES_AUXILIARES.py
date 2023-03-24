@@ -706,21 +706,21 @@ def consulta_botellas():
             if df_variables['parametros_muestreo'][ivariable] is not None: 
                 st.text(ivariable)
                 if df_variables['unidades_muestreo'][ivariable] is not None: 
-                    listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['parametros_muestreo'].iloc[ivariable] + '(' + ['unidades_muestreo'].iloc[ivariable] + ')']
+                    listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['parametros_muestreo'].iloc[ivariable] + '(' + df_variables['unidades_muestreo'].iloc[ivariable] + ')']
                 else:
                     listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['parametros_muestreo'].iloc[ivariable]]
 
         for ivariable in range(df_variables.shape[0]):
             if df_variables['variables_fisicas'][ivariable] is not None: 
                 if df_variables['unidades_fisica'][ivariable] is not None: 
-                    listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['variables_fisicas'].iloc[ivariable] + '(' + ['unidades_fisica'].iloc[ivariable] + ')']
+                    listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['variables_fisicas'].iloc[ivariable] + '(' + df_variables['unidades_fisica'].iloc[ivariable] + ')']
                 else:
                     listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['variables_fisicas'].iloc[ivariable]]
 
         for ivariable in range(df_variables.shape[0]):
             if df_variables['variables_biogeoquimicas'][ivariable] is not None: 
                 if df_variables['unidades_bgq'][ivariable] is not None: 
-                    listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['variables_biogeoquimicas'].iloc[ivariable] + '(' + ['unidades_bgq'].iloc[ivariable] + ')']
+                    listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['variables_biogeoquimicas'].iloc[ivariable] + '(' + df_variables['unidades_bgq'].iloc[ivariable] + ')']
                 else:
                     listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['variables_biogeoquimicas'].iloc[ivariable]]
                     
