@@ -699,7 +699,7 @@ def consulta_botellas():
         df_exporta.dropna(how='all', axis=1, inplace=True)
         
         # Añade unidades al nombre de cada variable
-        listado_variables_bd     = df_variables['parametros_muestreo'] + df_variables['variables_fisicas'] + df_variables['variables_biogeoquimicas']
+        listado_variables_bd     = [df_variables['parametros_muestreo']] + [df_variables['variables_fisicas']] + [df_variables['variables_biogeoquimicas']]
         listado_variables_uds_bd = [] 
         
         for ivariable in range(df_variables.shape[0]):
