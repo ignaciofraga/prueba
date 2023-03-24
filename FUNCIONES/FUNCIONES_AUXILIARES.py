@@ -704,7 +704,6 @@ def consulta_botellas():
         
         for ivariable in range(df_variables.shape[0]):
             if df_variables['parametros_muestreo'][ivariable] is not None: 
-                st.text(ivariable)
                 if df_variables['unidades_muestreo'][ivariable] is not None: 
                     listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['parametros_muestreo'].iloc[ivariable] + '(' + df_variables['unidades_muestreo'].iloc[ivariable] + ')']
                 else:
@@ -726,8 +725,9 @@ def consulta_botellas():
                     
         listado_variables_df = df_exporta.columns.tolist()
         for ivariable_df in range(len(listado_variables_df)):
-            indice     = listado_variables_bd.index(listado_variables_df[ivariable_df])
             st.text(listado_variables_df[ivariable_df])
+            st.text(listado_variables_bd)
+            indice     = listado_variables_bd.index(listado_variables_df[ivariable_df])
             st.text(listado_variables_uds_bd[indice])
             df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: listado_variables_uds_bd[indice]})
     
