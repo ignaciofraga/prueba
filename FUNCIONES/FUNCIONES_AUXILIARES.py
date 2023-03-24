@@ -712,7 +712,7 @@ def consulta_botellas():
                     nombre_uds = listado_variables_fisicas[indice] + '(' + listado_unidades_fisicas[indice] + ')'
                     df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})
             if listado_variables_df[ivariable_df] in listado_variables_bgq:
-                indice     = listado_variables_bgq.index(listado_variables_bgq[ivariable_df])
+                indice     = listado_variables_bgq.index(listado_variables_df[ivariable_df])
                 if listado_unidades_bgq[indice] is not None:
                     nombre_uds = listado_variables_bgq[indice] + '(' + listado_unidades_bgq[indice] + ')'
                     df_exporta = df_exporta.rename(columns={listado_variables_bgq[ivariable_df]: nombre_uds})
