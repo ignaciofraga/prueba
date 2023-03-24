@@ -704,6 +704,7 @@ def consulta_botellas():
         
         for ivariable in range(df_variables.shape[0]):
             if df_variables['parametros_muestreo'][ivariable] is not None: 
+                st.text(ivariable)
                 if df_variables['unidades_muestreo'][ivariable] is not None: 
                     listado_variables_uds_bd = listado_variables_uds_bd + [df_variables['parametros_muestreo'].iloc[ivariable] + '(' + ['unidades_muestreo'].iloc[ivariable] + ')']
                 else:
