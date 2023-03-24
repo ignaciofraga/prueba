@@ -726,6 +726,8 @@ def consulta_botellas():
         listado_variables_df = df_exporta.columns.tolist()
         for ivariable_df in range(len(listado_variables_df)):
             indice     = listado_variables_bd.index(listado_variables_df[ivariable_df])
+            st.text(listado_variables_df[ivariable_df])
+            st.text(listado_variables_uds_bd[indice])
             df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: listado_variables_uds_bd[indice]})
     
         ## Botón para exportar los resultados
