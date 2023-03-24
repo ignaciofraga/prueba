@@ -716,6 +716,7 @@ def consulta_botellas():
                 indice     = listado_variables_bgq.index(listado_variables_df[ivariable_df])
                 if listado_unidades_bgq[indice] is not None:
                     nombre_uds = listado_variables_bgq[indice] + '(' + listado_unidades_bgq[indice] + ')'
+                    st.text(nombre_uds)
                     df_exporta = df_exporta.rename(columns={listado_variables_bgq[ivariable_df]: nombre_uds})
                 
         ## Botón para exportar los resultados
