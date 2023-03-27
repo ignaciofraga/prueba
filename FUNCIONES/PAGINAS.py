@@ -149,38 +149,29 @@ def consulta_estado():
                         
                 df_estados = df_estados.sort_values('Año')
             
-                # ## Despliega la información en una tabla
-                # def color_tabla(valor_estado):
-                #     if valor_estado == 'No disponible':
-                #         return f'background-color: #CD5C5C'
-                #     elif valor_estado == 'Pendiente de análisis':
-                #         return f'background-color:#F4A460'
-                #     elif valor_estado == 'Analizado':
-                #         return f'background-color:#87CEEB'
-                #     elif valor_estado == 'Control de calidad secundario':                    
-                #         return f'background-color:#66CDAA'
+                ## Despliega la información en una tabla
+                def color_tabla(valor_estado,nombre_estados,colores_estados):
+                    for iestado in range(len(nombre_estados)):    
+                        if valor_estado == nombre_estados[iestado]:
+                            color = colores_estados[iestado]
+                            return f'background-color: {color}'
                     
-                # st.dataframe(df_estados.style.applymap(color_tabla, subset=['Estado']))
+                    # if valor_estado == 'No disponible':
+                    #     return f'background-color: #CD5C5C'
+                    # elif valor_estado == 'Pendiente de análisis':
+                    #     return f'background-color:#F4A460'
+                    # elif valor_estado == 'Analizado':
+                    #     return f'background-color:#87CEEB'
+                    # elif valor_estado == 'Control de calidad secundario':                    
+                    #     return f'background-color:#66CDAA'
+                    
+                st.dataframe(df_estados.style.applymap(color_tabla, subset=['Estado']))
                     
 
 
 
                 
-                cellsytle_jscode = st_aggrid.shared.JsCode("""function(params) {
-                if (params.value.includes('No disponible')){return {'color': 'black', 'backgroundColor': '#CD5C5C'}}
-                if (params.value.includes('Pendiente de análisis')){return {'color': 'black', 'backgroundColor': '#F4A460'}}
-                if (params.value.includes('Analizado')){return {'color': 'black', 'backgroundColor': '#87CEEB'}}
-                if (params.value.includes('Control de calidad secundario')){return {'color': 'black', 'backgroundColor': '#66CDAA'}}
-                };""")
-                
-                st.header("Listado de datos")
-                gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_estados)
-                gb.configure_column("Estado", cellStyle=cellsytle_jscode)
-            
-                gridOptions = gb.build()
-                
-                st_aggrid.AgGrid(df_estados,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
-                    
+
                     
                 # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
                 num_valores = numpy.zeros(len(nombre_estados),dtype=int)
