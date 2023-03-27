@@ -610,7 +610,7 @@ def consulta_procesos():
                 if df_muestreos_curso.shape[0] > 0:
                         
                     # Muestra una tabla con los análisis en curso
-                    st.dataframe(df_muestreos_terminados,height=150)
+                    st.dataframe(df_muestreos_terminados,height=150,use_container_width=True)
                 else:
                     
                     texto_error = 'No hay ninguna muestra en proceso durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
@@ -621,7 +621,7 @@ def consulta_procesos():
                 if df_muestreos_terminados.shape[0] > 0:
                         
                     # Muestra una tabla con los análisis en curso
-                    st.dataframe(df_muestreos_terminados,height=300)
+                    st.dataframe(df_muestreos_terminados,height=300,use_container_width=True)
                     # altura_tabla = 300
                     # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_terminados)
                     # gridOptions = gb.build()
@@ -932,7 +932,7 @@ def entrada_salidas_mar():
         conn.close()
 
         # Muestra una tabla con el personal ya incluido en la base de datos
-        st.dataframe(df_personal,height=250)
+        st.dataframe(df_personal,height=250,use_container_width=True)
         # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_personal)
         # gridOptions = gb.build()
         # st_aggrid.AgGrid(df_personal,gridOptions=gridOptions,enable_enterprise_modules=True,height=250,allow_unsafe_jscode=True,reload_data=True)    
@@ -1015,7 +1015,7 @@ def entrada_salidas_mar():
           
         
         # Muestra una tabla con las salidas realizadas
-        st.dataframe(df_salidas_radiales)
+        st.dataframe(df_salidas_radiales,use_container_width=True)
         # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_salidas_radiales)
         # gridOptions = gb.build()
         # st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
@@ -1467,7 +1467,7 @@ def entrada_condiciones_ambientales():
             for idato in range(df_condiciones_salida_seleccionada.shape[0]):
                 df_tabla['estacion'].iloc[idato] =  df_estaciones['nombre_estacion'][df_estaciones['id_estacion'] == df_tabla['estacion'].iloc[idato]] 
     
-            st.dataframe(df_tabla,height = 150)        
+            st.dataframe(df_tabla,height = 150,use_container_width=True)        
             # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_tabla)
             # gridOptions = gb.build()
             # st_aggrid.AgGrid(df_tabla,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
