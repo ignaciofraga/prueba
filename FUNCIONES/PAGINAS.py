@@ -150,34 +150,25 @@ def consulta_estado():
                 df_estados = df_estados.sort_values('Año')
             
                 ## Despliega la información en una tabla
-                # def color_tabla(valor_estado):
-                #     if valor_estado == 'No disponible':
-                #         return f'background-color: #CD5C5C'
-                #     elif valor_estado == 'Pendiente de análisis':
-                #         return f'background-color:#F4A460'
-                #     elif valor_estado == 'Analizado':
-                #         return f'background-color:#87CEEB'
-                #     elif valor_estado == 'Control de calidad secundario':                    
-                #         return f'background-color:#66CDAA'
-                
-                #st.dataframe(df_estados.style.applymap(color_tabla, subset=['Estado']))
-                    
-                
-                def color_tabla(s):
-#                    return ['background-color: #CD5C5C']*len(s) if s.Estado == 'No disponible' else ['background-color: #F4A460']*len(s)
-                    #return ['background-color: #CD5C5C']*len(s) if s.Estado == 'No disponible' else return ['background-color: #F4A460']*len(s) if s.Estado == 'Pendiente de análisis'  
-                    if s.Estado == 'No disponible':
-                        return ['background-color: #CD5C5C']*len(s)
-                    elif s.Estado == 'Pendiente de análisis':
-                        return ['background-color:#F4A460']*len(s)
-                    elif s.Estado == 'Analizado':
-                        return ['background-color:#87CEEB']*len(s)
-                    elif s.Estado == 'Control de calidad secundario':                    
-                        return ['background-color:#66CDAA']*len(s)
+                # def color_tabla(s):
+                #     if s.Estado == 'No disponible':
+                #         return ['background-color: #CD5C5C']*len(s)
+                #     elif s.Estado == 'Pendiente de análisis':
+                #         return ['background-color:#F4A460']*len(s)
+                #     elif s.Estado == 'Analizado':
+                #         return ['background-color:#87CEEB']*len(s)
+                #     elif s.Estado == 'Control de calidad secundario':                    
+                #         return ['background-color:#66CDAA']*len(s)
     
-                st.dataframe(df_estados.style.apply(color_tabla, axis=1))    
+                # st.dataframe(df_estados.style.apply(color_tabla, axis=1))    
                 
-                    
+                def color_tabla(s,nombre_estados,colores_estados):
+                    for iestado in range(len(nombre_estados)):
+                        if s.Estado == nombre_estados[iestado]:
+                            return ['background-color: ',colores_estados[iestado]]*len(s)
+
+    
+                st.dataframe(df_estados.style.apply(color_tabla(nombre_estados,colores_estados), axis=1))                     
 
 
 
