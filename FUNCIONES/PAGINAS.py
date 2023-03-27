@@ -934,10 +934,6 @@ def entrada_salidas_mar():
         # Muestra una tabla con el personal ya incluido en la base de datos
         st.dataframe(df_personal,height=250)
         
-        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_personal)
-        # gridOptions = gb.build()
-        # st_aggrid.AgGrid(df_personal,gridOptions=gridOptions,enable_enterprise_modules=True,height=250,allow_unsafe_jscode=True,reload_data=True)    
-
         st.subheader('Añadir personal participante')
         # Despliega un formulario para introducir los datos
         with st.form("Formulario seleccion"):
@@ -992,7 +988,8 @@ def entrada_salidas_mar():
         # Añade una columna con el nombre del buque utilizado
         df_salidas_radiales['Buque'] = None
         for isalida in range(df_salidas_radiales.shape[0]):
-             df_salidas_radiales['Buque'].iloc[isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]].iloc[0]
+            if df_salidas_radiales['buque'].iloc[isalida] is not None:
+                df_salidas_radiales['Buque'].iloc[isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]].iloc[0]
 
         # Elimina las columnas que no interesa mostrar
         df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','buque'])
