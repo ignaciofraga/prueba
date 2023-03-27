@@ -160,7 +160,11 @@ def consulta_estado():
                     elif valor_estado == 'Control de calidad secundario':                    
                         return f'background-color:#66CDAA'
                     
-                st.dataframe(df_estados.style.applymap(color_tabla, subset=['Estado']))
+                # def highlight_survived(s):
+                #     return ['background-color: green']*len(s) if s.Survived else ['background-color: red']*len(s)
+
+                st.dataframe(df_estados.style.apply(color_tabla, axis=1))    
+                #st.dataframe(df_estados.style.applymap(color_tabla, subset=['Estado']))
                     
 
 
