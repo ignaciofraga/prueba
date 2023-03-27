@@ -988,7 +988,7 @@ def entrada_salidas_mar():
         # Añade una columna con el nombre del buque utilizado
         df_salidas_radiales['Buque'] = None
         for isalida in range(df_salidas_radiales.shape[0]):
-            if df_salidas_radiales['buque'].iloc[isalida]:
+            if df_salidas_radiales['buque'].iloc[isalida].is_integer():
                 #st.text(df_salidas_radiales['buque'].iloc[isalida])
                 df_salidas_radiales['Buque'].iloc[isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]].iloc[0]
 
