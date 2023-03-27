@@ -166,7 +166,9 @@ def consulta_estado():
                         if valor_estado == nombre_estados[iestado]:
                             color = "f'background-color: {" + colores_estados[iestado] + "}"
                             st.text(color)
-                            return color
+                    return color
+                        
+                        
                 st.text('hola')    
                 st.dataframe(df_estados.style.applymap(color_tabla, subset=['Estado']))
                     
