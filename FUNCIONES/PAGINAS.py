@@ -1621,6 +1621,7 @@ def entrada_condiciones_ambientales():
         identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
         for idato in range(len(listado_salidas)):
             identificadores_salidas[idato] = df_salidas_radiales['id_salida'][df_salidas_radiales['nombre_salida']==listado_salidas[idato]].iloc[0]
+        st.text(identificadores_salidas)
     
         df_salidas_seleccion = df_condiciones[df_condiciones['salida'].isin(identificadores_salidas)]
 
