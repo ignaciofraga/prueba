@@ -8,7 +8,6 @@ Created on Mon Sep 19 13:09:09 2022
 import streamlit as st
 import psycopg2
 import pandas.io.sql as psql
-import st_aggrid 
 import numpy
 from io import BytesIO
 import pandas
@@ -110,9 +109,7 @@ def estado_procesos(altura_tabla):
             df_muestreos_curso['Final estimado'][idato] =  df_muestreos_curso['Final estimado'][idato].strftime("%Y-%m-%d")
           
         # Muestra una tabla con los análisis en curso
-        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
-        gridOptions = gb.build()
-        st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+        st.dataframe(df_muestreos_curso)
 
     else:
         

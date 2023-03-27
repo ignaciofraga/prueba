@@ -149,22 +149,37 @@ def consulta_estado():
                         
                 df_estados = df_estados.sort_values('Año')
             
-                # Despliega la información en una tabla
+                ## Despliega la información en una tabla
+                def color_tabla(valor_estado):
+                    if valor_estado == 'No disponible':
+                        return f'background-color: #CD5C5C'
+                    elif valor_estado == 'Pendiente de análisis':
+                        return f'background-color:#F4A460'
+                    elif valor_estado == 'Analizado':
+                        return f'background-color:#87CEEB'
+                    elif valor_estado == 'Control de calidad secundario':                    
+                        return f'background-color:#66CDAA'
+                    
+                st.dataframe(df_estados.style.applymap(color_tabla, subset=['Estado']))
+                    
+
+
+
                 
-                cellsytle_jscode = st_aggrid.shared.JsCode("""function(params) {
-                if (params.value.includes('No disponible')){return {'color': 'black', 'backgroundColor': '#CD5C5C'}}
-                if (params.value.includes('Pendiente de análisis')){return {'color': 'black', 'backgroundColor': '#F4A460'}}
-                if (params.value.includes('Analizado')){return {'color': 'black', 'backgroundColor': '#87CEEB'}}
-                if (params.value.includes('Control de calidad secundario')){return {'color': 'black', 'backgroundColor': '#66CDAA'}}
-                };""")
+                # cellsytle_jscode = st_aggrid.shared.JsCode("""function(params) {
+                # if (params.value.includes('No disponible')){return {'color': 'black', 'backgroundColor': '#CD5C5C'}}
+                # if (params.value.includes('Pendiente de análisis')){return {'color': 'black', 'backgroundColor': '#F4A460'}}
+                # if (params.value.includes('Analizado')){return {'color': 'black', 'backgroundColor': '#87CEEB'}}
+                # if (params.value.includes('Control de calidad secundario')){return {'color': 'black', 'backgroundColor': '#66CDAA'}}
+                # };""")
                 
-                st.header("Listado de datos")
-                gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_estados)
-                gb.configure_column("Estado", cellStyle=cellsytle_jscode)
+                # st.header("Listado de datos")
+                # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_estados)
+                # gb.configure_column("Estado", cellStyle=cellsytle_jscode)
             
-                gridOptions = gb.build()
+                # gridOptions = gb.build()
                 
-                st_aggrid.AgGrid(df_estados,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+                # st_aggrid.AgGrid(df_estados,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
                     
                     
                 # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
@@ -615,10 +630,11 @@ def consulta_procesos():
                 if df_muestreos_curso.shape[0] > 0:
                         
                     # Muestra una tabla con los análisis en curso
-                    altura_tabla = 150
-                    gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
-                    gridOptions = gb.build()
-                    st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+                    st.dataframe(df_muestreos_terminados,height=150)
+                    # altura_tabla = 150
+                    # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
+                    # gridOptions = gb.build()
+                    # st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
             
                 else:
                     
@@ -630,10 +646,11 @@ def consulta_procesos():
                 if df_muestreos_terminados.shape[0] > 0:
                         
                     # Muestra una tabla con los análisis en curso
-                    altura_tabla = 300
-                    gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_terminados)
-                    gridOptions = gb.build()
-                    st_aggrid.AgGrid(df_muestreos_terminados,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
+                    st.dataframe(df_muestreos_terminados,height=300)
+                    # altura_tabla = 300
+                    # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_terminados)
+                    # gridOptions = gb.build()
+                    # st_aggrid.AgGrid(df_muestreos_terminados,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
             
                 else:
                     
@@ -940,9 +957,10 @@ def entrada_salidas_mar():
         conn.close()
 
         # Muestra una tabla con el personal ya incluido en la base de datos
-        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_personal)
-        gridOptions = gb.build()
-        st_aggrid.AgGrid(df_personal,gridOptions=gridOptions,enable_enterprise_modules=True,height=250,allow_unsafe_jscode=True,reload_data=True)    
+        st.dataframe(df_personal,height=250)
+        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_personal)
+        # gridOptions = gb.build()
+        # st_aggrid.AgGrid(df_personal,gridOptions=gridOptions,enable_enterprise_modules=True,height=250,allow_unsafe_jscode=True,reload_data=True)    
 
         st.subheader('Añadir personal participante')
         # Despliega un formulario para introducir los datos
@@ -1022,9 +1040,10 @@ def entrada_salidas_mar():
           
         
         # Muestra una tabla con las salidas realizadas
-        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_salidas_radiales)
-        gridOptions = gb.build()
-        st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+        st.dataframe(df_salidas_radiales)
+        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_salidas_radiales)
+        # gridOptions = gb.build()
+        # st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
 
 
         # Botón para descargar las salidas disponibles
@@ -1473,9 +1492,10 @@ def entrada_condiciones_ambientales():
             for idato in range(df_condiciones_salida_seleccionada.shape[0]):
                 df_tabla['estacion'].iloc[idato] =  df_estaciones['nombre_estacion'][df_estaciones['id_estacion'] == df_tabla['estacion'].iloc[idato]] 
     
-            gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_tabla)
-            gridOptions = gb.build()
-            st_aggrid.AgGrid(df_tabla,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
+            st.dataframe(df_tabla,height = 150)        
+            # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_tabla)
+            # gridOptions = gb.build()
+            # st_aggrid.AgGrid(df_tabla,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
                    
     
         # Extrae las estaciones visitadas en la salida seleccionada
@@ -2591,16 +2611,7 @@ def configuraciones_muestreo():
         df_perfilador = df_perfilador.rename(columns={'nombre_configuracion':'Configuracion','id_config_perfil':'Id','sensor_ctd':'CTD','num_serie_ctd':'Num.serie(CTD)','sensor_par':'PAR','num_serie_par':'Num.serie(PAR)','sensor_oxigeno':'Optodo','num_serie_oxigeno':'Num.serie(Optodo)','sensor_fluorescencia':'Fluorescencia','num_serie_fluorescencia':'Num.serie(Fluor.)'})
 
         # Muestra una tabla con las configuraciones 
-        gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_perfilador)
-        gridOptions = gb.build()
-        st_aggrid.AgGrid(df_perfilador,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
-
-
-
-
-
-
-
+        st.dataframe(df_perfilador, height=150)
 
 
 
