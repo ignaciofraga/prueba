@@ -932,7 +932,7 @@ def entrada_salidas_mar():
         conn.close()
 
         # Muestra una tabla con el personal ya incluido en la base de datos
-        st.dataframe(df_personal,height=250,use_container_width=True)
+        st.dataframe(df_personal,height=250)
         # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_personal)
         # gridOptions = gb.build()
         # st_aggrid.AgGrid(df_personal,gridOptions=gridOptions,enable_enterprise_modules=True,height=250,allow_unsafe_jscode=True,reload_data=True)    
