@@ -154,6 +154,7 @@ def consulta_estado():
                     for iestado in range(len(nombre_estados)):    
                         if valor_estado == nombre_estados[iestado]:
                             color = "'" + colores_estados[iestado] + "'"
+                            st.text(color)
                             return f'background-color: {color}'
                     
                 # def color_survived(val):
