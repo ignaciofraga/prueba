@@ -119,7 +119,6 @@ def consulta_estado():
             with col2:
                 fecha_consulta = st.date_input("Selecciona fecha de consulta",datetime.date.today())
         
-            st.columns(1,gap="small")
             # Botón de envío para confirmar selección
             submit = st.form_submit_button("Enviar")
         
@@ -161,7 +160,7 @@ def consulta_estado():
                     elif s.Estado == 'Control de calidad secundario':                    
                         return ['background-color:#66CDAA']*len(s)
     
-                st.dataframe(df_estados.style.apply(color_tabla, axis=1))    
+                st.dataframe(df_estados.style.apply(color_tabla, axis=1),use_container_width=True)    
                 
 
    
