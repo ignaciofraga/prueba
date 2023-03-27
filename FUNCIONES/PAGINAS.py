@@ -1467,10 +1467,7 @@ def entrada_condiciones_ambientales():
                 df_tabla['estacion'].iloc[idato] =  df_estaciones['nombre_estacion'][df_estaciones['id_estacion'] == df_tabla['estacion'].iloc[idato]] 
     
             st.dataframe(df_tabla,height = 150,use_container_width=True)        
-            # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_tabla)
-            # gridOptions = gb.build()
-            # st_aggrid.AgGrid(df_tabla,gridOptions=gridOptions,enable_enterprise_modules=True,height = 150,fit_columns_on_grid_load = False,allow_unsafe_jscode=True,reload_data=True)    
-                   
+
     
         # Extrae las estaciones visitadas en la salida seleccionada
         listado_estaciones = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida].iloc[0] 
@@ -1617,6 +1614,8 @@ def entrada_condiciones_ambientales():
         # Selecciona las salidas de la que se quieren descargar los datos
         df_salidas_radiales    = df_salidas_radiales.sort_values('fecha_salida',ascending=False)
         
+        st.dataframe(df_salidas_radiales)
+        
         listado_salidas        = st.multiselect('Muestreo',(df_salidas_radiales['nombre_salida'])) 
         
         identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
@@ -1625,7 +1624,8 @@ def entrada_condiciones_ambientales():
     
         df_salidas_seleccion = df_condiciones[df_condiciones['salida'].isin(identificadores_salidas)]
 
-        
+        st.dataframe(df_salidas_seleccion)        
+
         # Asigna nombres de salida, estaciones y fecha, y elimina el identificador de los datos ambientales
         df_salidas_seleccion['fecha'] = None
         for idato in range(df_salidas_seleccion.shape[0]):
