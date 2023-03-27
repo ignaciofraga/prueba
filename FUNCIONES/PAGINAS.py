@@ -149,27 +149,21 @@ def consulta_estado():
                         
                 df_estados = df_estados.sort_values('Año')
             
-                ## Despliega la información en una tabla
-                # def color_tabla(s):
-                #     if s.Estado == 'No disponible':
-                #         return ['background-color: #CD5C5C']*len(s)
-                #     elif s.Estado == 'Pendiente de análisis':
-                #         return ['background-color:#F4A460']*len(s)
-                #     elif s.Estado == 'Analizado':
-                #         return ['background-color:#87CEEB']*len(s)
-                #     elif s.Estado == 'Control de calidad secundario':                    
-                #         return ['background-color:#66CDAA']*len(s)
+                # Despliega la información en una tabla
+                def color_tabla(s):
+                    if s.Estado == 'No disponible':
+                        return ['background-color: #CD5C5C']*len(s)
+                    elif s.Estado == 'Pendiente de análisis':
+                        return ['background-color:#F4A460']*len(s)
+                    elif s.Estado == 'Analizado':
+                        return ['background-color:#87CEEB']*len(s)
+                    elif s.Estado == 'Control de calidad secundario':                    
+                        return ['background-color:#66CDAA']*len(s)
     
-                # st.dataframe(df_estados.style.apply(color_tabla, axis=1))    
+                st.dataframe(df_estados.style.apply(color_tabla, axis=1))    
                 
-                def color_tabla(s,nombre_estados,colores_estados):
-                    for iestado in range(len(nombre_estados)):
-                        if s.Estado == nombre_estados[iestado]:
-                            return ['background-color: ',colores_estados[iestado]]*len(s)
 
-    
-                st.dataframe(df_estados.style.apply(color_tabla(nombre_estados,colores_estados), axis=1))                     
-
+   
 
 
                 
