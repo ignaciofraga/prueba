@@ -9,7 +9,6 @@ import pandas.io.sql as psql
 import datetime
 import pandas 
 import matplotlib.pyplot as plt
-import st_aggrid 
 from io import BytesIO
 import numpy
 import psycopg2
@@ -162,12 +161,6 @@ def consulta_estado():
     
                 st.dataframe(df_estados.style.apply(color_tabla, axis=1),use_container_width=True)    
                 
-
-   
-
-
-                
-
                     
                 # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
                 num_valores = numpy.zeros(len(nombre_estados),dtype=int)
@@ -618,11 +611,6 @@ def consulta_procesos():
                         
                     # Muestra una tabla con los análisis en curso
                     st.dataframe(df_muestreos_terminados,height=150)
-                    # altura_tabla = 150
-                    # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_curso)
-                    # gridOptions = gb.build()
-                    # st_aggrid.AgGrid(df_muestreos_curso,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
-            
                 else:
                     
                     texto_error = 'No hay ninguna muestra en proceso durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'

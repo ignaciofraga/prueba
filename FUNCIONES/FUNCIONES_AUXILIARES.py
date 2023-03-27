@@ -109,7 +109,7 @@ def estado_procesos(altura_tabla):
             df_muestreos_curso['Final estimado'][idato] =  df_muestreos_curso['Final estimado'][idato].strftime("%Y-%m-%d")
           
         # Muestra una tabla con los análisis en curso
-        st.dataframe(df_muestreos_curso)
+        st.dataframe(df_muestreos_curso,use_container_width=True)
 
     else:
         
