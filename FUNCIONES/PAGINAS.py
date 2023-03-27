@@ -170,6 +170,8 @@ def consulta_estado():
                         
                         
                 st.text('hola')    
+                st.text(nombre_estados)
+                st.text(colores_estados)
                 st.dataframe(df_estados.style.applymap(color_tabla, subset=['Estado']))
                     
 
