@@ -151,16 +151,6 @@ def consulta_estado():
             
                 ## Despliega la información en una tabla
                 def color_tabla(valor_estado,nombre_estados,colores_estados):
-                    for iestado in range(len(nombre_estados)):    
-                        if valor_estado == nombre_estados[iestado]:
-                            color = "'" + colores_estados[iestado] + "'"
-                            st.text(color)
-                            return f'background-color: {color}'
-                    
-                # def color_survived(val):
-                #     color = 'green' if val else 'red'
-                #     return f'background-color: {color}'
-                    
                     # if valor_estado == 'No disponible':
                     #     return f'background-color: #CD5C5C'
                     # elif valor_estado == 'Pendiente de análisis':
@@ -169,6 +159,13 @@ def consulta_estado():
                     #     return f'background-color:#87CEEB'
                     # elif valor_estado == 'Control de calidad secundario':                    
                     #     return f'background-color:#66CDAA'
+                    
+                    
+                    for iestado in range(len(nombre_estados)):    
+                        if valor_estado == nombre_estados[iestado]:
+                            color = "f'background-color: {" + colores_estados[iestado] + "}"
+                            st.text(color)
+                            return color
                     
                 st.dataframe(df_estados.style.applymap(color_tabla, subset=['Estado']))
                     
