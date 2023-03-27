@@ -164,8 +164,17 @@ def consulta_estado():
                     
                 
                 def color_tabla(s):
-                    return ['background-color: #CD5C5C']*len(s) if s.Estado == 'No disponible' else ['background-color: #F4A460']*len(s)
- 
+#                    return ['background-color: #CD5C5C']*len(s) if s.Estado == 'No disponible' else ['background-color: #F4A460']*len(s)
+                    #return ['background-color: #CD5C5C']*len(s) if s.Estado == 'No disponible' else return ['background-color: #F4A460']*len(s) if s.Estado == 'Pendiente de análisis'  
+                    if s.Estado == 'No disponible':
+                        return ['background-color: #CD5C5C']*len(s)
+                    elif s.Estado == 'Pendiente de análisis':
+                        return ['background-color:#F4A460']*len(s)
+                    elif s.Estado == 'Analizado':
+                        return ['background-color:#87CEEB']*len(s)
+                    elif s.Estado == 'Control de calidad secundario':                    
+                        return ['background-color:#66CDAA']*len(s)
+    
                 st.dataframe(df_estados.style.apply(color_tabla, axis=1))    
                 
                     
