@@ -153,8 +153,12 @@ def consulta_estado():
                 def color_tabla(valor_estado,nombre_estados,colores_estados):
                     for iestado in range(len(nombre_estados)):    
                         if valor_estado == nombre_estados[iestado]:
-                            color = colores_estados[iestado]
+                            color = "'" + colores_estados[iestado] + "'"
                         return f'background-color: {color}'
+                    
+                # def color_survived(val):
+                #     color = 'green' if val else 'red'
+                #     return f'background-color: {color}'
                     
                     # if valor_estado == 'No disponible':
                     #     return f'background-color: #CD5C5C'
