@@ -1634,7 +1634,7 @@ def entrada_condiciones_ambientales():
             df_salidas_seleccion['salida'].iloc[idato]   = df_salidas['nombre_salida'][df_salidas['id_salida']==df_salidas_seleccion['salida'].iloc[idato]].iloc[0]
             df_salidas_seleccion['estacion'].iloc[idato] = df_estaciones['nombre_estacion'][df_estaciones['id_estacion']==df_salidas_seleccion['estacion'].iloc[idato]].iloc[0]
 
-        df_salidas_seleccion = df_salidas_seleccion.drop(columns=['id_condicion'])
+        #df_salidas_seleccion = df_salidas_seleccion.drop(columns=['id_condicion'])
             
         # mueve la columna con las fechas a la primera posicion
         df_salidas_seleccion = df_salidas_seleccion[ ['fecha'] + [ col for col in df_salidas_seleccion.columns if col != 'fecha' ] ]

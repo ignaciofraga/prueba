@@ -59,17 +59,17 @@ for idato in range(datos_ambientales.shape[0]):
         datos_ambientales['Lluvia'].iloc[idato] = None
     
 # Calcula el estado de Beaufort y Douglas
-datos_ambientales['Beaufort'] = None
+# datos_ambientales['Beaufort'] = None
 
-beaufort_nombre = ['Calma (0)','Ventolina (1)','Flojito (2)','Flojo (3)','Moderada (4)','Fresquito (5)','Fresco (6)','Frescachón (7)','Temporal (8)','Temporal fuerte (9)']
-beaufort_vmin   = [0  ,0.2, 1.5, 3.3, 5.4, 7.90, 10.70 ,13.8, 17.1, 20.7 ]
-beaufort_vmax   = [0.2,1.5, 3.3, 5.4, 7.9, 10.7, 13.80, 17.1, 20.7, 24.5 ]
+# beaufort_nombre = ['Calma (0)','Ventolina (1)','Flojito (2)','Flojo (3)','Moderada (4)','Fresquito (5)','Fresco (6)','Frescachón (7)','Temporal (8)','Temporal fuerte (9)']
+# beaufort_vmin   = [0  ,0.2, 1.5, 3.3, 5.4, 7.90, 10.70 ,13.8, 17.1, 20.7 ]
+# beaufort_vmax   = [0.2,1.5, 3.3, 5.4, 7.9, 10.7, 13.80, 17.1, 20.7, 24.5 ]
 
-for idato in range(datos_ambientales.shape[0]):   
-    if datos_ambientales['Viento'].iloc[idato] is not None:
-        for iescala in range(len(beaufort_nombre)) :
-            if datos_ambientales['Viento'].iloc[idato] > beaufort_vmin [iescala] and datos_ambientales['Viento'].iloc[idato] < beaufort_vmax [iescala]:
-                datos_ambientales['Beaufort'].iloc[idato] = beaufort_nombre[iescala]
+# for idato in range(datos_ambientales.shape[0]):   
+#     if datos_ambientales['Viento'].iloc[idato] is not None:
+#         for iescala in range(len(beaufort_nombre)) :
+#             if datos_ambientales['Viento'].iloc[idato] > beaufort_vmin [iescala] and datos_ambientales['Viento'].iloc[idato] < beaufort_vmax [iescala]:
+#                 datos_ambientales['Beaufort'].iloc[idato] = beaufort_nombre[iescala]
 
 datos_ambientales['Douglas']  = None
 douglas_nombre = ['Mar rizada (1)','Marejadilla (2)', 'Marejada (3)', 'Fuerte marejada (4)', 'Gruesa (5)', 'Muy Gruesa (6)']
@@ -84,8 +84,8 @@ for idato in range(datos_ambientales.shape[0]):
 
 
 
-instruccion_sql = '''INSERT INTO condiciones_ambientales_muestreos (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_douglas,mar_direccion,humedad_relativa,temp_aire,prof_secchi,max_clorofila,marea,temp_superficie)
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (salida,estacion) DO UPDATE SET (hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,viento_beaufort,altura_ola,mar_fondo,mar_douglas,mar_direccion,humedad_relativa,temp_aire,prof_secchi,max_clorofila,marea,temp_superficie) = ROW(EXCLUDED.hora_llegada,EXCLUDED.profundidad,EXCLUDED.nubosidad,EXCLUDED.lluvia,EXCLUDED.velocidad_viento,EXCLUDED.direccion_viento,EXCLUDED.pres_atmosferica,EXCLUDED.viento_beaufort,EXCLUDED.altura_ola,EXCLUDED.mar_fondo,EXCLUDED.mar_douglas,EXCLUDED.mar_direccion,EXCLUDED.humedad_relativa,EXCLUDED.temp_aire,EXCLUDED.prof_secchi,EXCLUDED.max_clorofila,EXCLUDED.marea,EXCLUDED.temp_superficie);''' 
+instruccion_sql = '''INSERT INTO condiciones_ambientales_muestreos (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,altura_ola,mar_fondo,estado_mar,mar_direccion,humedad_relativa,temp_aire,prof_secchi,max_clorofila,marea,temp_superficie)
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (salida,estacion) DO UPDATE SET (hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,altura_ola,mar_fondo,estado_mar,mar_direccion,humedad_relativa,temp_aire,prof_secchi,max_clorofila,marea,temp_superficie) = ROW(EXCLUDED.hora_llegada,EXCLUDED.profundidad,EXCLUDED.nubosidad,EXCLUDED.lluvia,EXCLUDED.velocidad_viento,EXCLUDED.direccion_viento,EXCLUDED.pres_atmosferica,EXCLUDED.altura_ola,EXCLUDED.mar_fondo,EXCLUDED.estado_mar,EXCLUDED.mar_direccion,EXCLUDED.humedad_relativa,EXCLUDED.temp_aire,EXCLUDED.prof_secchi,EXCLUDED.max_clorofila,EXCLUDED.marea,EXCLUDED.temp_superficie);''' 
     
 
 conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -93,7 +93,9 @@ cursor = conn.cursor()
     
 # Introduce datos en la base de datos
 for idato in range(datos_ambientales.shape[0]):          
-    cursor.execute(instruccion_sql, (int(datos_ambientales['id_salida'].iloc[idato]),int(datos_ambientales['id_estacion'].iloc[idato]),datos_ambientales['Hora inicio'].iloc[idato],datos_ambientales['Profundidad'].iloc[idato],datos_ambientales['Nubosidad'].iloc[idato],datos_ambientales['Lluvia'].iloc[idato],datos_ambientales['Viento'].iloc[idato],datos_ambientales['Viento_dir'].iloc[idato],datos_ambientales['Presíon'].iloc[idato],datos_ambientales['Beaufort'].iloc[idato],datos_ambientales['Altura de Ola'].iloc[idato],datos_ambientales['Mar de fondo'].iloc[idato],datos_ambientales['Douglas'].iloc[idato],datos_ambientales['Mar'].iloc[idato],datos_ambientales['Humedad'].iloc[idato],datos_ambientales['Tª aire'].iloc[idato],datos_ambientales['Secchi'].iloc[idato],datos_ambientales['Max. Cla'].iloc[idato],datos_ambientales['Marea'].iloc[idato],datos_ambientales['Tª superf.'].iloc[idato]))
+    cursor.execute(instruccion_sql, (int(datos_ambientales['id_salida'].iloc[idato]),int(datos_ambientales['id_estacion'].iloc[idato]),datos_ambientales['Hora inicio'].iloc[idato],datos_ambientales['Profundidad'].iloc[idato],datos_ambientales['Nubosidad'].iloc[idato],datos_ambientales['Lluvia'].iloc[idato],datos_ambientales['Viento'].iloc[idato],datos_ambientales['Viento_dir'].iloc[idato],datos_ambientales['Presíon'].iloc[idato],datos_ambientales['Altura de Ola'].iloc[idato],datos_ambientales['Mar de fondo'].iloc[idato],datos_ambientales['Douglas'].iloc[idato],datos_ambientales['Mar'].iloc[idato],datos_ambientales['Humedad'].iloc[idato],datos_ambientales['Tª aire'].iloc[idato],datos_ambientales['Secchi'].iloc[idato],datos_ambientales['Max. Cla'].iloc[idato],datos_ambientales['Marea'].iloc[idato],datos_ambientales['Tª superf.'].iloc[idato]))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+
     conn.commit()
 cursor.close()
 conn.close()
