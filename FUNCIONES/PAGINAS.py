@@ -119,6 +119,7 @@ def consulta_estado():
             with col2:
                 fecha_consulta = st.date_input("Selecciona fecha de consulta",datetime.date.today())
         
+            st.columns(1,gap="small")
             # Botón de envío para confirmar selección
             submit = st.form_submit_button("Enviar")
         
