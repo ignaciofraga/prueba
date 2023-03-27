@@ -160,6 +160,7 @@ def consulta_estado():
                     # elif valor_estado == 'Control de calidad secundario':                    
                     #     return f'background-color:#66CDAA'
                     
+                    st.text('hola')
                     
                     for iestado in range(len(nombre_estados)):    
                         if valor_estado == nombre_estados[iestado]:
