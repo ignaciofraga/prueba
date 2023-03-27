@@ -150,28 +150,16 @@ def consulta_estado():
                 df_estados = df_estados.sort_values('Año')
             
                 ## Despliega la información en una tabla
-                def color_tabla(valor_estado,nombre_estados,colores_estados):
-                    # if valor_estado == 'No disponible':
-                    #     return f'background-color: #CD5C5C'
-                    # elif valor_estado == 'Pendiente de análisis':
-                    #     return f'background-color:#F4A460'
-                    # elif valor_estado == 'Analizado':
-                    #     return f'background-color:#87CEEB'
-                    # elif valor_estado == 'Control de calidad secundario':                    
-                    #     return f'background-color:#66CDAA'
+                def color_tabla(valor_estado):
+                    if valor_estado == 'No disponible':
+                        return f'background-color: #CD5C5C'
+                    elif valor_estado == 'Pendiente de análisis':
+                        return f'background-color:#F4A460'
+                    elif valor_estado == 'Analizado':
+                        return f'background-color:#87CEEB'
+                    elif valor_estado == 'Control de calidad secundario':                    
+                        return f'background-color:#66CDAA'
                     
-                    st.text('adios')
-                    
-                    for iestado in range(len(nombre_estados)):    
-                        if valor_estado == nombre_estados[iestado]:
-                            color = "f'background-color: {" + colores_estados[iestado] + "}"
-                            st.text(color)
-                    return color
-                        
-                        
-                st.text('hola')    
-                st.text(nombre_estados)
-                st.text(colores_estados)
                 st.dataframe(df_estados.style.applymap(color_tabla, subset=['Estado']))
                     
 
