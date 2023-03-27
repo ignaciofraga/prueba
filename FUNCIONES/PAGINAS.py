@@ -1458,13 +1458,9 @@ def entrada_condiciones_ambientales():
             texto_error = 'Ya existen datos correspondientes a la salida seleccionada.'
             st.warning(texto_error, icon="⚠️")       
     
-            #df_tabla             = df_condiciones_salida_seleccionada.drop(columns=['id_condicion','salida'])
             for idato in range(df_condiciones_salida_seleccionada.shape[0]):
                 df_condiciones_salida_seleccionada['estacion'].iloc[idato] =  df_estaciones['nombre_estacion'][df_estaciones['id_estacion'] == df_condiciones_salida_seleccionada['estacion'].iloc[idato]] 
-    
-            st.dataframe(df_condiciones_salida_seleccionada,height = 150,use_container_width=True)        
 
-    
         # Extrae las estaciones visitadas en la salida seleccionada
         listado_estaciones = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida].iloc[0] 
     
