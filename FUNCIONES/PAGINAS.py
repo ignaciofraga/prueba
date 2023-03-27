@@ -1440,22 +1440,13 @@ def entrada_condiciones_ambientales():
         # Vectores con los valores de las variables que tienen opciones concretas
         seleccion_SN = ['Si','No']
         direcciones  = ['N','NW','W','SW','S','SE','E','NE'] 
-    
-        # beaufort_nombre = ['Calma (0)','Ventolina (1)','Brisa muy débil (2)','Brisa Ligera (3)','Brisa moderada (4)','Brisa fresca (5)','Brisa fuerte (6)','Viento fuerte (7)','Viento duro (8)','Muy duro (9)','Temporal (10)','Borrasca (11)','Huracán (12)']
-        # beaufort_vmin   = [0,2,6,12,20,29,39,50,62,75,89,103,118]
-        # beaufort_vmax   = [2,6,12,20,29,39,50,62,75,89,103,118,500]
         
-        # beaufort_nombre = ['Calma (0)','Ventolina (1)','Flojito (2)','Flojo (3)','Moderada (4)','Fresquito (5)','Fresco (6)','Frescachón (7)','Temporal (8)','Temporal fuerte (9)']
-        # beaufort_vmin   = [0  ,0.2, 1.5, 3.3, 5.4, 7.90, 10.70 ,13.8, 17.1, 20.7 ]
-        # beaufort_vmax   = [0.2,1.5, 3.3, 5.4, 7.9, 10.7, 13.80, 17.1, 20.7, 24.5 ]
-    
         estado_mar_nombre = ['Mar rizada (1)','Marejadilla (2)', 'Marejada (3)', 'Fuerte marejada (4)', 'Gruesa (5)', 'Muy Gruesa (6)']
         estado_mar_hmin   = [0  , 0.1 , 0.50 , 1.25, 2.5, 4]
         estado_mar_hmax   = [0.1, 0.5 , 1.25 , 2.50, 4.0, 6]
     
         mareas          = ['Baja','Media','Pleamar']
         
- 
         # Selecciona la salida de la que se quiere introducir datos
         df_salidas_radiales    = df_salidas_radiales.sort_values('fecha_salida',ascending=False)
         salida                 = st.selectbox('Salida',(df_salidas_radiales['nombre_salida']))   
@@ -1467,10 +1458,11 @@ def entrada_condiciones_ambientales():
             texto_error = 'Ya existen datos correspondientes a la salida seleccionada.'
             st.warning(texto_error, icon="⚠️")       
     
+            #df_tabla             = df_condiciones_salida_seleccionada.drop(columns=['id_condicion','salida'])
             for idato in range(df_condiciones_salida_seleccionada.shape[0]):
-                df_tabla['estacion'].iloc[idato] =  df_estaciones['nombre_estacion'][df_estaciones['id_estacion'] == df_tabla['estacion'].iloc[idato]] 
+                df_condiciones_salida_seleccionada['estacion'].iloc[idato] =  df_estaciones['nombre_estacion'][df_estaciones['id_estacion'] == df_condiciones_salida_seleccionada['estacion'].iloc[idato]] 
     
-            st.dataframe(df_tabla,height = 150,use_container_width=True)        
+            st.dataframe(df_condiciones_salida_seleccionada,height = 150,use_container_width=True)        
 
     
         # Extrae las estaciones visitadas en la salida seleccionada
