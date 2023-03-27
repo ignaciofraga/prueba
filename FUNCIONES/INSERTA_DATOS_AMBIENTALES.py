@@ -79,10 +79,12 @@ douglas_vmax   = [0.1, 0.5 , 1.25 , 2.50, 4.0, 6]
 for idato in range(datos_ambientales.shape[0]):   
     if datos_ambientales['Altura de Ola'].iloc[idato] is not None:
         for iescala in range(len(douglas_nombre)) :
-            if datos_ambientales['Altura de Ola'].iloc[idato] > douglas_vmin [iescala] and datos_ambientales['Altura de Ola'].iloc[idato] < douglas_vmax [iescala]:
+            if datos_ambientales['Altura de Ola'].iloc[idato] >= douglas_vmin [iescala] and datos_ambientales['Altura de Ola'].iloc[idato] < douglas_vmax [iescala]:
                 datos_ambientales['Douglas'].iloc[idato] = douglas_nombre[iescala]
-
-
+            if datos_ambientales['Altura de Ola'].iloc[idato] < douglas_vmin [0]:
+                datos_ambientales['Douglas'].iloc[idato] = douglas_nombre[0]
+            if datos_ambientales['Altura de Ola'].iloc[idato] >= douglas_vmin [-1]:
+                datos_ambientales['Douglas'].iloc[idato] = douglas_nombre[-1]
 
 instruccion_sql = '''INSERT INTO condiciones_ambientales_muestreos (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,altura_ola,mar_fondo,estado_mar,mar_direccion,humedad_relativa,temp_aire,prof_secchi,max_clorofila,marea,temp_superficie)
     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (salida,estacion) DO UPDATE SET (hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,altura_ola,mar_fondo,estado_mar,mar_direccion,humedad_relativa,temp_aire,prof_secchi,max_clorofila,marea,temp_superficie) = ROW(EXCLUDED.hora_llegada,EXCLUDED.profundidad,EXCLUDED.nubosidad,EXCLUDED.lluvia,EXCLUDED.velocidad_viento,EXCLUDED.direccion_viento,EXCLUDED.pres_atmosferica,EXCLUDED.altura_ola,EXCLUDED.mar_fondo,EXCLUDED.estado_mar,EXCLUDED.mar_direccion,EXCLUDED.humedad_relativa,EXCLUDED.temp_aire,EXCLUDED.prof_secchi,EXCLUDED.max_clorofila,EXCLUDED.marea,EXCLUDED.temp_superficie);''' 
