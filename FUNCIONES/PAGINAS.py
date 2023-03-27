@@ -1395,6 +1395,16 @@ def entrada_salidas_mar():
 
 def entrada_condiciones_ambientales():
     
+    # Función para cargar en caché los datos a utilizar
+    @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
+    def carga_datos_condiciones_ambientales():
+        conn                      = init_connection()
+        df_salidas      = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_programas    = psql.read_sql('SELECT * FROM programas', conn)
+        df_estaciones   = psql.read_sql('SELECT * FROM estaciones', conn)
+        df_condiciones  = psql.read_sql('SELECT * FROM condiciones_ambientales_muestreos', conn)
+        conn.close()
+        return df_salidas,df_programas,df_estaciones,df_condiciones
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host = st.secrets["postgres"].host
@@ -1403,13 +1413,8 @@ def entrada_condiciones_ambientales():
     contrasena     = st.secrets["postgres"].password
     puerto         = st.secrets["postgres"].port
     
-    # Recupera la tabla de las salidas realizadas 
-    conn            = init_connection()
-    df_salidas      = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-    df_programas    = psql.read_sql('SELECT * FROM programas', conn)
-    df_estaciones   = psql.read_sql('SELECT * FROM estaciones', conn)
-    df_condiciones  = psql.read_sql('SELECT * FROM condiciones_ambientales_muestreos', conn)
-    conn.close()
+    # Carga la informacion de la cache 
+    df_salidas,df_programas,df_estaciones,df_condiciones = carga_datos_condiciones_ambientales()
     
     id_radiales            = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
 
@@ -1610,48 +1615,58 @@ def entrada_condiciones_ambientales():
                 
     # Descarga datos ambientales
     if tipo_entrada == entradas[1]:    
+        
+        st.subheader('Descarga de datos de condiciones ambientales')
 
         # Selecciona las salidas de la que se quieren descargar los datos
-        df_salidas_radiales    = df_salidas_radiales.sort_values('fecha_salida',ascending=False)
-        
-        listado_salidas        = st.multiselect('Muestreo',(df_salidas_radiales['nombre_salida'])) 
-        
-        identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
-        for idato in range(len(listado_salidas)):
-            identificadores_salidas[idato] = df_salidas_radiales['id_salida'][df_salidas_radiales['nombre_salida']==listado_salidas[idato]].iloc[0]
-        st.text(identificadores_salidas)
-    
-        df_salidas_seleccion = df_condiciones[df_condiciones['salida'].isin(identificadores_salidas)]       
-
-        # Asigna nombres de salida, estaciones y fecha, y elimina el identificador de los datos ambientales
-        df_salidas_seleccion['fecha'] = None
-        for idato in range(df_salidas_seleccion.shape[0]):
-            df_salidas_seleccion['fecha'].iloc[idato]   = df_salidas_radiales['fecha_salida'][df_salidas_radiales['id_salida']==df_salidas_seleccion['salida'].iloc[idato]].iloc[0]
-            df_salidas_seleccion['salida'].iloc[idato]   = df_salidas['nombre_salida'][df_salidas['id_salida']==df_salidas_seleccion['salida'].iloc[idato]].iloc[0]
-            df_salidas_seleccion['estacion'].iloc[idato] = df_estaciones['nombre_estacion'][df_estaciones['id_estacion']==df_salidas_seleccion['estacion'].iloc[idato]].iloc[0]
+        with st.form("Formulario seleccion"): 
             
-        # mueve la columna con las fechas a la primera posicion
-        df_salidas_seleccion = df_salidas_seleccion[ ['fecha'] + [ col for col in df_salidas_seleccion.columns if col != 'fecha' ] ]
-        
-        # Botón para descargar las salidas disponibles
-        nombre_archivo =  'DATOS_AMBIENTALES.xlsx'
+            df_salidas_radiales    = df_salidas_radiales.sort_values('fecha_salida',ascending=False)
+            
+            listado_salidas        = st.multiselect('Muestreo',(df_salidas_radiales['nombre_salida'])) 
+
+            submit = st.form_submit_button("Confirmar selección")                    
     
-        output = BytesIO()
-        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-        df_salidas_seleccion.to_excel(writer, index=False, sheet_name='DATOS')
-        workbook = writer.book
-        worksheet = writer.sheets['DATOS']
-        writer.save()
-        df_salidas_seleccion = output.getvalue()
-    
-        st.download_button(
-            label="DESCARGA EXCEL CON LAS SALIDAS REALIZADAS",
-            data=df_salidas_seleccion,
-            file_name=nombre_archivo,
-            help= 'Descarga un archivo .csv con los datos solicitados',
-            mime="application/vnd.ms-excel"
-        )
+            if submit is True:
         
+                identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
+                for idato in range(len(listado_salidas)):
+                    identificadores_salidas[idato] = df_salidas_radiales['id_salida'][df_salidas_radiales['nombre_salida']==listado_salidas[idato]].iloc[0]
+            
+                df_salidas_seleccion = df_condiciones[df_condiciones['salida'].isin(identificadores_salidas)]       
+        
+                # Asigna nombres de salida, estaciones y fecha, y elimina el identificador de los datos ambientales
+                df_salidas_seleccion['fecha'] = None
+                for idato in range(df_salidas_seleccion.shape[0]):
+                    df_salidas_seleccion['fecha'].iloc[idato]   = df_salidas_radiales['fecha_salida'][df_salidas_radiales['id_salida']==df_salidas_seleccion['salida'].iloc[idato]].iloc[0]
+                    df_salidas_seleccion['salida'].iloc[idato]   = df_salidas['nombre_salida'][df_salidas['id_salida']==df_salidas_seleccion['salida'].iloc[idato]].iloc[0]
+                    df_salidas_seleccion['estacion'].iloc[idato] = df_estaciones['nombre_estacion'][df_estaciones['id_estacion']==df_salidas_seleccion['estacion'].iloc[idato]].iloc[0]
+                    
+                # mueve la columna con las fechas a la primera posicion
+                df_salidas_seleccion = df_salidas_seleccion[ ['fecha'] + [ col for col in df_salidas_seleccion.columns if col != 'fecha' ] ]
+                
+                # Muestra el dataframe con los datos a descargar
+                st.dataframe(df_salidas_seleccion)
+                
+                # Botón para descargar las salidas disponibles
+                nombre_archivo =  'DATOS_AMBIENTALES.xlsx'
+            
+                output = BytesIO()
+                writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                df_salidas_seleccion.to_excel(writer, index=False, sheet_name='DATOS')
+                workbook = writer.book
+                worksheet = writer.sheets['DATOS']
+                writer.save()
+                df_salidas_seleccion = output.getvalue()
+            
+                st.download_button(
+                    label="DESCARGA EXCEL CON LOS DATOS DE LAS SALIDAS SELECCIONADAS",
+                    data=df_salidas_seleccion,
+                    file_name=nombre_archivo,
+                    help= 'Descarga un archivo .csv con los datos solicitados',
+                    mime="application/vnd.ms-excel"
+                )
+                
 
 
 
