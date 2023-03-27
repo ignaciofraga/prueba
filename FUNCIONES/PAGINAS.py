@@ -1467,7 +1467,6 @@ def entrada_condiciones_ambientales():
             texto_error = 'Ya existen datos correspondientes a la salida seleccionada.'
             st.warning(texto_error, icon="⚠️")       
     
-            df_tabla             = df_condiciones_salida_seleccionada.drop(columns=['id_condicion','salida'])
             for idato in range(df_condiciones_salida_seleccionada.shape[0]):
                 df_tabla['estacion'].iloc[idato] =  df_estaciones['nombre_estacion'][df_estaciones['id_estacion'] == df_tabla['estacion'].iloc[idato]] 
     
@@ -1566,11 +1565,6 @@ def entrada_condiciones_ambientales():
                 pres_atmosferica  = st.number_input('Presion atm. (mmHg):',format='%i',value=int(pres_atmosferica_defecto),min_value=0)
                 humedad_relativa = st.number_input('Humedad relativa (%):',value=int(humedad_relativa_defecto),min_value=0)
                 
-                
-                # for idato_beaufort in range(len(beaufort_nombre)):
-                #     if velocidad_viento >= beaufort_vmin[idato_beaufort] and velocidad_viento < beaufort_vmax[idato_beaufort]:
-                #         indice_prop = idato_beaufort  
-                # viento_beaufort  = st.selectbox('Viento Beaufort:',(beaufort_nombre),index=indice_prop)
     
             with col3:
                  altura_ola  = st.number_input('Altura de ola (m):',value=float(altura_ola_defecto),min_value=float(0),step =0.5)
@@ -1644,10 +1638,7 @@ def entrada_condiciones_ambientales():
                 
             # mueve la columna con las fechas a la primera posicion
             df_salidas_seleccion = df_salidas_seleccion[ ['fecha'] + [ col for col in df_salidas_seleccion.columns if col != 'fecha' ] ]
-            
-            # Muestra el dataframe con los datos a descargar
-            st.dataframe(df_salidas_seleccion)
-            
+                        
             # Botón para descargar las salidas disponibles
             nombre_archivo =  'DATOS_AMBIENTALES.xlsx'
         
