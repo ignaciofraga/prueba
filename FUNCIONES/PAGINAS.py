@@ -868,55 +868,8 @@ def entrada_salidas_mar():
 
 
 
-
-
-    # Añade personal participante en las salidas de radial
-    if tipo_entrada == entradas[2]: 
-
-        st.subheader('Personal participante')
-        
-        # Muestra una tabla con el personal ya incluido en la base de datos
-        st.dataframe(df_personal,height=250)
-        
-        st.subheader('Añadir personal participante')
-        # Despliega un formulario para introducir los datos
-        with st.form("Formulario seleccion"):
-                   
-            nombre_participante  = st.text_input('Nombre y apellidos del nuevo personal', value="")
-            
-            comision             = st.checkbox('Comisionado')
-            
-            submit = st.form_submit_button("Añadir participante")
-
-            if submit == True:
-
-                io_incluido = 0
-                for ipersonal in range(df_personal.shape[0]):
-                    if df_personal['nombre_apellidos'][ipersonal] == nombre_participante:
-                        io_incluido = 1
-                
-                if io_incluido == 0:
-
-                    instruccion_sql = '''INSERT INTO personal_salidas (nombre_apellidos,comisionado)
-                        VALUES (%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.correo,EXCLUDED.comisionado);''' 
-                            
-                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                    cursor = conn.cursor()
-                    cursor.execute(instruccion_sql, (nombre_participante,comision))
-                    conn.commit()
-                    cursor.close()
-                    conn.close()
-
-                    texto_exito = 'Participante añadido correctamente'
-                    st.success(texto_exito)
-        
-                else:
-                    texto_error = 'El participante introducido ya se encuentra en la base de datos '
-                    st.warning(texto_error, icon="⚠️")  
-
-
     # Consulta las salidas realizadas
-    if tipo_entrada == entradas[3]: 
+    if tipo_entrada == entradas[2]: 
         
         st.subheader('Consultar salidas al mar realizadas')
        
@@ -965,9 +918,57 @@ def entrada_salidas_mar():
             data=df_salidas_radiales,
             file_name=nombre_archivo,
             help= 'Descarga un archivo .csv con los datos solicitados',
-            mime="application/vnd.ms-excel"
-        )
+            mime="application/vnd.ms-excel")
         
+
+
+
+    # Añade personal participante en las salidas de radial
+    if tipo_entrada == entradas[3]: 
+
+        st.subheader('Personal participante')
+        
+        # Muestra una tabla con el personal ya incluido en la base de datos
+        st.dataframe(df_personal,height=250)
+        
+        st.subheader('Añadir personal participante')
+        # Despliega un formulario para introducir los datos
+        with st.form("Formulario seleccion"):
+                   
+            nombre_participante  = st.text_input('Nombre y apellidos del nuevo personal', value="")
+            
+            comision             = st.checkbox('Comisionado')
+            
+            submit = st.form_submit_button("Añadir participante")
+
+            if submit == True:
+
+                io_incluido = 0
+                for ipersonal in range(df_personal.shape[0]):
+                    if df_personal['nombre_apellidos'][ipersonal] == nombre_participante:
+                        io_incluido = 1
+                
+                if io_incluido == 0:
+
+                    instruccion_sql = '''INSERT INTO personal_salidas (nombre_apellidos,comisionado)
+                        VALUES (%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.correo,EXCLUDED.comisionado);''' 
+                            
+                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                    cursor = conn.cursor()
+                    cursor.execute(instruccion_sql, (nombre_participante,comision))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+
+                    texto_exito = 'Participante añadido correctamente'
+                    st.success(texto_exito)
+        
+                else:
+                    texto_error = 'El participante introducido ya se encuentra en la base de datos '
+                    st.warning(texto_error, icon="⚠️")  
+
+
+
         
                
 
@@ -1249,8 +1250,7 @@ def entrada_condiciones_ambientales():
             output = BytesIO()
             writer = pandas.ExcelWriter(output, engine='xlsxwriter')
             df_salidas_seleccion.to_excel(writer, index=False, sheet_name='DATOS')
-            workbook = writer.book
-            worksheet = writer.sheets['DATOS']
+            writer.sheets['DATOS']
             writer.save()
             df_salidas_seleccion = output.getvalue()
         
@@ -1273,7 +1273,7 @@ def entrada_condiciones_ambientales():
 def entrada_archivos_roseta():
     
     # Función para cargar en caché los datos a utilizar
-    @st.cache_data(show_spinner=False,ttl=600)
+    @st.cache_data(ttl=600,show_spinner='Recuperando información de la base de datos')
     def carga_datos_entrada_archivo_roseta():
         conn                      = init_connection()
         df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
@@ -1306,7 +1306,7 @@ def entrada_archivos_roseta():
         st.subheader('Entrada de datos procedentes de botellas y perfiles') 
     
         # Recupera tablas con informacion utilizada en el procesado
-        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas = carga_datos_entrada_archivo_roseta()
+        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
         
         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
 
