@@ -680,6 +680,8 @@ def entrada_salidas_mar():
     df_salidas_radiales        = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
     df_estaciones_radiales     = df_estaciones[df_estaciones['programa']==int(id_radiales)]
   
+    st.text(id_radiales)  
+  
     st.dataframe(df_estaciones_radiales)  
   
     # Fechas y horas por defecto
