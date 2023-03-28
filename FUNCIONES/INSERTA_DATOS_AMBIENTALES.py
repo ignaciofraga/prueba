@@ -136,7 +136,7 @@ else:
     conn.close() 
         
     # Inserta el dataframe resultante en la base de datos 
-    df_condiciones.to_sql('condiciones_ambientales_muestreos', conn_psql,if_exists='replace')
+    df_condiciones.to_sql('condiciones_ambientales_muestreos', conn_psql,if_exists='append')
 
 
 conn_psql.dispose()
@@ -146,14 +146,14 @@ conn_psql.dispose()
 # instruccion_sql_consulta = '''SELECT id_condicion FROM condiciones_ambientales_muestreos WHERE salida = %s and estacion = %s ''' 
         
 
-conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()     
+#conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+#cursor = conn.cursor()     
     
 # # Introduce datos en la base de datos
 # for idato in range(datos_ambientales.shape[0]):          
     
-    cursor.execute(instruccion_sql_consulta, (int(datos_ambientales['id_salida'].iloc[idato]),int(datos_ambientales['id_estacion'].iloc[idato])))
-    id_condicion = cursor.fetchone()[]
+#    cursor.execute(instruccion_sql_consulta, (int(datos_ambientales['id_salida'].iloc[idato]),int(datos_ambientales['id_estacion'].iloc[idato])))
+#    id_condicion = cursor.fetchone()[]
     
 #     cursor.execute(instruccion_sql, (int(datos_ambientales['id_salida'].iloc[idato]),int(datos_ambientales['id_estacion'].iloc[idato]),datos_ambientales['Hora inicio'].iloc[idato],datos_ambientales['Profundidad'].iloc[idato],datos_ambientales['Nubosidad'].iloc[idato],datos_ambientales['Lluvia'].iloc[idato],datos_ambientales['Viento'].iloc[idato],datos_ambientales['Viento_dir'].iloc[idato],datos_ambientales['Presíon'].iloc[idato],datos_ambientales['Altura de Ola'].iloc[idato],datos_ambientales['Mar de fondo'].iloc[idato],datos_ambientales['Douglas'].iloc[idato],datos_ambientales['Mar'].iloc[idato],datos_ambientales['Humedad'].iloc[idato],datos_ambientales['Tª aire'].iloc[idato],datos_ambientales['Secchi'].iloc[idato],datos_ambientales['Max. Cla'].iloc[idato],datos_ambientales['Marea'].iloc[idato],datos_ambientales['Tª superf.'].iloc[idato]))
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         

@@ -657,10 +657,9 @@ def entrada_salidas_mar():
         df_personal          = psql.read_sql('SELECT * FROM personal_salidas', conn)
         df_salidas           = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_estaciones        = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_programas         = psql.read_sql('SELECT * FROM programas', conn)
         
         conn.close()
-        return df_buques,df_config_perfilador,df_config_superficie,df_personal,df_salidas,df_estaciones,df_programas
+        return df_salidas,df_programas,df_estaciones,df_condiciones
     
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
@@ -670,23 +669,8 @@ def entrada_salidas_mar():
     contrasena     = st.secrets["postgres"].password
     puerto         = st.secrets["postgres"].port
     
-    # Cargar los datos de la caché
-    df_buques,df_config_perfilador,df_config_superficie,df_personal,df_salidas,df_estaciones,df_programas = carga_datos_salidas_mar()
-    
-    # Procesa cierta información utilizada en todos los procesos
-    id_radiales                = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
-    df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
-    df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
-    df_salidas_radiales        = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
-    df_estaciones_radiales     = df_estaciones[df_estaciones['programa']==id_radiales]
-  
-    # Fechas y horas por defecto
-    fecha_actual        = datetime.date.today()
-    hora_defecto_inicio = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
-    hora_defecto_final  = datetime.time(14,30,0,0,tzinfo = datetime.timezone.utc)  
-  
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    entradas     = ['Añadir salida al mar','Modificar salidas realizadas','Consultar salidas realizadas','Personal participante']
+    entradas     = ['Añadir salida al mar', 'Rersonal participante','Consultar o modificar salidas realizadas']
     tipo_entrada = st.sidebar.radio("Indicar la consulta a realizar",entradas)
     
 
@@ -694,10 +678,40 @@ def entrada_salidas_mar():
     if tipo_entrada == entradas[0]:  
         
         st.subheader('Salida al mar')
+        
+        # Recupera la tabla con los buques disponibles en la base de datos, como un dataframe
+        conn = init_connection()
+        df_buques            = psql.read_sql('SELECT * FROM buques', conn)
+        df_config_perfilador = psql.read_sql('SELECT * FROM configuracion_perfilador', conn)
+        df_config_superficie = psql.read_sql('SELECT * FROM configuracion_superficie', conn)
+        conn.close()
+        
+        # Recupera tablas con información utilizada
+        conn                       = init_connection()
+        
+        # Personal disponible
+        df_personal                = psql.read_sql('SELECT * FROM personal_salidas', conn)
+        df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
+        df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
+        # Salidas realizadas 
+        df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
+        # Estaciones de muestreo (radiales)
+        df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+        df_estaciones_radiales = df_estaciones[df_estaciones['programa']==3]
+        
+        conn.close()
+        
 
         # tipos de salida en las radiales
         tipos_radiales = ['MENSUAL','SEMANAL']
-
+        
+        
+        fecha_actual        = datetime.date.today()
+        
+        hora_defecto_inicio = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
+        hora_defecto_final  = datetime.time(14,30,0,0,tzinfo = datetime.timezone.utc)
+        
         # Despliega un formulario para seleccionar las fechas de inicio y final
         with st.form("Formulario seleccion"):
                    
@@ -913,28 +927,172 @@ def entrada_salidas_mar():
                         texto_exito = 'Salida añadida correctamente'
                         st.success(texto_exito)
                         
-                        st.cache_data.clear()
-                        
                     else:
-                        texto_error = 'La base de datos ya contiene una salida ' + tipo_salida.lower() + ' para la fecha seleccionada. Puede modificar los datos de esa salida en la pestaña correspondiente'
+                        texto_error = 'La base de datos ya contiene una salida ' + tipo_salida.lower() + ' para la fecha seleccionada'
                         st.warning(texto_error, icon="⚠️")                      
                         
     
+
+
+
+
+    # Añade personal participante en las salidas de radial
+    if tipo_entrada == entradas[1]: 
+
+        st.subheader('Personal participante')
+        
+        # Recupera la tabla con el personal ya introducido, como un dataframe
+        conn = init_connection()
+        df_personal = psql.read_sql('SELECT * FROM personal_salidas', conn)
+        conn.close()
+
+        # Muestra una tabla con el personal ya incluido en la base de datos
+        st.dataframe(df_personal,height=250)
+        
+        st.subheader('Añadir personal participante')
+        # Despliega un formulario para introducir los datos
+        with st.form("Formulario seleccion"):
+                   
+            nombre_participante  = st.text_input('Nombre y apellidos del nuevo personal', value="")
+            
+            comision             = st.checkbox('Comisionado')
+            
+            submit = st.form_submit_button("Añadir participante")
+
+            if submit == True:
+
+                io_incluido = 0
+                for ipersonal in range(df_personal.shape[0]):
+                    if df_personal['nombre_apellidos'][ipersonal] == nombre_participante:
+                        io_incluido = 1
+                
+                if io_incluido == 0:
+
+                    instruccion_sql = '''INSERT INTO personal_salidas (nombre_apellidos,comisionado)
+                        VALUES (%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.correo,EXCLUDED.comisionado);''' 
+                            
+                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                    cursor = conn.cursor()
+                    cursor.execute(instruccion_sql, (nombre_participante,comision))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+
+                    texto_exito = 'Participante añadido correctamente'
+                    st.success(texto_exito)
+        
+                else:
+                    texto_error = 'El participante introducido ya se encuentra en la base de datos '
+                    st.warning(texto_error, icon="⚠️")  
+
+
+    # Consulta las salidas realizadas
+    if tipo_entrada == entradas[2]: 
+        
+        st.subheader('Salidas al mar realizadas')
+
+        # Muestra las salidas realizadas
+
+        # Recupera la tabla con las salidas disponibles, como un dataframe
+        conn = init_connection()
+        df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
+        df_buques = psql.read_sql('SELECT * FROM buques', conn)
+        conn.close()
+        
+        # Añade una columna con el nombre del buque utilizado
+        df_salidas_radiales['Buque'] = None
+        for isalida in range(df_salidas_radiales.shape[0]):
+            if df_salidas_radiales['buque'].iloc[isalida].is_integer():
+                #st.text(df_salidas_radiales['buque'].iloc[isalida])
+                df_salidas_radiales['Buque'].iloc[isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]].iloc[0]
+
+        # Elimina las columnas que no interesa mostrar
+        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','buque'])
     
-    # Modificar datos correspondientes a una salida de radial
-    if tipo_entrada == entradas[1]:                    
+        # Renombra las columnas
+        df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados'})
+    
+        # Ajusta el formato de las fechas
+        for idato in range(df_salidas_radiales.shape[0]):
+            df_salidas_radiales['Fecha salida'].iloc[idato]   =  df_salidas_radiales['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
+            df_salidas_radiales['Fecha retorno'].iloc[idato]  =  df_salidas_radiales['Fecha retorno'].iloc[idato].strftime("%Y-%m-%d")
+
+        # Ordena los valores por fechas
+        df_salidas_radiales = df_salidas_radiales.sort_values('Fecha salida')
+
+        # Mueve os identificadores de muestreo al final del dataframe
+        listado_cols = df_salidas_radiales.columns.tolist()
+        listado_cols.append(listado_cols.pop(listado_cols.index('Observaciones')))
+        #listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud')))    
+        df_salidas_radiales = df_salidas_radiales[listado_cols]
+          
+        
+        # Muestra una tabla con las salidas realizadas
+        st.dataframe(df_salidas_radiales,use_container_width=True)
+        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_salidas_radiales)
+        # gridOptions = gb.build()
+        # st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+
+
+        # Botón para descargar las salidas disponibles
+        nombre_archivo =  'DATOS_SALIDAS.xlsx'
+    
+        output = BytesIO()
+        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+        df_salidas_radiales.to_excel(writer, index=False, sheet_name='DATOS')
+        workbook = writer.book
+        worksheet = writer.sheets['DATOS']
+        writer.save()
+        df_salidas_radiales = output.getvalue()
+    
+        st.download_button(
+            label="DESCARGA EXCEL CON LAS SALIDAS REALIZADAS",
+            data=df_salidas_radiales,
+            file_name=nombre_archivo,
+            help= 'Descarga un archivo .csv con los datos solicitados',
+            mime="application/vnd.ms-excel"
+        )
+        
+        
+               
+
+
 
         # Modifica una salida
         st.subheader('Modifica salida al mar')
-                  
+        
+        # Recupera la tabla con los buques disponibles en la base de datos, como un dataframe
+        conn = init_connection()
+        df_buques = psql.read_sql('SELECT * FROM buques', conn)
+        conn.close()
+          
+        # Recupera tablas con información utilizada
+        conn                       = init_connection()
+          
         # Personal disponible
+        df_personal                = psql.read_sql('SELECT * FROM personal_salidas', conn)
         df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
         df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
         # Salidas realizadas 
+        df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
         # Estaciones de muestreo (radiales)
-        df_estaciones_radiales = df_estaciones[df_estaciones['programa']==id_radiales]
-    
+        df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+        df_estaciones_radiales = df_estaciones[df_estaciones['programa']==3]
+        
+        conn.close()
+      
+        # Recupera tablas con informacion utilizada en el procesado
+        conn                = init_connection()
+        df_salidas          = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_programas        = psql.read_sql('SELECT * FROM programas', conn)
+        conn.close()    
+        
+        id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+        #id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
+
+
         fecha_actual        = datetime.date.today()
         
         hora_defecto_inicio = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
@@ -1035,187 +1193,186 @@ def entrada_salidas_mar():
                 estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
             json_estaciones         = json.dumps(estaciones_muestreadas)
 
-            json_variables = FUNCIONES_AUXILIARES.menu_variable_radiales(json_variables_previas)
 
-            # # Selecciona las variables muestreadas
-            # st.subheader('Variables muestreadas')
+            # Selecciona las variables muestreadas
+            st.subheader('Variables muestreadas')
 
-            # st.markdown('BOTELLAS')
+            st.markdown('BOTELLAS')
 
-            # json_variables = []
-            # col1, col2, col3, col4= st.columns(4,gap="small")
+            json_variables = []
+            col1, col2, col3, col4= st.columns(4,gap="small")
         
-            # with col1:
-            #     if 'Oxigenos' in json_variables_previas:
-            #         oxigenos = st.checkbox('Oxigenos', value=True)
-            #     else:
-            #         oxigenos = st.checkbox('Oxigenos', value=False)                    
-            #     if oxigenos:
-            #         json_variables = json_variables + ['Oxigenos']
+            with col1:
+                if 'Oxigenos' in json_variables_previas:
+                    oxigenos = st.checkbox('Oxigenos', value=True)
+                else:
+                    oxigenos = st.checkbox('Oxigenos', value=False)                    
+                if oxigenos:
+                    json_variables = json_variables + ['Oxigenos']
                     
-            #     if 'Alcalinidad' in json_variables_previas:
-            #         alcalinidad = st.checkbox('Alcalinidad', value=True)
-            #     else:
-            #         alcalinidad = st.checkbox('Alcalinidad', value=False)                    
-            #     if alcalinidad:
-            #         json_variables = json_variables + ['Alcalinidad']
+                if 'Alcalinidad' in json_variables_previas:
+                    alcalinidad = st.checkbox('Alcalinidad', value=True)
+                else:
+                    alcalinidad = st.checkbox('Alcalinidad', value=False)                    
+                if alcalinidad:
+                    json_variables = json_variables + ['Alcalinidad']
 
-            #     if 'pH' in json_variables_previas:                    
-            #         ph = st.checkbox('pH', value=True)
-            #     else:
-            #         ph = st.checkbox('pH', value=False)                
-            #     if ph:
-            #         json_variables = json_variables + ['pH']
+                if 'pH' in json_variables_previas:                    
+                    ph = st.checkbox('pH', value=True)
+                else:
+                    ph = st.checkbox('pH', value=False)                
+                if ph:
+                    json_variables = json_variables + ['pH']
                     
-            #     if 'Nutrientes (A)' in json_variables_previas:                 
-            #         nut_a = st.checkbox('Nutrientes (A)', value=True)
-            #     else:
-            #         nut_a = st.checkbox('Nutrientes (A)', value=False)                    
-            #     if nut_a:
-            #         json_variables = json_variables + ['Nutrientes (A)']
+                if 'Nutrientes (A)' in json_variables_previas:                 
+                    nut_a = st.checkbox('Nutrientes (A)', value=True)
+                else:
+                    nut_a = st.checkbox('Nutrientes (A)', value=False)                    
+                if nut_a:
+                    json_variables = json_variables + ['Nutrientes (A)']
                     
-            #     if 'Nutrientes (B)' in json_variables_previas:                 
-            #         nut_b = st.checkbox('Nutrientes (B)', value=True)
-            #     else:
-            #         nut_b = st.checkbox('Nutrientes (B)', value=False)                     
-            #     if nut_b:
-            #         json_variables = json_variables + ['Nutrientes (B)']
+                if 'Nutrientes (B)' in json_variables_previas:                 
+                    nut_b = st.checkbox('Nutrientes (B)', value=True)
+                else:
+                    nut_b = st.checkbox('Nutrientes (B)', value=False)                     
+                if nut_b:
+                    json_variables = json_variables + ['Nutrientes (B)']
                    
                     
-            # with col2:                                       
-            #     if 'Citometria' in json_variables_previas:   
-            #         citometria = st.checkbox('Citometria', value=True)
-            #     else:
-            #         citometria = st.checkbox('Citometria', value=False)                    
-            #     if citometria:
-            #         json_variables = json_variables + ['Citometría']
+            with col2:                                       
+                if 'Citometria' in json_variables_previas:   
+                    citometria = st.checkbox('Citometria', value=True)
+                else:
+                    citometria = st.checkbox('Citometria', value=False)                    
+                if citometria:
+                    json_variables = json_variables + ['Citometría']
 
-            #     if 'Ciliados' in json_variables_previas:                                         
-            #         ciliados = st.checkbox('Ciliados', value=True)
-            #     else:
-            #         ciliados = st.checkbox('Ciliados', value=False)                    
-            #     if ciliados:
-            #         json_variables = json_variables + ['Ciliados']
+                if 'Ciliados' in json_variables_previas:                                         
+                    ciliados = st.checkbox('Ciliados', value=True)
+                else:
+                    ciliados = st.checkbox('Ciliados', value=False)                    
+                if ciliados:
+                    json_variables = json_variables + ['Ciliados']
 
-            #     if 'Zoop. (meso)' in json_variables_previas:                     
-            #         zoop_meso = st.checkbox('Zoop. (meso)', value=True)
-            #     else:
-            #         zoop_meso = st.checkbox('Zoop. (meso)', value=False)                    
-            #     if zoop_meso:
-            #         json_variables = json_variables + ['Zoop. (meso)']
+                if 'Zoop. (meso)' in json_variables_previas:                     
+                    zoop_meso = st.checkbox('Zoop. (meso)', value=True)
+                else:
+                    zoop_meso = st.checkbox('Zoop. (meso)', value=False)                    
+                if zoop_meso:
+                    json_variables = json_variables + ['Zoop. (meso)']
 
-            #     if 'Zoop. (micro)' in json_variables_previas:                     
-            #         zoop_micro = st.checkbox('Zoop. (micro)', value=True)
-            #     else:
-            #         zoop_micro = st.checkbox('Zoop. (micro)', value=False)                    
-            #     if zoop_micro:
-            #         json_variables = json_variables + ['Zoop. (micro)']   
+                if 'Zoop. (micro)' in json_variables_previas:                     
+                    zoop_micro = st.checkbox('Zoop. (micro)', value=True)
+                else:
+                    zoop_micro = st.checkbox('Zoop. (micro)', value=False)                    
+                if zoop_micro:
+                    json_variables = json_variables + ['Zoop. (micro)']   
                    
-            #     if 'Zoop. (ictio)' in json_variables_previas: 
-            #         zoop_ictio = st.checkbox('Zoop. (ictio)', value=True)
-            #     else:
-            #         zoop_ictio = st.checkbox('Zoop. (ictio)', value=False)                    
-            #     if zoop_ictio:
-            #         json_variables = json_variables + ['Zoop. (ictio)']   
+                if 'Zoop. (ictio)' in json_variables_previas: 
+                    zoop_ictio = st.checkbox('Zoop. (ictio)', value=True)
+                else:
+                    zoop_ictio = st.checkbox('Zoop. (ictio)', value=False)                    
+                if zoop_ictio:
+                    json_variables = json_variables + ['Zoop. (ictio)']   
 
 
-            # with col3:
-            #     if 'Clorofilas' in json_variables_previas: 
-            #         colorofilas = st.checkbox('Clorofilas', value=True)
-            #     else:
-            #         colorofilas = st.checkbox('Clorofilas', value=False)                    
-            #     if colorofilas:
-            #         json_variables = json_variables + ['Clorofilas'] 
+            with col3:
+                if 'Clorofilas' in json_variables_previas: 
+                    colorofilas = st.checkbox('Clorofilas', value=True)
+                else:
+                    colorofilas = st.checkbox('Clorofilas', value=False)                    
+                if colorofilas:
+                    json_variables = json_variables + ['Clorofilas'] 
 
-            #     if 'Prod.Primaria' in json_variables_previas: 
-            #         prod_prim = st.checkbox('Prod.Primaria', value=True)
-            #     else:
-            #         prod_prim = st.checkbox('Prod.Primaria', value=False)                    
-            #     if prod_prim:
-            #         json_variables = json_variables + ['Prod.Primaria']
+                if 'Prod.Primaria' in json_variables_previas: 
+                    prod_prim = st.checkbox('Prod.Primaria', value=True)
+                else:
+                    prod_prim = st.checkbox('Prod.Primaria', value=False)                    
+                if prod_prim:
+                    json_variables = json_variables + ['Prod.Primaria']
                                         
-            #     if 'Flow Cam' in json_variables_previas:                     
-            #         flow_cam = st.checkbox('Flow Cam', value=True)
-            #     else:
-            #         flow_cam = st.checkbox('Flow Cam', value=False)
-            #     if flow_cam:
-            #         json_variables = json_variables + ['Flow Cam'] 
+                if 'Flow Cam' in json_variables_previas:                     
+                    flow_cam = st.checkbox('Flow Cam', value=True)
+                else:
+                    flow_cam = st.checkbox('Flow Cam', value=False)
+                if flow_cam:
+                    json_variables = json_variables + ['Flow Cam'] 
                     
-            #     if 'ADN' in json_variables_previas:                    
-            #         adn = st.checkbox('ADN', value=True)
-            #     else:
-            #         adn = st.checkbox('ADN', value=False)                    
-            #     if adn:
-            #         json_variables = json_variables + ['ADN'] 
+                if 'ADN' in json_variables_previas:                    
+                    adn = st.checkbox('ADN', value=True)
+                else:
+                    adn = st.checkbox('ADN', value=False)                    
+                if adn:
+                    json_variables = json_variables + ['ADN'] 
 
-            #     if 'DOM' in json_variables_previas:                     
-            #         dom = st.checkbox('DOM', value=True)
-            #     else:
-            #         dom = st.checkbox('DOM', value=False)                
-            #     if dom:
-            #         json_variables = json_variables + ['DOM']
+                if 'DOM' in json_variables_previas:                     
+                    dom = st.checkbox('DOM', value=True)
+                else:
+                    dom = st.checkbox('DOM', value=False)                
+                if dom:
+                    json_variables = json_variables + ['DOM']
             
             
-            # with col4:
-            #     if 'TOC' in json_variables_previas:                 
-            #         toc = st.checkbox('TOC', value=True)
-            #     else:
-            #         toc = st.checkbox('TOC', value=False)                    
-            #     if toc:
-            #         json_variables = json_variables + ['TOC']
+            with col4:
+                if 'TOC' in json_variables_previas:                 
+                    toc = st.checkbox('TOC', value=True)
+                else:
+                    toc = st.checkbox('TOC', value=False)                    
+                if toc:
+                    json_variables = json_variables + ['TOC']
                     
-            #     if 'POC' in json_variables_previas:    
-            #         poc = st.checkbox('POC', value=True)
-            #     else:
-            #         poc = st.checkbox('POC', value=False)                    
-            #     if poc:
-            #         json_variables = json_variables + ['POC']
+                if 'POC' in json_variables_previas:    
+                    poc = st.checkbox('POC', value=True)
+                else:
+                    poc = st.checkbox('POC', value=False)                    
+                if poc:
+                    json_variables = json_variables + ['POC']
 
-            #     if 'PPL' in json_variables_previas:                                    
-            #         ppl = st.checkbox('PPL', value=True)
-            #     else:
-            #         ppl = st.checkbox('PPL', value=False)                    
-            #     if ppl:
-            #         json_variables = json_variables + ['PPL']
+                if 'PPL' in json_variables_previas:                                    
+                    ppl = st.checkbox('PPL', value=True)
+                else:
+                    ppl = st.checkbox('PPL', value=False)                    
+                if ppl:
+                    json_variables = json_variables + ['PPL']
                     
-            #     otros = st.text_input('Otros:')
-            #     if otros:
-            #         json_variables = json_variables + [otros]
+                otros = st.text_input('Otros:')
+                if otros:
+                    json_variables = json_variables + [otros]
 
-            # st.markdown('CONTINUO')
-            # col1, col2, col3, col4= st.columns(4,gap="small")
+            st.markdown('CONTINUO')
+            col1, col2, col3, col4= st.columns(4,gap="small")
             
-            # with col1:
-            #     if 'Oxigeno (Cont.)' in json_variables_previas:
-            #         oxigenos_continuo = st.checkbox('Oxigeno (Cont.)', value=True)
-            #     else:
-            #         oxigenos_continuo = st.checkbox('Oxigeno (Cont.)', value=False)
-            #     if oxigenos_continuo:
-            #         json_variables = json_variables + ['Oxigeno (Cont.)']  
+            with col1:
+                if 'Oxigeno (Cont.)' in json_variables_previas:
+                    oxigenos_continuo = st.checkbox('Oxigeno (Cont.)', value=True)
+                else:
+                    oxigenos_continuo = st.checkbox('Oxigeno (Cont.)', value=False)
+                if oxigenos_continuo:
+                    json_variables = json_variables + ['Oxigeno (Cont.)']  
 
-            # with col2:
-            #     if 'pH (Cont.)' in json_variables_previas:
-            #         ph_continuo = st.checkbox('pH (Cont.)', value=True)
-            #     else:
-            #         ph_continuo = st.checkbox('pH (Cont.)', value=False)
-            #     if ph_continuo:
-            #         json_variables = json_variables + ['pH (Cont.)']            
+            with col2:
+                if 'pH (Cont.)' in json_variables_previas:
+                    ph_continuo = st.checkbox('pH (Cont.)', value=True)
+                else:
+                    ph_continuo = st.checkbox('pH (Cont.)', value=False)
+                if ph_continuo:
+                    json_variables = json_variables + ['pH (Cont.)']            
 
-            # with col3:
-            #     if 'CDOM (Cont.)' in json_variables_previas:
-            #         cdom_continuo = st.checkbox('CDOM (Cont.)', value=True)
-            #     else:
-            #         cdom_continuo = st.checkbox('CDOM (Cont.)', value=False)                    
-            #     if cdom_continuo:
-            #         json_variables = json_variables + ['CDOM (Cont.)'] 
+            with col3:
+                if 'CDOM (Cont.)' in json_variables_previas:
+                    cdom_continuo = st.checkbox('CDOM (Cont.)', value=True)
+                else:
+                    cdom_continuo = st.checkbox('CDOM (Cont.)', value=False)                    
+                if cdom_continuo:
+                    json_variables = json_variables + ['CDOM (Cont.)'] 
             
-            # with col4:
-            #     if 'Clorofila (Cont.)' in json_variables_previas:
-            #         clorofilas_continuo = st.checkbox('Clorofila (Cont.)', value=True)
-            #     else:
-            #         clorofilas_continuo = st.checkbox('Clorofila (Cont.)', value=False)
-            #     if clorofilas_continuo:
-            #         json_variables = json_variables + ['Clorofila (Cont.)'] 
+            with col4:
+                if 'Clorofila (Cont.)' in json_variables_previas:
+                    clorofilas_continuo = st.checkbox('Clorofila (Cont.)', value=True)
+                else:
+                    clorofilas_continuo = st.checkbox('Clorofila (Cont.)', value=False)
+                if clorofilas_continuo:
+                    json_variables = json_variables + ['Clorofila (Cont.)'] 
                     
                     
             json_variables         = json.dumps(json_variables)
@@ -1242,117 +1399,6 @@ def entrada_salidas_mar():
                 time.sleep(5)
                     
                 st.experimental_rerun()
-
-
-    # Añade personal participante en las salidas de radial
-    if tipo_entrada == entradas[1]: 
-
-        st.subheader('Personal participante')
-        
-        # Muestra una tabla con el personal ya incluido en la base de datos
-        st.dataframe(df_personal,height=250)
-        
-        st.subheader('Añadir personal participante')
-        # Despliega un formulario para introducir los datos
-        with st.form("Formulario seleccion"):
-                   
-            nombre_participante  = st.text_input('Nombre y apellidos del nuevo personal', value="")
-            
-            comision             = st.checkbox('Comisionado')
-            
-            submit = st.form_submit_button("Añadir participante")
-
-            if submit == True:
-
-                io_incluido = 0
-                for ipersonal in range(df_personal.shape[0]):
-                    if df_personal['nombre_apellidos'][ipersonal] == nombre_participante:
-                        io_incluido = 1
-                
-                if io_incluido == 0:
-
-                    instruccion_sql = '''INSERT INTO personal_salidas (nombre_apellidos,comisionado)
-                        VALUES (%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.correo,EXCLUDED.comisionado);''' 
-                            
-                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                    cursor = conn.cursor()
-                    cursor.execute(instruccion_sql, (nombre_participante,comision))
-                    conn.commit()
-                    cursor.close()
-                    conn.close()
-
-                    texto_exito = 'Participante añadido correctamente'
-                    st.success(texto_exito)
-        
-                else:
-                    texto_error = 'El participante introducido ya se encuentra en la base de datos '
-                    st.warning(texto_error, icon="⚠️")  
-
-
-    # Consulta las salidas realizadas
-    if tipo_entrada == entradas[2]: 
-        
-        st.subheader('Salidas al mar realizadas')
-
-        # Muestra las salidas realizadas
-
-        # Recupera la tabla con las salidas disponibles, como un dataframe
-        df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
-
-        
-        # Añade una columna con el nombre del buque utilizado
-        df_salidas_radiales['Buque'] = None
-        for isalida in range(df_salidas_radiales.shape[0]):
-            if df_salidas_radiales['buque'].iloc[isalida].is_integer():
-                df_salidas_radiales['Buque'].iloc[isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]].iloc[0]
-
-        # Elimina las columnas que no interesa mostrar
-        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','buque'])
-    
-        # Renombra las columnas
-        df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados'})
-    
-        # Ajusta el formato de las fechas
-        for idato in range(df_salidas_radiales.shape[0]):
-            df_salidas_radiales['Fecha salida'].iloc[idato]   =  df_salidas_radiales['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
-            df_salidas_radiales['Fecha retorno'].iloc[idato]  =  df_salidas_radiales['Fecha retorno'].iloc[idato].strftime("%Y-%m-%d")
-
-        # Ordena los valores por fechas
-        df_salidas_radiales = df_salidas_radiales.sort_values('Fecha salida')
-
-        # Mueve los identificadores de muestreo al final del dataframe
-        listado_cols = df_salidas_radiales.columns.tolist()
-        listado_cols.append(listado_cols.pop(listado_cols.index('Observaciones')))   
-        df_salidas_radiales = df_salidas_radiales[listado_cols]
-          
-        # Muestra una tabla con las salidas realizadas
-        st.dataframe(df_salidas_radiales,use_container_width=True)
-
-        # Botón para descargar las salidas disponibles
-        nombre_archivo =  'DATOS_SALIDAS.xlsx'
-    
-        output = BytesIO()
-        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-        df_salidas_radiales.to_excel(writer, index=False, sheet_name='DATOS')
-        workbook = writer.book
-        worksheet = writer.sheets['DATOS']
-        writer.save()
-        df_salidas_radiales = output.getvalue()
-    
-        st.download_button(
-            label="DESCARGA EXCEL CON LAS SALIDAS REALIZADAS",
-            data=df_salidas_radiales,
-            file_name=nombre_archivo,
-            help= 'Descarga un archivo .csv con los datos solicitados',
-            mime="application/vnd.ms-excel"
-        )
-        
-        
-               
-
-
-
-
 
 
 

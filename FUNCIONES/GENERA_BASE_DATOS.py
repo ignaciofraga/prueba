@@ -1052,7 +1052,6 @@ conn.commit()
 
 # Crea la tabla de nuevo
 listado_variables = ('(id_condicion int PRIMARY KEY,'
-#listado_variables = ('(salida int NOT NULL,'
 ' salida int NOT NULL,'
 ' estacion int NOT NULL,'
 ' hora_llegada time,'
