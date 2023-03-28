@@ -962,13 +962,13 @@ def menu_metadatos_radiales(fecha_salida_defecto,hora_defecto_inicio,fecha_regre
         if id_perfil_previo is None:
             id_configurador_perfil     = st.selectbox('Id.configuracion perfilador',(df_config_perfilador['id_config_perfil']))            
         else:
-            id_configurador_perfil     = st.selectbox('Id.configuracion perfilador',(df_config_perfilador['id_config_perfil']),index=id_perfil_previo)
+            id_configurador_perfil     = st.selectbox('Id.configuracion perfilador',(df_config_perfilador['id_config_perfil']),index=int(id_perfil_previo))
 
     with col3:
         if id_sup_previo is None:
             id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_superficie['id_config_superficie']))
         else:
-            id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_superficie['id_config_superficie']),index=id_sup_previo)            
+            id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_superficie['id_config_superficie']),index=int(id_sup_previo))            
 
     # Bloque de personal
     
