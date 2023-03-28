@@ -1506,10 +1506,25 @@ def entrada_condiciones_ambientales():
             else:
                 indice_marea_defecto        = 0
                 
-            prof_secchi_defecto             = df_condicion_introducida['prof_secchi'].iloc[0]
-            max_clorofila_defecto           = df_condicion_introducida['max_clorofila'].iloc[0]
-            humedad_relativa_defecto        = df_condicion_introducida['humedad_relativa'].iloc[0]
-            temp_superficie_defecto         = df_condicion_introducida['temp_superficie'].iloc[0]
+            if df_condicion_introducida['prof_secchi'].iloc[0] is not None:
+                prof_secchi_defecto         = df_condicion_introducida['prof_secchi'].iloc[0]
+            else:
+                prof_secchi_defecto         = 0
+                
+            if df_condicion_introducida['max_clorofila'].iloc[0] is not None:
+                max_clorofila_defecto       = df_condicion_introducida['max_clorofila'].iloc[0]
+            else:
+                max_clorofila_defecto       = 0
+
+            if df_condicion_introducida['humedad_relativa'].iloc[0] is not None:                
+                humedad_relativa_defecto    = df_condicion_introducida['humedad_relativa'].iloc[0]
+            else:
+                humedad_relativa_defecto    = 50
+            
+            if df_condicion_introducida['temp_superficie'].iloc[0] is not None:
+                temp_superficie_defecto     = df_condicion_introducida['temp_superficie'].iloc[0]
+            else:
+                temp_superficie_defecto     = 16                
             
             io_previo                       = 1
             
