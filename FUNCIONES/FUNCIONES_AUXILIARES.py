@@ -549,15 +549,15 @@ def consulta_botellas():
         # Selecciona mostrar o no datos malos y dudosos
         col1, col2, col3, col4 = st.columns(4,gap="small")
         with col1:
-            io_temperatura   = st.checkbox('Temperatura(CTD)', value=True)
+            io_temperatura   = st.checkbox('Temperatura(CTD)', value=False)
             if io_temperatura:
                 listado_variables = listado_variables + ['temperatura_ctd'] + ['temperatura_ctd_qf']
         with col2:
-            io_salinidad     = st.checkbox('Salinidad(CTD)', value=True)
+            io_salinidad     = st.checkbox('Salinidad(CTD)', value=False)
             if io_salinidad:
                 listado_variables = listado_variables + ['salinidad_ctd'] + ['salinidad_ctd_qf']
         with col3:
-            io_par           = st.checkbox('PAR(CTD)', value=True)
+            io_par           = st.checkbox('PAR(CTD)', value=False)
             if io_par:
                 listado_variables = listado_variables + ['par_ctd'] + ['par_ctd_qf']
         with col4:
@@ -577,49 +577,49 @@ def consulta_botellas():
         # Selecciona mostrar o no datos malos y dudosos
         col1, col2, col3 = st.columns(3,gap="small")
         with col1:
-            io_fluorescencia   = st.checkbox('Fluorescencia(CTD)', value=True)
+            io_fluorescencia   = st.checkbox('Fluorescencia(CTD)', value=False)
             if io_fluorescencia:
                 listado_variables = listado_variables + ['fluorescencia_ctd'] + ['fluorescencia_ctd_qf']
  
-            io_oxigeno_ctd   = st.checkbox('Oxígeno(CTD)', value=True)
+            io_oxigeno_ctd   = st.checkbox('Oxígeno(CTD)', value=False)
             if io_oxigeno_ctd:
                 listado_variables = listado_variables + ['oxigeno_ctd'] + ['oxigeno_ctd_qf']
 
-            io_oxigeno_wk   = st.checkbox('Oxígeno(Winkler)', value=True)
+            io_oxigeno_wk   = st.checkbox('Oxígeno(Winkler)', value=False)
             if io_oxigeno_wk:
                 listado_variables = listado_variables + ['oxigeno_wk'] + ['oxigeno_wk_qf']  
                 
-            io_ph      = st.checkbox('pH', value=True)
+            io_ph      = st.checkbox('pH', value=False)
             if io_ph:
                 listado_variables = listado_variables + ['ph'] + ['ph_qf'] + ['ph_metodo']               
 
-            io_alcalinidad           = st.checkbox('Alcalinidad', value=True)
+            io_alcalinidad           = st.checkbox('Alcalinidad', value=False)
             if io_alcalinidad:
                  listado_variables = listado_variables + ['alcalinidad'] + ['alcalinidad_qf']  
                              
                 
         with col2:
-            io_nitrogeno_total     = st.checkbox('TON', value=True)
+            io_nitrogeno_total     = st.checkbox('TON', value=False)
             if io_nitrogeno_total:
                 listado_variables = listado_variables + ['ton'] + ['ton_qf']
                 
-            io_nitrato   = st.checkbox('Nitrato', value=True)
+            io_nitrato   = st.checkbox('Nitrato', value=False)
             if io_nitrato:
                 listado_variables = listado_variables + ['nitrato'] + ['nitrato_qf']
   
-            io_nitrito   = st.checkbox('Nitrito', value=True)
+            io_nitrito   = st.checkbox('Nitrito', value=False)
             if io_nitrito:
                  listado_variables = listado_variables + ['nitrito'] + ['nitrito_qf']
 
-            io_amonio   = st.checkbox('Amonio', value=True)
+            io_amonio   = st.checkbox('Amonio', value=False)
             if io_amonio:
                  listado_variables = listado_variables + ['amonio'] + ['amonio_qf']                 
                 
-            io_fosfato   = st.checkbox('Fosfato', value=True)
+            io_fosfato   = st.checkbox('Fosfato', value=False)
             if io_fosfato:
                   listado_variables = listado_variables + ['fosfato'] + ['fosfato_qf']                 
    
-            io_silicato   = st.checkbox('Silicato', value=True)
+            io_silicato   = st.checkbox('Silicato', value=False)
             if io_silicato:
                   listado_variables = listado_variables + ['silicato'] + ['silicato_qf'] 
                   
