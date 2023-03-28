@@ -674,7 +674,7 @@ def entrada_salidas_mar():
     df_buques,df_config_perfilador,df_config_superficie,df_personal,df_salidas,df_estaciones,df_programas = carga_datos_salidas_mar()
     
     # Procesa cierta información utilizada en todos los procesos
-    id_radiales                = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+    id_radiales                = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
     df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
     df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
     df_salidas_radiales        = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
