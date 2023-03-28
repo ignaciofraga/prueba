@@ -675,8 +675,7 @@ def entrada_salidas_mar():
     
     # Procesa cierta información utilizada en todos los procesos
     id_radiales                = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
-    df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
-    df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
+
     df_salidas_radiales        = df_salidas[df_salidas['programa']==int(id_radiales)]
     df_estaciones_radiales     = df_estaciones[df_estaciones['programa']==int(id_radiales)]
   
@@ -702,170 +701,27 @@ def entrada_salidas_mar():
         # tipos de salida en las radiales
         tipos_radiales = ['MENSUAL','SEMANAL']
 
-        # Despliega un formulario para seleccionar las fechas de inicio y final
+        # Despliega los formularios 
         with st.form("Formulario seleccion"):
                    
-            nombre_salida        = st.text_input('Nombre de la salida', value="")
-            
-            col1, col2,col3= st.columns(3,gap="small")
-            
-            with col1:
-                
-                tipo_salida     = st.selectbox('Tipo de radial',(tipos_radiales))
-                
-                buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']))
-                id_buque_elegido = int(df_buques['id_buque'][df_buques['nombre_buque']==buque_elegido].values[0])               
-
-                   
-            with col2:               
-                fecha_salida  = st.date_input('Fecha de salida',max_value=fecha_actual,value=fecha_actual)
-
-                hora_salida   = st.time_input('Hora de salida (UTC)', value=hora_defecto_inicio)
-
-            with col3:
-                
-                fecha_regreso = st.date_input('Fecha de regreso',max_value=fecha_actual,value=fecha_actual)
-
-                hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto_final)
-                
-            
             col1, col2 = st.columns(2,gap="small")
             
-            with col1:     
-                id_configurador_perfil     = st.selectbox('Id.configuracion perfilador',(df_config_perfilador['id_config_perfil']))
-
+            with col1:
+                tipo_salida     = st.selectbox('Tipo de radial',(tipos_radiales))
+           
             with col2:
-                id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_superficie['id_config_superficie']))
-
-
-            personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])
-            json_comisionados       = json.dumps(personal_comisionado)
-
-            personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])
-            if len(personal_no_comisionado)>0:
-                json_no_comisionados = json.dumps(personal_no_comisionado)
-            else:
-                json_no_comisionados = None  
+                nombre_salida        = st.text_input('Nombre de la salida', value="")                
             
-            estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
-            json_estaciones         = json.dumps(estaciones_muestreadas)
-            
-            
-            # # Selecciona las variables muestreadas
-            # st.subheader('Variables muestreadas')
-            
-            # st.markdown('BOTELLAS')
 
-            # json_variables = []
-            # col1, col2, col3, col4= st.columns(4,gap="small")
-            
-            # with col1:
-            #     oxigenos = st.checkbox('Oxigenos', value=True)
-            #     if oxigenos:
-            #         json_variables = json_variables + ['Oxigenos']
-                    
-            #     alcalinidad = st.checkbox('Alcalinidad', value=True)
-            #     if alcalinidad:
-            #         json_variables = json_variables + ['Alcalinidad']
-                    
-            #     ph = st.checkbox('pH', value=True)
-            #     if ph:
-            #         json_variables = json_variables + ['pH']
-                    
-            #     nut_a = st.checkbox('Nutrientes (A)', value=True)
-            #     if nut_a:
-            #         json_variables = json_variables + ['Nutrientes (A)']
-                    
-            #     nut_b = st.checkbox('Nutrientes (B)', value=True)
-            #     if nut_b:
-            #         json_variables = json_variables + ['Nutrientes (B)']
-                   
-                    
-            # with col2:                                       
-            #     citometria = st.checkbox('Citometria', value=True)
-            #     if citometria:
-            #         json_variables = json_variables + ['Citometria']
-                                        
-            #     ciliados = st.checkbox('Ciliados', value=True)
-            #     if ciliados:
-            #         json_variables = json_variables + ['Ciliados']
-                    
-            #     zoop_meso = st.checkbox('Zoop. (meso)', value=True)
-            #     if zoop_meso:
-            #         json_variables = json_variables + ['Zoop. (meso)']
-                    
-            #     zoop_micro = st.checkbox('Zoop. (micro)', value=True)
-            #     if zoop_micro:
-            #         json_variables = json_variables + ['Zoop. (micro)']   
-                    
-            #     zoop_ictio = st.checkbox('Zoop. (ictio)', value=False)
-            #     if zoop_ictio:
-            #         json_variables = json_variables + ['Zoop. (ictio)']   
-
-
-            # with col3:
-            #     colorofilas = st.checkbox('Clorofilas', value=True)
-            #     if colorofilas:
-            #         json_variables = json_variables + ['Clorofilas'] 
-
-            #     prod_prim = st.checkbox('Prod.Primaria', value=True)
-            #     if prod_prim:
-            #         json_variables = json_variables + ['Prod.Primaria']
-                                        
-            #     flow_cam = st.checkbox('Flow Cam', value=True)
-            #     if flow_cam:
-            #         json_variables = json_variables + ['Flow Cam'] 
-                    
-            #     adn = st.checkbox('ADN', value=True)
-            #     if adn:
-            #         json_variables = json_variables + ['ADN'] 
-                    
-            #     dom = st.checkbox('DOM', value=True)
-            #     if dom:
-            #         json_variables = json_variables + ['DOM']
-            
-            
-            # with col4:
-                
-            #     toc = st.checkbox('TOC', value=True)
-            #     if toc:
-            #         json_variables = json_variables + ['TOC']
-                    
-            #     poc = st.checkbox('POC', value=True)
-            #     if poc:
-            #         json_variables = json_variables + ['POC']
-                                    
-            #     ppl = st.checkbox('PPL', value=False)
-            #     if ppl:
-            #         json_variables = json_variables + ['PPL']
-                    
-            #     otros = st.text_input('Otros:')
-            #     if otros:
-            #         json_variables = json_variables + [otros]
-                    
-                    
-            # st.markdown('CONTINUO')
-            # col1, col2, col3, col4= st.columns(4,gap="small")
-            
-            # with col1:
-            #     oxigenos_continuo = st.checkbox('Oxigeno (Cont.)', value=True)
-            #     if oxigenos_continuo:
-            #         json_variables = json_variables + ['Oxigeno (Cont.)']  
-
-            # with col2:
-            #     ph_continuo = st.checkbox('pH (Cont.)', value=True)
-            #     if ph_continuo:
-            #         json_variables = json_variables + ['pH (Cont.)']            
-
-            # with col3:
-            #     cdom_continuo = st.checkbox('CDOM (Cont.)', value=False)
-            #     if cdom_continuo:
-            #         json_variables = json_variables + ['CDOM (Cont.)'] 
-            
-            # with col4:
-            #     clorofilas_continuo = st.checkbox('Clorofila (Cont.)', value=False)
-            #     if clorofilas_continuo:
-            #         json_variables = json_variables + ['Clorofila (Cont.)'] 
+            # Selección de fechas, personal, y estaciones        
+            personal_comisionado_previo    = None
+            personal_no_comisionado_previo = None
+            estaciones_previas             = None 
+            id_buque_previo                = None 
+            id_perfil_previo               = None 
+            id_sup_previo                  = None
+            fecha_salida,hora_salida,fecha_regreso,hora_regreso,json_comisionados,json_no_comisionados,json_estaciones,id_buque_elegido,id_configurador_perfil,id_configurador_sup = FUNCIONES_AUXILIARES.menu_metadatos_radiales(fecha_actual,hora_defecto_inicio,fecha_actual,hora_defecto_final,df_personal,personal_comisionado_previo,personal_no_comisionado_previo,estaciones_previas,df_estaciones_radiales,id_buque_previo,df_buques,id_perfil_previo,df_config_perfilador,id_sup_previo,df_config_superficie)
+    
                     
             # Selección de variables medidas con botellas y continuo
             json_variables_previas = []
@@ -961,74 +817,31 @@ def entrada_salidas_mar():
     
         salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
     
-    
-    
-        # Recupera propiedades de la salida seleccionada
-        datos_salida_seleccionada  = df_salidas[df_salidas['nombre_salida']==salida]
-        
-        id_salida                      = datos_salida_seleccionada['id_salida'].iloc[0]
-        fecha_salida                   = datos_salida_seleccionada['fecha_salida'].iloc[0] 
-        json_variables_previas         = datos_salida_seleccionada['variables_muestreadas'].iloc[0]
-        personal_comisionado_previo    = datos_salida_seleccionada['participantes_comisionados'].iloc[0]
-        personal_no_comisionado_previo = datos_salida_seleccionada['participantes_no_comisionados'].iloc[0]           
-        estaciones_previas             = datos_salida_seleccionada['estaciones'].iloc[0]
-        observaciones_previas          = datos_salida_seleccionada['observaciones'].iloc[0]
-
-        # Si no hay variables previas, genero una lista con un None para evitar problemas
-        if json_variables_previas is None:
-            json_variables_previas = [None]    
-        
-
-        # Recupera el personal de la salida seleccionada
-        
         # Despliega un formulario para modificar los datos de la salida 
-        with st.form("Formulario seleccion"):
-                   
-            col1, col2,col3= st.columns(3,gap="small")
-            
-            with col1:
-                                
-                buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']))
-                id_buque_elegido = int(df_buques['id_buque'][df_buques['nombre_buque']==buque_elegido].values[0])               
+        with st.form("Formulario seleccion"):    
+    
+                    
+            datos_salida_seleccionada      = df_salidas[df_salidas['nombre_salida']==salida]
+            id_salida                      = datos_salida_seleccionada['id_salida'].iloc[0]
+            # Selección de fechas, personal, y estaciones
+            fecha_salida                   = datos_salida_seleccionada['fecha_salida'].iloc[0]
+            hora_salida                    = datos_salida_seleccionada['hora_salida'].iloc[0]
+            fecha_regreso                  = datos_salida_seleccionada['fecha_retorno'].iloc[0]
+            hora_regreso                   = datos_salida_seleccionada['hora_retorno'].iloc[0]
+            personal_comisionado_previo    = datos_salida_seleccionada['participantes_comisionados'].iloc[0]
+            personal_no_comisionado_previo = datos_salida_seleccionada['participantes_no_comisionados'].iloc[0]
+            estaciones_previas             = datos_salida_seleccionada['estaciones'].iloc[0] 
+            id_buque_previo                = datos_salida_seleccionada['buque'].iloc[0] 
+            id_perfil_previo               = datos_salida_seleccionada['configuracion_perfil'].iloc[0]  
+            id_sup_previo                  = datos_salida_seleccionada['configuracion_superficie'].iloc[0] 
+            fecha_salida,hora_salida,fecha_regreso,hora_regreso,json_comisionados,json_no_comisionados,json_estaciones,id_buque_elegido,id_configurador_perfil,id_configurador_sup = FUNCIONES_AUXILIARES.menu_metadatos_radiales(fecha_salida,hora_salida,fecha_regreso,hora_regreso,df_personal,personal_comisionado_previo,personal_no_comisionado_previo,estaciones_previas,df_estaciones_radiales,id_buque_previo,df_buques,id_perfil_previo,df_config_perfilador,id_sup_previo,df_config_superficie)
+            # Selección de fechas, personal, y estaciones
+            json_variables_previas         = datos_salida_seleccionada['variables_muestreadas'].iloc[0]
+            json_variables                 = FUNCIONES_AUXILIARES.menu_variables_radiales(json_variables_previas)
+            json_variables                 = json.dumps(json_variables)
 
-                   
-            with col2:               
-                fecha_salida  = st.date_input('Fecha de salida',max_value=fecha_actual,value=fecha_salida)
-
-                hora_salida   = st.time_input('Hora de salida (UTC)', value=hora_defecto_inicio)
-
-            with col3:
-                
-                fecha_regreso = st.date_input('Fecha de regreso',max_value=fecha_actual,value=fecha_salida)
-
-                hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto_final)
-
-            if personal_comisionado_previo is not None:
-                personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'],default=personal_comisionado_previo)
-            else:
-                personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])                
-            json_comisionados       = json.dumps(personal_comisionado)
-
-            if personal_no_comisionado_previo is not None:            
-                personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'],default=personal_no_comisionado_previo)
-            else:
-                personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])                
-            if len(personal_no_comisionado)>0:
-                json_no_comisionados    = json.dumps(personal_no_comisionado)
-            else:
-                json_no_comisionados    = None
-            
-            if len(estaciones_previas):
-                estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'],default=estaciones_previas)
-            else:                
-                estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
-            json_estaciones         = json.dumps(estaciones_muestreadas)
-
-            # Selección de variables medidas con botellas y continuo
-            json_variables    = FUNCIONES_AUXILIARES.menu_variables_radiales(json_variables_previas)
-            json_variables    = json.dumps(json_variables)
-
-            observaciones = st.text_input('Observaciones', value=observaciones_previas)
+            observaciones_previas          = datos_salida_seleccionada['observaciones'].iloc[0] 
+            observaciones                  = st.text_input('Observaciones', value=observaciones_previas)
     
             submit = st.form_submit_button("Actualizar salida")
     

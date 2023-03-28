@@ -13,7 +13,8 @@ from io import BytesIO
 import pandas
 from sqlalchemy import create_engine
 import math
-#import FUNCIONES_PROCESADO
+import datetime
+import json
 
 pandas.options.mode.chained_assignment = None
 
@@ -916,7 +917,84 @@ def consulta_perfiles():
         writer.save()
         
         st.download_button(label="DESCARGA LOS DATOS MOSTRADOS",data=buffer,file_name="PERFILES.xlsx",mime="application/vnd.ms-excel")
+
+
+
+###############################################################################
+################# MENU DE SELECCION DE METADATOS DE LA SALIDA  ################
+###############################################################################    
+
+
+def menu_metadatos_radiales(fecha_salida_defecto,hora_defecto_inicio,fecha_regreso_defecto,hora_defecto_final,df_personal,personal_comisionado_previo,personal_no_comisionado_previo,estaciones_previas,df_estaciones_radiales,id_buque_previo,df_buques,id_perfil_previo,df_config_perfilador,id_sup_previo,df_config_superficie):
+           
+    df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
+    df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
+    fecha_actual               = datetime.date.today()
+    
+    
+    # Bloque de fechas
+    col1, col2 = st.columns(2,gap="small")
+    
+    with col1:               
+        fecha_salida  = st.date_input('Fecha de salida',max_value=fecha_actual,value=fecha_salida_defecto)
+
+        hora_salida   = st.time_input('Hora de salida (UTC)', value=hora_defecto_inicio)
+
+    with col2:
         
+        fecha_regreso = st.date_input('Fecha de regreso',max_value=fecha_actual,value=fecha_regreso_defecto)
+
+        hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto_final)
+    
+    
+    
+    # Bloque de buque y configuracion
+    col1, col2, col3 = st.columns(3,gap="small")    
+
+    with col1:  
+        if id_buque_previo is None:
+            buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']))
+        else:
+            buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']),index=id_buque_previo)            
+        id_buque_elegido = int(df_buques['id_buque'][df_buques['nombre_buque']==buque_elegido].values[0])               
+    
+    with col2:     
+        if id_perfil_previo is None:
+            id_configurador_perfil     = st.selectbox('Id.configuracion perfilador',(df_config_perfilador['id_config_perfil']))            
+        else:
+            id_configurador_perfil     = st.selectbox('Id.configuracion perfilador',(df_config_perfilador['id_config_perfil']),index=id_perfil_previo)
+
+    with col3:
+        if id_sup_previo is None:
+            id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_superficie['id_config_superficie']))
+        else:
+            id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_superficie['id_config_superficie']),index=id_sup_previo)            
+
+    # Bloque de personal
+    
+    if personal_comisionado_previo is not None:
+        personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'],default=personal_comisionado_previo)
+    else:
+        personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])                
+    json_comisionados       = json.dumps(personal_comisionado)
+
+    if personal_no_comisionado_previo is not None:            
+        personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'],default=personal_no_comisionado_previo)
+    else:
+        personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])                
+    if len(personal_no_comisionado)>0:
+        json_no_comisionados    = json.dumps(personal_no_comisionado)
+    else:
+        json_no_comisionados    = None
+    
+    if len(estaciones_previas):
+        estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'],default=estaciones_previas)
+    else:                
+        estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
+    json_estaciones         = json.dumps(estaciones_muestreadas)
+
+
+    return fecha_salida,hora_salida,fecha_regreso,hora_regreso,json_comisionados,json_no_comisionados,json_estaciones,id_buque_elegido,id_configurador_perfil,id_configurador_sup
 
     
 ###############################################################################
