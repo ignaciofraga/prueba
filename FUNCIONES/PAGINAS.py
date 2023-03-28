@@ -830,6 +830,10 @@ def entrada_salidas_mar():
             id_buque_previo                = datos_salida_seleccionada['buque'].iloc[0] 
             id_perfil_previo               = datos_salida_seleccionada['configuracion_perfilador'].iloc[0]  
             id_sup_previo                  = datos_salida_seleccionada['configuracion_superficie'].iloc[0] 
+            
+            st.text(id_perfil_previo)
+            st.text(id_sup_previo)
+            
             fecha_salida,hora_salida,fecha_regreso,hora_regreso,json_comisionados,json_no_comisionados,json_estaciones,id_buque_elegido,id_configurador_perfil,id_configurador_sup = FUNCIONES_AUXILIARES.menu_metadatos_radiales(fecha_salida,hora_salida,fecha_regreso,hora_regreso,df_personal,personal_comisionado_previo,personal_no_comisionado_previo,estaciones_previas,df_estaciones_radiales,id_buque_previo,df_buques,id_perfil_previo,df_config_perfilador,id_sup_previo,df_config_superficie)
             # Selección de fechas, personal, y estaciones
             json_variables_previas         = datos_salida_seleccionada['variables_muestreadas'].iloc[0]
