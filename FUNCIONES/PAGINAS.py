@@ -819,6 +819,7 @@ def entrada_salidas_mar():
                     
             datos_salida_seleccionada      = df_salidas[df_salidas['nombre_salida']==salida]
             id_salida                      = datos_salida_seleccionada['id_salida'].iloc[0]
+            
             # Selección de fechas, personal, y estaciones
             fecha_salida                   = datos_salida_seleccionada['fecha_salida'].iloc[0]
             hora_salida                    = datos_salida_seleccionada['hora_salida'].iloc[0]
@@ -829,22 +830,15 @@ def entrada_salidas_mar():
             estaciones_previas             = datos_salida_seleccionada['estaciones'].iloc[0] 
             id_buque_previo                = datos_salida_seleccionada['buque'].iloc[0] 
             
-
             listado_config_perfilador      = datos_salida_seleccionada['configuracion_perfilador']
             listado_config_perfilador      = [ int(x) for x in listado_config_perfilador]
             listado_config_sup             = datos_salida_seleccionada['configuracion_superficie']
             listado_config_sup             = [ int(x) for x in listado_config_sup]            
-            
-            st.text(listado_config_perfilador)
-            st.text(int(datos_salida_seleccionada['configuracion_perfilador'].iloc[0]))
-            
             id_perfil_previo               = listado_config_perfilador.index(int(datos_salida_seleccionada['configuracion_perfilador'].iloc[0]))
             id_sup_previo                  = listado_config_sup.index(int(datos_salida_seleccionada['configuracion_superficie'].iloc[0]))
             
-            st.text(id_perfil_previo)
-            st.text(id_sup_previo)
-            
             fecha_salida,hora_salida,fecha_regreso,hora_regreso,json_comisionados,json_no_comisionados,json_estaciones,id_buque_elegido,id_configurador_perfil,id_configurador_sup = FUNCIONES_AUXILIARES.menu_metadatos_radiales(fecha_salida,hora_salida,fecha_regreso,hora_regreso,df_personal,personal_comisionado_previo,personal_no_comisionado_previo,estaciones_previas,df_estaciones_radiales,id_buque_previo,df_buques,id_perfil_previo,df_config_perfilador,id_sup_previo,df_config_superficie)
+            
             # Selección de fechas, personal, y estaciones
             json_variables_previas         = datos_salida_seleccionada['variables_muestreadas'].iloc[0]
             json_variables                 = FUNCIONES_AUXILIARES.menu_variables_radiales(json_variables_previas)
@@ -924,14 +918,8 @@ def entrada_salidas_mar():
     # Consulta las salidas realizadas
     if tipo_entrada == entradas[3]: 
         
-        st.subheader('Salidas al mar realizadas')
-
-        # Muestra las salidas realizadas
-
-        # Recupera la tabla con las salidas disponibles, como un dataframe
-        df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
-
-        
+        st.subheader('Consultar salidas al mar realizadas')
+       
         # Añade una columna con el nombre del buque utilizado
         df_salidas_radiales['Buque'] = None
         for isalida in range(df_salidas_radiales.shape[0]):
@@ -966,8 +954,9 @@ def entrada_salidas_mar():
         output = BytesIO()
         writer = pandas.ExcelWriter(output, engine='xlsxwriter')
         df_salidas_radiales.to_excel(writer, index=False, sheet_name='DATOS')
-        workbook = writer.book
-        worksheet = writer.sheets['DATOS']
+        # workbook = writer.book
+        # worksheet = writer.sheets['DATOS']
+        writer.sheets['DATOS']        
         writer.save()
         df_salidas_radiales = output.getvalue()
     
