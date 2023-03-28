@@ -23,7 +23,8 @@ con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccio
 conn_psql        = create_engine(con_engine)
 df_salidas       = psql.read_sql('SELECT * FROM salidas_muestreos', conn_psql)
 df_estaciones    = psql.read_sql('SELECT * FROM estaciones', conn_psql)
-conn_psql.dispose()
+df_condiciones   = psql.read_sql('SELECT * FROM condiciones_ambientales_muestreos', conn_psql)
+
 
 
 archivo_condiciones = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/AMBIENTALES/AMBIENTALES.xlsx'
@@ -58,19 +59,6 @@ for idato in range(datos_ambientales.shape[0]):
     else:
         datos_ambientales['Lluvia'].iloc[idato] = None
     
-# Calcula el estado de Beaufort y Douglas
-# datos_ambientales['Beaufort'] = None
-
-# beaufort_nombre = ['Calma (0)','Ventolina (1)','Flojito (2)','Flojo (3)','Moderada (4)','Fresquito (5)','Fresco (6)','Frescachón (7)','Temporal (8)','Temporal fuerte (9)']
-# beaufort_vmin   = [0  ,0.2, 1.5, 3.3, 5.4, 7.90, 10.70 ,13.8, 17.1, 20.7 ]
-# beaufort_vmax   = [0.2,1.5, 3.3, 5.4, 7.9, 10.7, 13.80, 17.1, 20.7, 24.5 ]
-
-# for idato in range(datos_ambientales.shape[0]):   
-#     if datos_ambientales['Viento'].iloc[idato] is not None:
-#         for iescala in range(len(beaufort_nombre)) :
-#             if datos_ambientales['Viento'].iloc[idato] > beaufort_vmin [iescala] and datos_ambientales['Viento'].iloc[idato] < beaufort_vmax [iescala]:
-#                 datos_ambientales['Beaufort'].iloc[idato] = beaufort_nombre[iescala]
-
 datos_ambientales['Douglas']  = None
 douglas_nombre = ['Mar rizada (1)','Marejadilla (2)', 'Marejada (3)', 'Fuerte marejada (4)', 'Gruesa (5)', 'Muy Gruesa (6)']
 douglas_vmin   = [0  , 0.1 , 0.50 , 1.25, 2.5, 4]
@@ -86,21 +74,93 @@ for idato in range(datos_ambientales.shape[0]):
             if datos_ambientales['Altura de Ola'].iloc[idato] >= douglas_vmin [-1]:
                 datos_ambientales['Douglas'].iloc[idato] = douglas_nombre[-1]
 
-instruccion_sql = '''INSERT INTO condiciones_ambientales_muestreos (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,altura_ola,mar_fondo,estado_mar,mar_direccion,humedad_relativa,temp_aire,prof_secchi,max_clorofila,marea,temp_superficie)
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (salida,estacion) DO UPDATE SET (hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,altura_ola,mar_fondo,estado_mar,mar_direccion,humedad_relativa,temp_aire,prof_secchi,max_clorofila,marea,temp_superficie) = ROW(EXCLUDED.hora_llegada,EXCLUDED.profundidad,EXCLUDED.nubosidad,EXCLUDED.lluvia,EXCLUDED.velocidad_viento,EXCLUDED.direccion_viento,EXCLUDED.pres_atmosferica,EXCLUDED.altura_ola,EXCLUDED.mar_fondo,EXCLUDED.estado_mar,EXCLUDED.mar_direccion,EXCLUDED.humedad_relativa,EXCLUDED.temp_aire,EXCLUDED.prof_secchi,EXCLUDED.max_clorofila,EXCLUDED.marea,EXCLUDED.temp_superficie);''' 
+# Recorta las variables que interesan
+datos_exporta = datos_ambientales[['id_salida','id_estacion','Hora inicio','Profundidad','Nubosidad','Lluvia','Viento','Viento_dir','Presíon','Altura de Ola','Mar de fondo','Douglas','Mar','Humedad','Tª aire','Secchi','Max. Cla','Marea','Tª superf.']]
+                                                                                                                                         
+# Cambia los nombres de las variables
+datos_exporta = datos_exporta.rename(columns={"id_salida": "salida", "id_estacion": "estacion", 'Hora inicio':'hora_llegada','Profundidad':'profundidad',
+                                                 'Nubosidad':'nubosidad','Lluvia':'lluvia','Viento':'velocidad_viento','Viento_dir':'direccion_viento',
+                                                 'Presíon':'pres_atmosferica','Altura de Ola':'altura_ola','Mar de fondo':'mar_fondo','Douglas':'estado_mar',
+                                                 'Mar':'mar_direccion','Humedad':'humedad_relativa','Tª aire':'temp_aire','Secchi':'prof_secchi','Max. Cla':'max_clorofila',
+                                                 'Marea':'marea','Tª superf.':'temp_superficie'}) 
+
+
+if df_condiciones.shape[0] == 0:
+
+    # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
+    indices_dataframe              = numpy.arange(1,datos_exporta.shape[0]+1,1,dtype=int)    
+    datos_exporta['id_condicion'] = indices_dataframe
+    datos_exporta.set_index('id_condicion',drop=True,append=False,inplace=True)    
     
+    # Inserta el dataframe resultante en la base de datos 
+    datos_exporta.to_sql('condiciones_ambientales_muestreos', conn_psql,if_exists='append')
+
+else:
+    
+    datos_exporta['id_condicion'] = [None]*datos_exporta.shape[0]
+    listado_variables = datos_exporta.columns.tolist()
+    ultimo_registro_bd         = max(df_condiciones['id_condicion'])
+    
+    for idato in range(datos_exporta.shape[0]):
+        
+        df_temp = df_condiciones[(df_condiciones['salida']==datos_exporta['salida'].iloc[idato]) & (df_condiciones['estacion']==datos_exporta['estacion'].iloc[idato])]
+
+        if df_temp.shape[0]>0:  # Muestreo ya incluido en la base de datos
+        
+            condicion = df_temp['id_condicion'].iloc[0]
+                            
+            for ivariable in range(len(listado_variables)): # Reemplazar las variables disponibles en el muestreo correspondiente
+                    
+                df_condiciones[listado_variables[ivariable]][df_condiciones['id_condicion']==int(condicion)] = datos_exporta[listado_variables[ivariable]].iloc[idato]
+
+        else: # Nuevo muestreo
+                   
+            df_add = datos_exporta.iloc[idato] # Genero un dataframe con cada línea de datos a añadir
+  
+            df_add['id_condicion'] = ultimo_registro_bd + 1
+            ultimo_registro_bd     = ultimo_registro_bd + 1 
+        
+            df_condiciones = pandas.concat([df_condiciones, df_add]) # Combino ambos dataframes
+
+    indices_dataframe              = numpy.arange(1,df_condiciones.shape[0]+1,1,dtype=int)    
+    df_condiciones['id_condicion'] = indices_dataframe
+    df_condiciones.set_index('id_condicion',drop=True,append=False,inplace=True) 
+
+    # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor()
+    instruccion_sql = "TRUNCATE condiciones_ambientales_muestreos;"
+    cursor.execute(instruccion_sql)
+    conn.commit()
+    cursor.close()
+    conn.close() 
+        
+    # Inserta el dataframe resultante en la base de datos 
+    df_condiciones.to_sql('condiciones_ambientales_muestreos', conn_psql,if_exists='replace')
+
+
+conn_psql.dispose()
+# instruccion_sql_introduccion = '''INSERT INTO condiciones_ambientales_muestreos (salida,estacion,hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,altura_ola,mar_fondo,estado_mar,mar_direccion,humedad_relativa,temp_aire,prof_secchi,max_clorofila,marea,temp_superficie)
+#     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (salida,estacion) DO UPDATE SET (hora_llegada,profundidad,nubosidad,lluvia,velocidad_viento,direccion_viento,pres_atmosferica,altura_ola,mar_fondo,estado_mar,mar_direccion,humedad_relativa,temp_aire,prof_secchi,max_clorofila,marea,temp_superficie) = ROW(EXCLUDED.hora_llegada,EXCLUDED.profundidad,EXCLUDED.nubosidad,EXCLUDED.lluvia,EXCLUDED.velocidad_viento,EXCLUDED.direccion_viento,EXCLUDED.pres_atmosferica,EXCLUDED.altura_ola,EXCLUDED.mar_fondo,EXCLUDED.estado_mar,EXCLUDED.mar_direccion,EXCLUDED.humedad_relativa,EXCLUDED.temp_aire,EXCLUDED.prof_secchi,EXCLUDED.max_clorofila,EXCLUDED.marea,EXCLUDED.temp_superficie);''' 
+
+# instruccion_sql_consulta = '''SELECT id_condicion FROM condiciones_ambientales_muestreos WHERE salida = %s and estacion = %s ''' 
+        
 
 conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
 cursor = conn.cursor()     
     
-# Introduce datos en la base de datos
-for idato in range(datos_ambientales.shape[0]):          
-    cursor.execute(instruccion_sql, (int(datos_ambientales['id_salida'].iloc[idato]),int(datos_ambientales['id_estacion'].iloc[idato]),datos_ambientales['Hora inicio'].iloc[idato],datos_ambientales['Profundidad'].iloc[idato],datos_ambientales['Nubosidad'].iloc[idato],datos_ambientales['Lluvia'].iloc[idato],datos_ambientales['Viento'].iloc[idato],datos_ambientales['Viento_dir'].iloc[idato],datos_ambientales['Presíon'].iloc[idato],datos_ambientales['Altura de Ola'].iloc[idato],datos_ambientales['Mar de fondo'].iloc[idato],datos_ambientales['Douglas'].iloc[idato],datos_ambientales['Mar'].iloc[idato],datos_ambientales['Humedad'].iloc[idato],datos_ambientales['Tª aire'].iloc[idato],datos_ambientales['Secchi'].iloc[idato],datos_ambientales['Max. Cla'].iloc[idato],datos_ambientales['Marea'].iloc[idato],datos_ambientales['Tª superf.'].iloc[idato]))
+# # Introduce datos en la base de datos
+# for idato in range(datos_ambientales.shape[0]):          
+    
+    cursor.execute(instruccion_sql_consulta, (int(datos_ambientales['id_salida'].iloc[idato]),int(datos_ambientales['id_estacion'].iloc[idato])))
+    id_condicion = cursor.fetchone()[]
+    
+#     cursor.execute(instruccion_sql, (int(datos_ambientales['id_salida'].iloc[idato]),int(datos_ambientales['id_estacion'].iloc[idato]),datos_ambientales['Hora inicio'].iloc[idato],datos_ambientales['Profundidad'].iloc[idato],datos_ambientales['Nubosidad'].iloc[idato],datos_ambientales['Lluvia'].iloc[idato],datos_ambientales['Viento'].iloc[idato],datos_ambientales['Viento_dir'].iloc[idato],datos_ambientales['Presíon'].iloc[idato],datos_ambientales['Altura de Ola'].iloc[idato],datos_ambientales['Mar de fondo'].iloc[idato],datos_ambientales['Douglas'].iloc[idato],datos_ambientales['Mar'].iloc[idato],datos_ambientales['Humedad'].iloc[idato],datos_ambientales['Tª aire'].iloc[idato],datos_ambientales['Secchi'].iloc[idato],datos_ambientales['Max. Cla'].iloc[idato],datos_ambientales['Marea'].iloc[idato],datos_ambientales['Tª superf.'].iloc[idato]))
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 
-    conn.commit()
-cursor.close()
-conn.close()
+#     conn.commit()
+# cursor.close()
+# conn.close()
 
 # if io_previo == 0:
 #     texto_exito = 'Datos de las estación ' + estacion_elegida + ' durante la salida '  + salida  + ' añadidos correctamente'
