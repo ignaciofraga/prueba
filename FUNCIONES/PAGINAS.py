@@ -831,7 +831,9 @@ def entrada_salidas_mar():
             
 
             listado_config_perfilador      = datos_salida_seleccionada['configuracion_perfilador']
+            listado_config_perfilador      = [ int(x) for x in listado_config_perfilador]
             listado_config_sup             = datos_salida_seleccionada['configuracion_superficie']
+            listado_config_sup             = [ int(x) for x in listado_config_sup]            
             
             st.text(listado_config_perfilador)
             st.text(int(datos_salida_seleccionada['configuracion_perfilador'].iloc[0]))
