@@ -987,7 +987,7 @@ def menu_metadatos_radiales(fecha_salida_defecto,hora_defecto_inicio,fecha_regre
     else:
         json_no_comisionados    = None
     
-    if len(estaciones_previas):
+    if estaciones_previas is not None:
         estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'],default=estaciones_previas)
     else:                
         estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
