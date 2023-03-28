@@ -926,20 +926,7 @@ def entrada_salidas_mar():
 
         # Modifica una salida
         st.subheader('Modifica salida al mar')
-                  
-        # Personal disponible
-        df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
-        df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
-        # Salidas realizadas 
-        df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
-        # Estaciones de muestreo (radiales)
-        df_estaciones_radiales = df_estaciones[df_estaciones['programa']==id_radiales]
-    
-        fecha_actual        = datetime.date.today()
-        
-        hora_defecto_inicio = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
-        hora_defecto_final  = datetime.time(14,30,0,0,tzinfo = datetime.timezone.utc)
-        
+                         
         
         # Despliega menús de selección del programa, tipo de salida, año y fecha               
         col1, col2, col3= st.columns(3,gap="small")
