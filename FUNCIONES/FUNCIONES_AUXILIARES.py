@@ -924,7 +924,7 @@ def consulta_perfiles():
 ###############################################################################    
 
 
-def menu_variable_radiales(json_variables_previas):
+def menu_variables_radiales(json_variables_previas):
            
     # Selecciona las variables muestreadas
     st.subheader('Variables muestreadas')
