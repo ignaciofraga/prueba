@@ -754,11 +754,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         # Busca los datos de la base de datos dentro del rango de meses seleccionados
         df_datos_buenos['mes']  = pandas.DatetimeIndex(df_datos_buenos['fecha_muestreo']).month
         df_rango_temporal       = df_datos_buenos[df_datos_buenos['mes'].isin(listado_meses)]
-                   
-        # Líneas para separar un poco la parte gráfica de la de entrada de datos        
-        for isepara in range(4):
-            st.text(' ')
-               
+                                  
         with st.expander("Ajustar estilo de gráficos",expanded=False):
         
             st.write("Selecciona los datos a mostrar según su bandera de calidad")    
@@ -1204,7 +1200,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 datos_procesados[qf_variable_procesada].iloc[idato] = int(indice_validacion[texto_indice.index(valor_asignado)])
             
            
-            io_envio = st.form_submit_button("Añadir resultados a la base de datos con los índices seleccionados")  
+            io_envio = st.form_submit_button("Asignar los valores de QF seleccionados")  
     
             if io_envio:
             
