@@ -43,31 +43,35 @@ fecha_actualizacion = datetime.date.today()
 
 con_engine      = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
 conn            = create_engine(con_engine)
-df_programas    = psql.read_sql('SELECT * FROM programas', conn)
-variables_bd    = psql.read_sql('SELECT * FROM variables_procesado', conn)
-# df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-# df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
-# df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-# df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
-# df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-# df_programas              = psql.read_sql('SELECT * FROM programas', conn)
-# df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
-# df_rmns                   = psql.read_sql('SELECT * FROM rmn_nutrientes', conn)
-df_variables              = psql.read_sql('SELECT * FROM variables_procesado', conn)
+# df_programas    = psql.read_sql('SELECT * FROM programas', conn)
+# variables_bd    = psql.read_sql('SELECT * FROM variables_procesado', conn)
+df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
+df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
+df_rmns                   = psql.read_sql('SELECT * FROM rmn_nutrientes', conn)
+# df_variables              = psql.read_sql('SELECT * FROM variables_procesado', conn)
 conn.dispose() 
 
 
 
 
 
-# datos_combinados = pandas.merge(df_muestreos, df_datos_biogeoquimicos, on="muestreo")
+datos_combinados = pandas.merge(df_muestreos, df_datos_biogeoquimicos, on="muestreo")
+datos_combinados = pandas.merge(datos_combinados, df_datos_fisicos, on="muestreo")
 
-# df_salidas     = df_salidas.rename(columns={"id_salida": "salida_mar"})
-# datos_combinados = pandas.merge(datos_combinados, df_salidas, on="salida_mar")
+df_salidas     = df_salidas.rename(columns={"id_salida": "salida_mar"})
+datos_combinados = pandas.merge(datos_combinados, df_salidas, on="salida_mar")
 
 # datos_radcan  = datos_combinados[datos_combinados['programa']==4]
 # datos_pelacus = datos_combinados[datos_combinados['programa']==1]
-# datos_radcor  = datos_combinados[datos_combinados['programa']==3]
+datos_radcor  = datos_combinados[datos_combinados['programa']==3]
+
+datos_3c = datos_radcor[datos_radcor['estacion']==3]
+
 # df_datos_importacion  = pandas.read_excel(archivo_datos) 
 
 # # corrige el formato de las fechas

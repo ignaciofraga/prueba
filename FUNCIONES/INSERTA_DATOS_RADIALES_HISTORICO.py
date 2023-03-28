@@ -71,6 +71,9 @@ for idato in range(datos_radiales.shape[0]):
     if datos_radiales['sigmat'].iloc[idato] is not None:
         datos_radiales['densidad'].iloc[idato]  =  1 + datos_radiales['sigmat'].iloc[idato]/10000
 
+datos_radiales = datos_radiales.rename(columns={"Fecha": "fecha_muestreo", "Prof":"presion_ctd", "t":"temperatura_ctd","S":"salinidad_ctd","E":"par_ctd", 
+                                                "O2 umol/kg":"oxigeno_wk","Cla":"clorofila_a","ID_estacion":"estacion"})
+
 # correccion
 datos_radiales['ton']      = [None]*datos_radiales.shape[0]
 datos_radiales['nitrato']  = [None]*datos_radiales.shape[0]
@@ -92,6 +95,10 @@ datos_radiales['hora_muestreo'] = [None]*datos_radiales.shape[0]
 datos_radiales['prof_referencia'] = [None]*datos_radiales.shape[0]
 datos_radiales['num_cast']        = [None]*datos_radiales.shape[0]
 
+datos_radiales['salinidad_ctd_qf']   = numpy.ones(datos_radiales.shape[0])
+datos_radiales['temperatura_ctd_qf'] = numpy.ones(datos_radiales.shape[0])
+datos_radiales['par_ctd_qf']         = numpy.ones(datos_radiales.shape[0])
+
 for idato in range(datos_radiales.shape[0]):
     if datos_radiales['NO3'].iloc[idato] is not None:
         datos_radiales['nitrato'].iloc[idato]  = datos_radiales['NO3'].iloc[idato]/datos_radiales['densidad'].iloc[idato]            
@@ -110,23 +117,29 @@ for idato in range(datos_radiales.shape[0]):
         if datos_radiales['amonio'].iloc[idato] is not None:
             datos_radiales['ton'].iloc[idato] = datos_radiales['ton'].iloc[idato] + datos_radiales['amonio'].iloc[idato]
     
-    
+    # Reviso los QF
+    if datos_radiales['salinidad_ctd'].iloc[idato] is None:
+        datos_radiales['salinidad_ctd_qf'].iloc[idato] = 9
+    if datos_radiales['temperatura_ctd'].iloc[idato] is None:
+        datos_radiales['temperatura_ctd_qf'].iloc[idato] = 9
+    if datos_radiales['par_ctd'].iloc[idato] is None:
+        datos_radiales['par_ctd_qf'].iloc[idato] = 9
+        
     # aprovecho para cambiar el nombre de la estación
-    if datos_radiales['ID_estacion'].iloc[idato] == 'E2CO':
-        datos_radiales['ID_estacion'].iloc[idato]  = '2'    
-    if datos_radiales['ID_estacion'].iloc[idato] == 'E4CO':
-        datos_radiales['ID_estacion'].iloc[idato]  = '4'    
-    if datos_radiales['ID_estacion'].iloc[idato] == 'E3CO':
-        datos_radiales['ID_estacion'].iloc[idato]  = '3' 
-    if datos_radiales['ID_estacion'].iloc[idato] == 'E3ACO':
-        datos_radiales['ID_estacion'].iloc[idato]  = '3A' 
-    if datos_radiales['ID_estacion'].iloc[idato] == 'E3BCO':
-        datos_radiales['ID_estacion'].iloc[idato]  = '3B' 
-    if datos_radiales['ID_estacion'].iloc[idato] == 'E3CCO':
-        datos_radiales['ID_estacion'].iloc[idato]  = '3C'         
+    if datos_radiales['estacion'].iloc[idato] == 'E2CO':
+        datos_radiales['estacion'].iloc[idato]  = '2'    
+    if datos_radiales['estacion'].iloc[idato] == 'E4CO':
+        datos_radiales['estacion'].iloc[idato]  = '4'    
+    if datos_radiales['estacion'].iloc[idato] == 'E3CO':
+        datos_radiales['estacion'].iloc[idato]  = '3' 
+    if datos_radiales['estacion'].iloc[idato] == 'E3ACO':
+        datos_radiales['estacion'].iloc[idato]  = '3A' 
+    if datos_radiales['estacion'].iloc[idato] == 'E3BCO':
+        datos_radiales['estacion'].iloc[idato]  = '3B' 
+    if datos_radiales['estacion'].iloc[idato] == 'E3CCO':
+        datos_radiales['estacion'].iloc[idato]  = '3C'         
 
-datos_radiales = datos_radiales.rename(columns={"Fecha": "fecha_muestreo", "Prof":"presion_ctd", "t":"temperatura_ctd","S":"salinidad_ctd","E":"par_ctd", 
-                                                "O2 umol/kg":"oxigeno_wk","Cla":"clorofila_a","ID_estacion":"estacion"})  
+  
 
 # Recupera el identificador del programa de muestreo
 id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)

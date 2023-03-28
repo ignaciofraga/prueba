@@ -809,6 +809,18 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         fig, (ax, az) = plt.subplots(1, 2, figsize=(20/2.54, 18/2.54), gridspec_kw = {'wspace':0.2, 'hspace':0}, width_ratios=[3, 1])
  
         ### DATOS DISPONIBLES PREVIAMENTE ###
+        # Representa los datos con QF No evaluado si se seleccionó esta opción   
+        if io_no_eval:
+            ax.plot(df_datos_no_eval[variable_procesada],df_datos_no_eval['presion_ctd'],'.',color=color_no_eval,label='NO EVALUADO') 
+        
+        # Representa los datos con QF malos si se seleccionó esta opción   
+        if io_malos:
+            ax.plot(df_datos_malos[variable_procesada],df_datos_malos['presion_ctd'],'.',color=color_malos,label='MALO')    
+
+        # Representa los datos con QF dudoso si se seleccionó esta opción   
+        if io_dudosos:
+            ax.plot(df_datos_dudosos[variable_procesada],df_datos_dudosos['presion_ctd'],'.',color=color_dudosos,label='DUDOSO')  
+
         # Representa los datos disponibles de un color
         if io_buenos:
             ax.plot(df_datos_buenos[variable_procesada],df_datos_buenos['presion_ctd'],'.',color=color_buenos,label='BUENO')
@@ -817,20 +829,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         if io_rango:
             ax.plot(df_rango_temporal[variable_procesada],df_rango_temporal['presion_ctd'],'.',color=color_rango,label='BUENO (INTERVALO)')
         
-        # Representa los datos con QF malos si se seleccionó esta opción   
-        if io_malos:
-            ax.plot(df_datos_malos[variable_procesada],df_datos_malos['presion_ctd'],'.',color=color_malos,label='MALO')    
-
-        # Representa los datos con QF dudoso si se seleccionó esta opción   
-        if io_dudosos:
-            ax.plot(df_datos_dudosos[variable_procesada],df_datos_dudosos['presion_ctd'],'.',color=color_dudosos,label='DUDOSO')    
-
-        # Representa los datos con QF No evaluado si se seleccionó esta opción   
-        if io_no_eval:
-            ax.plot(df_datos_no_eval[variable_procesada],df_datos_no_eval['presion_ctd'],'.',color=color_no_eval,label='NO EVALUADO')    
-
-
-
+        
         ### DATOS PROCESADOS ###        
         ax.plot(datos_procesados[variable_procesada],datos_procesados['presion_ctd'],'.r',label='PROCESADO' )
         
