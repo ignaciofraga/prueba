@@ -955,7 +955,7 @@ def menu_metadatos_radiales(fecha_salida_defecto,hora_defecto_inicio,fecha_regre
         if id_buque_previo is None:
             buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']))
         else:
-            buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']),index=id_buque_previo)            
+            buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']),index=int(id_buque_previo))            
         id_buque_elegido = int(df_buques['id_buque'][df_buques['nombre_buque']==buque_elegido].values[0])               
     
     with col2:     
