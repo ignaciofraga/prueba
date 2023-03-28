@@ -503,8 +503,8 @@ def consulta_botellas():
     # carga de la caché los datos 
     df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_variables = carga_datos_consulta_botellas()
 
-
-    id_radiales             = int(df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0])
+    listado_programas       = df_programas['nombre_programa'].tolist()
+    id_radiales             = listado_programas.index('RADIAL CORUÑA')
     
     # Despliega menús de selección del programa, tipo de salida, año y fecha               
     col1, col2, col3= st.columns(3,gap="small")
