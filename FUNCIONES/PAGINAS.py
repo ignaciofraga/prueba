@@ -828,8 +828,12 @@ def entrada_salidas_mar():
             personal_no_comisionado_previo = datos_salida_seleccionada['participantes_no_comisionados'].iloc[0]
             estaciones_previas             = datos_salida_seleccionada['estaciones'].iloc[0] 
             id_buque_previo                = datos_salida_seleccionada['buque'].iloc[0] 
-            id_perfil_previo               = [datos_salida_seleccionada['configuracion_perfilador']].index(datos_salida_seleccionada['configuracion_perfilador'].iloc[0])
-            id_sup_previo                  = [datos_salida_seleccionada['configuracion_superficie']].index(datos_salida_seleccionada['configuracion_superficie'].iloc[0])
+            
+
+            listado_config_perfilador      = datos_salida_seleccionada['configuracion_perfilador']
+            listado_config_sup             = datos_salida_seleccionada['configuracion_superficie']
+            id_perfil_previo               = listado_config_perfilador.index(datos_salida_seleccionada['configuracion_perfilador'].iloc[0])
+            id_sup_previo                  = listado_config_sup.index(datos_salida_seleccionada['configuracion_superficie'].iloc[0])
             
             st.text(id_perfil_previo)
             st.text(id_sup_previo)
