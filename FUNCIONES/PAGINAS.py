@@ -678,7 +678,7 @@ def entrada_salidas_mar():
     df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
     df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
     df_salidas_radiales        = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
-    df_estaciones_radiales     = df_estaciones[df_estaciones['programa']==id_radiales]
+    df_estaciones_radiales     = df_estaciones[df_estaciones['programa']==int(id_radiales)]
   
     st.dataframe(df_estaciones_radiales)  
   
