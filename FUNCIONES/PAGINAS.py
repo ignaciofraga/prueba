@@ -939,10 +939,10 @@ def entrada_salidas_mar():
             tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_radiales['tipo_salida'].unique()))   
             df_salidas_seleccion      = df_salidas_radiales[df_salidas_radiales['tipo_salida']==tipo_salida_seleccionada]
         
-            # # Añade la variable año al dataframe
-            # indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
-            # df_salidas_seleccion['id_temp'] = indices_dataframe
-            # df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
+            # Añade la variable año al dataframe
+            indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+            df_salidas_seleccion['id_temp'] = indices_dataframe
+            df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
             
             # Define los años con salidas asociadas
             df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
