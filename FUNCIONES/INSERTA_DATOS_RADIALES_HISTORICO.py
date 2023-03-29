@@ -44,10 +44,10 @@ fecha_actualizacion = datetime.date.today()
 ### PROCESADO ###
 
 
-nombre_archivo = directorio_datos + '/HISTORICO_MODIFICADO.xlsx'
+nombre_archivo = directorio_datos + '/HISTORICO_FINAL.xlsx'
     
 # Importa el .xlsx
-datos_radiales = pandas.read_excel(nombre_archivo, 'datos')
+datos_radiales = pandas.read_excel(nombre_archivo, 'datos',na_values='#N/A')
 
 # # Elimina la primera fila, con unidades de las distintas variables
 # datos_radiales = datos_radiales.iloc[1: , :]
@@ -72,7 +72,8 @@ for idato in range(datos_radiales.shape[0]):
         datos_radiales['densidad'].iloc[idato]  =  1 + datos_radiales['sigmat'].iloc[idato]/10000
 
 datos_radiales = datos_radiales.rename(columns={"Fecha": "fecha_muestreo", "Prof":"presion_ctd", "t":"temperatura_ctd","S":"salinidad_ctd","E":"par_ctd", 
-                                                "O2 umol/kg":"oxigeno_wk","Cla":"clorofila_a","ID_estacion":"estacion"})
+                                                "O2 umol/kg":"oxigeno_wk","Cla":"clorofila_a","ID_estacion":"estacion","Clb":"clorofila_b","Clc":"clorofila_c","PP":"prod_primaria","COP":"cop",'NOP':'nop'})
+
 
 # correccion
 datos_radiales['ton']      = [None]*datos_radiales.shape[0]
@@ -94,28 +95,63 @@ datos_radiales['botella']       = [None]*datos_radiales.shape[0]
 datos_radiales['hora_muestreo'] = [None]*datos_radiales.shape[0]
 datos_radiales['prof_referencia'] = [None]*datos_radiales.shape[0]
 datos_radiales['num_cast']        = [None]*datos_radiales.shape[0]
+datos_radiales['sigmat_temp']     = [None]*datos_radiales.shape[0]
 
-datos_radiales['salinidad_ctd_qf']   = numpy.ones(datos_radiales.shape[0])
-datos_radiales['temperatura_ctd_qf'] = numpy.ones(datos_radiales.shape[0])
-datos_radiales['par_ctd_qf']         = numpy.ones(datos_radiales.shape[0])
+datos_radiales['salinidad_ctd_qf']   = int(2)
+datos_radiales['temperatura_ctd_qf'] = int(2)
+datos_radiales['par_ctd_qf']         = int(2)
+
+datos_radiales['oxigeno_wk_qf']      = int(2)
+datos_radiales['clorofila_a_qf']     = int(2)
+datos_radiales['clorofila_b_qf']     = int(2)
+datos_radiales['clorofila_c_qf']     = int(2)
 
 for idato in range(datos_radiales.shape[0]):
     if datos_radiales['NO3'].iloc[idato] is not None:
-        datos_radiales['nitrato'].iloc[idato]  = datos_radiales['NO3'].iloc[idato]/datos_radiales['densidad'].iloc[idato]            
+        datos_radiales['nitrato'].iloc[idato]  = datos_radiales['NO3'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+    else:
+        datos_radiales['nitrato_qf'].iloc[idato] = 9
+          
     if datos_radiales['NO2'].iloc[idato] is not None:
         datos_radiales['nitrito'].iloc[idato]  = datos_radiales['NO2'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+    else:
+        datos_radiales['nitrito_qf'].iloc[idato]  = 9       
+    
     if datos_radiales['NH4'].iloc[idato] is not None:
         datos_radiales['amonio'].iloc[idato]  = datos_radiales['NH4'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+    else:
+        datos_radiales['amonio_qf'].iloc[idato]  = 9
+    
     if datos_radiales['PO4'].iloc[idato] is not None:
         datos_radiales['fosfato'].iloc[idato]  = datos_radiales['PO4'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+    else:
+        datos_radiales['fosfato_qf'].iloc[idato]  = 9
+        
     if datos_radiales['SiO2'].iloc[idato] is not None:
         datos_radiales['silicato'].iloc[idato]  = datos_radiales['SiO2'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+    else:
+        datos_radiales['silicato_qf'].iloc[idato]  = 9  
+        
+        
+    # QF
+    if datos_radiales['NO3flag'].iloc[idato] is not None:
+        datos_radiales['nitrato_qf'].iloc[idato]  = datos_radiales['NO3flag'].iloc[idato]  
+    if datos_radiales['NO2flag'].iloc[idato] is not None:
+        datos_radiales['nitrito_qf'].iloc[idato]  = datos_radiales['NO2flag'].iloc[idato]  
+    if datos_radiales['NH4flag'].iloc[idato] is not None:
+        datos_radiales['amonio_qf'].iloc[idato]  = datos_radiales['NH4flag'].iloc[idato]
+    if datos_radiales['PO4flag'].iloc[idato] is not None:
+        datos_radiales['fosfato_qf'].iloc[idato]  = datos_radiales['PO4flag'].iloc[idato]          
+    if datos_radiales['SiO2flag'].iloc[idato] is not None:
+        datos_radiales['silicato_qf'].iloc[idato]  = datos_radiales['SiO2flag'].iloc[idato]           
 
     # calculo del TON 
     if datos_radiales['nitrato'].iloc[idato] is not None and datos_radiales['nitrito'].iloc[idato] is not None:
         datos_radiales['ton'].iloc[idato]  = datos_radiales['nitrato'].iloc[idato] + datos_radiales['nitrito'].iloc[idato]
         if datos_radiales['amonio'].iloc[idato] is not None:
             datos_radiales['ton'].iloc[idato] = datos_radiales['ton'].iloc[idato] + datos_radiales['amonio'].iloc[idato]
+    else:
+        datos_radiales['ton_qf'].iloc[idato] = 9
     
     # Reviso los QF
     if datos_radiales['salinidad_ctd'].iloc[idato] is None:
@@ -124,6 +160,14 @@ for idato in range(datos_radiales.shape[0]):
         datos_radiales['temperatura_ctd_qf'].iloc[idato] = 9
     if datos_radiales['par_ctd'].iloc[idato] is None:
         datos_radiales['par_ctd_qf'].iloc[idato] = 9
+    if datos_radiales['oxigeno_wk'].iloc[idato] is None:
+        datos_radiales['oxigeno_wk_qf'].iloc[idato] = 9
+    if datos_radiales['clorofila_a'].iloc[idato] is None:
+        datos_radiales['clorofila_a_qf'].iloc[idato] = 9
+    if datos_radiales['clorofila_b'].iloc[idato] is None:
+        datos_radiales['clorofila_b_qf'].iloc[idato] = 9
+    if datos_radiales['clorofila_c'].iloc[idato] is None:
+        datos_radiales['clorofila_c_qf'].iloc[idato] = 9         
         
     # aprovecho para cambiar el nombre de la estación
     if datos_radiales['estacion'].iloc[idato] == 'E2CO':
@@ -139,7 +183,8 @@ for idato in range(datos_radiales.shape[0]):
     if datos_radiales['estacion'].iloc[idato] == 'E3CCO':
         datos_radiales['estacion'].iloc[idato]  = '3C'         
 
-  
+
+
 
 # Recupera el identificador del programa de muestreo
 id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)

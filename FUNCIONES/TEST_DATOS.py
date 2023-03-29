@@ -19,7 +19,7 @@ import FUNCIONES_PROCESADO
 import pandas
 pandas.options.mode.chained_assignment = None
 import datetime
-
+import seawater
 
 # Parámetros de la base de datos
 base_datos     = 'COAC'
@@ -40,56 +40,31 @@ identificadores_salidas = [158]
 # Recupera la tabla con los registros de los muestreos
 con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
 conn_psql        = create_engine(con_engine)
-df_factores_nutrientes    = psql.read_sql('SELECT * FROM factores_correctores_nutrientes', conn_psql)
-df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
-
-
-df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn_psql)
-df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
-df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn_psql)
-df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn_psql)
-
+df_datos_fisicos = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
+df_muestreos     = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
 conn_psql.dispose()   
 
+datos_combinados = pandas.merge(df_muestreos, df_datos_fisicos, on="muestreo")
 
+# Inserta en la base de datos
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()                      
+instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,sigmat)
+VALUES (%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (sigmat) = ROW(EXCLUDED.sigmat)'''        
 
-df_salidas_seleccion = df_salidas.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones'])
+for idato in range(datos_combinados.shape[0]):
+    if datos_combinados['salinidad_ctd'].iloc[idato] is not None and datos_combinados['temperatura_ctd'].iloc[idato] is not None and datos_combinados['presion_ctd'].iloc[idato] is not None:
+        sigmat = seawater.eos80.dens(datos_combinados['salinidad_ctd'].iloc[idato], datos_combinados['temperatura_ctd'].iloc[idato], datos_combinados['presion_ctd'].iloc[idato])
+        sigmat = sigmat-1000
+        cursor.execute(instruccion_sql, (int(datos_combinados['muestreo'].iloc[idato]),sigmat))
+        conn.commit()
 
-df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
-
-df_datos_fisicos_seleccion = df_datos_fisicos
-df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos
-
-
-# Recupera los muestreos correspondientes a las salidas seleccionadas
-df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(identificadores_salidas)]
-df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"id_muestreo": "muestreo"})
-
-# Asocia las coordenadas y nombre de estación de cada muestreo
-df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
-df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
-              
-# Asocia las propiedades físicas de cada muestreo
-df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos_seleccion, on="muestreo")
-             
-# Asocia las propiedades biogeoquimicas de cada muestreo
-df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
-       
+cursor.close()
+conn.close()
 
 
 
 
-factores_salidas  = pandas.merge(df_factores_nutrientes, df_muestreos, on="salida_mar")
-                      
-factores_salidas  = factores_salidas.drop(columns=['nombre_salida','observaciones','salida_mar','nombre_muestreo','fecha_muestreo','hora_muestreo','latitud_muestreo','longitud_muestreo','estacion','num_cast','botella','prof_referencia','presion_ctd'])
-    
-df_muestreos_seleccionados['densidad'] = seawater.eos80.dens0(df_muestreos_seleccionados['salinidad_ctd'], df_muestreos_seleccionados['temperatura_ctd'])
-
-
-
-df_muestreos_seleccionados['factor_nitrato']  = [None]*df_muestreos_seleccionados.shape[0]
-df_muestreos_seleccionados['factor_silicato'] = [None]*df_muestreos_seleccionados.shape[0]
-df_muestreos_seleccionados['factor_fosfato']  = [None]*df_muestreos_seleccionados.shape[0]
 # datos['id_muestreo']  = numpy.zeros(datos.shape[0],dtype=int)
 
 # # si no hay ningun valor en la tabla de registro, meter directamente todos los datos registrados
