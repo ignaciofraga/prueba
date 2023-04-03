@@ -473,6 +473,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         ultimo_registro_bd         = max(tabla_muestreos['muestreo'])
         datos['io_nuevo_muestreo'] = numpy.ones(datos.shape[0],dtype=int)
 
+        
+        st.text(listado_variables_datos)
+        st.dataframe(datos)
         for idato in range(datos.shape[0]):
 
             if 'botella' in listado_variables_datos and datos['botella'].iloc[idato] is not None:        
@@ -489,7 +492,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                     df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'].iloc[idato])]
                
             
-            st.dataframe(df_temp)
+            #st.dataframe(df_temp)
             
             if df_temp.shape[0]> 0:
                 datos['muestreo'].iloc[idato]          = df_temp['muestreo'].iloc[0]    
