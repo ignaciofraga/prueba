@@ -29,36 +29,36 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
         
     datos = datos.replace({numpy.nan:None})
     
-    # Eliminar los registros sin dato de latitud,longitud, profundidad o fecha 
-    datos = datos[datos['latitud'].notna()]
-    datos = datos[datos['longitud'].notna()]  
-    datos = datos[datos['presion_ctd'].notna()] 
-    datos = datos[datos['fecha_muestreo'].notna()] 
+    # # Eliminar los registros sin dato de latitud,longitud, profundidad o fecha 
+    # datos = datos[datos['latitud'].notna()]
+    # datos = datos[datos['longitud'].notna()]  
+    # datos = datos[datos['presion_ctd'].notna()] 
+    # datos = datos[datos['fecha_muestreo'].notna()] 
     
-    # Elimina los registros con datos de profundidad negativos
-    datos = datos.drop(datos[datos.presion_ctd < 0].index)
+    # # Elimina los registros con datos de profundidad negativos
+    # datos = datos.drop(datos[datos.presion_ctd < 0].index)
     
-    # Elimina registros duplicados en el mismo punto y a la misma hora(por precaucion)
-    num_reg_inicial = datos.shape[0]
-    datos           = datos.drop_duplicates(subset=['latitud','longitud','presion_ctd','fecha_muestreo','hora_muestreo'], keep='last')    
-    num_reg_final   = datos.shape[0]
-    if num_reg_final < num_reg_inicial:
-        textos_aviso.append('Se han eliminado registros correspondientes a una misma fecha, hora, profundidad y estación')
+    # # Elimina registros duplicados en el mismo punto y a la misma hora(por precaucion)
+    # num_reg_inicial = datos.shape[0]
+    # datos           = datos.drop_duplicates(subset=['latitud','longitud','presion_ctd','fecha_muestreo','hora_muestreo'], keep='last')    
+    # num_reg_final   = datos.shape[0]
+    # if num_reg_final < num_reg_inicial:
+    #     textos_aviso.append('Se han eliminado registros correspondientes a una misma fecha, hora, profundidad y estación')
     
     
-    # Corregir los valores positivos de longitud, pasándolos a negativos (algunos datos de Pelacus tienen este error)
-    datos['longitud'] = -1*datos['longitud'].abs()  
+    # # Corregir los valores positivos de longitud, pasándolos a negativos (algunos datos de Pelacus tienen este error)
+    # datos['longitud'] = -1*datos['longitud'].abs()  
     
-    # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
-    indices_dataframe        = numpy.arange(0,datos.shape[0],1,dtype=int)    
-    datos['id_temp'] = indices_dataframe
-    datos.set_index('id_temp',drop=False,append=False,inplace=True)
+    # # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
+    # indices_dataframe        = numpy.arange(0,datos.shape[0],1,dtype=int)    
+    # datos['id_temp'] = indices_dataframe
+    # datos.set_index('id_temp',drop=False,append=False,inplace=True)
     
-    # Redondea los decimales los datos de latitud, longitud y profundidad (precisión utilizada en la base de datos)
-    for idato in range(datos.shape[0]):
-        datos['longitud'][idato] = round(datos['longitud'][idato],4)
-        datos['latitud'][idato] = round(datos['latitud'][idato],4)
-        datos['presion_ctd'][idato] = round(datos['presion_ctd'][idato],2)      
+    # # Redondea los decimales los datos de latitud, longitud y profundidad (precisión utilizada en la base de datos)
+    # for idato in range(datos.shape[0]):
+    #     datos['longitud'][idato] = round(datos['longitud'][idato],4)
+    #     datos['latitud'][idato] = round(datos['latitud'][idato],4)
+    #     datos['presion_ctd'][idato] = round(datos['presion_ctd'][idato],2)      
 
 
     # Cambia todos los -999 por None
