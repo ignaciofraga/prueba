@@ -419,6 +419,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
     tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn_psql)
        
+    listado_variables_datos   = datos.columns.tolist()
+    
     datos['muestreo']  = numpy.zeros(datos.shape[0],dtype=int)
     
     # si no hay ningun valor en la tabla de registro, meter directamente todos los datos registrados
@@ -428,7 +430,6 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         variables_bd  = [x for x in tabla_variables['parametros_muestreo'] if str(x) != 'None']
         
         # Busca qué variables están incluidas en los datos a importar
-        listado_variables_datos   = datos.columns.tolist()
         listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
         listado_adicional         = ['id_estacion_temp','id_salida'] + listado_variables_comunes
         exporta_registros         = datos[listado_adicional]
@@ -474,14 +475,14 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
         for idato in range(datos.shape[0]):
 
-            if datos['botella'].iloc[idato] is not None:        
+            if 'botella' in listado_variables_datos and datos['botella'].iloc[idato] is not None:        
                 if datos['hora_muestreo'].iloc[idato] is not None:          
                     df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['botella']==datos['botella'].iloc[idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'].iloc[idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'].iloc[idato])]
     
                 else:
                     df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['botella']==datos['botella'].iloc[idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'].iloc[idato])]
             else:
-                if datos['hora_muestreo'].iloc[idato] is not None:          
+                if 'hora_muestreo' in listado_variables_datos and datos['hora_muestreo'].iloc[idato] is not None:          
                     df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'].iloc[idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'].iloc[idato])]
     
                 else:
@@ -507,7 +508,6 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             variables_bd  = [x for x in tabla_variables['parametros_muestreo'] if str(x) != 'None']
             
             # Busca qué variables están incluidas en los datos a importar
-            listado_variables_datos   = datos.columns.tolist()
             listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
             listado_adicional         = ['muestreo','id_estacion_temp','id_salida'] + listado_variables_comunes
             exporta_registros         = nuevos_muestreos[listado_adicional]
