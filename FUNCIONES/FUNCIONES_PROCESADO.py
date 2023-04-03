@@ -411,7 +411,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
 
 def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto):
     
-    import streamlit as st
+
     # Recupera la tabla con los registros de los muestreos
     con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql        = create_engine(con_engine)
@@ -474,8 +474,6 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         datos['io_nuevo_muestreo'] = numpy.ones(datos.shape[0],dtype=int)
 
         
-        st.text(listado_variables_datos)
-        st.dataframe(datos)
         for idato in range(datos.shape[0]):
             
             if 'botella' in listado_variables_datos and datos['botella'].iloc[idato] is not None:        
