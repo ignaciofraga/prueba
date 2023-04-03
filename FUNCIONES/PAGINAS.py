@@ -2003,12 +2003,18 @@ def entrada_datos_excel():
     if archivo_datos is not None and io_envio is True:
         
         df_datos_importacion  = pandas.read_excel(archivo_datos) 
+        
+        # Identifica las variables que contiene el archivo
+        variables_archivo = df_datos_importacion.columns.tolist()
+        variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
+        variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
+                
                 
         # Corrige el formato de las fechas
         for idato in range(df_datos_importacion.shape[0]):
             df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
             if df_datos_importacion['fecha_muestreo'][idato]:
-                if isinstance(df_datos_importacion['hora_muestreo'][idato], str):
+                if 'hora_muestreo' in variables_archivo and isinstance(df_datos_importacion['hora_muestreo'][idato], str):
                     df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
 
         # Cambia el nombre del identificador 
@@ -2018,11 +2024,7 @@ def entrada_datos_excel():
             texto_aviso = "Los datos importados no contienen identificador."
             st.warning(texto_aviso, icon="⚠️")
 
-        # Identifica las variables que contiene el archivo
-        variables_archivo = df_datos_importacion.columns.tolist()
-        variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
-        variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
-                
+
         # Realiza un control de calidad primario a los datos importados   
         datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
 
