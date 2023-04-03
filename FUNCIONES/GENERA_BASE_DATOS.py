@@ -191,13 +191,8 @@ direccion_host = '193.146.155.99'
 # # Crea la tabla de nuevo
 # listado_variables = ('(id_config_perfil int PRIMARY KEY,'
 # ' buque int NOT NULL,'
-# ' centro_asociado int,'
-# ' fecha_inicio date,'
-# ' sensor_ctd text,'
+# ' ctd text,'
 # ' num_serie_ctd text,'
-# ' propietario_ctd text,'
-# ' fecha_calibracion_ctd date,'
-# ' ruta_configuracion_ctd text,'
 # ' sensor_par text,'
 # ' num_serie_par text,'
 # ' fecha_calibracion_par date,'
@@ -207,23 +202,24 @@ direccion_host = '193.146.155.99'
 # ' sensor_fluorescencia text,'
 # ' num_serie_fluorescencia text,'
 # ' fecha_calibracion_fluorescencia date,'
-# ' adcp text,'
-# ' num_serie_adcp text,'
-# ' fecha_calibracion_adcp date,'
+# ' sensor_conductividad text,'
+# ' num_serie_conductividad text,'
+# ' fecha_calibracion_conductividad date,'
+# ' sensor_presion text,'
+# ' num_serie_presion text,'
+# ' fecha_calibracion_presion date,'
+# ' sensor_turbidez text,'
+# ' num_serie_turbidez text,'
+# ' fecha_calibracion_turbidez date,'
 # ) 
 
-# listado_dependencias = ('FOREIGN KEY (centro_asociado)'
-#   'REFERENCES centros_oceanograficos (id_centro)'
-#   ' ON UPDATE CASCADE '
-#   'ON DELETE CASCADE,'
-#   'FOREIGN KEY (buque)'
+# listado_dependencias = ('FOREIGN KEY (buque)'
 #   'REFERENCES buques (id_buque)'
 #   'ON UPDATE CASCADE ON DELETE CASCADE'
 #   )
 
-# listado_unicidades = (', UNIQUE (buque,centro_asociado,fecha_inicio,sensor_ctd,num_serie_ctd,sensor_par,num_serie_par,sensor_oxigeno,num_serie_oxigeno,sensor_fluorescencia,num_serie_fluorescencia,adcp,num_serie_adcp))')
 
-# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias 
 
 
 # cursor.execute(instruccion_sql)

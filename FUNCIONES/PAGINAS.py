@@ -2024,7 +2024,7 @@ def entrada_datos_excel():
         variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
                 
         # Realiza un control de calidad primario a los datos importados   
-        datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
+        #datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
 
         # Recupera el identificador del programa de muestreo
         id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
@@ -2032,7 +2032,7 @@ def entrada_datos_excel():
         
         with st.spinner('Asignando la estación y salida al mar de cada medida'):
             # Encuentra la estación asociada a cada registro
-            datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(df_datos_importacion,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
             # Encuentra las salidas al mar correspondientes  
             datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
