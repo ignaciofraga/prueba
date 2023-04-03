@@ -477,7 +477,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         st.text(listado_variables_datos)
         st.dataframe(datos)
         for idato in range(datos.shape[0]):
-            st.text(datos['hora_muestreo'].iloc[idato])
+            
             if 'botella' in listado_variables_datos and datos['botella'].iloc[idato] is not None:        
                 if datos['hora_muestreo'].iloc[idato] is not None:          
                     df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['botella']==datos['botella'].iloc[idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (tabla_muestreos['hora_muestreo']==datos['hora_muestreo'].iloc[idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'].iloc[idato])]
