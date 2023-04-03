@@ -2028,22 +2028,21 @@ def entrada_datos_excel():
 
         # Realiza un control de calidad primario a los datos importados   
         datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
-        st.dataframe(datos_corregidos)
 
-        # # Recupera el identificador del programa de muestreo
-        # id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+        # Recupera el identificador del programa de muestreo
+        id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
         
         
-        # with st.spinner('Asignando la estación y salida al mar de cada medida'):
-        #     # Encuentra la estación asociada a cada registro
-        #     datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(df_datos_importacion,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+        with st.spinner('Asignando la estación y salida al mar de cada medida'):
+            # Encuentra la estación asociada a cada registro
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(df_datos_importacion,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-        #     # Encuentra las salidas al mar correspondientes  
-        #     datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+            # Encuentra las salidas al mar correspondientes  
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
      
-        # # Encuentra el identificador asociado a cada registro
-        # with st.spinner('Asignando el registro correspondiente a cada medida'):
-        #     datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+        # Encuentra el identificador asociado a cada registro
+        with st.spinner('Asignando el registro correspondiente a cada medida'):
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
         # # Añade datos físicos
         # if len(variables_fisica)>0:
