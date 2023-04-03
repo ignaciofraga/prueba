@@ -54,11 +54,11 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
     # datos['id_temp'] = indices_dataframe
     # datos.set_index('id_temp',drop=False,append=False,inplace=True)
     
-    # # Redondea los decimales los datos de latitud, longitud y profundidad (precisión utilizada en la base de datos)
-    # for idato in range(datos.shape[0]):
-    #     datos['longitud'][idato] = round(datos['longitud'][idato],4)
-    #     datos['latitud'][idato] = round(datos['latitud'][idato],4)
-    #     datos['presion_ctd'][idato] = round(datos['presion_ctd'][idato],2)      
+    # Redondea los decimales los datos de latitud, longitud y profundidad (precisión utilizada en la base de datos)
+    for idato in range(datos.shape[0]):
+        #datos['longitud'][idato] = round(datos['longitud'][idato],4)
+        #datos['latitud'][idato] = round(datos['latitud'][idato],4)
+        datos['presion_ctd'][idato] = round(datos['presion_ctd'][idato],2)      
 
 
     # Cambia todos los -999 por None
