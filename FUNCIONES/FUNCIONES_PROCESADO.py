@@ -411,7 +411,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
 
 def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto):
     
-    
+    import streamlit as st
     # Recupera la tabla con los registros de los muestreos
     con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql        = create_engine(con_engine)
@@ -489,6 +489,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                     df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (tabla_muestreos['presion_ctd']== datos['presion_ctd'].iloc[idato])]
                
             
+            st.dataframe(df_temp)
+            
             if df_temp.shape[0]> 0:
                 datos['muestreo'].iloc[idato]          = df_temp['muestreo'].iloc[0]    
                 datos['io_nuevo_muestreo'].iloc[idato] = 0
@@ -499,48 +501,48 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 datos['muestreo'].iloc[idato]       = ultimo_registro_bd 
             
         
-        if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
+        # if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
         
-            # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
-            nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
+        #     # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
+        #     nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
             
-            # Mantén sólo las columnas que interesan
-            variables_bd  = [x for x in tabla_variables['parametros_muestreo'] if str(x) != 'None']
+        #     # Mantén sólo las columnas que interesan
+        #     variables_bd  = [x for x in tabla_variables['parametros_muestreo'] if str(x) != 'None']
             
-            # Busca qué variables están incluidas en los datos a importar
-            listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
-            listado_adicional         = ['muestreo','id_estacion_temp','id_salida'] + listado_variables_comunes
-            exporta_registros         = nuevos_muestreos[listado_adicional]
+        #     # Busca qué variables están incluidas en los datos a importar
+        #     listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
+        #     listado_adicional         = ['muestreo','id_estacion_temp','id_salida'] + listado_variables_comunes
+        #     exporta_registros         = nuevos_muestreos[listado_adicional]
              
-            # Cambia el nombre de la columna de estaciones
-            exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
-            # Indice temporal
-            exporta_registros['indice_temporal'] = numpy.arange(0,exporta_registros.shape[0])
-            exporta_registros.set_index('indice_temporal',drop=True,append=False,inplace=True)
-            # Añade el nombre del muestreo
-            exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
-            for idato in range(exporta_registros.shape[0]):    
-                nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == datos['id_estacion_temp'].iloc[idato]]['nombre_estacion'].iloc[0]
+        #     # Cambia el nombre de la columna de estaciones
+        #     exporta_registros = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
+        #     # Indice temporal
+        #     exporta_registros['indice_temporal'] = numpy.arange(0,exporta_registros.shape[0])
+        #     exporta_registros.set_index('indice_temporal',drop=True,append=False,inplace=True)
+        #     # Añade el nombre del muestreo
+        #     exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
+        #     for idato in range(exporta_registros.shape[0]):    
+        #         nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == datos['id_estacion_temp'].iloc[idato]]['nombre_estacion'].iloc[0]
               
-                nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'].iloc[idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
-                if 'num_cast' in listado_variables_datos and datos['num_cast'].iloc[idato] is not None:
-                    nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'].iloc[idato]))
-                else:
-                    nombre_muestreo = nombre_muestreo + '_C1'     
+        #         nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'].iloc[idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
+        #         if 'num_cast' in listado_variables_datos and datos['num_cast'].iloc[idato] is not None:
+        #             nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'].iloc[idato]))
+        #         else:
+        #             nombre_muestreo = nombre_muestreo + '_C1'     
                 
-                if 'botella' in listado_variables_datos and datos['botella'].iloc[idato] is not None:
-                    nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'].iloc[idato])) 
-                else:
-                    if datos['prof_referencia'].iloc[idato] is not None: 
-                        nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['prof_referencia'].iloc[idato]))
-                    else:
-                        nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'].iloc[idato])) 
+        #         if 'botella' in listado_variables_datos and datos['botella'].iloc[idato] is not None:
+        #             nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'].iloc[idato])) 
+        #         else:
+        #             if datos['prof_referencia'].iloc[idato] is not None: 
+        #                 nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['prof_referencia'].iloc[idato]))
+        #             else:
+        #                 nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'].iloc[idato])) 
                  
-                exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
+        #         exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
         
-            # # Inserta el dataframe resultante en la base de datos 
-            exporta_registros.set_index('muestreo',drop=True,append=False,inplace=True)
-            exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append')    
+        #     # # Inserta el dataframe resultante en la base de datos 
+        #     exporta_registros.set_index('muestreo',drop=True,append=False,inplace=True)
+        #     exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append')    
     
     conn_psql.dispose() # Cierra la conexión con la base de datos  
     
