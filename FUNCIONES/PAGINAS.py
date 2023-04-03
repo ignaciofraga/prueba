@@ -2060,7 +2060,7 @@ def entrada_datos_excel():
         st.success(texto_exito)
 
 
-
+        st.dataframe(datos_corregidos)
 
 
 # ###############################################################################
