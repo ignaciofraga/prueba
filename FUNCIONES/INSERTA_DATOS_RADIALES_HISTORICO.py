@@ -69,7 +69,7 @@ datos_radiales = datos_radiales.replace(numpy.nan, None)
 datos_radiales['densidad'] = numpy.ones(datos_radiales.shape[0])
 for idato in range(datos_radiales.shape[0]):
     if datos_radiales['sigmat'].iloc[idato] is not None:
-        datos_radiales['densidad'].iloc[idato]  =  1 + datos_radiales['sigmat'].iloc[idato]/10000
+        datos_radiales['densidad'].iloc[idato]  =  1 + datos_radiales['sigmat'].iloc[idato]/1000
 
 datos_radiales = datos_radiales.rename(columns={"Fecha": "fecha_muestreo", "Prof":"presion_ctd", "t":"temperatura_ctd","S":"salinidad_ctd","E":"par_ctd", 
                                                 "O2 umol/kg":"oxigeno_wk","Cla":"clorofila_a","ID_estacion":"estacion","Clb":"clorofila_b","Clc":"clorofila_c","PP":"prod_primaria","COP":"cop",'NOP':'nop'})

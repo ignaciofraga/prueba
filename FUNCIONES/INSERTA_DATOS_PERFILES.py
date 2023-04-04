@@ -36,7 +36,7 @@ direccion_host = '193.146.155.99'
 nombre_programa = 'RADIAL CORUÑA'
 
 anho = 2020
-anho = 2023
+anho = 2022
 ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
 tipo_salida   = 'MENSUAL' 
 configuracion_perfilador = 1
@@ -91,34 +91,34 @@ for isalida in range(len(listado_salidas)):
         fecha_salida       = datetime.datetime.strptime(archivo[0:posicion_final], '%Y%m%d').date()                     
         id_salida          = tabla_salidas_programa['id_salida'][tabla_salidas_programa['fecha_salida']==fecha_salida].iloc[0]
         
-        # # Lee los archivos .btl
-        # nombre_archivo = archivo
-        # lectura_archivo = open(archivo, "r")  
-        # datos_archivo = lectura_archivo.readlines()
+        # Lee los archivos .btl
+        nombre_archivo = archivo
+        lectura_archivo = open(archivo, "r")  
+        datos_archivo = lectura_archivo.readlines()
               
-        # mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+        mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
     
-        # for imuestreo in range(datos_botellas.shape[0]):
-        #     if datos_botellas['latitud'].iloc[imuestreo] is None:
-        #         datos_botellas['latitud'].iloc[imuestreo] = tabla_estaciones_programa['latitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
-        #     if datos_botellas['longitud'].iloc[imuestreo] is None:
-        #         datos_botellas['longitud'].iloc[imuestreo] = tabla_estaciones_programa['longitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
+        for imuestreo in range(datos_botellas.shape[0]):
+            if datos_botellas['latitud'].iloc[imuestreo] is None:
+                datos_botellas['latitud'].iloc[imuestreo] = tabla_estaciones_programa['latitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
+            if datos_botellas['longitud'].iloc[imuestreo] is None:
+                datos_botellas['longitud'].iloc[imuestreo] = tabla_estaciones_programa['longitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
     
-        # # Aplica control de calidad
-        # #datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
-        # datos_botellas['id_estacion_temp']         = datos_botellas['estacion']
+        # Aplica control de calidad
+        #datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
+        datos_botellas['id_estacion_temp']         = datos_botellas['estacion']
     
-        # # Asigna el identificador de la salida al mar
-        # datos_botellas['id_salida'] =  id_salida
+        # Asigna el identificador de la salida al mar
+        datos_botellas['id_salida'] =  id_salida
     
-        # datos_botellas,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)  
+        datos_botellas,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)  
 
     
-        # # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-        # datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+        # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+        datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
      
-        # FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-        # FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
                
     ### DATOS DE PERFILES
        

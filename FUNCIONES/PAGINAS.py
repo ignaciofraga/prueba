@@ -2062,7 +2062,6 @@ def entrada_datos_excel():
         texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
         st.success(texto_exito)
         
-        st.dataframe(datos_corregidos)
 
 
 
