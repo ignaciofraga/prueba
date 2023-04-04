@@ -29,11 +29,28 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
         
     datos = datos.replace({numpy.nan:None})
     
+    # listado_variables_datos   = datos.columns.tolist()
+           
+    # if 'nombre_muestreo' in listado_variables_datos is False and 'id_externo' in listado_variables_datos is False:        
+    #     datos = datos[datos['presion_ctd'].notna()] 
+    #     datos = datos[datos['fecha_muestreo'].notna()] 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     # # Eliminar los registros sin dato de latitud,longitud, profundidad o fecha 
     # datos = datos[datos['latitud'].notna()]
     # datos = datos[datos['longitud'].notna()]  
-    # datos = datos[datos['presion_ctd'].notna()] 
-    # datos = datos[datos['fecha_muestreo'].notna()] 
+
     
     # # Elimina los registros con datos de profundidad negativos
     # datos = datos.drop(datos[datos.presion_ctd < 0].index)

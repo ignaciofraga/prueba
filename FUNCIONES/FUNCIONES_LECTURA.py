@@ -432,7 +432,9 @@ def lectura_archivo_perfiles(datos_archivo):
                 if nombre_variable == 'par':
                     nombre_variable = 'par_ctd' 
                 if nombre_variable == 'sbeox0Mm/Kg': 
-                    nombre_variable = 'oxigeno_ctd'                    
+                    nombre_variable = 'oxigeno_ctd'   
+                if nombre_variable == 'sigma-é00': 
+                    nombre_variable = 'sigmat_ctd'   
                 
                 listado_variables  = listado_variables + [nombre_variable]
                             
@@ -506,7 +508,15 @@ def lectura_archivo_perfiles(datos_archivo):
         
     except:
         pass
-    
+
+    try:
+        df_sigmat                           = datos_perfil[['presion_ctd','sigmat_ctd']]
+        json_sigmat                         = df_sigmat.to_json()   
+        
+        df_perfiles['sigmat'] = json_sigmat
+        
+    except:
+        pass    
     
 
     return datos_perfil,df_perfiles,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo    
@@ -678,6 +688,7 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
     datos_fluor       = []
     datos_O2          = []
     datos_tiempos     = []
+    datos_sigmat      = []
 
     # Lee el archivo .btl y escribe la información de las botellas en un archivo temporal
     cast_muestreo          = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
@@ -770,7 +781,16 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
                     io_O2           = 1                   
                 except:
                     indice_O2       =  None  
-                    io_O2           = 0     
+                    io_O2           = 0  
+
+                try:
+                    indice_sigmat   = datos_linea.index("Sigma-t00")
+                    io_sigmat       = 1                   
+                except:
+                    indice_sigmat   =  None  
+                    io_sigmat       = 0                      
+                    
+                    
     
     
             elif datos_linea[0] == 'Position': # Segunda línea con las cabeceras
@@ -797,7 +817,9 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
                     if io_fluor == 1:
                         datos_fluor.append(float(datos_linea[indice_fluor + 2]))
                     if io_O2 == 1:
-                        datos_O2.append(float(datos_linea[indice_O2 + 2]))                    
+                        datos_O2.append(float(datos_linea[indice_O2 + 2]))
+                    if io_sigmat == 1:
+                        datos_sigmat.append(float(datos_linea[indice_sigmat + 2])) 
                                     
                 else: # Linea con los tiempos de cierre
                 
@@ -836,8 +858,9 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
         if io_O2 == 1:
             datos_botellas['oxigeno_ctd']          =  datos_O2
             datos_botellas['oxigeno_ctd_qf']       = int(1)
-            
-            
+        if io_sigmat == 1:
+            datos_botellas['sigmat']          =  datos_sigmat
+                 
         # Añade una columna con la profundidad de referencia
         if profundidades_referencia is not None:
             datos_botellas['prof_referencia'] = numpy.zeros(datos_botellas.shape[0],dtype=int)
@@ -847,7 +870,30 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
                     datos_botellas['prof_referencia'][idato] =  profundidades_referencia[idx]
         else:
             datos_botellas['prof_referencia'] = [None]*datos_botellas.shape[0]
-        
+
+
+        # Cambia los nombre de las botellas.        
+        if id_estacion == 1: #E2
+            listado_equiv_ctd = [1,3,5,7,9,11]
+            listado_equiv_real = [1,2,3,4,5,6]
+            for ibotella in range(datos_botellas.shape[0]):
+                for iequiv in range(len(listado_equiv_ctd)):
+                    if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                        datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+
+        if id_estacion == 5: #E4
+            
+            datos_botellas['botella_temp'] = datos_botellas['botella']
+            datos_botellas = datos_botellas.drop(datos_botellas[datos_botellas.botella_temp == 11].index)
+            
+            listado_equiv_ctd = [1,3,5,7,9,11]
+            listado_equiv_real = [8,9,10,11,12,None]
+            for ibotella in range(datos_botellas.shape[0]):
+                for iequiv in range(len(listado_equiv_ctd)):
+                    if datos_botellas['botella_temp'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                        datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+                        
+            datos_botellas = datos_botellas.drop(columns=['botella_temp'])
         
         # Añade informacion de lat/lon y fecha para que no elimine el registro durante el control de calidad
         datos_botellas['latitud']                  = lat_muestreo  
@@ -858,7 +904,7 @@ def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base
         datos_botellas['fecha_muestreo']           = fecha_muestreo_archivo
         datos_botellas['num_cast']                 = cast_muestreo
         datos_botellas['programa']                 = id_programa_elegido
-        
+                
         mensaje_error = []
         
     return mensaje_error,datos_botellas,io_par,io_fluor,io_O2

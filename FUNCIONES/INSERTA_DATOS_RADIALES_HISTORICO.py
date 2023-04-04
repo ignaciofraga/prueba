@@ -11,264 +11,186 @@ Created on Wed Jun  8 17:55:43 2022
 
 
 
-import FUNCIONES_LECTURA
+
 import FUNCIONES_PROCESADO
-import FUNCIONES_AUXILIARES
 import pandas
 pandas.options.mode.chained_assignment = None
-import datetime
 import numpy
-import seawater
 
 
-# Parámetros de la base de datos
-base_datos     = 'COAC'
-usuario        = 'postgres'
-contrasena     = 'm0nt34lt0'
-puerto         = '5432'
-direccion_host = '193.146.155.99'
 
-# Parámetros
-programa_muestreo = 'RADIAL CORUÑA'
+# # Parámetros
+# base_datos     = 'COAC'
+# usuario        = 'postgres'
+# contrasena     = 'm0nt34lt0'
+# puerto         = '5432'
+# direccion_host = '193.146.155.99'
 
-#archivo_variables_base_datos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VARIABLES.xlsx'  
-directorio_datos             = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/HISTORICO'
+# programa_muestreo = 'RADIAL CORUÑA'
 
-itipo_informacion = 1 # 1-dato nuevo (analisis laboratorio)  2-dato re-analizado (control calidad)   
-email_contacto    = 'prueba@ieo.csic.es'
-
-
-# Define la fecha actual
-fecha_actualizacion = datetime.date.today()
-
-### PROCESADO ###
-
-
-nombre_archivo = directorio_datos + '/HISTORICO_FINAL.xlsx'
+# nombre_archivo    = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/HISTORICO/HISTORICO_FINAL.xlsx'
     
-# Importa el .xlsx
-datos_radiales = pandas.read_excel(nombre_archivo, 'datos',na_values='#N/A')
+def inserta_radiales_historico(nombre_archivo,base_datos,usuario,contrasena,puerto,direccion_host,programa_muestreo):
 
-# # Elimina la primera fila, con unidades de las distintas variables
-# datos_radiales = datos_radiales.iloc[1: , :]
-
-# Convierte las fechas de DATE a formato correcto
-datos_radiales['Fecha'] =  pandas.to_datetime(datos_radiales['Fecha'], format='%Y%m%d').dt.date
-  
-# Define una columna índice
-indices_dataframe         = numpy.arange(0,datos_radiales.shape[0],1,dtype=int)
-datos_radiales['id_temp'] = indices_dataframe
-datos_radiales.set_index('id_temp',drop=True,append=False,inplace=True)
-
-# Cambia los nan por None
-datos_radiales = datos_radiales.replace(numpy.nan, None)
-
-# Corrige las concentraciones para pasarlas de mmol/m3 (o umol/l) a umol/kg
-
-# Calculo de densidades
-datos_radiales['densidad'] = numpy.ones(datos_radiales.shape[0])
-for idato in range(datos_radiales.shape[0]):
-    if datos_radiales['sigmat'].iloc[idato] is not None:
-        datos_radiales['densidad'].iloc[idato]  =  1 + datos_radiales['sigmat'].iloc[idato]/1000
-
-datos_radiales = datos_radiales.rename(columns={"Fecha": "fecha_muestreo", "Prof":"presion_ctd", "t":"temperatura_ctd","S":"salinidad_ctd","E":"par_ctd", 
-                                                "O2 umol/kg":"oxigeno_wk","Cla":"clorofila_a","ID_estacion":"estacion","Clb":"clorofila_b","Clc":"clorofila_c","PP":"prod_primaria","COP":"cop",'NOP':'nop'})
-
-
-# correccion
-datos_radiales['ton']      = [None]*datos_radiales.shape[0]
-datos_radiales['nitrato']  = [None]*datos_radiales.shape[0]
-datos_radiales['nitrito']  = [None]*datos_radiales.shape[0]
-datos_radiales['amonio']   = [None]*datos_radiales.shape[0]
-datos_radiales['fosfato']  = [None]*datos_radiales.shape[0]
-datos_radiales['silicato'] = [None]*datos_radiales.shape[0]
-
-
-datos_radiales['ton_qf']      = numpy.ones(datos_radiales.shape[0])
-datos_radiales['nitrato_qf']  = numpy.ones(datos_radiales.shape[0])
-datos_radiales['nitrito_qf']  = numpy.ones(datos_radiales.shape[0])
-datos_radiales['amonio_qf']   = numpy.ones(datos_radiales.shape[0])
-datos_radiales['fosfato_qf']  = numpy.ones(datos_radiales.shape[0])
-datos_radiales['silicato_qf'] = numpy.ones(datos_radiales.shape[0])
-
-datos_radiales['botella']       = [None]*datos_radiales.shape[0]
-datos_radiales['hora_muestreo'] = [None]*datos_radiales.shape[0]
-datos_radiales['prof_referencia'] = [None]*datos_radiales.shape[0]
-datos_radiales['num_cast']        = [None]*datos_radiales.shape[0]
-datos_radiales['sigmat_temp']     = [None]*datos_radiales.shape[0]
-
-datos_radiales['salinidad_ctd_qf']   = int(2)
-datos_radiales['temperatura_ctd_qf'] = int(2)
-datos_radiales['par_ctd_qf']         = int(2)
-
-datos_radiales['oxigeno_wk_qf']      = int(2)
-datos_radiales['clorofila_a_qf']     = int(2)
-datos_radiales['clorofila_b_qf']     = int(2)
-datos_radiales['clorofila_c_qf']     = int(2)
-
-for idato in range(datos_radiales.shape[0]):
-    if datos_radiales['NO3'].iloc[idato] is not None:
-        datos_radiales['nitrato'].iloc[idato]  = datos_radiales['NO3'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
-    else:
-        datos_radiales['nitrato_qf'].iloc[idato] = 9
-          
-    if datos_radiales['NO2'].iloc[idato] is not None:
-        datos_radiales['nitrito'].iloc[idato]  = datos_radiales['NO2'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
-    else:
-        datos_radiales['nitrito_qf'].iloc[idato]  = 9       
+    # Importa el .xlsx
+    datos_radiales = pandas.read_excel(nombre_archivo, 'datos',na_values='#N/A')
     
-    if datos_radiales['NH4'].iloc[idato] is not None:
-        datos_radiales['amonio'].iloc[idato]  = datos_radiales['NH4'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
-    else:
-        datos_radiales['amonio_qf'].iloc[idato]  = 9
+    # # Elimina la primera fila, con unidades de las distintas variables
+    # datos_radiales = datos_radiales.iloc[1: , :]
     
-    if datos_radiales['PO4'].iloc[idato] is not None:
-        datos_radiales['fosfato'].iloc[idato]  = datos_radiales['PO4'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
-    else:
-        datos_radiales['fosfato_qf'].iloc[idato]  = 9
+    # Convierte las fechas de DATE a formato correcto
+    datos_radiales['Fecha'] =  pandas.to_datetime(datos_radiales['Fecha'], format='%Y%m%d').dt.date
+      
+    # Define una columna índice
+    indices_dataframe         = numpy.arange(0,datos_radiales.shape[0],1,dtype=int)
+    datos_radiales['id_temp'] = indices_dataframe
+    datos_radiales.set_index('id_temp',drop=True,append=False,inplace=True)
+    
+    # Cambia los nan por None
+    datos_radiales = datos_radiales.replace(numpy.nan, None)
+    
+    # Corrige las concentraciones para pasarlas de mmol/m3 (o umol/l) a umol/kg
+    
+    # Calculo de densidades
+    datos_radiales['densidad'] = numpy.ones(datos_radiales.shape[0])
+    for idato in range(datos_radiales.shape[0]):
+        if datos_radiales['sigmat'].iloc[idato] is not None:
+            datos_radiales['densidad'].iloc[idato]  =  1 + datos_radiales['sigmat'].iloc[idato]/1000
+    
+    datos_radiales = datos_radiales.rename(columns={"Fecha": "fecha_muestreo", "Prof":"presion_ctd", "t":"temperatura_ctd","S":"salinidad_ctd","E":"par_ctd", 
+                                                    "O2 umol/kg":"oxigeno_wk","Cla":"clorofila_a","ID_estacion":"estacion","Clb":"clorofila_b","Clc":"clorofila_c","PP":"prod_primaria","COP":"cop",'NOP':'nop'})
+    
+    
+    # correccion
+    datos_radiales['ton']      = [None]*datos_radiales.shape[0]
+    datos_radiales['nitrato']  = [None]*datos_radiales.shape[0]
+    datos_radiales['nitrito']  = [None]*datos_radiales.shape[0]
+    datos_radiales['amonio']   = [None]*datos_radiales.shape[0]
+    datos_radiales['fosfato']  = [None]*datos_radiales.shape[0]
+    datos_radiales['silicato'] = [None]*datos_radiales.shape[0]
+    
+    
+    datos_radiales['ton_qf']      = numpy.ones(datos_radiales.shape[0])
+    datos_radiales['nitrato_qf']  = numpy.ones(datos_radiales.shape[0])
+    datos_radiales['nitrito_qf']  = numpy.ones(datos_radiales.shape[0])
+    datos_radiales['amonio_qf']   = numpy.ones(datos_radiales.shape[0])
+    datos_radiales['fosfato_qf']  = numpy.ones(datos_radiales.shape[0])
+    datos_radiales['silicato_qf'] = numpy.ones(datos_radiales.shape[0])
+    
+    datos_radiales['botella']       = [None]*datos_radiales.shape[0]
+    datos_radiales['hora_muestreo'] = [None]*datos_radiales.shape[0]
+    datos_radiales['prof_referencia'] = [None]*datos_radiales.shape[0]
+    datos_radiales['num_cast']        = [None]*datos_radiales.shape[0]
+    
+    datos_radiales['salinidad_ctd_qf']   = int(2)
+    datos_radiales['temperatura_ctd_qf'] = int(2)
+    datos_radiales['par_ctd_qf']         = int(2)
+    
+    datos_radiales['oxigeno_wk_qf']      = int(2)
+    datos_radiales['clorofila_a_qf']     = int(2)
+    datos_radiales['clorofila_b_qf']     = int(2)
+    datos_radiales['clorofila_c_qf']     = int(2)
+    
+    for idato in range(datos_radiales.shape[0]):
+        if datos_radiales['NO3'].iloc[idato] is not None:
+            datos_radiales['nitrato'].iloc[idato]  = datos_radiales['NO3'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+        else:
+            datos_radiales['nitrato_qf'].iloc[idato] = 9
+              
+        if datos_radiales['NO2'].iloc[idato] is not None:
+            datos_radiales['nitrito'].iloc[idato]  = datos_radiales['NO2'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+        else:
+            datos_radiales['nitrito_qf'].iloc[idato]  = 9       
         
-    if datos_radiales['SiO2'].iloc[idato] is not None:
-        datos_radiales['silicato'].iloc[idato]  = datos_radiales['SiO2'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
-    else:
-        datos_radiales['silicato_qf'].iloc[idato]  = 9  
+        if datos_radiales['NH4'].iloc[idato] is not None:
+            datos_radiales['amonio'].iloc[idato]  = datos_radiales['NH4'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+        else:
+            datos_radiales['amonio_qf'].iloc[idato]  = 9
         
-        
-    # QF
-    if datos_radiales['NO3flag'].iloc[idato] is not None:
-        datos_radiales['nitrato_qf'].iloc[idato]  = datos_radiales['NO3flag'].iloc[idato]  
-    if datos_radiales['NO2flag'].iloc[idato] is not None:
-        datos_radiales['nitrito_qf'].iloc[idato]  = datos_radiales['NO2flag'].iloc[idato]  
-    if datos_radiales['NH4flag'].iloc[idato] is not None:
-        datos_radiales['amonio_qf'].iloc[idato]  = datos_radiales['NH4flag'].iloc[idato]
-    if datos_radiales['PO4flag'].iloc[idato] is not None:
-        datos_radiales['fosfato_qf'].iloc[idato]  = datos_radiales['PO4flag'].iloc[idato]          
-    if datos_radiales['SiO2flag'].iloc[idato] is not None:
-        datos_radiales['silicato_qf'].iloc[idato]  = datos_radiales['SiO2flag'].iloc[idato]           
-
-    # calculo del TON 
-    if datos_radiales['nitrato'].iloc[idato] is not None and datos_radiales['nitrito'].iloc[idato] is not None:
-        datos_radiales['ton'].iloc[idato]  = datos_radiales['nitrato'].iloc[idato] + datos_radiales['nitrito'].iloc[idato]
-        if datos_radiales['amonio'].iloc[idato] is not None:
-            datos_radiales['ton'].iloc[idato] = datos_radiales['ton'].iloc[idato] + datos_radiales['amonio'].iloc[idato]
-    else:
-        datos_radiales['ton_qf'].iloc[idato] = 9
-    
-    # Reviso los QF
-    if datos_radiales['salinidad_ctd'].iloc[idato] is None:
-        datos_radiales['salinidad_ctd_qf'].iloc[idato] = 9
-    if datos_radiales['temperatura_ctd'].iloc[idato] is None:
-        datos_radiales['temperatura_ctd_qf'].iloc[idato] = 9
-    if datos_radiales['par_ctd'].iloc[idato] is None:
-        datos_radiales['par_ctd_qf'].iloc[idato] = 9
-    if datos_radiales['oxigeno_wk'].iloc[idato] is None:
-        datos_radiales['oxigeno_wk_qf'].iloc[idato] = 9
-    if datos_radiales['clorofila_a'].iloc[idato] is None:
-        datos_radiales['clorofila_a_qf'].iloc[idato] = 9
-    if datos_radiales['clorofila_b'].iloc[idato] is None:
-        datos_radiales['clorofila_b_qf'].iloc[idato] = 9
-    if datos_radiales['clorofila_c'].iloc[idato] is None:
-        datos_radiales['clorofila_c_qf'].iloc[idato] = 9         
-        
-    # aprovecho para cambiar el nombre de la estación
-    if datos_radiales['estacion'].iloc[idato] == 'E2CO':
-        datos_radiales['estacion'].iloc[idato]  = '2'    
-    if datos_radiales['estacion'].iloc[idato] == 'E4CO':
-        datos_radiales['estacion'].iloc[idato]  = '4'    
-    if datos_radiales['estacion'].iloc[idato] == 'E3CO':
-        datos_radiales['estacion'].iloc[idato]  = '3' 
-    if datos_radiales['estacion'].iloc[idato] == 'E3ACO':
-        datos_radiales['estacion'].iloc[idato]  = '3A' 
-    if datos_radiales['estacion'].iloc[idato] == 'E3BCO':
-        datos_radiales['estacion'].iloc[idato]  = '3B' 
-    if datos_radiales['estacion'].iloc[idato] == 'E3CCO':
-        datos_radiales['estacion'].iloc[idato]  = '3C'         
-
-
-
-
-# Recupera el identificador del programa de muestreo
-id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
-
-# Encuentra la estación asociada a cada registro
-print('Asignando la estación correspondiente a cada medida')
-datos_radiales = FUNCIONES_PROCESADO.evalua_estaciones(datos_radiales,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-
-
-# Encuentra las salidas al mar correspondientes
-print('Asignando la salida correspondiente a cada medida')
-tipo_salida    = 'MENSUAL'   
-datos_radiales = FUNCIONES_PROCESADO.evalua_salidas(datos_radiales,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
- 
-# Encuentra el identificador asociado a cada registro
-print('Asignando el registro correspondiente a cada medida')
-datos_radiales = FUNCIONES_PROCESADO.evalua_registros(datos_radiales,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-   
-# # # # # Introduce los datos en la base de datos
-print('Introduciendo los datos en la base de datos')
-FUNCIONES_PROCESADO.inserta_datos(datos_radiales,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-FUNCIONES_PROCESADO.inserta_datos(datos_radiales,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
-
-
-
-# datos = datos_radiales
-# nombre_programa = programa_muestreo
-# from sqlalchemy import create_engine
-# import psycopg2
-# itipo_informacion = 2
-
-# # Busca de cuántos años diferentes contiene información el dataframe
-# vector_auxiliar_tiempo = numpy.zeros(datos.shape[0],dtype=int)
-# for idato in range(datos.shape[0]):
-#     vector_auxiliar_tiempo[idato] = datos['fecha_muestreo'][idato].year
-# anhos_muestreados                 = numpy.unique(vector_auxiliar_tiempo)
-# datos['año']                      = vector_auxiliar_tiempo 
-
-# # Procesado para cada uno de los años incluidos en el dataframe importado
-# for ianho in range(len(anhos_muestreados)):
-    
-#     anho_procesado = anhos_muestreados[ianho]
-           
-#     if itipo_informacion == 1 or itipo_informacion == 2:
-#         # Selecciona la información de cada uno de los años 
-#         fechas_anuales  = datos['fecha_muestreo'][datos['año']==anhos_muestreados[ianho]]
-    
-#         # Encuentra la fecha de final de muestreo 
-#         fecha_actualizacion = fechas_anuales.max()
-
-#     # Recupera los datos disponibles        
-#     con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-#     conn_psql        = create_engine(con_engine)
-#     datos_bd         = pandas.read_sql('SELECT * FROM estado_procesos', conn_psql)
-#     conn_psql.dispose()
+        if datos_radiales['PO4'].iloc[idato] is not None:
+            datos_radiales['fosfato'].iloc[idato]  = datos_radiales['PO4'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+        else:
+            datos_radiales['fosfato_qf'].iloc[idato]  = 9
             
-#     datos_bd_programa       = datos_bd[datos_bd['programa']==id_programa]
-#     datos_bd_programa_anho  = datos_bd_programa[datos_bd_programa['año']==anho_procesado]
+        if datos_radiales['SiO2'].iloc[idato] is not None:
+            datos_radiales['silicato'].iloc[idato]  = datos_radiales['SiO2'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+        else:
+            datos_radiales['silicato_qf'].iloc[idato]  = 9  
+            
+            
+        # QF
+        if datos_radiales['NO3flag'].iloc[idato] is not None:
+            datos_radiales['nitrato_qf'].iloc[idato]  = datos_radiales['NO3flag'].iloc[idato]  
+        if datos_radiales['NO2flag'].iloc[idato] is not None:
+            datos_radiales['nitrito_qf'].iloc[idato]  = datos_radiales['NO2flag'].iloc[idato]  
+        if datos_radiales['NH4flag'].iloc[idato] is not None:
+            datos_radiales['amonio_qf'].iloc[idato]  = datos_radiales['NH4flag'].iloc[idato]
+        if datos_radiales['PO4flag'].iloc[idato] is not None:
+            datos_radiales['fosfato_qf'].iloc[idato]  = datos_radiales['PO4flag'].iloc[idato]          
+        if datos_radiales['SiO2flag'].iloc[idato] is not None:
+            datos_radiales['silicato_qf'].iloc[idato]  = datos_radiales['SiO2flag'].iloc[idato]           
     
-#     if datos_bd_programa_anho.shape[0] == 0:
-#         id_proceso = datos_bd.shape[0] + 1
-#     else:
-#         id_proceso = datos_bd_programa_anho['id_proceso'].iloc[0] 
+        # calculo del TON 
+        if datos_radiales['nitrato'].iloc[idato] is not None and datos_radiales['nitrito'].iloc[idato] is not None:
+            datos_radiales['ton'].iloc[idato]  = datos_radiales['nitrato'].iloc[idato] + datos_radiales['nitrito'].iloc[idato]
+            if datos_radiales['amonio'].iloc[idato] is not None:
+                datos_radiales['ton'].iloc[idato] = datos_radiales['ton'].iloc[idato] + datos_radiales['amonio'].iloc[idato]
+        else:
+            datos_radiales['ton_qf'].iloc[idato] = 9
         
-#     conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-#     cursor = conn.cursor()  
-#     if itipo_informacion == 1:
-#         instruccion_sql = "INSERT INTO estado_procesos (id_proceso,programa,nombre_programa,año,fecha_final_muestreo,contacto_muestreo) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (id_proceso) DO UPDATE SET (programa,nombre_programa,año,fecha_final_muestreo,contacto_muestreo) = ROW(EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.año,EXCLUDED.fecha_final_muestreo,EXCLUDED.contacto_muestreo);"   
-#     if itipo_informacion == 2:
-#         instruccion_sql = "INSERT INTO estado_procesos (id_proceso,programa,nombre_programa,año,fecha_analisis_laboratorio,contacto_analisis_laboratorio) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (id_proceso) DO UPDATE SET (programa,nombre_programa,año,fecha_analisis_laboratorio,contacto_analisis_laboratorio) = ROW(EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.año,EXCLUDED.fecha_analisis_laboratorio,EXCLUDED.contacto_analisis_laboratorio);"   
-#     if itipo_informacion == 3:
-#         instruccion_sql = "INSERT INTO estado_procesos (id_proceso,programa,nombre_programa,año,fecha_post_procesado,contacto_post_procesado) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (id_proceso) DO UPDATE SET (programa,nombre_programa,año,fecha_post_procesado,contacto_post_procesado) = ROW(EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.año,EXCLUDED.fecha_post_procesado,EXCLUDED.contacto_post_procesado);"   
-                    
-        
-#     cursor.execute(instruccion_sql, (int(id_proceso),int(id_programa),nombre_programa,int(anho_procesado),fecha_actualizacion,email_contacto))
-#     conn.commit() 
+        # Reviso los QF
+        if datos_radiales['salinidad_ctd'].iloc[idato] is None:
+            datos_radiales['salinidad_ctd_qf'].iloc[idato] = 9
+        if datos_radiales['temperatura_ctd'].iloc[idato] is None:
+            datos_radiales['temperatura_ctd_qf'].iloc[idato] = 9
+        if datos_radiales['par_ctd'].iloc[idato] is None:
+            datos_radiales['par_ctd_qf'].iloc[idato] = 9
+        if datos_radiales['oxigeno_wk'].iloc[idato] is None:
+            datos_radiales['oxigeno_wk_qf'].iloc[idato] = 9
+        if datos_radiales['clorofila_a'].iloc[idato] is None:
+            datos_radiales['clorofila_a_qf'].iloc[idato] = 9
+        if datos_radiales['clorofila_b'].iloc[idato] is None:
+            datos_radiales['clorofila_b_qf'].iloc[idato] = 9
+        if datos_radiales['clorofila_c'].iloc[idato] is None:
+            datos_radiales['clorofila_c_qf'].iloc[idato] = 9         
+            
+        # aprovecho para cambiar el nombre de la estación
+        if datos_radiales['estacion'].iloc[idato] == 'E2CO':
+            datos_radiales['estacion'].iloc[idato]  = '2'    
+        if datos_radiales['estacion'].iloc[idato] == 'E4CO':
+            datos_radiales['estacion'].iloc[idato]  = '4'    
+        if datos_radiales['estacion'].iloc[idato] == 'E3CO':
+            datos_radiales['estacion'].iloc[idato]  = '3' 
+        if datos_radiales['estacion'].iloc[idato] == 'E3ACO':
+            datos_radiales['estacion'].iloc[idato]  = '3A' 
+        if datos_radiales['estacion'].iloc[idato] == 'E3BCO':
+            datos_radiales['estacion'].iloc[idato]  = '3B' 
+        if datos_radiales['estacion'].iloc[idato] == 'E3CCO':
+            datos_radiales['estacion'].iloc[idato]  = '3C'         
+    
+    
+    
+    
+    # Recupera el identificador del programa de muestreo
+    id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    # Encuentra la estación asociada a cada registro
+    print('Asignando la estación correspondiente a cada medida')
+    datos_radiales = FUNCIONES_PROCESADO.evalua_estaciones(datos_radiales,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    
+    # Encuentra las salidas al mar correspondientes
+    print('Asignando la salida correspondiente a cada medida')
+    tipo_salida    = 'MENSUAL'   
+    datos_radiales = FUNCIONES_PROCESADO.evalua_salidas(datos_radiales,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+     
+    # Encuentra el identificador asociado a cada registro
+    print('Asignando el registro correspondiente a cada medida')
+    datos_radiales = FUNCIONES_PROCESADO.evalua_registros(datos_radiales,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+       
+    # # # # # Introduce los datos en la base de datos
+    print('Introduciendo los datos en la base de datos')
+    FUNCIONES_PROCESADO.inserta_datos(datos_radiales,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_PROCESADO.inserta_datos(datos_radiales,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
 
-
-
-
-
-
-
-# # # Actualiza estado
-# print('Actualizando el estado de los procesos')
-# FUNCIONES_AUXILIARES.actualiza_estado(datos_radiales,id_programa,programa_muestreo,fecha_actualizacion,email_contacto,itipo_informacion,direccion_host,base_datos,usuario,contrasena,puerto)
 
