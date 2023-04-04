@@ -130,9 +130,7 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
             nombre_estacion    = archivo[posicion_inicio:posicion_final].upper() #+ 'CO' 
             
             id_estacion = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
-        
-            print(archivo)
-                    
+                           
             # Lectura de la información contenida en el archivo como un dataframe
             lectura_archivo = open(archivo, "r")  
             datos_archivo = lectura_archivo.readlines()

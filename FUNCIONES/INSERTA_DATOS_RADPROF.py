@@ -45,18 +45,6 @@ from os import listdir
 from os.path import isfile, join
 listado_archivos = [f for f in listdir(directorio_datos) if isfile(join(directorio_datos, f))]
 
-#for iarchivo in range(len(listado_archivos)):
-#for iarchivo in range(1):
-
-#nombre_archivo = directorio_datos + '/' + listado_archivos[iarchivo]
-
-#nombre_archivo  = directorio_datos + '/RADPROF_2013.xlsm'
-
-# Listado de archivos disponibles
-from os import listdir
-from os.path import isfile, join
-listado_archivos = [f for f in listdir(directorio_datos) if isfile(join(directorio_datos, f))]
-
 for iarchivo in range(len(listado_archivos)):
    
     nombre_archivo = directorio_datos + '/' + listado_archivos[iarchivo] 

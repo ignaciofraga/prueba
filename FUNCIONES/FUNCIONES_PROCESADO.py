@@ -26,78 +26,47 @@ pandas.options.mode.chained_assignment = None
 def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
  
     textos_aviso = [] 
-        
+      
+    # Cambia valores no válidos por None
     datos = datos.replace({numpy.nan:None})
+    datos = datos.replace(-999, None) 
     
-    # listado_variables_datos   = datos.columns.tolist()
+    listado_variables_datos   = datos.columns.tolist()
            
-    # if 'nombre_muestreo' in listado_variables_datos is False and 'id_externo' in listado_variables_datos is False:        
-    #     datos = datos[datos['presion_ctd'].notna()] 
-    #     datos = datos[datos['fecha_muestreo'].notna()] 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    # # Eliminar los registros sin dato de latitud,longitud, profundidad o fecha 
-    # datos = datos[datos['latitud'].notna()]
-    # datos = datos[datos['longitud'].notna()]  
-
-    
-    # # Elimina los registros con datos de profundidad negativos
-    # datos = datos.drop(datos[datos.presion_ctd < 0].index)
+    # Elimina datos sin profundidad o fecha (en caso de que estas variables estén entre las de entrada)
+    if 'presion_ctd' in listado_variables_datos :        
+        datos = datos[datos['presion_ctd'].notna()]
+        datos = datos.drop(datos[datos.presion_ctd < 0].index) # Corregir los valores positivos de longitud, pasándolos a negativos (algunos datos de Pelacus tienen este error)
+    if 'fecha_muestreo' in listado_variables_datos:        
+        datos = datos[datos['fecha_muestreo'].notna()] 
+        
     
     # # Elimina registros duplicados en el mismo punto y a la misma hora(por precaucion)
-    # num_reg_inicial = datos.shape[0]
-    # datos           = datos.drop_duplicates(subset=['latitud','longitud','presion_ctd','fecha_muestreo','hora_muestreo'], keep='last')    
-    # num_reg_final   = datos.shape[0]
-    # if num_reg_final < num_reg_inicial:
-    #     textos_aviso.append('Se han eliminado registros correspondientes a una misma fecha, hora, profundidad y estación')
+    if 'latitud' in listado_variables_datos and 'longitud' in listado_variables_datos and 'presion_ctd' in listado_variables_datos and 'fecha_muestreo' in listado_variables_datos and 'hora_muestreo' in listado_variables_datos : 
+        num_reg_inicial = datos.shape[0]
+        datos           = datos.drop_duplicates(subset=['latitud','longitud','presion_ctd','fecha_muestreo','hora_muestreo'], keep='last')    
+        num_reg_final   = datos.shape[0]
+        if num_reg_final < num_reg_inicial:
+            textos_aviso.append('Se han eliminado registros correspondientes a una misma fecha, hora, profundidad y estación')
     
+    # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
+    indices_dataframe        = numpy.arange(0,datos.shape[0],1,dtype=int)    
+    datos['id_temp'] = indices_dataframe
+    datos.set_index('id_temp',drop=False,append=False,inplace=True)
     
-    # # Corregir los valores positivos de longitud, pasándolos a negativos (algunos datos de Pelacus tienen este error)
-    # datos['longitud'] = -1*datos['longitud'].abs()  
+    # Redondea los decimales los datos de latitud, longitud y profundidad (precisión utilizada en la base de datos) 
+    if 'longitud' in listado_variables_datos : 
+        datos['longitud'] = -1*datos['longitud'].abs()  
+        for idato in range(datos.shape[0]):
+            datos['longitud'][idato] = round(datos['longitud'][idato],4)
     
-    # # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
-    # indices_dataframe        = numpy.arange(0,datos.shape[0],1,dtype=int)    
-    # datos['id_temp'] = indices_dataframe
-    # datos.set_index('id_temp',drop=False,append=False,inplace=True)
-    
-    # Redondea los decimales los datos de latitud, longitud y profundidad (precisión utilizada en la base de datos)
-    for idato in range(datos.shape[0]):
-        #datos['longitud'][idato] = round(datos['longitud'][idato],4)
-        #datos['latitud'][idato] = round(datos['latitud'][idato],4)
-        datos['presion_ctd'][idato] = round(datos['presion_ctd'][idato],2)      
-
-
-    # Cambia todos los -999 por None
-    datos = datos.replace(-999, None) 
-    #datos  = datos.replace({-999: None})
-    #datos = datos.replace(-999, datos.replace([-999], [None])
-
-    # # Añade las columnas con datos de qf=9 en aquellas variables que no estén incluidas
-    # con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    # conn_psql          = create_engine(con_engine)
-    # tabla_variables    = psql.read_sql('SELECT * FROM variables_procesado', conn_psql)    
-    # conn_psql.dispose()
+    if 'latitud' in listado_variables_datos:
+        for idato in range(datos.shape[0]):
+            datos['latitud'][idato] = round(datos['latitud'][idato],4)
         
-    # listado_variables_fisicas = tabla_variables['variables_fisicas']
-    # for variable in listado_variables_fisicas:
-    #     if variable is not None and variable.endswith("_qf") and variable not in datos.columns.tolist(): 
-    #         datos[variable] = 9 
-
-    # listado_variables_bgq = tabla_variables['variables_biogeoquimicas']
-    # for variable in listado_variables_bgq:
-    #     if variable is not None and variable.endswith("_qf") and variable not in datos.columns.tolist(): 
-    #         datos[variable] = 9     
+    if 'presion_ctd' in listado_variables_datos:
+        for idato in range(datos.shape[0]):
+            datos['presion_ctd'][idato] = round(datos['presion_ctd'][idato],2)      
 
     return datos,textos_aviso    
  
