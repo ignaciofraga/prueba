@@ -2223,25 +2223,25 @@ def referencias_nutrientes():
 
     # Mostrar los RMNs altos disponibles en la base de datos y/o modificarlos   
     st.subheader('RMNs Altos')
-    with st.form("Formulario", clear_on_submit=False):
+    #with st.form("Formulario", clear_on_submit=False):
 
-        tabla_rmns_modificada_altos = st.experimental_data_editor(tabla_rmns_altos, num_rows="dynamic",key="data_editor")
+    tabla_rmns_modificada_altos = st.experimental_data_editor(tabla_rmns_altos, num_rows="dynamic",key="data_editor")
 
-        # io_envio = st.form_submit_button('Actualizar la tabla de RMNs altos') 
+    # io_envio = st.form_submit_button('Actualizar la tabla de RMNs altos') 
 
-        # if io_envio: 
-    
-        st.dataframe(tabla_rmns_modificada_altos)        
+    # if io_envio: 
 
-        # Comprueba datos      
-        io_consistencia = 1
-        for idato in range(tabla_rmns_modificada_altos.shape[0]):
-            if tabla_rmns_modificada_altos['id_rmn'].iloc[idato] is None or tabla_rmns_modificada_altos['nombre_rmn'].iloc[idato] is None: 
-                io_consistencia = 0
-                    
-        if io_consistencia == 0:
-            texto_error = 'IMPORTANTE. El identificador y nombre no pueden ser nulos' 
-            st.warning(texto_error, icon="⚠️")
+    st.dataframe(tabla_rmns_modificada_altos)        
+
+    # Comprueba datos      
+    io_consistencia = 1
+    for idato in range(tabla_rmns_modificada_altos.shape[0]):
+        if tabla_rmns_modificada_altos['id_rmn'].iloc[idato] is None or tabla_rmns_modificada_altos['nombre_rmn'].iloc[idato] is None: 
+            io_consistencia = 0
+                
+    if io_consistencia == 0:
+        texto_error = 'IMPORTANTE. El identificador y nombre no pueden ser nulos' 
+        st.warning(texto_error, icon="⚠️")
             
         # else:
 
