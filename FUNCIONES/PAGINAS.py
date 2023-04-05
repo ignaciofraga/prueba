@@ -2248,7 +2248,7 @@ def referencias_nutrientes():
         if io_envio: 
             
             # Comprueba valores
-            if nombre_muestras is None or salinidad is None or ton is None or nitrito is None or silicato is None or fosfato is None:
+            if len(nombre_muestras) == 0 or salinidad is None or ton is None or nitrito is None or silicato is None or fosfato is None:
                 texto_error = 'IMPORTANTE. Los campos de nombre, TON, nitrito, silicato y fosfato no pueden ser nulos' 
                 st.warning(texto_error, icon="⚠️")
                 
