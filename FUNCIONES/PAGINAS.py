@@ -2234,7 +2234,7 @@ def referencias_nutrientes():
         # Comprueba datos      
         io_consistencia = 1
         for idato in range(tabla_rmns_modificada_altos.shape[0]):
-            if tabla_rmns_modificada_altos['id_rmn'].iloc[idato] is None and tabla_rmns_modificada_altos['nombre_rmn'].iloc[idato] is None: 
+            if tabla_rmns_modificada_altos['id_rmn'].iloc[idato] is None or tabla_rmns_modificada_altos['nombre_rmn'].iloc[idato] is None: 
                 io_consistencia = 0
                     
         if io_consistencia == 0:
