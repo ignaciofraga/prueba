@@ -2251,20 +2251,22 @@ def referencias_nutrientes():
             if nombre_muestras is None or salinidad is None or ton is None or nitrito is None or silicato is None or fosfato is None:
                 texto_error = 'IMPORTANTE. Los campos de nombre, TON, nitrito, silicato y fosfato no pueden ser nulos' 
                 st.warning(texto_error, icon="⚠️")
+                
+            else:
             
-            with st.spinner('Añadiendo RMN a la base de datos'):
-            
-                instruccion_sql = 'INSERT INTO ' + nombre_tabla + ' (nombre_rmn,salinidad,ton,nitrito,silicato,fosfato,observaciones) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato);'
-                    
-                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                cursor = conn.cursor()
-                cursor.execute(instruccion_sql,(nombre_muestras,salinidad,ton,nitrito,silicato,fosfato,observaciones))
-                conn.commit()                 
-                cursor.close()
-                conn.close()
-
-                texto_exito = 'Referencia añadida correctamente'
-                st.success(texto_exito)            
+                with st.spinner('Añadiendo RMN a la base de datos'):
+                
+                    instruccion_sql = 'INSERT INTO ' + nombre_tabla + ' (nombre_rmn,salinidad,ton,nitrito,silicato,fosfato,observaciones) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato);'
+                        
+                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                    cursor = conn.cursor()
+                    cursor.execute(instruccion_sql,(nombre_muestras,salinidad,ton,nitrito,silicato,fosfato,observaciones))
+                    conn.commit()                 
+                    cursor.close()
+                    conn.close()
+    
+                    texto_exito = 'Referencia añadida correctamente'
+                    st.success(texto_exito)            
         
     # Recupera la tabla con los RMNs utilizados 
     con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
