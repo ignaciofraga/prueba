@@ -2233,14 +2233,9 @@ def referencias_nutrientes():
 
         # Comprueba datos      
         io_consistencia = 1
-        #df_comparacion  = tabla_rmns_altos.compare(tabla_rmns_modificada_altos, keep_shape=True)
-        df_comparacion = pandas.concat([tabla_rmns_modificada_altos,tabla_rmns_altos]).drop_duplicates(keep=False)
-        
-        st.dataframe(df_comparacion)
-        if df_comparacion.shape[0] > 0:
-            for idato in range(df_comparacion.shape[0]):
-                if df_comparacion['id_rmn'].iloc[idato] is None and df_comparacion['nombre_rmn'].iloc[idato]: 
-                    io_consistencia = 0
+        for idato in range(tabla_rmns_modificada_altos.shape[0]):
+            if tabla_rmns_modificada_altos['id_rmn'].iloc[idato] is None and tabla_rmns_modificada_altos['nombre_rmn'].iloc[idato] is None: 
+                io_consistencia = 0
                     
         if io_consistencia == 0:
             texto_error = 'IMPORTANTE. El identificador y nombre no pueden ser nulos' 
