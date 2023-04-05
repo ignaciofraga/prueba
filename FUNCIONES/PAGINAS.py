@@ -2216,7 +2216,8 @@ def referencias_nutrientes():
     # Recupera la tabla con los RMNs utilizados 
     con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql  = create_engine(con_engine)
-    tabla_rmns = psql.read_sql('SELECT * FROM rmn_nutrientes', conn_psql)
+    tabla_rmns_altos = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn_psql)
+    tabla_rmns_bajos = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn_psql)
     conn_psql.dispose()
         
 
@@ -2224,33 +2225,47 @@ def referencias_nutrientes():
 
     with st.form("Formulario", clear_on_submit=False):
 
-        tabla_rmns_modificada = st.experimental_data_editor(tabla_rmns, num_rows="dynamic",key="data_editor")
+        tabla_rmns_modificada = st.experimental_data_editor(tabla_rmns_altos, num_rows="dynamic",key="data_editor")
 
-        io_envio = st.form_submit_button('Actualizar la tabla de RMNs') 
+        io_envio = st.form_submit_button('Actualizar la tabla de RMNs altos') 
 
     if io_envio: 
 
-        # Inserta uno a uno los registros
-        instruccion_sql = '''INSERT INTO rmn_nutrientes (id_rmn,nombre_rmn,salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (id_rmn,salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones) = ROW(EXCLUDED.id_rmn,EXCLUDED.salinidad_rmn_bajo,EXCLUDED.ton_rmn_bajo,EXCLUDED.nitrito_rmn_bajo,EXCLUDED.silicato_rmn_bajo,EXCLUDED.fosfato_rmn_bajo,EXCLUDED.salinidad_rmn_alto,EXCLUDED.ton_rmn_alto,EXCLUDED.nitrito_rmn_alto,EXCLUDED.silicato_rmn_alto,EXCLUDED.fosfato_rmn_alto,EXCLUDED.observaciones);''' 
-        
-        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        cursor = conn.cursor()
-        
-        with st.spinner('Actualizando la base de datos'):
-        
-            for idato in range(tabla_rmns_modificada.shape[0]):
+        # Comprueba datos      
+        io_consistencia = 1
+        df_comparacion  = tabla_rmns_altos.compare(tabla_rmns_modificada, keep_shape=True)
+        if df_comparacion.shape[0] > 0:
+            for idato in range(df_comparacion.shape[0]):
+                if df_comparacion['id_rmn'].iloc[idato] is None and df_comparacion['nombre_rmn'].iloc[idato]: 
+                    io_consistencia = 0
+                    
+        if io_consistencia == 0:
+            texto_error = 'IMPORTANTE. El identificador y nombre no pueden ser nulos' 
+            st.warning(texto_error, icon="⚠️")
+            
+        else:
 
-                cursor.execute(instruccion_sql,(int(tabla_rmns_modificada['id_rmn'].iloc[idato]),tabla_rmns_modificada['nombre_rmn'].iloc[idato],tabla_rmns_modificada['salinidad_rmn_bajo'].iloc[idato],tabla_rmns_modificada['ton_rmn_bajo'].iloc[idato],tabla_rmns_modificada['nitrito_rmn_bajo'].iloc[idato],tabla_rmns_modificada['silicato_rmn_bajo'].iloc[idato],tabla_rmns_modificada['fosfato_rmn_bajo'].iloc[idato],tabla_rmns_modificada['salinidad_rmn_alto'].iloc[idato],tabla_rmns_modificada['ton_rmn_alto'].iloc[idato],tabla_rmns_modificada['nitrito_rmn_alto'].iloc[idato],tabla_rmns_modificada['silicato_rmn_alto'].iloc[idato],tabla_rmns_modificada['fosfato_rmn_alto'].iloc[idato],tabla_rmns_modificada['observaciones'].iloc[idato]))
-                conn.commit() 
-        
-            cursor.close()
-            conn.close()
-
-        texto_exito = 'Referencias actualizadas correctamente'
-        st.success(texto_exito)            
-
-        st.cache_data.clear()
+            # Inserta uno a uno los registros
+            instruccion_sql = '''INSERT INTO rmn_alto_nutrientes (id_rmn,nombre_rmn,salinidad,ton,nitrito,silicato,fosfato,observaciones)
+            VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_rmn,nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato);''' 
+            
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()
+            
+            with st.spinner('Actualizando la base de datos'):
+            
+                for idato in range(tabla_rmns_modificada.shape[0]):
+    
+                    cursor.execute(instruccion_sql,(int(tabla_rmns_modificada['id_rmn'].iloc[idato]),tabla_rmns_modificada['nombre_rmn'].iloc[idato],tabla_rmns_modificada['salinidad'].iloc[idato],tabla_rmns_modificada['ton'].iloc[idato],tabla_rmns_modificada['nitrito'].iloc[idato],tabla_rmns_modificada['silicato'].iloc[idato],tabla_rmns_modificada['fosfato'].iloc[idato],tabla_rmns_modificada['observaciones'].iloc[idato]))
+                    conn.commit() 
+            
+                cursor.close()
+                conn.close()
+    
+            texto_exito = 'Referencias actualizadas correctamente'
+            st.success(texto_exito)            
+    
+            st.cache_data.clear()
 
 
 
