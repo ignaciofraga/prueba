@@ -66,8 +66,6 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
         
         for archivo in glob("*.btl"):
 
-            
-             
             # Encuentra el identificador de la estación
             posicion_inicio    = archivo.find('e') + 1
             posicion_final     = archivo.find('.')
@@ -134,7 +132,7 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
             # Lectura de la información contenida en el archivo como un dataframe
             lectura_archivo = open(archivo, "r")  
             datos_archivo = lectura_archivo.readlines()
-                          
+                       
             datos_perfil,df_perfiles,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
             
             
@@ -213,17 +211,17 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
 
  
 
-# Parámetros de la base de datos
-base_datos     = 'COAC'
-usuario        = 'postgres'
-contrasena     = 'm0nt34lt0'
-puerto         = '5432'
-direccion_host = '193.146.155.99'
+# # Parámetros de la base de datos
+# base_datos     = 'COAC'
+# usuario        = 'postgres'
+# contrasena     = 'm0nt34lt0'
+# puerto         = '5432'
+# direccion_host = '193.146.155.99'
 
-# Parámetros
-nombre_programa = 'RADIAL CORUÑA'
-anho = 2022
-ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
+# # Parámetros
+# nombre_programa = 'RADIAL CORUÑA'
+# anho = 2022
+# ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
 
 
-inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usuario,contrasena,puerto,direccion_host)       
+# inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usuario,contrasena,puerto,direccion_host)       

@@ -394,12 +394,12 @@ def lectura_archivo_perfiles(datos_archivo):
                 
             if texto_linea[0:12] == '** Latitude:': # Línea con latitud del muestreo
                 lat_muestreo  = float(texto_linea[12:19])
-                if texto_linea[-1] == 'S':
+                if texto_linea[-2] == 'S':
                     lat_muestreo = lat_muestreo*-1
 
             if texto_linea[0:13] == '** Longitude:': # Línea con latitud del muestreo
                 lon_muestreo  = float(texto_linea[13:20])
-                if texto_linea[-1] == 'W':
+                if texto_linea[-2] == 'W':
                     lon_muestreo = lon_muestreo*-1                
                                 
             if texto_linea[0:22] == '* System UpLoad Time =': # Línea con hora del cast

@@ -66,7 +66,7 @@ def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
         
     if 'presion_ctd' in listado_variables_datos:
         for idato in range(datos.shape[0]):
-            datos['presion_ctd'][idato] = round(datos['presion_ctd'][idato],2)      
+            datos['presion_ctd'][idato] = round(float(datos['presion_ctd'][idato]),2)      
 
     return datos,textos_aviso    
  
@@ -404,7 +404,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
     tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
     tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn_psql)
-       
+    conn_psql.dispose() 
+    
     listado_variables_datos   = datos.columns.tolist()
     
     datos['muestreo']  = numpy.zeros(datos.shape[0],dtype=int)
@@ -431,15 +432,15 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == datos['id_estacion_temp'].iloc[idato]]['nombre_estacion'].iloc[0]
             
             nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'].iloc[idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
-            if datos['num_cast'].iloc[idato] is not None:
+            if 'num_cast' in listado_variables_datos and datos['num_cast'].iloc[idato] is not None:
                 nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'].iloc[idato]))
             else:
                 nombre_muestreo = nombre_muestreo + '_C1' 
                 
-            if datos['botella'].iloc[idato] is not None:
+            if 'botella' in listado_variables_datos and datos['botella'].iloc[idato] is not None:
                 nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'].iloc[idato])) 
             else:
-                if datos['prof_referencia'].iloc[idato] is not None: 
+                if 'prof_referencia' in listado_variables_datos and datos['prof_referencia'].iloc[idato] is not None: 
                     nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['prof_referencia'].iloc[idato]))
                 else:
                     nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'].iloc[idato])) 
@@ -477,6 +478,17 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             if df_temp.shape[0]> 0:
                 datos['muestreo'].iloc[idato]          = df_temp['muestreo'].iloc[0]    
                 datos['io_nuevo_muestreo'].iloc[idato] = 0
+                
+                if 'id_externo' in listado_variables_datos and datos['id_externo'].iloc[idato] is not None:
+                    # Inserta en la base de datos
+                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                    cursor = conn.cursor()                      
+                    instruccion_sql = 'UPDATE muestreos_discretos SET id_externo =%s WHERE muestreo = %s;'
+                    cursor.execute(instruccion_sql, (datos['id_externo'].iloc[idato],int(datos['muestreo'].iloc[idato])))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+                
                 
             else:
                 datos['io_nuevo_muestreo'].iloc[idato] = 1
@@ -524,10 +536,10 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
         
             # # Inserta el dataframe resultante en la base de datos 
+            conn_psql        = create_engine(con_engine)
             exporta_registros.set_index('muestreo',drop=True,append=False,inplace=True)
             exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append')    
-    
-    conn_psql.dispose() # Cierra la conexión con la base de datos  
+            conn_psql.dispose() # Cierra la conexión con la base de datos  
     
     return datos
 

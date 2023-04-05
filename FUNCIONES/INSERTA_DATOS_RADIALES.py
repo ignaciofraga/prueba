@@ -27,9 +27,8 @@ puerto         = '5432'
 direccion_host = '193.146.155.99'
 programa_muestreo = 'RADIAL CORUÑA'
 
-# DATOS HISTORICOS
-
-nombre_archivo    = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/HISTORICO/HISTORICO_FINAL.xlsx'
+# DATOS HISTORICOS (1988 - 2012)
+nombre_archivo    = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/HISTORICO/HISTORICO_MODIFICADO.xlsx'
 print('Añadiendo los datos históricos')   
 INSERTA_DATOS_RADIALES_HISTORICO.inserta_radiales_historico(nombre_archivo,base_datos,usuario,contrasena,puerto,direccion_host,programa_muestreo)
 
@@ -85,7 +84,7 @@ for iarchivo in range(len(listado_archivos)):
 # # Parámetros
 anhos = [2021,2022,2023]
 ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
-
+#anhos = [2022]
 import INSERTA_DATOS_PERFILES
 for ianho in range(len(anhos)):
     anho = anhos[ianho]
