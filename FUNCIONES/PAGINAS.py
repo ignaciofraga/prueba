@@ -2231,6 +2231,8 @@ def referencias_nutrientes():
 
     if io_envio: 
 
+        st.dataframe(tabla_rmns_modificada_altos)        
+
         # Comprueba datos      
         io_consistencia = 1
         for idato in range(tabla_rmns_modificada_altos.shape[0]):
