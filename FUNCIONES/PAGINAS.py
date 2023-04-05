@@ -2256,7 +2256,7 @@ def referencias_nutrientes():
             
                 with st.spinner('Añadiendo RMN a la base de datos'):
                 
-                    instruccion_sql = 'INSERT INTO ' + nombre_tabla + ' (nombre_rmn,salinidad,ton,nitrito,silicato,fosfato,observaciones) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato);'
+                    instruccion_sql = 'INSERT INTO ' + nombre_tabla + ' (nombre_rmn,salinidad,ton,nitrito,silicato,fosfato,observaciones) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato,EXCLUDED.observaciones);'
                         
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
