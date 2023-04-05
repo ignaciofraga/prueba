@@ -1299,7 +1299,7 @@ cursor.execute(instruccion_sql)
 conn.commit()
 
 # Crea la tabla de nuevo
-listado_variables = ('(id_rmn int,'
+listado_variables = ('(id_rmn SERIAL,'
 ' nombre_rmn text NOT NULL,'
 ' salinidad NUMERIC (5, 3) NOT NULL,'
 ' ton NUMERIC (5, 3) NOT NULL,'
@@ -1309,7 +1309,7 @@ listado_variables = ('(id_rmn int,'
 ' observaciones text'
 ) 
 
-listado_unicidades = (', UNIQUE (id_rmn,nombre_rmn))')
+listado_unicidades = (', UNIQUE (nombre_rmn))')
 
 instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
 
@@ -1334,7 +1334,7 @@ cursor.execute(instruccion_sql)
 conn.commit()
 
 # Crea la tabla de nuevo
-listado_variables = ('(id_rmn int,'
+listado_variables = ('(id_rmn SERIAL,'
 ' nombre_rmn text NOT NULL,'
 ' salinidad NUMERIC (5, 3) NOT NULL,'
 ' ton NUMERIC (5, 3) NOT NULL,'
@@ -1344,7 +1344,7 @@ listado_variables = ('(id_rmn int,'
 ' observaciones text'
 ) 
 
-listado_unicidades = (', UNIQUE (id_rmn,nombre_rmn))')
+listado_unicidades = (', UNIQUE (nombre_rmn))')
 
 instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_unicidades
 

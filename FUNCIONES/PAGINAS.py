@@ -2254,7 +2254,7 @@ def referencias_nutrientes():
                 st.warning(texto_error, icon="⚠️")
             
             instruccion_sql = '''INSERT INTO rmn_alto_nutrientes (nombre_rmn,salinidad,ton,nitrito,silicato,fosfato,observaciones)
-            VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato);''' 
+            VALUES (%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato);''' 
                 
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
             cursor = conn.cursor()
