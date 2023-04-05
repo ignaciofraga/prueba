@@ -2211,23 +2211,22 @@ def referencias_nutrientes():
     contrasena       = st.secrets["postgres"].password
     puerto           = st.secrets["postgres"].port
 
-        
+    # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
+    acciones     = ['RMN Altos', 'RMN Bajos']
+    tipo_accion  = st.sidebar.radio("Seleccionar tipo de RMN ",acciones)    
+    
+    if tipo_accion == acciones[0]:
+        nombre_tabla     = 'rmn_alto_nutrientes'
+        texto_formulario = 'Nombre del RMN **ALTO**'
+        cabecera         = 'RMNs Altos'
 
-    # Recupera la tabla con los RMNs utilizados 
-    con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    conn_psql  = create_engine(con_engine)
-    tabla_rmns_altos = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn_psql)
-    tabla_rmns_bajos = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn_psql)
-    conn_psql.dispose()
-        
-
-    # Mostrar los RMNs altos disponibles en la base de datos y/o modificarlos   
-    st.subheader('RMNs Altos')
+      
+    st.subheader(cabecera)
     
     # Despliega un formulario para introducir los datos de las muestras que se están analizando
     with st.form("Formulario seleccion"):
     
-        nombre_muestras = st.text_input('Nombre del RMN **ALTO**', value="")
+        nombre_muestras = st.text_input(texto_formulario, value="")
         
         col1, col2, col3= st.columns(3,gap="small")
         with col1:
@@ -2244,7 +2243,7 @@ def referencias_nutrientes():
 
         observaciones = st.text_input('**Observaciones**', value="")    
 
-        io_envio = st.form_submit_button('Actualizar la tabla de RMNs altos') 
+        io_envio = st.form_submit_button('Actualizar la tabla de RMNs') 
 
         if io_envio: 
             
@@ -2253,20 +2252,33 @@ def referencias_nutrientes():
                 texto_error = 'IMPORTANTE. Los campos de nombre, TON, nitrito, silicato y fosfato no pueden ser nulos' 
                 st.warning(texto_error, icon="⚠️")
             
-            instruccion_sql = '''INSERT INTO rmn_alto_nutrientes (nombre_rmn,salinidad,ton,nitrito,silicato,fosfato,observaciones)
-            VALUES (%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato);''' 
-                
-            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-            cursor = conn.cursor()
-            cursor.execute(instruccion_sql,(nombre_muestras,salinidad,ton,nitrito,silicato,fosfato,observaciones))
-            conn.commit()                 
-            cursor.close()
-            conn.close()
-  
-
-                
-
+            with st.spinner('Añadiendo RMN a la base de datos'):
             
+                instruccion_sql = 'INSERT INTO ' + nombre_tabla + ' (nombre_rmn,salinidad,ton,nitrito,silicato,fosfato,observaciones) VALUES (%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato);'
+                    
+                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()
+                cursor.execute(instruccion_sql,(nombre_muestras,salinidad,ton,nitrito,silicato,fosfato,observaciones))
+                conn.commit()                 
+                cursor.close()
+                conn.close()
+
+                texto_exito = 'Referencia añadida correctamente'
+                st.success(texto_exito)            
+        
+    # Recupera la tabla con los RMNs utilizados 
+    con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    conn_psql  = create_engine(con_engine)
+    tabla_rmns_altos = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn_psql)
+    tabla_rmns_bajos = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn_psql)
+    conn_psql.dispose()                
+
+
+    if tipo_accion == acciones[0]:
+        st.dataframe(tabla_rmns_altos)
+
+         
+    st.markdown('RMNs incluidos en la base de datos')   
         # else:
 
         #     # Inserta uno a uno los registros
