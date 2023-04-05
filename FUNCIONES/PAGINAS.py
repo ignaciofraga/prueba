@@ -2223,25 +2223,49 @@ def referencias_nutrientes():
 
     # Mostrar los RMNs altos disponibles en la base de datos y/o modificarlos   
     st.subheader('RMNs Altos')
-    #with st.form("Formulario", clear_on_submit=False):
+    
+    # Despliega un formulario para introducir los datos de las muestras que se están analizando
+    with st.form("Formulario seleccion"):
+    
+        nombre_muestras = st.text_input('Nombre del RMN **ALTO**', value="")
+        
+        col1, col2, col3= st.columns(3,gap="small")
+        with col1:
+            salinidad = st.number_input('Salinidad (PSU):',value=float(35))
+            ton       = st.number_input('Nitrógeno total (µmol/L):',value=float(15))
 
-    tabla_rmns_modificada_altos = st.experimental_data_editor(tabla_rmns_altos, num_rows="dynamic",key="data_editor")
+            
+        with col2:
+            nitrito   = st.number_input('Nitrito  (µmol/L):',value=float(0.5))
+            silicato  = st.number_input('Silicato (µmol/L):',value=float(8.5))
+ 
+        with col3:
+            fosfato   = st.number_input('Fosfato  (µmol/L):',value=float(1))   
 
-    # io_envio = st.form_submit_button('Actualizar la tabla de RMNs altos') 
+        observaciones = st.text_input('**Observaciones**', value="")    
 
-    # if io_envio: 
+        io_envio = st.form_submit_button('Actualizar la tabla de RMNs altos') 
 
-    st.dataframe(tabla_rmns_modificada_altos)        
-
-    # Comprueba datos      
-    io_consistencia = 1
-    for idato in range(tabla_rmns_modificada_altos.shape[0]):
-        if tabla_rmns_modificada_altos['id_rmn'].iloc[idato] is None or tabla_rmns_modificada_altos['nombre_rmn'].iloc[idato] is None: 
-            io_consistencia = 0
+        if io_envio: 
+            
+            # Comprueba valores
+            if nombre_muestras is None or salinidad is None or ton is None or nitrito is None or silicato is None or fosfato is None:
+                texto_error = 'IMPORTANTE. Los campos de nombre, TON, nitrito, silicato y fosfato no pueden ser nulos' 
+                st.warning(texto_error, icon="⚠️")
+            
+            instruccion_sql = '''INSERT INTO rmn_alto_nutrientes (nombre_rmn,salinidad,ton,nitrito,silicato,fosfato,observaciones)
+            VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato);''' 
                 
-    if io_consistencia == 0:
-        texto_error = 'IMPORTANTE. El identificador y nombre no pueden ser nulos' 
-        st.warning(texto_error, icon="⚠️")
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()
+            cursor.execute(instruccion_sql,(nombre_muestras,salinidad,ton,nitrito,silicato,fosfato,observaciones))
+            conn.commit()                 
+            cursor.close()
+            conn.close()
+  
+
+                
+
             
         # else:
 
