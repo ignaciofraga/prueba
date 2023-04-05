@@ -460,6 +460,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         ultimo_registro_bd         = max(tabla_muestreos['muestreo'])
         datos['io_nuevo_muestreo'] = numpy.ones(datos.shape[0],dtype=int)
 
+        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        cursor = conn.cursor()
         
         for idato in range(datos.shape[0]):
             
@@ -481,20 +483,19 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 
                 if 'id_externo' in listado_variables_datos and datos['id_externo'].iloc[idato] is not None:
                     # Inserta en la base de datos
-                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                    cursor = conn.cursor()                      
+                      
                     instruccion_sql = 'UPDATE muestreos_discretos SET id_externo =%s WHERE muestreo = %s;'
                     cursor.execute(instruccion_sql, (datos['id_externo'].iloc[idato],int(datos['muestreo'].iloc[idato])))
                     conn.commit()
-                    cursor.close()
-                    conn.close()
-                
-                
+                                
             else:
                 datos['io_nuevo_muestreo'].iloc[idato] = 1
                 ultimo_registro_bd                     = ultimo_registro_bd + 1
                 datos['muestreo'].iloc[idato]       = ultimo_registro_bd 
             
+        cursor.close()
+        conn.close()
+           
         
         if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
         
