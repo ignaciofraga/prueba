@@ -1299,7 +1299,7 @@ cursor.execute(instruccion_sql)
 conn.commit()
 
 # Crea la tabla de nuevo
-listado_variables = ('(id_rmn SERIAL,'
+listado_variables = ('(id_rmn SERIAL PRIMARY KEY,'
 ' nombre_rmn text NOT NULL,'
 ' salinidad NUMERIC (5, 3) NOT NULL,'
 ' ton NUMERIC (5, 3) NOT NULL,'
@@ -1319,6 +1319,8 @@ cursor.close()
 conn.close()
 
 
+
+
 ################################################################
 ## TABLA CON LOS RMNs ALTOS UTILIZADOS EN EL ANALISIS DE NUTRIENTES ##
 ################################################################
@@ -1334,7 +1336,7 @@ cursor.execute(instruccion_sql)
 conn.commit()
 
 # Crea la tabla de nuevo
-listado_variables = ('(id_rmn SERIAL,'
+listado_variables = ('(id_rmn SERIAL PRIMARY KEY,'
 ' nombre_rmn text NOT NULL,'
 ' salinidad NUMERIC (5, 3) NOT NULL,'
 ' ton NUMERIC (5, 3) NOT NULL,'

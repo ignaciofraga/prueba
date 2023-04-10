@@ -2219,6 +2219,11 @@ def referencias_nutrientes():
         nombre_tabla     = 'rmn_alto_nutrientes'
         texto_formulario = 'Nombre del RMN **ALTO**'
         cabecera         = 'RMNs Altos'
+        
+    if tipo_accion == acciones[1]:
+        nombre_tabla     = 'rmn_bajo_nutrientes'
+        texto_formulario = 'Nombre del RMN **BAJO**'
+        cabecera         = 'RMNs Bajos'
 
       
     st.subheader(cabecera)
@@ -2275,12 +2280,14 @@ def referencias_nutrientes():
     tabla_rmns_bajos = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn_psql)
     conn_psql.dispose()                
 
-
+    st.markdown('RMNs incluidos en la base de datos')
+    
     if tipo_accion == acciones[0]:
         st.dataframe(tabla_rmns_altos)
-
+    if tipo_accion == acciones[1]:
+        st.dataframe(tabla_rmns_bajos)
          
-    st.markdown('RMNs incluidos en la base de datos')   
+       
         # else:
 
         #     # Inserta uno a uno los registros
