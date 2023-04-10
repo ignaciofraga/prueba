@@ -703,6 +703,8 @@ def consulta_botellas():
         # Asocia las propiedades biogeoquimicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
 
+        st.dataframe(df_muestreos_seleccionados)
+
         # Elimina las columnas que no interesan
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
     
