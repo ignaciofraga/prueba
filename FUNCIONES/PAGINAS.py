@@ -2220,6 +2220,7 @@ def referencias_nutrientes():
         texto_formulario = 'Nombre del RMN **ALTO**'
         cabecera         = 'RMNs Altos'
         
+        
     if tipo_accion == acciones[1]:
         nombre_tabla     = 'rmn_bajo_nutrientes'
         texto_formulario = 'Nombre del RMN **BAJO**'
