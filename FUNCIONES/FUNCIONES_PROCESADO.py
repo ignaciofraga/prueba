@@ -1247,7 +1247,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
 ######## FUNCION PARA REALIZAR LA CORRECCIÓN DE DERIVA  ########
 ################################################################
 
-def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_columna,temperatura_laboratorio):
+def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio):
     
     # Predimensiona un dataframe con los resultados de la correccion
     datos_corregidos = pandas.DataFrame(columns=variables_run)    
@@ -1276,11 +1276,11 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
         if datos_entrada['Sample ID'].iloc[idato][0:7].lower() == 'rmn low' :
             posicion_RMN_bajos[icont_bajos] = idato
             icont_bajos                     = icont_bajos + 1 
-            datos_entrada['salinidad'].iloc[idato]  = df_referencias['salinidad_rmn_bajo'][0]
+            datos_entrada['salinidad'].iloc[idato]  = df_referencias_bajas['salinidad'][0]
         if datos_entrada['Sample ID'].iloc[idato][0:8].lower() == 'rmn high':
             posicion_RMN_altos[icont_altos] = idato
             icont_altos                     = icont_altos + 1
-            datos_entrada['salinidad'].iloc[idato]  = df_referencias['salinidad_rmn_alto'][0]
+            datos_entrada['salinidad'].iloc[idato]  = df_referencias_altas['salinidad'][0]
 
     densidades = seawater.eos80.dens0(datos_entrada['salinidad'], datos_entrada['temp.lab'])
     datos_entrada['DENSIDAD'] = densidades/1000  
@@ -1306,8 +1306,8 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
         #variable_rmn    = variables_run[ivariable] + '_rmn_bajo'
         # RMN_CE_variable = df_referencias[variables_run[ivariable]].iloc[0]
         # RMN_CI_variable = df_referencias[variables_run[ivariable]].iloc[1]  
-        RMN_CE_variable = df_referencias[variables_run[ivariable] + '_rmn_bajo'].iloc[0]
-        RMN_CI_variable = df_referencias[variables_run[ivariable] + '_rmn_alto'].iloc[0]  
+        RMN_BAJO_variable = df_referencias_bajas[variables_run[ivariable]].iloc[0]
+        RMN_ALTO_variable   = df_referencias_altas[variables_run[ivariable]].iloc[0]  
         
         # Concentraciones de las muestras analizadas como referencias
         RMN_altos       = datos_entrada[variable_concentracion][posicion_RMN_altos]
@@ -1319,8 +1319,8 @@ def correccion_drift(datos_entrada,df_referencias,variables_run,rendimiento_colu
         recta_at              = numpy.zeros(datos_entrada.shape[0])
         recta_bt              = numpy.zeros(datos_entrada.shape[0])
             
-        pte_RMN      = (RMN_CI_variable-RMN_CE_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
-        t_indep_RMN  = RMN_CE_variable- pte_RMN*RMN_bajos.iloc[0] 
+        pte_RMN      = (RMN_ALTO_variable-RMN_BAJO_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
+        t_indep_RMN  = RMN_BAJO_variable- pte_RMN*RMN_bajos.iloc[0] 
     
         variable_drift = numpy.zeros(datos_entrada.shape[0])
     

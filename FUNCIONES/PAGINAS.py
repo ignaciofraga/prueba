@@ -1628,9 +1628,10 @@ def procesado_nutrientes():
         df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_programas              = psql.read_sql('SELECT * FROM programas', conn)
         df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
-        df_rmns                   = psql.read_sql('SELECT * FROM rmn_nutrientes', conn)
+        df_rmns_bajos             = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
+        df_rmns_altos             = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
         conn.close()
-        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns
+        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos
         
 
 
@@ -1643,7 +1644,7 @@ def procesado_nutrientes():
     puerto           = st.secrets["postgres"].port
     
    
-    df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns = carga_datos_procesado_nutrientes()
+    df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos = carga_datos_procesado_nutrientes()
 
     
  
@@ -1676,14 +1677,19 @@ def procesado_nutrientes():
         with st.form("Formulario", clear_on_submit=False):
               
             # Despliega un formulario para subir los archivos del AA y las referencias
-            col1, col2,col3 = st.columns(3,gap="small")
+            col1, col2,col3,col4 = st.columns(4,gap="small")
             with col1:
                 temperatura_laboratorio = st.number_input('Temperatura laboratorio:',value=20.5)
             with col2:
                 rendimiento_columna     = st.number_input('Rendimiento columna:',value=float(100),min_value=float(0),max_value=float(100))
             with col3:            
-                rmn_elegida             = st.selectbox("Selecciona los RMNs utilizados", (df_rmns['nombre_rmn']))
-                df_referencias          = df_rmns[df_rmns['nombre_rmn']==rmn_elegida]
+                rmn_elegida             = st.selectbox("Selecciona el RMN **BAJO** utilizados", (df_rmns_bajos['nombre_rmn']))
+                df_referencias_bajas    = df_rmns_bajos[df_rmns_bajos['nombre_rmn']==rmn_elegida]
+            with col4:            
+                rmn_elegida             = st.selectbox("Selecciona los RMNs utilizados", (df_rmns_altos['nombre_rmn']))
+                df_referencias_altas    = df_rmns_altos[df_rmns_altos['nombre_rmn']==rmn_elegida]
+            
+
             
             archivo_AA                  = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
             
@@ -1735,7 +1741,7 @@ def procesado_nutrientes():
             # En caso contrario procesa los datos
                         
                 # Aplica la corrección de deriva (DRIFT)                 
-                datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias,variables_run,rendimiento_columna,temperatura_laboratorio)
+                datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
                                 
                 # Calcula el NO3 como diferencia entre el TON y el NO2
                 datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
@@ -2271,7 +2277,7 @@ def referencias_nutrientes():
                     cursor.close()
                     conn.close()
     
-                    texto_exito = 'Referencia añadida correctamente'
+                    texto_exito = 'Referencia añadida o actualizada correctamente'
                     st.success(texto_exito)            
         
     # Recupera la tabla con los RMNs utilizados 
@@ -2288,79 +2294,7 @@ def referencias_nutrientes():
     if tipo_accion == acciones[1]:
         st.dataframe(tabla_rmns_bajos)
          
-       
-        # else:
 
-        #     # Inserta uno a uno los registros
-        #     instruccion_sql = '''INSERT INTO rmn_alto_nutrientes (id_rmn,nombre_rmn,salinidad,ton,nitrito,silicato,fosfato,observaciones)
-        #     VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_rmn,nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato);''' 
-            
-        #     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        #     cursor = conn.cursor()
-            
-        #     with st.spinner('Actualizando la base de datos'):
-            
-        #         for idato in range(tabla_rmns_modificada_altos.shape[0]):
-    
-        #             cursor.execute(instruccion_sql,(int(tabla_rmns_modificada_altos['id_rmn'].iloc[idato]),tabla_rmns_modificada_altos['nombre_rmn'].iloc[idato],tabla_rmns_modificada_altos['salinidad'].iloc[idato],tabla_rmns_modificada_altos['ton'].iloc[idato],tabla_rmns_modificada_altos['nitrito'].iloc[idato],tabla_rmns_modificada_altos['silicato'].iloc[idato],tabla_rmns_modificada_altos['fosfato'].iloc[idato],tabla_rmns_modificada_altos['observaciones'].iloc[idato]))
-        #             conn.commit() 
-            
-        #         cursor.close()
-        #         conn.close()
-    
-        #     texto_exito = 'Referencias actualizadas correctamente'
-        #     st.success(texto_exito)            
-    
-        #     st.cache_data.clear()
-
-
-
-
-    # # Mostrar los RMNs disponibles en la base de datos y/o modificarlos   
-    # st.subheader('RMNs Bajos')
-    # with st.form("Formulario", clear_on_submit=False):
-
-    #     tabla_rmns_modificada_bajos = st.experimental_data_editor(tabla_rmns_bajos, num_rows="dynamic",key="data_editor")
-
-    #     io_envio = st.form_submit_button('Actualizar la tabla de RMNs bajos') 
-
-    # if io_envio: 
-
-    #     # Comprueba datos      
-    #     io_consistencia = 1
-    #     df_comparacion  = tabla_rmns_bajos.compare(tabla_rmns_modificada_bajos, keep_shape=True)
-    #     if df_comparacion.shape[0] > 0:
-    #         for idato in range(df_comparacion.shape[0]):
-    #             if df_comparacion['id_rmn'].iloc[idato] is None and df_comparacion['nombre_rmn'].iloc[idato]: 
-    #                 io_consistencia = 0
-                    
-    #     if io_consistencia == 0:
-    #         texto_error = 'IMPORTANTE. El identificador y nombre no pueden ser nulos' 
-    #         st.warning(texto_error, icon="⚠️")
-            
-    #     else:
-
-    #         # Inserta uno a uno los registros
-    #         instruccion_sql = '''INSERT INTO rmn_alto_nutrientes (id_rmn,nombre_rmn,salinidad,ton,nitrito,silicato,fosfato,observaciones)
-    #         VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_rmn,nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato);''' 
-            
-    #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    #         cursor = conn.cursor()
-            
-    #         with st.spinner('Actualizando la base de datos'):
-            
-    #             for idato in range(tabla_rmns_modificada_bajos.shape[0]):
-    
-    #                 cursor.execute(instruccion_sql,(int(tabla_rmns_modificada_bajos['id_rmn'].iloc[idato]),tabla_rmns_modificada_bajos['nombre_rmn'].iloc[idato],tabla_rmns_modificada_bajos['salinidad'].iloc[idato],tabla_rmns_modificada_bajos['ton'].iloc[idato],tabla_rmns_modificada_bajos['nitrito'].iloc[idato],tabla_rmns_modificada_bajos['silicato'].iloc[idato],tabla_rmns_modificada_bajos['fosfato'].iloc[idato],tabla_rmns_modificada_bajos['observaciones'].iloc[idato]))
-    #                 conn.commit() 
-            
-    #             cursor.close()
-    #             conn.close()
-    
-    #         texto_exito = 'Referencias actualizadas correctamente'
-    #         st.success(texto_exito)            
-    
-    #         st.cache_data.clear()
 
 
 # ###############################################################################
