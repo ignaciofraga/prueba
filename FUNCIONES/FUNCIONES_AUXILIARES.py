@@ -672,7 +672,8 @@ def consulta_botellas():
     df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos.loc[:, listado_variables]
                        
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
-     
+    st.text(listado_salidas) 
+    
     if len(listado_salidas) > 0:  
   
         identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
