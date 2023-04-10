@@ -1683,11 +1683,11 @@ def procesado_nutrientes():
             with col2:
                 rendimiento_columna     = st.number_input('Rendimiento columna:',value=float(100),min_value=float(0),max_value=float(100))
             with col3:            
-                rmn_elegida             = st.selectbox("Selecciona el RMN **BAJO** utilizados", (df_rmns_bajos['nombre_rmn']))
-                df_referencias_bajas    = df_rmns_bajos[df_rmns_bajos['nombre_rmn']==rmn_elegida]
+                rmn_elegida_bajo             = st.selectbox("Selecciona el RMN **BAJO** utilizados", (df_rmns_bajos['nombre_rmn']))
+                df_referencias_bajas    = df_rmns_bajos[df_rmns_bajos['nombre_rmn']==rmn_elegida_bajo]
             with col4:            
-                rmn_elegida             = st.selectbox("Selecciona los RMNs utilizados", (df_rmns_altos['nombre_rmn']))
-                df_referencias_altas    = df_rmns_altos[df_rmns_altos['nombre_rmn']==rmn_elegida]
+                rmn_elegida_alto             = st.selectbox("Selecciona los RMNs utilizados", (df_rmns_altos['nombre_rmn']))
+                df_referencias_altas    = df_rmns_altos[df_rmns_altos['nombre_rmn']==rmn_elegida_alto]
             
 
             
@@ -1752,6 +1752,12 @@ def procesado_nutrientes():
                 datos_corregidos['silicato'][datos_corregidos['silicato']<0] = 0
                 datos_corregidos['fosfato'][datos_corregidos['fosfato']<0]   = 0
             
+                # Añade informacion de RMNs, temperaturas y rendimiento
+                datos_corregidos['rto_columna_procesado']  = rendimiento_columna
+                datos_corregidos['temp_lab_procesado']     = temperatura_laboratorio
+                datos_corregidos['rmn_bajo_procesado']     = int(rmn_elegida_bajo)
+                datos_corregidos['rmn_alto_procesado']     = int(rmn_elegida_alto)
+                
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
                 
@@ -2005,6 +2011,8 @@ def entrada_datos_excel():
         archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
             
         io_envio                    = st.form_submit_button("Procesar el archivo subido")
+        
+    st.markdown('Los datos subidos deben contener al menos información de estación, fecha de muestreo y botella o profundidad')
         
     if archivo_datos is not None and io_envio is True:
         
