@@ -28,42 +28,47 @@ contrasena     = 'm0nt34lt0'
 puerto         = '5432'
 direccion_host = '193.146.155.99'
 
-
-programa_seleccionado = 'RADIAL CANTABRICO'
-
-
-
-identificadores_salidas = [158]
-
-
+fecha_umbral = datetime.date(2018,1,1)
 
 # Recupera la tabla con los registros de los muestreos
 con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
 conn_psql        = create_engine(con_engine)
-df_datos_fisicos = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn_psql)
 df_muestreos     = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
 conn_psql.dispose()   
 
-datos_combinados = pandas.merge(df_muestreos, df_datos_fisicos, on="muestreo")
+nombre_archivo    = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/HISTORICO/HISTORICO_FINAL.xlsx' 
+datos_radiales    = pandas.read_excel(nombre_archivo, 'datos',na_values='#N/A')
 
-# Inserta en la base de datos
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()                      
-instruccion_sql = '''INSERT INTO datos_discretos_fisica (muestreo,sigmat)
-VALUES (%s,%s) ON CONFLICT (muestreo) DO UPDATE SET (sigmat) = ROW(EXCLUDED.sigmat)'''        
+# Convierte las fechas de DATE a formato correcto
+datos_radiales['Fecha'] =  pandas.to_datetime(datos_radiales['Fecha'], format='%Y%m%d').dt.date
 
-for idato in range(datos_combinados.shape[0]):
-    if datos_combinados['salinidad_ctd'].iloc[idato] is not None and datos_combinados['temperatura_ctd'].iloc[idato] is not None and datos_combinados['presion_ctd'].iloc[idato] is not None:
-        sigmat = seawater.eos80.dens(datos_combinados['salinidad_ctd'].iloc[idato], datos_combinados['temperatura_ctd'].iloc[idato], datos_combinados['presion_ctd'].iloc[idato])
-        sigmat = sigmat-1000
-        cursor.execute(instruccion_sql, (int(datos_combinados['muestreo'].iloc[idato]),sigmat))
-        conn.commit()
+datos = datos_radiales[datos_radiales['Fecha']>fecha_umbral]
 
-cursor.close()
-conn.close()
+datos['estacion'] = [None]*datos.shape[0]
+datos['prof_bd'] = [None]*datos.shape[0]
+datos['nombre_muestreo'] = [None]*datos.shape[0]
+
+for idato in range(datos.shape[0]):
+  
+    if datos['ID_estacion'].iloc[idato] == 'E2CO':
+        datos['estacion'].iloc[idato] = 1
+    if datos['ID_estacion'].iloc[idato] == 'E4CO':       
+        datos['estacion'].iloc[idato] = 5
+        
+    if datos['estacion'].iloc[idato]  == 5 or datos['estacion'].iloc[idato]  == 1:
+                
+        df_temp = df_muestreos[(df_muestreos['fecha_muestreo']==datos['Fecha'].iloc[idato]) & (df_muestreos['estacion']==datos['estacion'].iloc[idato])]
 
 
+        dif_profs     = numpy.asarray(abs(df_temp['presion_ctd'] - datos['Prof'].iloc[idato]))
+        indice_posicion = numpy.argmin(dif_profs)
 
+        datos['prof_bd'].iloc[idato] = df_temp['presion_ctd'].iloc[indice_posicion]
+        datos['nombre_muestreo'].iloc[idato] = df_temp['nombre_muestreo'].iloc[indice_posicion]
+
+datos = datos[datos['nombre_muestreo'].notna()]
+datos = datos.rename(columns={"Cla": "clorofila_a", "Clb": "clorofila_b","Clc":"clorofila_c","PP":"prod_primaria","COP":"cop", "NOP": "nop"})        					
+datos_recorte = datos[['nombre_muestreo','clorofila_a','clorofila_b','clorofila_c','prod_primaria','cop','nop']]
 
 # datos['id_muestreo']  = numpy.zeros(datos.shape[0],dtype=int)
 

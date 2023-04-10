@@ -16,6 +16,7 @@ import FUNCIONES_PROCESADO
 import INSERTA_DATOS_RADIALES_HISTORICO
 import pandas
 pandas.options.mode.chained_assignment = None
+import datetime
 
 
 
@@ -90,19 +91,39 @@ programa_muestreo = 'RADIAL CORUÑA'
 #     INSERTA_DATOS_PERFILES.inserta_radiales_historico(ruta_archivos,anho,programa_muestreo,base_datos,usuario,contrasena,puerto,direccion_host)       
 
 
+# ####################
+# # Nutrientes 21-22 #
+# ####################
+# nombre_archivo    = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/SOLO_NUTRIENTES/NUTRIENTES-21-22.xlsx'
 
-# Nutrientes 21-22
-nombre_archivo    = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/SOLO_NUTRIENTES/NUTRIENTES-21-22.xlsx'
+# datos_radiales = pandas.read_excel(nombre_archivo)
+# datos_radiales_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)  
 
-datos_radiales = pandas.read_excel(nombre_archivo)
-datos_radiales_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)  
+# # Recupera el identificador del programa de muestreo
+# id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+
+# # Encuentra el identificador asociado a cada registro
+# print('Asignando el registro correspondiente a cada medida')
+# datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+ 
+# print('Introduciendo los datos en la base de datos')
+# FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+# FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+  
+
+########################################
+# Clorofilas, prod_primaria, cop y nop #
+########################################
+
+fecha_umbral = datetime.date(2018,1,1)
+datos_radiales = INSERTA_DATOS_RADIALES_HISTORICO.recupera_id(fecha_umbral,usuario,contrasena,direccion_host,puerto,base_datos)
 
 # Recupera el identificador del programa de muestreo
 id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
 
 # Encuentra el identificador asociado a cada registro
 print('Asignando el registro correspondiente a cada medida')
-datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radiales,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
 print('Introduciendo los datos en la base de datos')
 FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
