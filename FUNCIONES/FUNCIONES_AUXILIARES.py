@@ -575,7 +575,7 @@ def consulta_botellas():
         st.write("Selecciona las variables biogeoquímicas a exportar")    
     
         # Selecciona mostrar o no datos malos y dudosos
-        col1, col2, col3 = st.columns(3,gap="small")
+        col1, col2, col3, col4 = st.columns(4,gap="small")
         with col1:
             io_fluorescencia   = st.checkbox('Fluorescencia(CTD)', value=False)
             if io_fluorescencia:
@@ -640,10 +640,33 @@ def consulta_botellas():
             if io_cdom:
                 listado_variables = listado_variables + ['cdom'] + ['cdom_qf']            
                 
-            io_clorofila           = st.checkbox('Clorofila (a)', value=False)
-            if io_clorofila:
+            io_clorofila_a         = st.checkbox('Clorofila (a)', value=False)
+            if io_clorofila_a:
                  listado_variables = listado_variables + ['clorofila_a'] + ['clorofila_a_qf']                 
-                
+  
+            io_clorofila_b         = st.checkbox('Clorofila (b)', value=False)
+            if io_clorofila_b:
+                 listado_variables = listado_variables + ['clorofila_b'] + ['clorofila_b_qf']                   
+  
+            io_clorofila_c         = st.checkbox('Clorofila (c)', value=False)
+            if io_clorofila_c:
+                 listado_variables = listado_variables + ['clorofila_c'] + ['clorofila_c_qf']    
+                 
+                 
+        with col4:
+           io_pp             = st.checkbox('Producción primaria', value=False)
+           if io_pp:
+               listado_variables = listado_variables + ['prod_primaria'] 
+               
+           io_doc           = st.checkbox('COP', value=False)
+           if io_doc:
+                listado_variables = listado_variables + ['cop'] 
+
+           io_cdom           = st.checkbox('NOP', value=False)
+           if io_cdom:
+               listado_variables = listado_variables + ['nop']           
+               
+               
                 
     # Recorta el dataframe de datos biogeoquimicos con las variables seleccionadas
     df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos.loc[:, listado_variables]
