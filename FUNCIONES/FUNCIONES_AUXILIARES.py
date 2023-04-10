@@ -672,15 +672,12 @@ def consulta_botellas():
     df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos.loc[:, listado_variables]
                        
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
-    st.text(listado_salidas) 
     
     if len(listado_salidas) > 0:  
   
         identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
         for idato in range(len(listado_salidas)):
             identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
-                
-            st.text(identificadores_salidas[idato])
             
         # Elimina las columnas que no interesan en los dataframes a utilizar
         #df_salidas_seleccion        = df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
@@ -702,8 +699,6 @@ def consulta_botellas():
                              
         # Asocia las propiedades biogeoquimicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
-
-        st.dataframe(df_muestreos_seleccionados)
 
         # Elimina las columnas que no interesan
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
