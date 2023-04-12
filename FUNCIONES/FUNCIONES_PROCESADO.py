@@ -1272,7 +1272,7 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
     icont_bajos        = 0
     icont_altos        = 0
 
-    import stramlit as st
+    import streamlit as st
     st.dataframe(df_referencias_bajas)
     st.dataframe(df_referencias_altas)
 
