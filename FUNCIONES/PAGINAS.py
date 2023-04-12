@@ -1755,8 +1755,8 @@ def procesado_nutrientes():
                 # Añade informacion de RMNs, temperaturas y rendimiento
                 datos_corregidos['rto_columna_procesado']  = rendimiento_columna
                 datos_corregidos['temp_lab_procesado']     = temperatura_laboratorio
-                datos_corregidos['rmn_bajo_procesado']     = int(rmn_elegida_bajo)
-                datos_corregidos['rmn_alto_procesado']     = int(rmn_elegida_alto)
+                datos_corregidos['rmn_bajo_procesado']     = int(df_referencias_bajas['id_rmn'].iloc[0])
+                datos_corregidos['rmn_alto_procesado']     = int(df_referencias_altas['id_rmn'].iloc[0])
                 
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
