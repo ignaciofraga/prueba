@@ -1743,14 +1743,15 @@ def procesado_nutrientes():
                 # Aplica la corrección de deriva (DRIFT)                 
                 datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
                                 
-                # # Calcula el NO3 como diferencia entre el TON y el NO2
-                datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
+                # Corrige posibles valores negativos
+                datos_corregidos['ton'][datos_corregidos['ton']<0]   = 0
+                datos_corregidos['nitrito'][datos_corregidos['nitrito']<0]   = 0
+                datos_corregidos['silicato'][datos_corregidos['silicato']<0] = 0
+                datos_corregidos['fosfato'][datos_corregidos['fosfato']<0]   = 0
             
-                # # corrige posibles valores negativos
-                # datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
-                # datos_corregidos['nitrito'][datos_corregidos['nitrito']<0]   = 0
-                # datos_corregidos['silicato'][datos_corregidos['silicato']<0] = 0
-                # datos_corregidos['fosfato'][datos_corregidos['fosfato']<0]   = 0
+                # Calcula el NO3 como diferencia entre el TON y el NO2
+                datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
+                datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
             
                 # Añade informacion de RMNs, temperaturas y rendimiento
                 datos_corregidos['rto_columna_procesado']  = rendimiento_columna
