@@ -1272,9 +1272,6 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
     icont_bajos        = 0
     icont_altos        = 0
 
-    import streamlit as st
-    st.dataframe(df_referencias_bajas)
-    st.dataframe(df_referencias_altas)
 
     for idato in range(datos_entrada.shape[0]):
         if datos_entrada['Sample ID'].iloc[idato][0:7].lower() == 'rmn low' :
