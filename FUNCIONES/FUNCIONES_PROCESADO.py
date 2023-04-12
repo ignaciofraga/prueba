@@ -1280,11 +1280,11 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
         if datos_entrada['Sample ID'].iloc[idato][0:7].lower() == 'rmn low' :
             posicion_RMN_bajos[icont_bajos] = idato
             icont_bajos                     = icont_bajos + 1 
-            datos_entrada['salinidad'].iloc[idato]  = df_referencias_bajas['salinidad'][0]
+            datos_entrada['salinidad'].iloc[idato]  = df_referencias_bajas['salinidad'].iloc[0]
         if datos_entrada['Sample ID'].iloc[idato][0:8].lower() == 'rmn high':
             posicion_RMN_altos[icont_altos] = idato
             icont_altos                     = icont_altos + 1
-            datos_entrada['salinidad'].iloc[idato]  = df_referencias_altas['salinidad'][0]
+            datos_entrada['salinidad'].iloc[idato]  = df_referencias_altas['salinidad'].iloc[0]
 
     densidades = seawater.eos80.dens0(datos_entrada['salinidad'], datos_entrada['temp.lab'])
     datos_entrada['DENSIDAD'] = densidades/1000  
