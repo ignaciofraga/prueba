@@ -2265,7 +2265,10 @@ def referencias_nutrientes():
         with col3:
             fosfato   = st.number_input('Fosfato  (µmol/L):',value=float(1))   
 
-        observaciones = st.text_input('**Observaciones**', value="")    
+        observaciones = st.text_input('**Observaciones**', value="")
+        
+        if len(observaciones) < 1:
+            observaciones = None
 
         io_envio = st.form_submit_button('Actualizar la tabla de RMNs') 
 
