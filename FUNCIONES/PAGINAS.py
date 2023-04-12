@@ -1752,6 +1752,9 @@ def procesado_nutrientes():
                 # Calcula el NO3 como diferencia entre el TON y el NO2
                 datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
                 datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
+                
+                # vuelvo a calcular el TON como NO3+NO2, por si hubiese corregido valores nulos
+                datos_corregidos['ton'] = datos_corregidos['nitrato'] + datos_corregidos['nitrito']
             
                 # Añade informacion de RMNs, temperaturas y rendimiento
                 datos_corregidos['rto_columna_procesado']  = rendimiento_columna
