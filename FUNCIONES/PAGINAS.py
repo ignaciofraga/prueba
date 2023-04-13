@@ -2012,6 +2012,7 @@ def entrada_datos_excel():
             
         archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
             
+        st.text(programa_seleccionado)
         if programa_seleccionado == 'OTROS':
             nombre_programa = st.text_input('Nombre del muestreo')
 
