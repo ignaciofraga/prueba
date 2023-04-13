@@ -2012,7 +2012,7 @@ def entrada_datos_excel():
         with col2: 
             tipo_salida           = st.selectbox('Tipo de salida',(listado_tipos_salida))
             
-        nombre_entrada      = st.text_input('Nombre del muestreo (**solo para datos del programa "Otros"**')
+        nombre_entrada      = st.text_input('Nombre del muestreo **(solo para datos del programa "Otros")**')
             
         archivo_datos       = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
             
@@ -2022,7 +2022,11 @@ def entrada_datos_excel():
         
     
     if programa_seleccionado == 'OTROS':
-        nombre_programa = nombre_entrada
+        if len(nombre_entrada) <2:
+            st.warning('El nombre del muestreo no puede ser nulo')
+            st.stop()
+        else:
+            nombre_programa = nombre_entrada
     else:
         nombre_programa = programa_seleccionado  
     
