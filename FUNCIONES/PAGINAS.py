@@ -2025,10 +2025,8 @@ def entrada_datos_excel():
         if len(nombre_entrada) <2:
             st.warning('El nombre del muestreo no puede ser nulo en datos de programa "OTROS"')
             st.stop()
-        else:
-            nombre_cabeceras = nombre_entrada
     else:
-        nombre_cabeceras = programa_seleccionado  
+        nombre_entrada = programa_seleccionado  
     
  
     if archivo_datos is not None and io_envio is True:
@@ -2068,7 +2066,7 @@ def entrada_datos_excel():
             datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
             # Encuentra las salidas al mar correspondientes  
-            datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_entrada,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
      
         # # Encuentra el identificador asociado a cada registro
         # with st.spinner('Asignando el registro correspondiente a cada medida'):
