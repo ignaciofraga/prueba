@@ -2023,7 +2023,7 @@ def entrada_datos_excel():
     
     if programa_seleccionado == 'OTROS':
         if len(nombre_entrada) <2:
-            st.warning('El nombre del muestreo no puede ser nulo')
+            st.warning('El nombre del muestreo no puede ser nulo en datos de programa "OTROS"')
             st.stop()
         else:
             nombre_programa = nombre_entrada
@@ -2070,27 +2070,27 @@ def entrada_datos_excel():
             # Encuentra las salidas al mar correspondientes  
             datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_programa,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
      
-        # Encuentra el identificador asociado a cada registro
-        with st.spinner('Asignando el registro correspondiente a cada medida'):
-            datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+        # # Encuentra el identificador asociado a cada registro
+        # with st.spinner('Asignando el registro correspondiente a cada medida'):
+        #     datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
-        # Añade datos físicos
-        if len(variables_fisica)>0:
+        # # Añade datos físicos
+        # if len(variables_fisica)>0:
                             
-            with st.spinner('Añadiendo datos físicos'):
+        #     with st.spinner('Añadiendo datos físicos'):
                 
-                FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+        #         FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
 
-        # Añade datos biogeoquímicos
-        if len(variables_bgq)>0:
+        # # Añade datos biogeoquímicos
+        # if len(variables_bgq)>0:
                             
-            with st.spinner('Añadiendo datos biogeoquímicos'):
+        #     with st.spinner('Añadiendo datos biogeoquímicos'):
 
-                FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+        #         FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
 
                 
-        texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
-        st.success(texto_exito)
+        # texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
+        # st.success(texto_exito)
         
 
 
