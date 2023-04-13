@@ -242,7 +242,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
 ###### FUNCION PARA ENCONTRAR LA SALIDA AL MAR ASOCIADA A CADA REGISTRO  ######
 ###############################################################################
 
-def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto):
+def evalua_salidas(datos,id_programa,nombre_programa,nombre_cabeceras,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto):
 
     # Recupera la tabla con los registros de muestreos físicos
     con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
@@ -297,7 +297,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                 json_estaciones        = json.dumps(estaciones_muestreadas)
                    
                 # Define nombre
-                nombre_salida = nombre_programa + ' ' + str(dias_salida_mar[idia])
+                nombre_salida = nombre_cabeceras + ' ' + str(dias_salida_mar[idia])
           
                 # Inserta en la base de datos
                 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
