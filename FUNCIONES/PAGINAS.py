@@ -2014,9 +2014,7 @@ def entrada_datos_excel():
             
         if programa_seleccionado == 'OTROS':
             nombre_programa = st.text_input('Nombre del muestreo')
-            if len(nombre_programa) < 2:
-                st.warning('El nombre del muestreo no puede ser nulo')
-                st.stop()
+
         else:
             nombre_programa = programa_seleccionado           
         
@@ -2024,7 +2022,9 @@ def entrada_datos_excel():
         
     st.markdown('Los datos subidos deben contener al menos información de estación, fecha de muestreo y botella o profundidad')
       
-    
+    if len(nombre_programa) < 2:
+        st.warning('El nombre del muestreo no puede ser nulo')
+        st.stop()    
     
     if archivo_datos is not None and io_envio is True:
         
