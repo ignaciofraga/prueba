@@ -1999,6 +1999,8 @@ def entrada_datos_excel():
     conn.close()   
     
     
+       
+    
     # Despliega menús de selección de la variable, salida y la estación a controlar                
     listado_tipos_salida  = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
     with st.form("Formulario", clear_on_submit=False):
@@ -2020,13 +2022,10 @@ def entrada_datos_excel():
             nombre_programa = programa_seleccionado           
         
         
-        io_envio                    = st.form_submit_button("Procesar el archivo subido")
+    io_envio            = st.form_submit_button("Procesar el archivo subido")
         
     st.markdown('Los datos subidos deben contener al menos información de estación, fecha de muestreo y botella o profundidad')
-      
-    if len(nombre_programa) < 2:
-        st.warning('El nombre del muestreo no puede ser nulo')
-        st.stop()    
+        
     
     if archivo_datos is not None and io_envio is True:
         
@@ -2036,8 +2035,7 @@ def entrada_datos_excel():
         variables_archivo = df_datos_importacion.columns.tolist()
         variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
         variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
-                
-                
+                                
         # Corrige el formato de las fechas
         for idato in range(df_datos_importacion.shape[0]):
             df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
