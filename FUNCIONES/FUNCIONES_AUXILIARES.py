@@ -709,6 +709,8 @@ def consulta_botellas():
         # Asocia las propiedades biogeoquimicas de cada muestreo
         df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
 
+        st.dataframe(df_muestreos_seleccionados)
+
         # Elimina las columnas que no interesan
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
     
@@ -722,11 +724,15 @@ def consulta_botellas():
         
         # Ordena los valores por fechas
         df_exporta = df_exporta.sort_values('fecha_muestreo')
+        
+        st.dataframe(df_exporta)
 
         # Elimina las columnas sin datos        
         nan_value = float("NaN")
         df_exporta.replace("", nan_value, inplace=True)
         df_exporta.dropna(how='all', axis=1, inplace=True)
+        
+        st.dataframe(df_exporta)
         
         # Añade unidades al nombre de cada variable
         listado_variables_fisicas = df_variables['variables_fisicas'].tolist() 
