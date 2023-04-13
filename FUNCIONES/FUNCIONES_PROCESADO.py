@@ -270,7 +270,53 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
         datos['mes'].iloc[idato] =  datos['fecha_muestreo'].iloc[idato].month    
         datos['año'].iloc[idato] =  datos['fecha_muestreo'].iloc[idato].year 
     
- 
+    if tipo_salida == 'PUNTUAL' and id_programa == 6: # Muestra puntual de un programa que no es estructural
+    
+        dias_salida_mar = datos['fecha_muestreo'].unique()
+        
+        for idia in range(len(dias_salida_mar)):    
+      
+            df_temporal = tabla_salidas[(tabla_salidas['fecha_salida']==dias_salida_mar[idia]) & (tabla_salidas['programa']==id_programa)]
+    
+            # Salida ya incluida en la base de datos. Recuperar identificador
+            if df_temporal.shape[0]>0:
+                id_salida = df_temporal['id_salida'].iloc[0]
+                
+            # Salida no incluida. Añadirla a la base de datos.
+            else:
+            
+                id_salida           = id_ultima_salida_bd + iconta_nueva_salida
+                iconta_nueva_salida = iconta_nueva_salida + 1
+            
+                # Encuentra las estaciones muestreadas
+                subset_salida                        = datos[datos['fecha_muestreo']==dias_salida_mar[idia]]
+                identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
+                estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
+                for iestacion in range(len(estaciones_muestreadas)):
+                    estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
+                json_estaciones        = json.dumps(estaciones_muestreadas)
+                   
+                # Define nombre
+                nombre_salida = nombre_programa + ' ' + str(dias_salida_mar[idia])
+          
+                # Inserta en la base de datos
+                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()                      
+                instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''        
+                cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,dias_salida_mar[idia],dias_salida_mar[idia],json_estaciones))
+                conn.commit()
+                cursor.close()
+                conn.close()
+                
+            # Asigna el id de la salida al dataframe
+            datos['id_salida'][datos['fecha_muestreo']==dias_salida_mar[idia]] = id_salida
+        
+        
+        
+        
+
+
     if tipo_salida == 'ANUAL':
 
         anhos_salida_mar = datos['año'].unique()
@@ -284,7 +330,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
             fecha_salida     = min(fechas_anuales)
             fecha_llegada    = max(fechas_anuales)            
             
-            df_temporal = tabla_salidas[tabla_salidas['fecha_salida']==fecha_salida]
+            df_temporal = tabla_salidas[(tabla_salidas['fecha_salida']==fecha_salida) & (tabla_salidas['programa']==id_programa)]
     
             # Salida ya incluida en la base de datos. Recuperar identificador
             if df_temporal.shape[0]>0:
@@ -347,7 +393,8 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
         
             for isalida in range(len(fechas_partida)):            
     
-                df_temporal = tabla_salidas[tabla_salidas['fecha_salida']==fechas_partida[isalida]]
+                #df_temporal = tabla_salidas[tabla_salidas['fecha_salida']==fechas_partida[isalida]]
+                df_temporal = tabla_salidas[(tabla_salidas['fecha_salida']==fechas_partida[isalida]) & (tabla_salidas['programa']==id_programa)]
         
                 # Salida ya incluida en la base de datos. Recuperar identificador
                 if df_temporal.shape[0]>0:

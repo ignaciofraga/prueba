@@ -23,14 +23,14 @@ puerto         = '5432'
 direccion_host = '193.146.155.99'
 
 # Parámetros
-programa_seleccionado = 'RADIAL CORUÑA'
-tipo_salida           = 'MENSUAL'
+programa_seleccionado = 'OTROS'
+tipo_salida           = 'PUNTUAL'
 id_config_sup     = 1
 id_config_per     = 1
 
 # Rutas de los archivos a importar  
 #archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx' 
-archivo_datos                ='C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/PRUEBAS STREAMLIT/BTL_RADCOR22.xlsx'
+archivo_datos                ='C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/PRUEBAS STREAMLIT/BTL_acuario_TEST.xlsx'
 
 # Tipo de información a introducir
 itipo_informacion = 2 # 1-nuevo muestreo 2-dato nuevo (analisis laboratorio)  3-dato re-analizado (control calidad)   
@@ -46,6 +46,7 @@ conn            = create_engine(con_engine)
 df_programas              = psql.read_sql('SELECT * FROM programas', conn)
 variables_bd              = psql.read_sql('SELECT * FROM variables_procesado', conn)
 conn.dispose() 
+
 
 
 df_datos_importacion  = pandas.read_excel(archivo_datos) 
@@ -67,10 +68,9 @@ for idato in range(df_datos_importacion.shape[0]):
 try:
     df_datos_importacion = df_datos_importacion.rename(columns={"ID": "id_externo"})
 except:
-    pass
+    texto_aviso = "Los datos importados no contienen identificador."
+    #st.warning(texto_aviso, icon="⚠️")
 
-# for idato in range(df_datos_importacion.shape[0]):
-#     df_datos_importacion['estacion'].iloc[idato] = str(df_datos_importacion['estacion'].iloc[idato])
 
 
 # Realiza un control de calidad primario a los datos importados   
@@ -80,17 +80,29 @@ datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_i
 id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
 
 
-print('Asignando la estación y salida al mar de cada medida')
+
 # Encuentra la estación asociada a cada registro
 datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
 # Encuentra las salidas al mar correspondientes  
+programa_seleccionado = 'MUESTRAS ACUARIO'
 datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
  
-# Encuentra el identificador asociado a cada registro
-print('Asignando el registro correspondiente a cada medida')
-datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+## Encuentra el identificador asociado a cada registro
+#datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
      
+# # Añade datos físicos
+# if len(variables_fisica)>0:
+        
+#     FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
 
+# # Añade datos biogeoquímicos
+# if len(variables_bgq)>0:
+
+#     FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+
+        
+# texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
+# #st.success(texto_exito)
 
 

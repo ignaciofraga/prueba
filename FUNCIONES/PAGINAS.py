@@ -1683,17 +1683,17 @@ def procesado_nutrientes():
             with col2:
                 rendimiento_columna     = st.number_input('Rendimiento columna:',value=float(100),min_value=float(0),max_value=float(100))
             with col3:            
-                rmn_elegida_bajo             = st.selectbox("Selecciona el RMN **BAJO** utilizados", (df_rmns_bajos['nombre_rmn']))
+                rmn_elegida_bajo             = st.selectbox("Selecciona RMN **BAJO**", (df_rmns_bajos['nombre_rmn']))
                 df_referencias_bajas    = df_rmns_bajos[df_rmns_bajos['nombre_rmn']==rmn_elegida_bajo]
             with col4:            
-                rmn_elegida_alto             = st.selectbox("Selecciona los RMNs utilizados", (df_rmns_altos['nombre_rmn']))
+                rmn_elegida_alto             = st.selectbox("Selecciona RMN **ALTO**", (df_rmns_altos['nombre_rmn']))
                 df_referencias_altas    = df_rmns_altos[df_rmns_altos['nombre_rmn']==rmn_elegida_alto]
             
 
             
             archivo_AA                  = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
             
-            io_add_data                 = st.checkbox('Añadir datos procesados a la base de datos')
+            io_add_data                 = st.checkbox('Añadir datos procesados a la base de datos',value=True)
                             
             io_envio                    = st.form_submit_button("Procesar el archivo subido")        
         
@@ -1776,13 +1776,12 @@ def procesado_nutrientes():
                                 
                 # Comprueba si en la base da datos ya hay registros de esa salida con QF de nutrientes
                 for ivariable_procesada in range(len(variables_procesado_bd)):
-                    nombre_variable_qf = variables_procesado_bd[ivariable_procesada] + '_qf'
-                    
-                    if datos_corregidos[nombre_variable_qf].isnull().all():
-                        pass
-                    else:
-                        texto = 'La base de datos contiene QF de ' + variables_procesado_bd[ivariable_procesada] + ' correspondientes a las muestras procesadas. Revisar y actualizar los flags.'
-                        st.warning(texto, icon="⚠️")
+                    # nombre_variable_qf = variables_procesado_bd[ivariable_procesada] + '_qf'                    
+                    # if datos_corregidos[nombre_variable_qf].isnull().all():
+                    #     pass
+                    # else:
+                    #     texto = 'La base de datos contiene QF de ' + variables_procesado_bd[ivariable_procesada] + ' correspondientes a las muestras procesadas. Revisar y actualizar los flags.'
+                    #     st.warning(texto, icon="⚠️")
                         
                     #reduce los decimales 
                     datos_corregidos[variables_procesado_bd[ivariable_procesada]]=round(datos_corregidos[variables_procesado_bd[ivariable_procesada]],3)
@@ -2001,8 +2000,7 @@ def entrada_datos_excel():
     
     
     # Despliega menús de selección de la variable, salida y la estación a controlar                
-    listado_tipos_salida               = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
-    
+    listado_tipos_salida  = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
     with st.form("Formulario", clear_on_submit=False):
     
         col1, col2 = st.columns(2,gap="small")
@@ -2014,10 +2012,20 @@ def entrada_datos_excel():
             
         archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
             
+        if programa_seleccionado == 'OTROS':
+            nombre_programa = st.text_input('Nombre del muestreo')
+            if len(nombre_programa) < 2:
+                st.warning('El nombre del muestreo no puede ser nulo')
+                st.stop()
+        else:
+            nombre_programa = programa_seleccionado           
+        
         io_envio                    = st.form_submit_button("Procesar el archivo subido")
         
     st.markdown('Los datos subidos deben contener al menos información de estación, fecha de muestreo y botella o profundidad')
-        
+      
+    
+    
     if archivo_datos is not None and io_envio is True:
         
         df_datos_importacion  = pandas.read_excel(archivo_datos) 
@@ -2056,7 +2064,7 @@ def entrada_datos_excel():
             datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
             # Encuentra las salidas al mar correspondientes  
-            datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_programa,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
      
         # Encuentra el identificador asociado a cada registro
         with st.spinner('Asignando el registro correspondiente a cada medida'):
