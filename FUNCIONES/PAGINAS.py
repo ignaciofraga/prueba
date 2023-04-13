@@ -2012,21 +2012,21 @@ def entrada_datos_excel():
         with col2: 
             tipo_salida           = st.selectbox('Tipo de salida',(listado_tipos_salida))
             
-        archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
+        nombre_entrada      = st.text_input('Nombre del muestreo (**solo para datos del programa "Otros"**')
             
-        st.text(programa_seleccionado)
-        if programa_seleccionado == 'OTROS':
-            nombre_programa = st.text_input('Nombre del muestreo')
-
-        else:
-            nombre_programa = programa_seleccionado           
-        
-        
+        archivo_datos       = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
+            
         io_envio            = st.form_submit_button("Procesar el archivo subido")
         
     st.markdown('Los datos subidos deben contener al menos información de estación, fecha de muestreo y botella o profundidad')
         
     
+    if programa_seleccionado == 'OTROS':
+        nombre_programa = nombre_entrada
+    else:
+        nombre_programa = programa_seleccionado  
+    
+ 
     if archivo_datos is not None and io_envio is True:
         
         df_datos_importacion  = pandas.read_excel(archivo_datos) 
