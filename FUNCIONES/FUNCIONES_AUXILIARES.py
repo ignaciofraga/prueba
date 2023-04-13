@@ -511,10 +511,8 @@ def consulta_botellas():
  
     with col1: 
         programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
-        
-        
-        
-        df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
+        id_programa_seleccionado  = int(df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0])
+        df_salidas_seleccion      = df_salidas[df_salidas['programa']==id_programa_seleccionado]
         
     
     with col2:

@@ -88,8 +88,8 @@ datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_pro
 programa_seleccionado = 'MUESTRAS ACUARIO'
 datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
  
-## Encuentra el identificador asociado a cada registro
-#datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+# Encuentra el identificador asociado a cada registro
+datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
      
 # # Añade datos físicos
 # if len(variables_fisica)>0:
