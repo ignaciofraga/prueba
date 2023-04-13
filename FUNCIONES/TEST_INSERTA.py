@@ -99,7 +99,7 @@ datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abrevia
 # # Añade datos biogeoquímicos
 # if len(variables_bgq)>0:
 
-#     FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
 
         
 # texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
