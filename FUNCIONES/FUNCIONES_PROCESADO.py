@@ -162,8 +162,8 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     estaciones_muestreadas                      = pandas.DataFrame(data=estaciones_muestreadas,columns=['estacion'])  
     estaciones_muestreadas['id_estacion']       = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
     estaciones_muestreadas['io_nueva_estacion'] = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-    estaciones_muestreadas['latitud_estacion']  = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-    estaciones_muestreadas['longitud_estacion'] = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
+    estaciones_muestreadas['latitud_estacion']  = [None]*estaciones_muestreadas.shape[0]
+    estaciones_muestreadas['longitud_estacion'] = [None]*estaciones_muestreadas.shape[0]
     estaciones_muestreadas = estaciones_muestreadas.rename(columns={"estacion":"nombre_estacion"})
 
 
@@ -187,9 +187,9 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             estaciones_muestreadas['id_estacion'][iestacion]       = df_temporal['id_estacion'].iloc[0]
             
             # Asigna lat/lon a la medida si ésta no la tenía
-            if io_lat == 1:
+            if 'latitud' not in listado_variables:
                 datos['latitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['latitud_estacion'].iloc[0] 
-            if io_lon == 1:
+            if 'longitud' not in listado_variables:
                 datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['longitud_estacion'].iloc[0] 
             
              
@@ -200,8 +200,10 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             iconta_nueva_estacion                                 = iconta_nueva_estacion + 1
   
             # Determina la lat/lon de la estacion a partir de los valores de los registros asociados
-            estaciones_muestreadas['latitud_estacion'][iestacion]  = (datos['latitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
-            estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
+            if 'latitud' in listado_variables:
+                estaciones_muestreadas['latitud_estacion'][iestacion]  = (datos['latitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
+            if 'longitud' in listado_variables:
+                estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
           
         # Asigna el identificador de estación a los datos importados
         datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]=estaciones_muestreadas['id_estacion'][iestacion]
