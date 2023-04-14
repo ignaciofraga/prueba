@@ -494,14 +494,16 @@ def consulta_botellas():
         df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
         df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
         df_variables            = psql.read_sql('SELECT * FROM variables_procesado', conn)
+        df_rmn_altos            = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
+        df_rmn_bajos            = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
         conn.close() 
-        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_variables
+        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_variables,df_rmn_altos,df_rmn_bajos
            
     st.subheader('Consulta los datos de botellas disponibles') 
 
 
     # carga de la caché los datos 
-    df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_variables = carga_datos_consulta_botellas()
+    df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_variables,df_rmn_altos,df_rmn_bajos = carga_datos_consulta_botellas()
 
     listado_programas       = df_programas['nombre_programa'].tolist()
     id_radiales             = listado_programas.index('RADIAL CORUÑA')
@@ -667,7 +669,9 @@ def consulta_botellas():
            if io_cdom:
                listado_variables = listado_variables + ['nop']           
                
-               
+           io_parametros_nutrientes = st.checkbox('Parametros análisis nutrientes', value=False)
+           if io_parametros_nutrientes:
+               listado_variables = listado_variables + ['rmn_alto_procesado']  + ['rmn_bajo_procesado']  + ['temp_lab_procesado'] + ['rto_columna_procesado']  + ['tubo_nutrientes']  
                 
     # Recorta el dataframe de datos biogeoquimicos con las variables seleccionadas
     df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos.loc[:, listado_variables]
@@ -707,6 +711,17 @@ def consulta_botellas():
         df_temp  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
         if df_temp.shape[0]!=0:
             df_muestreos_seleccionados = df_temp
+            
+        # Si se quieren recuperar los parámetros de muestreo de nutrientes, componer el nombre de los rmns utilizados
+        if io_parametros_nutrientes:
+            df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"rmn_alto_procesado": "rmn_alto_procesado_temp","rmn_bajo_procesado": "rmn_bajo_procesado_temp"})
+            df_muestreos_seleccionados['rmn_alto_procesado'] = [None]*df_muestreos_seleccionados.shape[0]
+            df_muestreos_seleccionados['rmn_bajo_procesado'] = [None]*df_muestreos_seleccionados.shape[0]
+            for idato in range(df_muestreos_seleccionados.shape[0]):
+                if df_muestreos_seleccionados['rmn_alto_procesado_temp'].iloc[idato] is not None and df_muestreos_seleccionados['rmn_bajo_procesado_temp'].iloc[idato] is not None:
+                    df_muestreos_seleccionados['rmn_alto_procesado'].iloc[idato] = df_rmn_altos['nombre_rmn'][df_rmn_altos['id_rmn']==int(df_muestreos_seleccionados['rmn_alto_procesado_temp'].iloc[idato])]
+                    df_muestreos_seleccionados['rmn_bajo_procesado'].iloc[idato] = df_rmn_bajos['nombre_rmn'][df_rmn_bajos['id_rmn']==int(df_muestreos_seleccionados['rmn_bajo_procesado_temp'].iloc[idato])]
+
             
         # Elimina las columnas que no interesan
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
