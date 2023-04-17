@@ -1323,11 +1323,11 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
 
 
     for idato in range(datos_entrada.shape[0]):
-        if datos_entrada['Sample ID'].iloc[idato][0:7].lower() == 'rmn low' :
+        if datos_entrada['Sample ID'].iloc[idato] is not None and datos_entrada['Sample ID'].iloc[idato][0:7].lower() == 'rmn low' :
             posicion_RMN_bajos[icont_bajos] = idato
             icont_bajos                     = icont_bajos + 1 
             datos_entrada['salinidad'].iloc[idato]  = df_referencias_bajas['salinidad'].iloc[0]
-        if datos_entrada['Sample ID'].iloc[idato][0:8].lower() == 'rmn high':
+        if datos_entrada['Sample ID'].iloc[idato] is not None and datos_entrada['Sample ID'].iloc[idato][0:8].lower() == 'rmn high':
             posicion_RMN_altos[icont_altos] = idato
             icont_altos                     = icont_altos + 1
             datos_entrada['salinidad'].iloc[idato]  = df_referencias_altas['salinidad'].iloc[0]
