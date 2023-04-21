@@ -369,7 +369,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
             datos['id_salida'][datos['año']==anhos_salida_mar[ianho]] = id_salida
     
             
-    if tipo_salida == 'MENSUAL' : # Programa radiales Coruña
+    if tipo_salida == 'MENSUAL' : # Programas radiales
 
         anhos_salida_mar = datos['año'].unique()
         
@@ -409,7 +409,12 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                     iconta_nueva_salida = iconta_nueva_salida + 1
                 
                     # Encuentra las estaciones muestreadas
-                    subset_salida                        = datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]
+                    #subset_salida                        = datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]
+                    
+                    subset_salida = datos[(datos['fecha_muestreo']>=fechas_partida[isalida]) & (datos['fecha_muestreo']<=fechas_regreso[isalida])]
+                    
+                    
+                    
                     identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
                     estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
                     for iestacion in range(len(estaciones_muestreadas)):
@@ -417,14 +422,14 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                     json_estaciones        = json.dumps(estaciones_muestreadas)
                        
                     # Define nombre
-                    nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_salidas_mar[isalida].month-1]) + ' ' +  str(fechas_salidas_mar[isalida].year)
-              
+                    nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_partida[isalida].month-1]) + ' ' +  str(fechas_partida[isalida].year)
+                           
                     # Inserta en la base de datos
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()                      
                     instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
                     VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''        
-                    cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_salidas_mar[isalida],fechas_salidas_mar[isalida],json_estaciones))
+                    cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_partida[isalida],fechas_regreso[isalida],json_estaciones))
                     conn.commit()
                     cursor.close()
                     conn.close()
@@ -433,8 +438,8 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                 if id_programa == 3:
                     datos['id_salida'][datos['fecha_muestreo']==fechas_salidas_mar[isalida]] = id_salida
                 if id_programa == 4:                
-                    datos['id_salida'][(datos['año']==anhos_salida_mar[ianho]) & (datos['mes']==fechas_partida[isalida].month)] = id_salida
-      
+                    #datos['id_salida'][(datos['año']==anhos_salida_mar[ianho]) & (datos['mes']==fechas_partida[isalida].month)] = id_salida
+                    datos['id_salida'][(datos['fecha_muestreo']>=fechas_partida[isalida]) & (datos['fecha_muestreo']<=fechas_regreso[isalida])]  = id_salida
     return datos
 
 
