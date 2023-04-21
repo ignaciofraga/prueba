@@ -147,15 +147,11 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     estaciones_programa['id_temp'] = indices_dataframe
     estaciones_programa.set_index('id_temp',drop=True,append=False,inplace=True)
     
-    io_lat = 0
-    io_lon = 0
     listado_variables = datos.columns.tolist()
     if 'latitud' not in listado_variables:
         datos['latitud'] = [None]*datos.shape[0]
-        io_lat           = 1
     if 'longitud' not in listado_variables:
-        datos['longitud'] = [None]*datos.shape[0]
-        io_lon            = 1    
+        datos['longitud'] = [None]*datos.shape[0]   
         
     # Genera un dataframe con las estaciones incluidas en el muestreo
     estaciones_muestreadas                      = datos['estacion'].unique()
