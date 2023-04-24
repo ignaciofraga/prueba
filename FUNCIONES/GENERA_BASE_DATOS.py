@@ -245,13 +245,9 @@ direccion_host = '193.146.155.99'
 # # Crea la tabla de nuevo
 # listado_variables = ('(id_config_superficie int PRIMARY KEY,'
 # ' buque int NOT NULL,'
-# ' centro_asociado int,'
-# ' fecha_inicio date,'
 # ' sensor_tsg text,'
 # ' num_serie_tsg text,'
-# ' propietario_tsg text,'
 # ' fecha_calibracion_tsg date,'
-# ' ruta_configuracion_tsg text,'
 # ' sensor_ph text,'
 # ' num_serie_ph text,'
 # ' fecha_calibracion_ph date,'
@@ -266,19 +262,13 @@ direccion_host = '193.146.155.99'
 # ' fecha_calibracion_pco2 date,'
 # ) 
 
-# listado_dependencias = ('FOREIGN KEY (centro_asociado)'
-#   'REFERENCES centros_oceanograficos (id_centro)'
-#   ' ON UPDATE CASCADE '
-#   'ON DELETE CASCADE,'
-#   'FOREIGN KEY (buque)'
+# listado_dependencias = ('FOREIGN KEY (buque)'
 #   'REFERENCES buques (id_buque)'
 #   'ON UPDATE CASCADE ON DELETE CASCADE'
 #   )
 
 
-# listado_unicidades = (', UNIQUE (buque,centro_asociado,fecha_inicio,sensor_tsg,num_serie_tsg,sensor_ph,num_serie_ph,sensor_oxigeno,num_serie_oxigeno,sensor_fluorescencia,num_serie_fluorescencia,sensor_pco2,num_serie_pco2))')
-
-# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+# instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias 
 
 
 # cursor.execute(instruccion_sql)

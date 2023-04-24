@@ -1065,6 +1065,7 @@ def entrada_condiciones_ambientales():
         # recupera los datos disponibles en la base de datos para asignar valores por defecto
         df_condicion_introducida = df_condiciones[(df_condiciones['salida']==id_salida) & (df_condiciones['estacion']==id_estacion_elegida)]               
     
+        st.dataframe(df_condicion_introducida)
         
         if df_condicion_introducida.shape[0] == 1:
             

@@ -1012,7 +1012,7 @@ def menu_metadatos_radiales(fecha_salida_defecto,hora_defecto_inicio,fecha_regre
         id_configurador_perfil = id_perfil_previo
         
     if id_sup_previo is None:
-        id_configurador_sup = 1
+        id_configurador_sup = 2
     else:
         id_configurador_sup = id_sup_previo
 
