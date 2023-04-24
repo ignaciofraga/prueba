@@ -880,7 +880,7 @@ def entrada_salidas_mar():
                 df_salidas_radiales['Buque'].iloc[isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]].iloc[0]
 
         # Elimina las columnas que no interesa mostrar
-        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','buque'])
+        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','buque','configuracion_perfilador','configuracion_superficie'])
     
         # Renombra las columnas
         df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados'})
@@ -891,7 +891,7 @@ def entrada_salidas_mar():
             df_salidas_radiales['Fecha retorno'].iloc[idato]  =  df_salidas_radiales['Fecha retorno'].iloc[idato].strftime("%Y-%m-%d")
 
         # Ordena los valores por fechas
-        df_salidas_radiales = df_salidas_radiales.sort_values('Fecha salida')
+        df_salidas_radiales = df_salidas_radiales.sort_values('Fecha salida',ascending=False)
 
         # Mueve los identificadores de muestreo al final del dataframe
         listado_cols = df_salidas_radiales.columns.tolist()
@@ -1163,6 +1163,7 @@ def entrada_condiciones_ambientales():
             with col3:
                  altura_ola  = st.number_input('Altura de ola (m):',value=float(altura_ola_defecto),min_value=float(0),step =0.5)
                  for idato_estado in range(len(estado_mar_nombre)):
+                     indice_prop = estado_mar_nombre.shape[0]
                      if altura_ola >= estado_mar_hmin[idato_estado] and altura_ola <= estado_mar_hmax[idato_estado]:
                          indice_prop = idato_estado
                  #mar_douglas = st.selectbox('Mar Douglas:',(douglas_nombre),index=indice_prop)

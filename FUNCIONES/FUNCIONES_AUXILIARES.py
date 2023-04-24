@@ -997,29 +997,44 @@ def menu_metadatos_radiales(fecha_salida_defecto,hora_defecto_inicio,fecha_regre
 
         hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto_final)
     
-    
-    
-    # Bloque de buque y configuracion
-    col1, col2, col3 = st.columns(3,gap="small")    
 
-    with col1:  
-        if id_buque_previo is None:
-            buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']))
-        else:
-            buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']),index=int(id_buque_previo))            
-        id_buque_elegido = int(df_buques['id_buque'][df_buques['nombre_buque']==buque_elegido].values[0])               
-    
-    with col2:     
-        if id_perfil_previo is None:
-            id_configurador_perfil     = st.selectbox('Id.configuracion perfilador',(df_config_perfilador['id_config_perfil']))            
-        else:
-            id_configurador_perfil     = st.selectbox('Id.configuracion perfilador',(df_config_perfilador['id_config_perfil']),index=int(id_perfil_previo))
+    # Seleccion de buque
+    if id_buque_previo is None:
+        buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']))
+    else:
+        buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']),index=int(id_buque_previo))            
+    id_buque_elegido = int(df_buques['id_buque'][df_buques['nombre_buque']==buque_elegido].values[0])               
 
-    with col3:
-        if id_sup_previo is None:
-            id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_superficie['id_config_superficie']))
-        else:
-            id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_superficie['id_config_superficie']),index=int(id_sup_previo))            
+    # Asigna la configuracion de los muestreos
+    if id_perfil_previo is None:
+        id_configurador_perfil = 7 
+        
+    if id_sup_previo is None:
+        id_configurador_sup = 1
+
+    
+    
+    # # Bloque de buque y configuracion
+    # col1, col2, col3 = st.columns(3,gap="small")    
+
+    # with col1:  
+    #     if id_buque_previo is None:
+    #         buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']))
+    #     else:
+    #         buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']),index=int(id_buque_previo))            
+    #     id_buque_elegido = int(df_buques['id_buque'][df_buques['nombre_buque']==buque_elegido].values[0])               
+    
+    # with col2:     
+    #     if id_perfil_previo is None:
+    #         id_configurador_perfil     = st.selectbox('Id.configuracion perfilador',(df_config_perfilador['id_config_perfil']))            
+    #     else:
+    #         id_configurador_perfil     = st.selectbox('Id.configuracion perfilador',(df_config_perfilador['id_config_perfil']),index=int(id_perfil_previo))
+
+    # with col3:
+    #     if id_sup_previo is None:
+    #         id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_superficie['id_config_superficie']))
+    #     else:
+    #         id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_superficie['id_config_superficie']),index=int(id_sup_previo))            
 
     # Bloque de personal
     
