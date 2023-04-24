@@ -1008,9 +1008,13 @@ def menu_metadatos_radiales(fecha_salida_defecto,hora_defecto_inicio,fecha_regre
     # Asigna la configuracion de los muestreos
     if id_perfil_previo is None:
         id_configurador_perfil = 7 
+    else:
+        id_configurador_perfil = id_perfil_previo
         
     if id_sup_previo is None:
         id_configurador_sup = 1
+    else:
+        id_configurador_sup = id_sup_previo
 
     
     
