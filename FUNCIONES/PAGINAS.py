@@ -1214,8 +1214,8 @@ def entrada_condiciones_ambientales():
                     texto_exito = 'Datos de las estación ' + estacion_elegida + ' durante la salida '  + salida  + ' actualizados correctamente'
                     
             st.success(texto_exito)                
-                
-            st.cache_data.clear()
+                 
+        st.cache_data.clear()
                 
     # Descarga datos ambientales
     if tipo_entrada == entradas[1]:    
