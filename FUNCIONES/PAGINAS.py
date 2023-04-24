@@ -1188,7 +1188,7 @@ def entrada_condiciones_ambientales():
                 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                 cursor = conn.cursor()
                 
-                if io_previo == 0:
+                if io_previo == 1:
  
                     instruccion_sql_consulta = '''SELECT id_condicion FROM condiciones_ambientales_muestreos WHERE salida = %s and estacion = %s ''' 
                     cursor.execute(instruccion_sql_consulta, (int(id_salida),int(id_estacion_elegida)))
