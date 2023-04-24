@@ -1712,6 +1712,11 @@ def procesado_nutrientes():
             # Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
             df_datos_disponibles  = pandas.merge(df_datos_fisicos, df_muestreos, on="muestreo")            
             
+            # Adapta el nombre de las sw
+            for idato in range(datos_AA.shape[0]):
+                if datos_AA['Sample ID'].iloc[idato][0:2].lower()=='sw':
+                   datos_AA['Sample ID'].iloc[idato] ='sw' 
+            
             # Encuentra las posiciones de las referencias de sw
             indices_referencias = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='sw']) - 1
             # Agrupa en dos tandas, las iniciales y las finales
