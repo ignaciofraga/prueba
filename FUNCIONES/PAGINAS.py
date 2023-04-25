@@ -1493,7 +1493,7 @@ def entrada_archivos_roseta():
                                  
                                  st.dataframe(df_botella)
                                  
-                                 df_botella = df_botella.drop(columns = ['c0S/m','sigma-é00','flag'])
+                                 df_botella = df_botella.drop(columns = ['c0S/m','flag'])
                                  try:
                                      df_botella = df_botella.drop(columns = ['sbeox0V','sbeox0ML/L'])
                                      df_botella['oxigeno_ctd_qf']   = 1
