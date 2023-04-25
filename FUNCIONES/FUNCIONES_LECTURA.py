@@ -434,7 +434,7 @@ def lectura_archivo_perfiles(datos_archivo):
                 if nombre_variable == 'sbeox0Mm/Kg': 
                     nombre_variable = 'oxigeno_ctd'   
                 if nombre_variable == 'sigma-é00': 
-                    nombre_variable = 'sigmat_ctd'   
+                    nombre_variable = 'sigmat'   
                 
                 listado_variables  = listado_variables + [nombre_variable]
                             
