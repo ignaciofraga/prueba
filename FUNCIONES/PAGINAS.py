@@ -1790,7 +1790,7 @@ def procesado_nutrientes():
                 for ivariable_procesada in range(len(variables_run)):
                         
                     #reduce los decimales 
-                    datos_corregidos[variables_procesado_bd[ivariable_procesada]]=round(datos_corregidos[variables_procesado_bd[ivariable_procesada]],3)
+                    datos_corregidos[variables_run[ivariable_procesada]]=round(datos_corregidos[variables_run[ivariable_procesada]],3)
                         
                     # Añade qf a los datos, asignando a las variables procesadas un qf de valor 1 (no evaluado)
                     variables_run_qf                                        = variables_run_qf + [variables_run[ivariable_procesada] + '_qf']
