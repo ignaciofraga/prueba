@@ -1395,6 +1395,8 @@ def entrada_archivos_roseta():
                         ### DATOS DE BOTELLERO ###
                         mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_btl,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
            
+                        st.dataframe(datos_botellas) 
+           
                         # Asigna lat/lon de la estación si esa información no etá incluia en el .btl
                         for imuestreo in range(datos_botellas.shape[0]):
                             if datos_botellas['latitud'].iloc[imuestreo] is None:
