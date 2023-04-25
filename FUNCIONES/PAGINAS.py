@@ -1394,19 +1394,14 @@ def entrada_archivos_roseta():
                     
                         ### DATOS DE BOTELLERO ###
                         mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_btl,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
-           
-                        st.dataframe(datos_botellas) 
-           
+                      
                         # Asigna lat/lon de la estación si esa información no etá incluia en el .btl
                         for imuestreo in range(datos_botellas.shape[0]):
                             if datos_botellas['latitud'].iloc[imuestreo] is None:
                                 datos_botellas['latitud'].iloc[imuestreo] = tabla_estaciones_programa['latitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
                             if datos_botellas['longitud'].iloc[imuestreo] is None:
                                 datos_botellas['longitud'].iloc[imuestreo] = tabla_estaciones_programa['longitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
-                     
-           
-            
-           
+                                
                         # Asigna identificadores de salida al mar y estación
                         datos_botellas['id_estacion_temp'] = datos_botellas['estacion']
                         datos_botellas ['id_salida']       =  id_salida
@@ -1491,7 +1486,6 @@ def entrada_archivos_roseta():
                                  df_botella['prof_referencia']        = 0
                                  df_botella['fecha_muestreo']         = fecha_muestreo
                                  
-                                 st.dataframe(df_botella)
                                  
                                  df_botella = df_botella.drop(columns = ['c0S/m','flag'])
                                  try:
