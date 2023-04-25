@@ -25,7 +25,7 @@ import numpy
 import seawater
 
 
-archivo_AA   = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/PRUEBAS STREAMLIT/RADCAN2017/220809A_RADACAN2017profR1R1.xlsx'
+archivo_AA   = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/PRUEBAS STREAMLIT/RADCAN2017/220909_RCAN17_julago_prof_NO2R1R1.xlsx'
 
 #archivo_resultados   = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/PRUEBAS STREAMLIT/RADCOR_2022.xlsm'
 #datos_res            = pandas.read_excel(archivo_resultados,sheet_name='DatosFinales',skiprows=1) 
@@ -54,13 +54,17 @@ df_referencias_bajas = df_rmns_bajos[df_rmns_bajos['nombre_rmn']=='CE']
 variables_procesado    = ['TON','Nitrato','Nitrito','Silicato','Fosfato']    
 variables_procesado_bd = ['ton','nitrato','nitrito','silicato','fosfato']
 variables_unidades     = ['\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg']
-variables_run = ['ton','nitrito','silicato','fosfato']
+canales_autoanalizador = ['ton','nitrito','silicato','fosfato']
 
 
 # Lectura del archivo con los resultados del AA
 datos_AA              = pandas.read_excel(archivo_AA,skiprows=15)            
-datos_AA              = datos_AA.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
+datos_AA              = datos_AA.rename(columns={"Results 1":canales_autoanalizador[0],"Results 2":canales_autoanalizador[1],"Results 3":canales_autoanalizador[2],"Results 4":canales_autoanalizador[3]})
       
+# Identifica qué canales/variables se han procesado
+variables_procesadas = datos_AA.columns.tolist()
+variables_run        = list(set(variables_procesadas).intersection(variables_procesado_bd))
+
 # Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
 df_datos_disponibles  = pandas.merge(df_datos_fisicos, df_muestreos, on="muestreo")            
 
@@ -78,32 +82,34 @@ listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i 
 ref_inicial        = listado_refs[0][-1] + 1
 ref_final          = listado_refs[1][0]
 
-# # Encuentra la salinidad de cada muestra
-# datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
-# datos_AA['io_procesado']  = None
-# for idato in range(ref_inicial,ref_final):
-#     if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
+# Encuentra la salinidad de cada muestra
+datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
+datos_AA['io_procesado']  = None
+for idato in range(ref_inicial,ref_final):
+    if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
  
-#         id_temp = df_datos_disponibles['muestreo'][df_datos_disponibles['id_externo']==datos_AA['Sample ID'].iloc[idato]]
+        id_temp = df_datos_disponibles['muestreo'][df_datos_disponibles['id_externo']==datos_AA['Sample ID'].iloc[idato]]
             
-#         if len(id_temp) > 0:
-#             datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
-#             datos_AA['io_procesado'].iloc[idato]  = 1
-#         # else:
-#         #     texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
-#         #     st.warning(texto_error, icon="⚠️")                        
+        if len(id_temp) > 0:
+            datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
+            datos_AA['io_procesado'].iloc[idato]  = 1
+        # else:
+        #     texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
+        #     st.warning(texto_error, icon="⚠️")                        
    
-# # comprobación por si no hay ningún dato a procesar
-# if datos_AA['io_procesado'].isnull().all():
-#     texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
-#     # st.warning(texto_error, icon="⚠️")          
+# comprobación por si no hay ningún dato a procesar
+if datos_AA['io_procesado'].isnull().all():
+    texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
+    # st.warning(texto_error, icon="⚠️")          
    
-# else:
+else:
     
-# # En caso contrario procesa los datos
+   
+    
+# En caso contrario procesa los datos
             
-#     # # Aplica la corrección de deriva (DRIFT)                 
-#     # datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
+    # # Aplica la corrección de deriva (DRIFT)                 
+    datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
 #     datos_entrada = datos_AA                
     
     

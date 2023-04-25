@@ -1676,8 +1676,7 @@ def procesado_nutrientes():
         
         st.subheader('Procesado de datos de nutrientes')
         
-        variables_run = ['ton','nitrito','silicato','fosfato'] 
-
+        canales_autoanalizador = ['ton','nitrito','silicato','fosfato']
     
         with st.form("Formulario", clear_on_submit=False):
               
@@ -1707,8 +1706,12 @@ def procesado_nutrientes():
         
             # Lectura del archivo con los resultados del AA
             datos_AA              = pandas.read_excel(archivo_AA,skiprows=15)            
-            datos_AA              = datos_AA.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
+            datos_AA              = datos_AA.rename(columns={"Results 1":canales_autoanalizador[0],"Results 2":canales_autoanalizador[1],"Results 3":canales_autoanalizador[2],"Results 4":canales_autoanalizador[3]})
                   
+            # Identifica qué canales/variables se han procesado
+            variables_procesadas = datos_AA.columns.tolist()
+            variables_run        = list(set(variables_procesadas).intersection(variables_procesado_bd))
+            
             # Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
             df_datos_disponibles  = pandas.merge(df_datos_fisicos, df_muestreos, on="muestreo")            
             
@@ -1752,19 +1755,17 @@ def procesado_nutrientes():
                         
                 # Aplica la corrección de deriva (DRIFT)                 
                 datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
-                                
-                # Corrige posibles valores negativos
-                datos_corregidos['ton'][datos_corregidos['ton']<0]   = 0
-                datos_corregidos['nitrito'][datos_corregidos['nitrito']<0]   = 0
-                datos_corregidos['silicato'][datos_corregidos['silicato']<0] = 0
-                datos_corregidos['fosfato'][datos_corregidos['fosfato']<0]   = 0
-            
-                # Calcula el NO3 como diferencia entre el TON y el NO2
-                datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
-                datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
-                
-                # vuelvo a calcular el TON como NO3+NO2, por si hubiese corregido valores nulos
-                datos_corregidos['ton'] = datos_corregidos['nitrato'] + datos_corregidos['nitrito']
+                                            
+                # Calcula el NO3 como diferencia entre el TON y el NO2 (sólo si se han procesado estos dos canales)
+                if 'ton' in variables_run and 'nitrito' in variables_run:
+                    datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
+                    datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
+                    
+                    # vuelvo a calcular el TON como NO3+NO2, por si hubiese corregido valores nulos
+                    datos_corregidos['ton'] = datos_corregidos['nitrato'] + datos_corregidos['nitrito']
+                    
+                    # añade nitrato a variables procesadas (para redondear decimales y añadir qf)
+                    variables_run = variables_run + ['nitrato']
             
                 # Añade informacion de RMNs, temperaturas y rendimiento
                 datos_corregidos['rto_columna_procesado']  = rendimiento_columna
@@ -1784,23 +1785,17 @@ def procesado_nutrientes():
                 
                 datos_corregidos = pandas.merge(datos_corregidos, df_datos_fisicos, on="muestreo",how='left')  
                                 
-                # Comprueba si en la base da datos ya hay registros de esa salida con QF de nutrientes
-                for ivariable_procesada in range(len(variables_procesado_bd)):
-                    # nombre_variable_qf = variables_procesado_bd[ivariable_procesada] + '_qf'                    
-                    # if datos_corregidos[nombre_variable_qf].isnull().all():
-                    #     pass
-                    # else:
-                    #     texto = 'La base de datos contiene QF de ' + variables_procesado_bd[ivariable_procesada] + ' correspondientes a las muestras procesadas. Revisar y actualizar los flags.'
-                    #     st.warning(texto, icon="⚠️")
+                # Reduce los decimales y asigna QF a los datos
+                variables_run_qf = []
+                for ivariable_procesada in range(len(variables_run)):
                         
                     #reduce los decimales 
                     datos_corregidos[variables_procesado_bd[ivariable_procesada]]=round(datos_corregidos[variables_procesado_bd[ivariable_procesada]],3)
                         
                     # Añade qf a los datos, asignando a las variables procesadas un qf de valor 1 (no evaluado)
-                    for ivar in range(len(variables_run)):
-                        qf_var = variables_run[ivar] + '_qf'
-                        datos_corregidos[qf_var] = numpy.ones(datos_corregidos.shape[0],dtype=int)
-                    datos_corregidos['nitrato_qf'] = numpy.ones(datos_corregidos.shape[0],dtype=int)   
+                    variables_run_qf                                        = variables_run_qf + [variables_run[ivariable_procesada] + '_qf']
+                    datos_corregidos[variables_run_qf[ivariable_procesada]] = numpy.ones(datos_corregidos.shape[0],dtype=int)
+  
                 
                 
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
@@ -1816,7 +1811,7 @@ def procesado_nutrientes():
                 datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
 
                 # Descarga los datos como una hoja Excel        
-                listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd','ton','nitrato','nitrito','silicato','fosfato','ton_qf','nitrato_qf','nitrito_qf','silicato_qf','fosfato_qf']
+                listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
                 datos_corregidos        = datos_corregidos[listado_columnas]
       
                 # Botón para descargar la información como Excel

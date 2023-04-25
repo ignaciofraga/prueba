@@ -1302,17 +1302,29 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
     # Predimensiona un dataframe con los resultados de la correccion
     datos_corregidos = pandas.DataFrame(columns=variables_run)    
 
-    # Encuentra los índices (picos) correspondientes a la calbración
-    indices_calibracion = numpy.asarray(datos_entrada['Peak Number'][datos_entrada['Cup Type']=='CALB']) - 1
-           
-    # Corrige las concentraciones a partir de los rendimientos de la coumna reductora
-    datos_entrada['nitrato_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
-    datos_entrada['ton_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
-    factor = ((datos_entrada['ton'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])/(datos_entrada['ton'].iloc[indices_calibracion[-1]] + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])
-    for idato in range(datos_entrada.shape[0]):
-        datos_entrada['nitrato_rendimiento'].iloc[idato] = (datos_entrada['ton'].iloc[idato]*factor - datos_entrada['nitrito'].iloc[idato])/(rendimiento_columna/100) 
-        datos_entrada['ton_rendimiento'].iloc[idato] = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['nitrito'].iloc[idato]
+    # En runs con nitrato y nitrito calcular las concentraciones teniendo en cuenta el rendimiento
+    if 'ton' in variables_run and 'nitrito' in variables_run:
     
+        # Rendimiento de la columna del 100%, asignar directamente las concentraciones
+        if rendimiento_columna == 100:
+            datos_entrada['nitrato_rendimiento'] = datos_entrada['ton'] - datos_entrada['nitrito'] 
+            datos_entrada['ton_rendimiento']     = datos_entrada['ton']       
+        
+        # Rendimiento menor al 100%, buscar los calibrantes y componer la concentración
+        else:
+        
+            # Encuentra los índices (picos) correspondientes a la calbración
+            indices_calibracion = numpy.asarray(datos_entrada['Peak Number'][datos_entrada['Cup Type']=='CALB']) - 1
+                   
+            # Corrige las concentraciones a partir de los rendimientos de la columna reductora
+            datos_entrada['nitrato_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
+            datos_entrada['ton_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
+            factor = ((datos_entrada['ton'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])/(datos_entrada['ton'].iloc[indices_calibracion[-1]] + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])
+            for idato in range(datos_entrada.shape[0]):
+                datos_entrada['nitrato_rendimiento'].iloc[idato] = (datos_entrada['ton'].iloc[idato]*factor - datos_entrada['nitrito'].iloc[idato])/(rendimiento_columna/100) 
+                datos_entrada['ton_rendimiento'].iloc[idato] = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['nitrito'].iloc[idato]
+            
+            
     # Asocia la temperatura de laboratorio a todas las muestras
     datos_entrada['temp.lab'] = temperatura_laboratorio
     
@@ -1336,11 +1348,16 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
     densidades = seawater.eos80.dens0(datos_entrada['salinidad'], datos_entrada['temp.lab'])
     datos_entrada['DENSIDAD'] = densidades/1000  
                     
-    datos_entrada['ton_CONC'] = datos_entrada['ton_rendimiento']/datos_entrada['DENSIDAD']  
-    datos_entrada['nitrato_CONC'] = datos_entrada['nitrato_rendimiento']/datos_entrada['DENSIDAD']  
-    datos_entrada['nitrito_CONC'] = datos_entrada['nitrito']/datos_entrada['DENSIDAD']  
-    datos_entrada['silicato_CONC'] = datos_entrada['silicato']/datos_entrada['DENSIDAD']  
-    datos_entrada['fosfato_CONC'] = datos_entrada['fosfato']/datos_entrada['DENSIDAD']  
+    if 'ton' in variables_run:
+        datos_entrada['ton_CONC'] = datos_entrada['ton_rendimiento']/datos_entrada['DENSIDAD']  
+    if 'ton' in variables_run and 'nitrito' in variables_run:
+        datos_entrada['nitrato_CONC'] = datos_entrada['nitrato_rendimiento']/datos_entrada['DENSIDAD']  
+    if 'nitrito' in variables_run:
+        datos_entrada['nitrito_CONC'] = datos_entrada['nitrito']/datos_entrada['DENSIDAD']  
+    if 'silicato' in variables_run:
+        datos_entrada['silicato_CONC'] = datos_entrada['silicato']/datos_entrada['DENSIDAD']  
+    if 'fosfato' in variables_run:
+        datos_entrada['fosfato_CONC'] = datos_entrada['fosfato']/datos_entrada['DENSIDAD']  
 
 
     
@@ -1392,6 +1409,9 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
         
         datos_corregidos[variables_run[ivariable]] = variable_drift
         
+    # Corrige los valores negativos
+    datos_corregidos[datos_corregidos<0] = 0
+    
     # Añade columna con el identificador de cada muestra
     datos_corregidos['id_externo'] = datos_entrada['Sample ID']
        
