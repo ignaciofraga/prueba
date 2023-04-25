@@ -1361,19 +1361,12 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
 
 
     
-    ####  APLICA LA CORRECCIÓN DE DERIVA ####
-    # Encuentra las posiciones de los RMNs
-    #posicion_RMN_bajos  = [i for i, e in enumerate(datos_entrada['Sample ID']) if e == 'RMN Low']
-    #posicion_RMN_altos  = [i for i, e in enumerate(datos_entrada['Sample ID']) if e == 'RMN High']
-    
+    ####  APLICA LA CORRECCIÓN DE DERIVA ####   
     for ivariable in range(len(variables_run)):
                
         variable_concentracion  = variables_run[ivariable] + '_CONC'
         
-        # Concentraciones de las referencias
-        #variable_rmn    = variables_run[ivariable] + '_rmn_bajo'
-        # RMN_CE_variable = df_referencias[variables_run[ivariable]].iloc[0]
-        # RMN_CI_variable = df_referencias[variables_run[ivariable]].iloc[1]  
+        # Concentraciones de las referencias 
         RMN_BAJO_variable = df_referencias_bajas[variables_run[ivariable]].iloc[0]
         RMN_ALTO_variable   = df_referencias_altas[variables_run[ivariable]].iloc[0]  
         

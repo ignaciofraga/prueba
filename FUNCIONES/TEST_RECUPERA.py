@@ -37,8 +37,8 @@ email_contacto    = 'prueba@ieo.csic.es'
 
 fecha_actualizacion = datetime.date.today()
 
-anho_consulta = 2017
-programa_seleccionado = 'RADIAL CANTABRICO'
+anho_consulta = 2023
+programa_seleccionado = 'RADIAL CORUÑA'
 tipo_salida           = 'MENSUAL'
 ###### PROCESADO ########
 

@@ -1488,6 +1488,9 @@ def entrada_archivos_roseta():
                                  df_botella['longitud']               = lon_muestreo
                                  df_botella['prof_referencia']        = 0
                                  df_botella['fecha_muestreo']         = fecha_muestreo
+                                 
+                                 st.dataframe(df_botella)
+                                 
                                  df_botella = df_botella.drop(columns = ['c0S/m','sigma-é00','flag'])
                                  try:
                                      df_botella = df_botella.drop(columns = ['sbeox0V','sbeox0ML/L'])
