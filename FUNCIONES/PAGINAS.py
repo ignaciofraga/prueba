@@ -2022,7 +2022,7 @@ def entrada_datos_excel():
             
         io_envio            = st.form_submit_button("Procesar el archivo subido")
         
-    col1, col2= st.columns(5,gap="small")
+    col1, col2= st.columns(2,gap="small")
 
     with col1:
         
