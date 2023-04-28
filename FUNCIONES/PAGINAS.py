@@ -1502,8 +1502,8 @@ def entrada_archivos_roseta():
                                  df_botella['programa']               = id_programa    
                                  df_botella['num_cast']               = cast_muestreo 
                                  
-                                 # Añade botella y hora de muestreo (nulas) para evitar errores en el procesado
-                                 df_botella['botella']                = None
+                                 # Añade botella (7) y hora de muestreo (nulas) para evitar errores en el procesado
+                                 df_botella['botella']                = 7
                                  df_botella['hora_muestreo']          = None
                           
                                  # Añade qf 
@@ -2022,7 +2022,25 @@ def entrada_datos_excel():
             
         io_envio            = st.form_submit_button("Procesar el archivo subido")
         
-    st.markdown('Los datos subidos deben contener al menos información de estación, fecha de muestreo y botella o profundidad')
+    col1, col2= st.columns(5,gap="small")
+
+    with col1:
+        
+        st.markdown('Consulta las instrucciones para añadir información a la base de datos.')
+
+    with col2:
+
+        archivo_metadatos     = 'DATOS/Instrucciones_entrada.pdf'
+        with open(archivo_metadatos, "rb") as pdf_file:
+            PDFbyte = pdf_file.read()
+        
+        st.download_button(label="DESCARGA INSTRUCCIONES",
+                            data=PDFbyte,
+                            file_name="Instrucciones.pdf",
+                            mime='application/octet-stream')
+    
+   
+    
         
     
     if programa_seleccionado == 'OTROS':
