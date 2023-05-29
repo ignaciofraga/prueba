@@ -648,7 +648,7 @@ def consulta_procesos():
 def entrada_salidas_mar():
     
     # Función para cargar en caché los datos a utilizar
-    @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
+    @st.cache_data(ttl=300,show_spinner="Cargando información de la base de datos")
     def carga_datos_salidas_mar():
         conn                      = init_connection()
         df_buques            = psql.read_sql('SELECT * FROM buques', conn)
