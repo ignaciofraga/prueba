@@ -55,7 +55,7 @@ for iarchivo in range(len(listado_archivos)):
         
     # Realiza un control de calidad primario a los datos importados   
     print('Realizando control de calidad')
-    datos_radiales_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radiales,direccion_host,base_datos,usuario,contrasena,puerto)  
+    datos_radiales_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radiales)  
     
     datos_radiales_corregido = datos_radiales_corregido[datos_radiales_corregido['presion_ctd'].notna()] 
     datos_radiales_corregido = datos_radiales_corregido[datos_radiales_corregido['fecha_muestreo'].notna()] 

@@ -695,18 +695,37 @@ def lectura_archivo_perfiles(datos_archivo):
 ######################################################################
 ######## FUNCION PARA LEER DATOS DE BOTELLAs (ARCHIVOS .BTL)  ########
 ######################################################################
-def lectura_btl(nombre_archivo,datos_archivo):
+def lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto):
  
     
+    # recupera la información de las estaciones incluidas en la base de datos
+    con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    conn_psql        = create_engine(con_engine)
+    tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
+    df_programas = psql.read_sql('SELECT * FROM programas', conn_psql)
+    conn_psql.dispose()
     
-
+    id_programa_elegido = df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].iloc[0]
+    
+    df_estaciones_radiales = tabla_estaciones[tabla_estaciones['programa']==id_programa_elegido]
+    
+    
+    
+    # Identifica la estación a la que corresponde el archivo
+    posicion_inicio    = nombre_archivo.find('e') + 1
+    posicion_final     = nombre_archivo.find('.')
+    nombre_estacion    = nombre_archivo[posicion_inicio:posicion_final].upper() #+ 'CO'                
+    id_estacion        = df_estaciones_radiales['id_estacion'][df_estaciones_radiales['nombre_estacion']==nombre_estacion].iloc[0] 
+    
     # Identifica la fecha del muestreo
-    try: 
-        fecha_salida_texto = nombre_archivo[0:8]
-        fecha_salida       = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
-    except:
-        fecha_salida       = None
-
+    fecha_salida_texto = nombre_archivo[0:8]
+    fecha_salida       = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
+    
+    
+    id_estacion              = tabla_estaciones['id_estacion'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
+    profundidades_referencia = tabla_estaciones['profundidades_referencia'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
+    lat_estacion             = tabla_estaciones['latitud_estacion'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
+    lon_estacion             = tabla_estaciones['longitud_estacion'][tabla_estaciones['nombre_estacion']==nombre_estacion].iloc[0]
     
     
     # Genera las listas en las que se guardarán los datos si éstos existen
@@ -719,9 +738,6 @@ def lectura_btl(nombre_archivo,datos_archivo):
     datos_O2          = []
     datos_tiempos     = []
     datos_sigmat      = []
-    datos_turb        = []
-
-    io_time_nmea = 0
 
     # Lee el archivo .btl y escribe la información de las botellas en un archivo temporal
     cast_muestreo          = 1 # Asinga este valor por si no se introdujo ningún dato en el muestreo
@@ -738,21 +754,6 @@ def lectura_btl(nombre_archivo,datos_archivo):
                         lat_muestreo = lat_muestreo*-1
                 except:
                     lat_muestreo = None
-                    
-            if texto_linea[0:17] == '* NMEA Latitude =': # Línea con latitud del muestreo (NMEA)
-                listado_textos    = texto_linea.split('= ')     
-                try:
-                    texto_coordenadas   = listado_textos[1]
-                    listado_coordenadas = texto_coordenadas.split(' ')
-                    deg     = listado_coordenadas[0]
-                    minutes = listado_coordenadas[1].split('.')[0]
-                    seconds = listado_coordenadas[1].split('.')[1]
-                    lat_muestreo = float(deg) + float(minutes)/60 + float(seconds)/(60*60)
-                    if listado_coordenadas[2] == 'S':
-                        lat_muestreo = lat_muestreo*-1
-                except:
-                    lat_muestreo = None
-
 
             if texto_linea[0:13] == '** Longitude:': # Línea con latitud del muestreo
                 try:
@@ -762,43 +763,14 @@ def lectura_btl(nombre_archivo,datos_archivo):
                 except:
                     lon_muestreo = None
                     
-            if texto_linea[0:18] == '* NMEA Longitude =': # Línea con latitud del muestreo (NMEA)
-                listado_textos    = texto_linea.split('= ')     
-                try:
-                    texto_coordenadas   = listado_textos[1]
-                    listado_coordenadas = texto_coordenadas.split(' ')
-                    deg     = listado_coordenadas[0]
-                    minutes = listado_coordenadas[1].split('.')[0]
-                    seconds = listado_coordenadas[1].split('.')[1]
-                    lon_muestreo = float(deg) + float(minutes)/60 + float(seconds)/(60*60)
-                    if listado_coordenadas[2] == 'W':
-                        lon_muestreo = lon_muestreo*-1
-                except:
-                    lon_muestreo = None
-                    
-                    
-                    
-            
-            if texto_linea[0:19] == '* NMEA UTC (Time) =': # Línea con hora del cast 
-                listado_textos   = texto_linea.split('= ') 
-                try:
-                    datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
-                except:
-                    datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
-
-                fecha_muestreo_archivo = datetime_muestreo.date()
-                io_time_nmea  = 1
-                offset_tiempo = 0
-                   
-                    
-            if texto_linea[0:22] == '* System UpLoad Time =' and io_time_nmea == 0: # Línea con hora del cast
+            if texto_linea[0:22] == '* System UpLoad Time =': # Línea con hora del cast
                 listado_textos   = texto_linea.split('= ') 
                 try:
                     datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
                 except:
                     datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
                     
-            if texto_linea[0:14] == '* System UTC =' and io_time_nmea == 0: # Línea con hora del cast
+            if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
                 listado_textos    = texto_linea.split('= ')  
                 try:
                     datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
@@ -806,11 +778,6 @@ def lectura_btl(nombre_archivo,datos_archivo):
                     datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
                 offset_tiempo     = (datetime_sistema - datetime_muestreo).seconds
                 fecha_muestreo_archivo = datetime_muestreo.date()
-                
-                
-                
-                
-                
 
             if texto_linea[0:8] == '** Cast:': # Línea con el número de cast
 #                cast_muestreo = int(texto_linea[8:len(texto_linea)])
@@ -821,15 +788,10 @@ def lectura_btl(nombre_archivo,datos_archivo):
             # Separa las cabeceras de las medidas de oxigeno si existen y están juntas 
             if 'Sbeox0VSbeox0Mm/Kg' in texto_linea: 
                 texto_linea = texto_linea.replace('Sbeox0VSbeox0Mm/Kg', 'Sbeox0V Sbeox0Mm/Kg')
-
-            if 'FlECO-AFLTurbWETntu0' in texto_linea: 
-                texto_linea = texto_linea.replace('FlECO-AFLTurbWETntu0', 'FlECO-AFLTurbWET ntu0')                
-
+               
             datos_linea = texto_linea.split()
-                           
-            if datos_linea[0] == 'Bottle': # Primera línea con las cabeceras
-    
                 
+            if datos_linea[0] == 'Bottle': # Primera línea con las cabeceras
     
                 # Encuentra los indices (posiciones) de cada variable, si ésta está incluida
                 indice_botellas  = datos_linea.index("Bottle")
@@ -842,10 +804,7 @@ def lectura_btl(nombre_archivo,datos_archivo):
                 try: 
                    indice_presion   = datos_linea.index("PrSM")
                 except:
-                    try:
-                        indice_presion   = datos_linea.index("PrdM")
-                    except:
-                        indice_presion  = None      
+                    indice_presion  = None      
                 
                 try:
                     indice_temp     = datos_linea.index("T090C")
@@ -864,7 +823,7 @@ def lectura_btl(nombre_archivo,datos_archivo):
                     io_fluor        = 1
                 except:
                     try:
-                        indice_fluor    = datos_linea.index("FlECO-AFLTurbWET")  
+                        indice_fluor    = datos_linea.index("FlECO-AFLTurbWETntu0")  
                         io_fluor        = 1                        
                     except:
                         indice_fluor    =  None 
@@ -882,14 +841,7 @@ def lectura_btl(nombre_archivo,datos_archivo):
                     io_sigmat       = 1                   
                 except:
                     indice_sigmat   =  None  
-                    io_sigmat       = 0    
-                    
-                try:
-                    indice_turb   = datos_linea.index("ntu0")
-                    io_turb       = 1                   
-                except:
-                    indice_turb   =  None  
-                    io_turb       = 0   
+                    io_sigmat       = 0                      
                     
                     
     
@@ -921,8 +873,6 @@ def lectura_btl(nombre_archivo,datos_archivo):
                         datos_O2.append(float(datos_linea[indice_O2 + 2]))
                     if io_sigmat == 1:
                         datos_sigmat.append(float(datos_linea[indice_sigmat + 2])) 
-                    if io_turb == 1:
-                        datos_turb.append(float(datos_linea[indice_turb + 2])) 
                                     
                 else: # Linea con los tiempos de cierre
                 
@@ -934,7 +884,7 @@ def lectura_btl(nombre_archivo,datos_archivo):
     
     
     # Comprueba que la fecha contenida en el archivo y la del nombre del archivo son la misma
-    if fecha_muestreo_archivo is not None and fecha_salida is not None and fecha_muestreo_archivo != fecha_salida:
+    if fecha_muestreo_archivo is not None and fecha_muestreo_archivo != fecha_salida:
     
         mensaje_error  = 'La fecha indicada en el nombre del archivo no coincide con la que figura en dentro del mismo'
         datos_botellas = None
@@ -962,17 +912,51 @@ def lectura_btl(nombre_archivo,datos_archivo):
             datos_botellas['oxigeno_ctd']          =  datos_O2
             datos_botellas['oxigeno_ctd_qf']       = int(1)
         if io_sigmat == 1:
-            datos_botellas['sigmat']               =  datos_sigmat            
-        if io_turb == 1:
-            datos_botellas['turbidez_ctd']         =  datos_turb
-            datos_botellas['turbidez_ctd_qf']      = int(1)
-                     
+            datos_botellas['sigmat']          =  datos_sigmat
+                 
+        # Añade una columna con la profundidad de referencia
+        if profundidades_referencia is not None:
+            datos_botellas['prof_referencia'] = numpy.zeros(datos_botellas.shape[0],dtype=int)
+            for idato in range(datos_botellas.shape[0]):
+                    # Encuentra la profundidad de referencia más cercana a cada dato
+                    idx = (numpy.abs(profundidades_referencia - datos_botellas['presion_ctd'][idato])).argmin()
+                    datos_botellas['prof_referencia'][idato] =  profundidades_referencia[idx]
+        else:
+            datos_botellas['prof_referencia'] = [None]*datos_botellas.shape[0]
+
+
+        # Cambia los nombre de las botellas.        
+        if id_estacion == 1: #E2
+            listado_equiv_ctd = [1,3,5,7,9,11]
+            listado_equiv_real = [1,2,3,4,5,6]
+            for ibotella in range(datos_botellas.shape[0]):
+                for iequiv in range(len(listado_equiv_ctd)):
+                    if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                        datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+
+        if id_estacion == 5: #E4
+            
+            datos_botellas['botella_temp'] = datos_botellas['botella']
+            datos_botellas = datos_botellas.drop(datos_botellas[datos_botellas.botella_temp == 11].index)
+            
+            listado_equiv_ctd = [1,3,5,7,9,11]
+            listado_equiv_real = [8,9,10,11,12,None]
+            for ibotella in range(datos_botellas.shape[0]):
+                for iequiv in range(len(listado_equiv_ctd)):
+                    if datos_botellas['botella_temp'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                        datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+                        
+            datos_botellas = datos_botellas.drop(columns=['botella_temp'])
+        
         # Añade informacion de lat/lon y fecha para que no elimine el registro durante el control de calidad
         datos_botellas['latitud']                  = lat_muestreo  
         datos_botellas['longitud']                 = lon_muestreo 
+        datos_botellas['id_estacion_temp']         = numpy.zeros(datos_botellas.shape[0],dtype=int)
+        datos_botellas['id_estacion_temp']         = id_estacion
+        datos_botellas['estacion']                 = id_estacion
         datos_botellas['fecha_muestreo']           = fecha_muestreo_archivo
         datos_botellas['num_cast']                 = cast_muestreo
-        
+        datos_botellas['programa']                 = id_programa_elegido
                 
         mensaje_error = []
         

@@ -23,7 +23,7 @@ pandas.options.mode.chained_assignment = None
 #######################################################################################
 ######## FUNCION PARA APLICAR CONTROL DE CALIDAD BÁSICO LOS DATOS DE PROGRAMAS  #######
 #######################################################################################
-def control_calidad(datos):
+def control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto):
  
     textos_aviso = [] 
       
@@ -33,12 +33,12 @@ def control_calidad(datos):
     
     listado_variables_datos   = datos.columns.tolist()
            
-    # # Elimina datos sin profundidad o fecha (en caso de que estas variables estén entre las de entrada)
-    # if 'presion_ctd' in listado_variables_datos :        
-    #     datos = datos[datos['presion_ctd'].notna()]
-    #     datos = datos.drop(datos[datos.presion_ctd < 0].index) # Corregir los valores positivos de longitud, pasándolos a negativos (algunos datos de Pelacus tienen este error)
-    # if 'fecha_muestreo' in listado_variables_datos:        
-    #     datos = datos[datos['fecha_muestreo'].notna()] 
+    # Elimina datos sin profundidad o fecha (en caso de que estas variables estén entre las de entrada)
+    if 'presion_ctd' in listado_variables_datos :        
+        datos = datos[datos['presion_ctd'].notna()]
+        datos = datos.drop(datos[datos.presion_ctd < 0].index) # Corregir los valores positivos de longitud, pasándolos a negativos (algunos datos de Pelacus tienen este error)
+    if 'fecha_muestreo' in listado_variables_datos:        
+        datos = datos[datos['fecha_muestreo'].notna()] 
         
     
     # # Elimina registros duplicados en el mismo punto y a la misma hora(por precaucion)
@@ -66,8 +66,7 @@ def control_calidad(datos):
         
     if 'presion_ctd' in listado_variables_datos:
         for idato in range(datos.shape[0]):
-            if datos['presion_ctd'][idato] is not None:
-                datos['presion_ctd'][idato] = round(float(datos['presion_ctd'][idato]),2)      
+            datos['presion_ctd'][idato] = round(float(datos['presion_ctd'][idato]),2)      
 
     return datos,textos_aviso    
  

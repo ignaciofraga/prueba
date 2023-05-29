@@ -933,7 +933,7 @@ def entrada_salidas_mar():
         
         # Muestra una tabla con el personal ya incluido en la base de datos
         st.dataframe(df_personal,height=250)
-                
+        
         st.subheader('Añadir personal participante')
         # Despliega un formulario para introducir los datos
         with st.form("Formulario seleccion"):
@@ -953,14 +953,12 @@ def entrada_salidas_mar():
                 
                 if io_incluido == 0:
 
-                    id_asignado =  int(max(df_personal['id_personal']) + 1)
-
-                    instruccion_sql = '''INSERT INTO personal_salidas (id_personal,nombre_apellidos,comisionado)
-                        VALUES (%s,%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.correo,EXCLUDED.comisionado);''' 
+                    instruccion_sql = '''INSERT INTO personal_salidas (nombre_apellidos,comisionado)
+                        VALUES (%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.correo,EXCLUDED.comisionado);''' 
                             
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
-                    cursor.execute(instruccion_sql, (id_asignado,nombre_participante,comision))
+                    cursor.execute(instruccion_sql, (nombre_participante,comision))
                     conn.commit()
                     cursor.close()
                     conn.close()
@@ -1395,47 +1393,7 @@ def entrada_archivos_roseta():
                     if fecha_salida_archivo == fecha_salida:
                     
                         ### DATOS DE BOTELLERO ###
-                        mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_btl,datos_archivo)
-                      
-                        datos_botellas['id_estacion_temp']         = id_estacion
-                        datos_botellas['estacion']                 = id_estacion
-                        datos_botellas['programa']                 = id_programa
-
-                        profundidades_referencia = tabla_estaciones_programa['profundidades_referencia'][tabla_estaciones_programa['nombre_estacion']==nombre_estacion].iloc[0]
-                        # Añade una columna con la profundidad de referencia
-                        if profundidades_referencia is not None:
-                            datos_botellas['prof_referencia'] = numpy.zeros(datos_botellas.shape[0],dtype=int)
-                            for idato in range(datos_botellas.shape[0]):
-                                    # Encuentra la profundidad de referencia más cercana a cada dato
-                                    idx = (numpy.abs(profundidades_referencia - datos_botellas['presion_ctd'][idato])).argmin()
-                                    datos_botellas['prof_referencia'][idato] =  profundidades_referencia[idx]
-                        else:
-                            datos_botellas['prof_referencia'] = [None]*datos_botellas.shape[0]
-
-                        
-                      
-                        # Cambia los nombre de las botellas.        
-                        if id_estacion == 1: #E2
-                            listado_equiv_ctd = [1,3,5,7,9,11]
-                            listado_equiv_real = [1,2,3,4,5,6]
-                            for ibotella in range(datos_botellas.shape[0]):
-                                for iequiv in range(len(listado_equiv_ctd)):
-                                    if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                                        datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
-
-                        if id_estacion == 5: #E4
-                            
-                            datos_botellas['botella_temp'] = datos_botellas['botella']
-                            datos_botellas = datos_botellas.drop(datos_botellas[datos_botellas.botella_temp == 11].index)
-                            
-                            listado_equiv_ctd = [1,3,5,7,9,11]
-                            listado_equiv_real = [8,9,10,11,12,None]
-                            for ibotella in range(datos_botellas.shape[0]):
-                                for iequiv in range(len(listado_equiv_ctd)):
-                                    if datos_botellas['botella_temp'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                                        datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
-                                        
-                            datos_botellas = datos_botellas.drop(columns=['botella_temp'])  
+                        mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_btl,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
                       
                         # Asigna lat/lon de la estación si esa información no etá incluia en el .btl
                         for imuestreo in range(datos_botellas.shape[0]):
@@ -1449,7 +1407,7 @@ def entrada_archivos_roseta():
                         datos_botellas ['id_salida']       =  id_salida
                         
                         # Aplica control de calidad
-                        datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
+                        datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
            
                         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
                         datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
@@ -2119,7 +2077,7 @@ def entrada_datos_excel():
         
 
         # Realiza un control de calidad primario a los datos importados   
-        datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
+        datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
 
         # Recupera el identificador del programa de muestreo
         id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
@@ -2258,6 +2216,307 @@ def referencias_nutrientes():
          
 
 
+
+# ###############################################################################
+# ################## PÁGINA DE ENTRADA DE ESTADILLOS #################
+# ###############################################################################    
+
+
+# def estadillos_radiales():
+        
+#     st.subheader('Procesado de variables químicas')
+    
+#     # Recupera tablas con informacion utilizada en el procesado
+#     conn                = init_connection()
+#     df_salidas          = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+#     df_programas        = psql.read_sql('SELECT * FROM programas', conn)
+#     conn.close()    
+    
+#     id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+    
+#     # Despliega menús de selección del programa, tipo de salida, año y fecha               
+#     col1, col2, col3= st.columns(3,gap="small")
+ 
+#     with col1: 
+#         programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
+#         df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
+        
+    
+#     with col2:
+#         tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
+#         df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+    
+#         # Añade la variable año al dataframe
+#         indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+#         df_salidas_seleccion['id_temp'] = indices_dataframe
+#         df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
+        
+#         # Define los años con salidas asociadas
+#         df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
+#         for idato in range(df_salidas_seleccion.shape[0]):
+#             df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+#         df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
+        
+#         listado_anhos              = df_salidas_seleccion['año'].unique()
+    
+#     with col3:
+#         anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
+#         df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+
+#     salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
+
+
+# ###############################################################################
+# ################## PÁGINA DE ENTRADA DE ESTADILLOS DE DATOS ###################
+# ###############################################################################
+        
+# def entrada_estadillos():
+    
+#     archivo_plantilla     = 'DATOS/PLANTILLA.xlsx'
+#     archivo_instrucciones = 'DATOS/PLANTILLA.zip'
+    
+#     # Encabezados y titulos 
+#     #st.set_page_config(page_title='ENTRADA DE DATOS', layout="wide",page_icon=logo_IEO_reducido) 
+#     st.title('Servicio de entrada de datos del C.O de A Coruña')
+
+#     # Recupera la tabla de los programas disponibles en la base de datos, como un dataframe
+#     conn = init_connection()
+#     df_programas = psql.read_sql('SELECT * FROM programas', conn)
+#     conn.close()
+
+
+#     # Despliega un formulario para elegir el programa y la fecha a consultar
+#     with st.form("Formulario seleccion"):
+
+#         col1, col2 = st.columns(2,gap="small")
+#         #nombre_programa, tiempo_consulta = st.columns((1, 1))
+#         with col1:
+#             programa_elegido  = st.selectbox('Selecciona el programa al que corresponde la información',(df_programas['nombre_programa']))
+#         with col2:
+#             email_contacto    = st.text_input('Correo de contacto', "...@ieo.csic.es")
+
+#         # Botón de envío para confirmar selección
+#         st.form_submit_button("Enviar")
+
+
+
+#     ### Recupera los identificadores de la selección hecha
+
+#     # Recupera el identificador del programa seleccionado
+#     id_programa_elegido = int(df_programas['id_programa'][df_programas['nombre_programa']==programa_elegido].values[0])
+
+                    
+#     # Recordar que se ajusten a la plantilla y facilitar la misma
+#     texto_error = 'IMPORTANTE. Los datos a subir deben ajustarse a la plantilla facilitada' 
+#     st.warning(texto_error, icon="⚠️")
+
+#     with open(archivo_instrucciones, "rb") as fp:
+#         st.download_button(
+#             label="DESCARGAR PLANTILLA E INSTRUCCIONES",
+#             data=fp,
+#             file_name="PLANTILLA.zip",
+#             mime="application/zip"
+#         )
+            
+        
+#     fecha_actualizacion = datetime.date.today()    
+        
+#     ### Subida de archivos
+
+#     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+#     direccion_host = st.secrets["postgres"].host
+#     base_datos     = st.secrets["postgres"].dbname
+#     usuario        = st.secrets["postgres"].user
+#     contrasena     = st.secrets["postgres"].password
+#     puerto         = st.secrets["postgres"].port
+
+#     col1 = st.columns(1)
+
+#     # Boton para subir los archivos de datos
+#     listado_archivos_subidos = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)
+#     for archivo_subido in listado_archivos_subidos:
+
+#         # Lectura del estadillo con datos de entrada
+#         try:
+#             datos,texto_error = FUNCIONES_LECTURA.lectura_datos_estadillo(archivo_subido,archivo_plantilla)
+#             texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
+#             st.success(texto_exito)
+#             if len(texto_error)>0:
+#                 for iaviso in range(len(texto_error)):
+#                     st.warning(texto_error[iaviso], icon="⚠️")
+        
+#         except:
+#             texto_error = 'Error en la lectura del archivo ' + archivo_subido.name
+#             st.warning(texto_error, icon="⚠️")
+
+
+#         # Realiza un control de calidad primario a los datos importados   
+#         try:
+#             datos,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto) 
+#             texto_exito = 'Control de calidad de los datos del archivo ' + archivo_subido.name + ' realizado correctamente'
+#             st.success(texto_exito)
+#             if len(textos_aviso)>0:
+#                 for iaviso in range(len(textos_aviso)):
+#                     st.warning(textos_aviso[iaviso], icon="⚠️")
+            
+#         except:
+#             texto_error = 'Error en el control de calidad de los datos del archivo ' + archivo_subido.name
+#             st.warning(texto_error, icon="⚠️")
+
+#         # Introduce los datos en la base de datos
+#         # try:
+     
+#         with st.spinner('Insertando datos en la base de datos'):
+
+#             datos = FUNCIONES_PROCESADO.evalua_estaciones(datos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)  
+
+#             datos = FUNCIONES_PROCESADO.evalua_registros(datos,programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+
+#             FUNCIONES_PROCESADO.inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+
+#             FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+            
+#         texto_exito = 'Datos del archivo ' + archivo_subido.name + ' insertados en la base de datos correctamente'
+#         st.success(texto_exito)
+
+
+#         try:
+#             id_opcion_elegida = 3
+#             FUNCIONES_AUXILIARES.actualiza_estado(datos,fecha_actualizacion,id_programa_elegido,programa_elegido,id_opcion_elegida,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
+         
+#             texto_exito = 'Las fechas de procesado contenidas en la base de datos han sido actualizadas correctamente'
+#             st.success(texto_exito)    
+#         except:
+#             texto_error = 'Error al actualizar las fechas de procesado en la base de datos'
+#             st.warning(texto_error, icon="⚠️")    
+          
+# ###############################################################################
+# ################# PÁGINA DE CONSULTA DE ESTADILLOS ############################
+# ###############################################################################    
+    
+    
+# def consulta_estadillos():    
+    
+#     ### Encabezados y titulos 
+#     #st.set_page_config(page_title='CONSULTA ESTADILLOS', layout="wide",page_icon=logo_IEO_reducido) 
+#     st.title('Servicio de consulta de estadillos de datos muestreados')
+    
+#     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+#     direccion_host = st.secrets["postgres"].host
+#     base_datos     = st.secrets["postgres"].dbname
+#     usuario        = st.secrets["postgres"].user
+#     contrasena     = st.secrets["postgres"].password
+#     puerto         = st.secrets["postgres"].port
+    
+    
+#     # Recupera las tablas de los programas y estaciones disponibles como  dataframes
+#     conn = init_connection()
+#     df_programas  = psql.read_sql('SELECT * FROM programas', conn)
+#     df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+#     conn.close()
+    
+    
+#     # Selecciona el programa del que se quieren buscar estadillos
+#     nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere recuperar el estadillo',(df_programas['nombre_programa']))
+    
+#     id_programa      = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
+    
+    
+#     # Determina las fechas de las que hay información de datos de nutrientes
+#     estaciones_programa = df_estaciones[df_estaciones['programa'] == id_programa]
+    
+#     indices_dataframe   = numpy.arange(0,estaciones_programa.shape[0],1,dtype=int) 
+    
+#     # # Primero recupera los registros correspondientes al periodo evaluado y al año consultado
+#     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    
+#     cursor = conn.cursor()
+#     instruccion_sql = "SELECT id_muestreo,nombre_muestreo,fecha_muestreo,hora_muestreo,estacion,botella,presion_ctd,id_tubo_nutrientes FROM muestreos_discretos INNER JOIN estaciones ON muestreos_discretos.estacion = estaciones.id_estacion WHERE estaciones.programa = %s;"
+#     cursor.execute(instruccion_sql,(str(id_programa)))
+#     registros_consulta = cursor.fetchall()
+#     conn.commit()
+#     cursor.close()
+#     conn.close()
+    
+    
+#     dataframe_registros = pandas.DataFrame(registros_consulta, columns=['id_muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','botella','presion_ctd','id_tubo_nutrientes'])
+    
+#     # Mantén sólo los registros con datos de id_nutrientes
+#     dataframe_registros = dataframe_registros[dataframe_registros['id_tubo_nutrientes'].notna()]
+    
+#     # Busca las fechas disponibles 
+#     dataframe_temporal = dataframe_registros.drop_duplicates('fecha_muestreo')
+#     listado_fechas     = dataframe_temporal['fecha_muestreo']
+    
+#     if len(listado_fechas) > 0:
+    
+#         # Seleccionas una fecha
+#         fecha_seleccionada = st.selectbox('Selecciona la fecha de la que se quiere recuperar el estadillo',(listado_fechas))
+        
+#         # Recupera los registros correspondientes a esa fecha
+#         dataframe_fecha = dataframe_registros[dataframe_registros['fecha_muestreo']==fecha_seleccionada]
+        
+#         # Ajusta el numero de los indices
+#         indices_dataframe          = numpy.arange(0,dataframe_fecha.shape[0],1,dtype=int)    
+#         dataframe_fecha['id_temp'] = indices_dataframe
+#         dataframe_fecha.set_index('id_temp',drop=True,append=False,inplace=True)
+        
+#         # Recupera las coordenadas a partir de la estación asignada
+#         dataframe_fecha['latitud'] = numpy.zeros(dataframe_fecha.shape[0])
+#         dataframe_fecha['longitud'] = numpy.zeros(dataframe_fecha.shape[0])
+#         for idato in range(dataframe_fecha.shape[0]):
+#             dataframe_fecha['latitud'][idato]  = estaciones_programa['latitud'][estaciones_programa['id_estacion']==dataframe_fecha['estacion'][idato]]
+#             dataframe_fecha['longitud'][idato] = estaciones_programa['longitud'][estaciones_programa['id_estacion']==dataframe_fecha['estacion'][idato]]
+        
+#         # Recupera las propiedades físicas del registro (temperatura, salinidad....)
+#         conn = init_connection()
+#         tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+#         conn.close()
+#         dataframe_fecha['temperatura_ctd'] = numpy.zeros(dataframe_fecha.shape[0])
+#         dataframe_fecha['salinidad_ctd'] = numpy.zeros(dataframe_fecha.shape[0])
+#         for idato in range(dataframe_fecha.shape[0]):
+#             dataframe_fecha['temperatura_ctd'][idato]  = tabla_registros_fisica['temperatura_ctd'][tabla_registros_fisica['muestreo']==dataframe_fecha['id_muestreo'][idato]]
+#             dataframe_fecha['salinidad_ctd'][idato]    = tabla_registros_fisica['salinidad_ctd'][tabla_registros_fisica['muestreo']==dataframe_fecha['id_muestreo'][idato]]
+        
+#         # Quita la columna de estación
+#         dataframe_fecha = dataframe_fecha.drop(columns=['estacion','id_muestreo'])
+        
+#         # Ajusta el orden de las columnas
+#         dataframe_fecha = dataframe_fecha[['nombre_muestreo','fecha_muestreo','hora_muestreo','latitud','longitud','botella','id_tubo_nutrientes','presion_ctd','temperatura_ctd','salinidad_ctd']]
+        
+#         # Ordena en función del número de tubo
+#         dataframe_fecha = dataframe_fecha.sort_values(by=['id_tubo_nutrientes'])
+       
+#         ## Botón para exportar los resultados
+#         nombre_archivo =  'ESTADILLO_' + nombre_programa + '_' + fecha_seleccionada.strftime("%m/%d/%Y") + '.xlsx'
+    
+#         output = BytesIO()
+#         writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+#         dataframe_fecha.to_excel(writer, index=False, sheet_name='DATOS')
+#         workbook = writer.book
+#         worksheet = writer.sheets['DATOS']
+#         writer.save()
+#         datos_exporta = output.getvalue()
+    
+#         st.download_button(
+#             label="DESCARGA LOS DATOS SELECCIONADOS",
+#             data=datos_exporta,
+#             file_name=nombre_archivo,
+#             help= 'Descarga un archivo .csv con el estadillo solicitado',
+#             mime="application/vnd.ms-excel"
+#         )
+        
+#     else:
+        
+#         texto_error = 'No hay estadillos de entrada correspondientes al programa ' + nombre_programa
+#         st.warning(texto_error, icon="⚠️")
+
+
+        
+     
+        
+     
+        
      
         
      

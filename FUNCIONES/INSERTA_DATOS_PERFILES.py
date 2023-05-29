@@ -75,6 +75,7 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
             # Encuentra el identificador de la salida
             posicion_final     = archivo.find('e') 
             fecha_salida       = datetime.datetime.strptime(archivo[0:posicion_final], '%Y%m%d').date()                     
+            
             id_salida          = tabla_salidas_programa['id_salida'][tabla_salidas_programa['fecha_salida']==fecha_salida].iloc[0]
             
             # Lee los archivos .btl
@@ -93,6 +94,8 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
             # Aplica control de calidad
             #datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
             datos_botellas['id_estacion_temp']         = datos_botellas['estacion']
+
+            datos_botellas['fecha_muestreo']    = fecha_salida
 
             df_acc = pandas.concat([df_acc, datos_botellas])
 
