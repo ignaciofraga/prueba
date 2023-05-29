@@ -965,7 +965,7 @@ def entrada_salidas_mar():
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
                     if comision:
-                        cursor.execute(instruccion_sql, (id_asignado,nombre_participante,True))
+                        cursor.execute(instruccion_sql, (id_asignado,nombre_participante,"true"))
                     else:
                         cursor.execute(instruccion_sql, (id_asignado,nombre_participante,False))                        
                     conn.commit()
