@@ -967,6 +967,8 @@ def entrada_salidas_mar():
 
                     texto_exito = 'Participante añadido correctamente'
                     st.success(texto_exito)
+                    
+                    st.cache_data.clear()
         
                 else:
                     texto_error = 'El participante introducido ya se encuentra en la base de datos '
