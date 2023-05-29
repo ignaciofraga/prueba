@@ -956,7 +956,7 @@ def entrada_salidas_mar():
                     id_asignado =  int(max(df_personal['id_personal']) + 1)
 
                     instruccion_sql = '''INSERT INTO personal_salidas (id_personal,nombre_apellidos,comisionado)
-                        VALUES (%s,%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.correo,EXCLUDED.comisionado);''' 
+                        VALUES (%s,%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.comisionado);''' 
                       
                     st.text(id_asignado)
                     st.text(nombre_participante)
@@ -964,10 +964,7 @@ def entrada_salidas_mar():
                       
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
-                    if comision:
-                        cursor.execute(instruccion_sql, (id_asignado,nombre_participante,"true"))
-                    else:
-                        cursor.execute(instruccion_sql, (id_asignado,nombre_participante,False))                        
+                    cursor.execute(instruccion_sql, (id_asignado,nombre_participante,comision))                     
                     conn.commit()
                     cursor.close()
                     conn.close()
