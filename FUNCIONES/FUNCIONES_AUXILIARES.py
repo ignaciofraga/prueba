@@ -152,7 +152,7 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
 
         test = df_prog_anho_sel
         test = test.drop(columns=['variables_muestreadas'])
-        st.dataframe(df_prog_sel)
+        st.dataframe(test)
 
     col1, col2 = st.columns(2,gap="small")
     with col1: 
