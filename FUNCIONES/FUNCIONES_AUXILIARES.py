@@ -159,7 +159,7 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
         df_prog_anho_tipo_sel     = df_prog_anho_sel[df_prog_anho_sel['tipo_salida']==tipo_salida_seleccionada]
 
 
-    test = df_prog_anho_sel
+    test = df_prog_anho_tipo_sel
     test = test.drop(columns=['variables_muestreadas'])
     st.dataframe(test)
 
