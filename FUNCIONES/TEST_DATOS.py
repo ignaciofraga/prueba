@@ -109,34 +109,3 @@ df_datos_disponibles = df_datos_disponibles[(df_datos_disponibles["programa"] ==
 
 
 
-
-
-
-         
-        # Añade columna con información del año
-        df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
-        
-        # Borra los dataframes que ya no hagan falta para ahorrar memoria
-        del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos)
-        
-        # procesa ese dataframe
-        io_control_calidad = 1
-        indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada = FUNCIONES_AUXILIARES.menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
-                                                   
-        # Recupera el nombre "completo" de la variable y sus unidades
-        indice_variable          = variables_procesado_bd.index(variable_seleccionada)
-        nombre_completo_variable = variables_procesado[indice_variable] 
-        unidades_variable        = variables_unidades[indice_variable]
-        tabla_insercion          = variable_tabla[indice_variable]
-                        
-                                                        
-        # Selecciona los datos correspondientes al programa, estación, salida y cast seleccionados
-        datos_procesados     = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion) & (df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
-
-        df_datos_disponibles = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion)]
-            
-        FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset,tabla_insercion)
-
-
-
-
