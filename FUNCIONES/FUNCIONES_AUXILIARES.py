@@ -150,9 +150,9 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
         
         df_prog_anho_sel          = df_prog_sel[df_prog_sel['año']==anho_seleccionado]
 
-        test = df_prog_anho_sel
-        test = test.drop(columns=['variables_muestreadas'])
-        st.dataframe(test)
+        # test = df_prog_anho_sel
+        # test = test.drop(columns=['variables_muestreadas'])
+        # st.dataframe(test)
 
     col1, col2 = st.columns(2,gap="small")
     with col1: 

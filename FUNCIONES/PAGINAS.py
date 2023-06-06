@@ -1606,6 +1606,10 @@ def entrada_archivos_roseta():
         # Añade columna con información del año
         df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
         
+        test = df_datos_disponibles
+        test = test.drop(columns=['variables_muestreadas'])
+        st.dataframe(test)
+        
         # Borra los dataframes que ya no hagan falta para ahorrar memoria
         del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos)
         
