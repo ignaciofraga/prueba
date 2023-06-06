@@ -44,6 +44,8 @@ def principal():
     # Añade el logo del IEO
     imagen_pagina = Image.open(logo_IEO_principal) 
     st.image(imagen_pagina)
+    
+    st.cache_data.clear()
 
 
 ###############################################################################

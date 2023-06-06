@@ -153,7 +153,8 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
     col1, col2 = st.columns(2,gap="small")
     with col1: 
 
-        
+        st.dataframe(df_prog_anho_sel)        
+
         listado_salidas           = df_prog_anho_sel['salida_mar'].unique()
         df_salidas_muestreadas    = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
         df_salidas_muestreadas    = df_salidas_muestreadas.sort_values('fecha_salida',ascending=False)
