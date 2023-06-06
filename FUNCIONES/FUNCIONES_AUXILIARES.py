@@ -156,7 +156,7 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
         listado_tipos_salida      = datos_procesados['tipo_salida'].unique()
         tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(listado_tipos_salida))
         
-        df_prog_anho_tipo_sel     = df_prog_sel[df_prog_sel['tipo_salida']==tipo_salida_seleccionada]
+        df_prog_anho_tipo_sel     = df_prog_anho_sel[df_prog_anho_sel['tipo_salida']==tipo_salida_seleccionada]
 
 
         # test = df_prog_anho_sel
