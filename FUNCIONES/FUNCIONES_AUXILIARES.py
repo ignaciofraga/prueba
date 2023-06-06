@@ -133,7 +133,7 @@ def estado_procesos(altura_tabla):
 def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas):
     
     # Despliega menús de selección de la variable, salida y la estación a controlar                
-    col1, col2 = st.columns(2,gap="small")
+    col1, col2, col3 = st.columns(3,gap="small")
     with col1: 
         
         listado_programas         = datos_procesados['programa'].unique()
@@ -149,6 +149,15 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
         anho_seleccionado         = st.selectbox('Año',(anhos_disponibles))
         
         df_prog_anho_sel          = df_prog_sel[df_prog_sel['año']==anho_seleccionado]
+        
+        
+    with col3:
+        
+        listado_tipos_salida      = datos_procesados['tipo_salida'].unique()
+        tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(listado_tipos_salida))
+        
+        df_prog_anho_tipo_sel     = df_prog_sel[df_prog_sel['tipo_salida']==tipo_salida_seleccionada]
+
 
         # test = df_prog_anho_sel
         # test = test.drop(columns=['variables_muestreadas'])
@@ -157,13 +166,13 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
     col1, col2 = st.columns(2,gap="small")
     with col1: 
 
-        listado_salidas           = df_prog_anho_sel['salida_mar'].unique()
+        listado_salidas           = df_prog_anho_tipo_sel['salida_mar'].unique()
         df_salidas_muestreadas    = df_salidas[df_salidas['id_salida'].isin(listado_salidas)]
         df_salidas_muestreadas    = df_salidas_muestreadas.sort_values('fecha_salida',ascending=False)
         salida_seleccionada       = st.selectbox('Salida',(df_salidas_muestreadas['nombre_salida']))
         indice_salida             = df_salidas['id_salida'][df_salidas['nombre_salida']==salida_seleccionada].iloc[0]
 
-        df_prog_anho_sal_sel      = df_prog_anho_sel[df_prog_anho_sel['salida_mar']==indice_salida]
+        df_prog_anho_sal_sel      = df_prog_anho_tipo_sel[df_prog_anho_tipo_sel['salida_mar']==indice_salida]
 
     with col2:
 
