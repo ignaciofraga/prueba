@@ -795,6 +795,48 @@ direccion_host = '193.146.155.99'
 
 
 
+################################################################
+## TABLA CON DATOS FISICOS PROCEDENTES DE PERFILES VERTICALES ##
+################################################################
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()
+
+nombre_tabla = 'datos_perfiles'
+
+# Borra la table si ya existía
+instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+cursor.execute(instruccion_sql)
+conn.commit()
+
+# Crea la tabla de nuevo
+listado_variables = ('(perfil int,'
+' temperatura_ctd text,'
+' salinidad_ctd text,'
+' par_ctd text,'
+' sigmat text,'
+' oxigeno_ctd text,'
+' fluorescencia_ctd text,'
+) 
+
+listado_dependencias = ('FOREIGN KEY (perfil)'
+'REFERENCES perfiles_verticales (perfil)'
+'ON UPDATE CASCADE ON DELETE CASCADE'
+)
+
+listado_unicidades = (', UNIQUE (perfil))')
+
+instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+cursor.execute(instruccion_sql)
+conn.commit()
+cursor.close()
+conn.close()
+
+
+
+
+
+
+
 # ################################################################
 # ## TABLA CON DATOS FISICOS PROCEDENTES DE PERFILES VERTICALES ##
 # ################################################################

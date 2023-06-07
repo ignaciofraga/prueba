@@ -766,8 +766,6 @@ def consulta_botellas():
         df_exporta.replace("", nan_value, inplace=True)
         df_exporta.dropna(how='all', axis=1, inplace=True)
         
-        st.dataframe(df_variables)
-        
         # Añade unidades al nombre de cada variable
         listado_variables = df_variables['variables'].tolist() 
         listado_unidades  = df_variables['unidades_variables'].tolist() 
@@ -836,18 +834,17 @@ def consulta_perfiles():
         df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_programas            = psql.read_sql('SELECT * FROM programas', conn)
         df_perfiles             = psql.read_sql('SELECT * FROM perfiles_verticales', conn)
-        df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_perfil_fisica', conn)
-        df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_perfil_biogeoquimica', conn)
+        df_datos_perfiles       = psql.read_sql('SELECT * FROM datos_perfiles', conn)
         df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
         conn.close()    
         
-        return df_salidas,df_programas,df_perfiles,df_datos_fisicos,df_datos_biogeoquimicos,df_estaciones
+        return df_salidas,df_programas,df_perfiles,df_datos_perfiles,df_estaciones
  
     
     st.subheader('Consulta los datos de perfiles disponibles') 
 
     # Carga la información de la base de datos de la caché
-    df_salidas,df_programas,df_perfiles,df_datos_fisicos,df_datos_biogeoquimicos,df_estaciones = carga_datos_consulta_perfiles()
+    df_salidas,df_programas,df_perfiles,df_datos_perfiles,df_estaciones = carga_datos_consulta_perfiles()
 
     id_radiales             = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
     df_salidas_seleccion    = df_salidas[df_salidas['programa']==int(id_radiales)]
@@ -883,7 +880,7 @@ def consulta_perfiles():
     id_salida_seleccionada          = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida_seleccionada].iloc[0]
     
     df_perfiles_seleccion  = df_perfiles[df_perfiles['salida_mar']==int(id_salida_seleccionada)]
-    df_datos_combinado     = pandas.merge(df_datos_fisicos, df_datos_biogeoquimicos, on="perfil")
+    df_datos_combinado     = pandas.merge(df_datos_perfiles, df_perfiles, on="perfil")
         
     # Comprueba si hay datos disponibles
     if df_perfiles_seleccion.shape[0] == 0:

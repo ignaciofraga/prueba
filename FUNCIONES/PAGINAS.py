@@ -1511,10 +1511,8 @@ def entrada_archivos_roseta():
                             
                             df_perfiles['perfil'] = int(id_perfil)
                                                         
-                            FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-                            FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_bgq',direccion_host,base_datos,usuario,contrasena,puerto)               
-                                
-                                
+                            FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto)
+                                                                    
                             if nombre_estacion == '2' and programa_seleccionado == 'RADIAL CORUÑA' :  # Estacion 2 del programa radiales, añadir muestreo correspondiente a la botella en superficie
 
                                  # Genera dataframe con el muestreo de la estacion 2
@@ -1562,10 +1560,8 @@ def entrada_archivos_roseta():
                           
                                  df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
-                                 FUNCIONES_PROCESADO.inserta_datos(df_botella,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-                                 FUNCIONES_PROCESADO.inserta_datos(df_botella,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)               
-                                
-
+                                 FUNCIONES_PROCESADO.inserta_datos(df_botella,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
+                                 
                 texto_exito = 'Estación ' + nombre_estacion + ' procesada correctamente. Información subida a la base de datos'
                 st.success(texto_exito)                            
              
