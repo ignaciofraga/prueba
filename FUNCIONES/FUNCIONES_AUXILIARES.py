@@ -770,6 +770,9 @@ def consulta_botellas():
         listado_variables = df_variables['variables'].tolist() 
         listado_unidades  = df_variables['unidades_variables'].tolist() 
  
+    
+        st.text(listado_variables)
+        st.text(listado_unidades)
         
         listado_variables_df = df_exporta.columns.tolist()
         for ivariable_df in range(len(listado_variables_df)):
