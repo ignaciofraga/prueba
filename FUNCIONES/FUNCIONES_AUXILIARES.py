@@ -766,6 +766,7 @@ def consulta_botellas():
         df_exporta.replace("", nan_value, inplace=True)
         df_exporta.dropna(how='all', axis=1, inplace=True)
         
+        st.dataframe(df_variables)
         
         # Añade unidades al nombre de cada variable
         listado_variables = df_variables['variables'].tolist() 
