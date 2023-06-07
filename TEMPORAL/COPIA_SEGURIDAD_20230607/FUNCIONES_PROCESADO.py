@@ -610,11 +610,16 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
 def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,contrasena,puerto):
   
-    if tipo_datos     == 'discreto':
-        variables     = 'variables'
-        tabla_destino = 'datos_discretos'
+    if tipo_datos     == 'discreto_fisica':
+        variables     = 'variables_fisicas'
+        tabla_destino = 'datos_discretos_fisica'
         puntero       = 'muestreo'
-            
+    
+    elif tipo_datos   == 'discreto_bgq':
+        variables     = 'variables_biogeoquimicas'  
+        tabla_destino = 'datos_discretos_biogeoquimica'
+        puntero       = 'muestreo'
+        
     elif tipo_datos   == 'perfil_fisica':
         variables     = 'variables_fisicas'  
         tabla_destino = 'datos_perfil_fisica'

@@ -44,8 +44,6 @@ def principal():
     # Añade el logo del IEO
     imagen_pagina = Image.open(logo_IEO_principal) 
     st.image(imagen_pagina)
-    
-    st.cache_data.clear()
 
 
 ###############################################################################
@@ -650,7 +648,7 @@ def consulta_procesos():
 def entrada_salidas_mar():
     
     # Función para cargar en caché los datos a utilizar
-    @st.cache_data(ttl=300,show_spinner="Cargando información de la base de datos")
+    @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
     def carga_datos_salidas_mar():
         conn                      = init_connection()
         df_buques            = psql.read_sql('SELECT * FROM buques', conn)
@@ -659,10 +657,9 @@ def entrada_salidas_mar():
         df_personal          = psql.read_sql('SELECT * FROM personal_salidas', conn)
         df_salidas           = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_estaciones        = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_programas         = psql.read_sql('SELECT * FROM programas', conn)
         
         conn.close()
-        return df_buques,df_config_perfilador,df_config_superficie,df_personal,df_salidas,df_estaciones,df_programas
+        return df_salidas,df_programas,df_estaciones,df_condiciones
     
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
@@ -672,22 +669,8 @@ def entrada_salidas_mar():
     contrasena     = st.secrets["postgres"].password
     puerto         = st.secrets["postgres"].port
     
-    # Cargar los datos de la caché
-    df_buques,df_config_perfilador,df_config_superficie,df_personal,df_salidas,df_estaciones,df_programas = carga_datos_salidas_mar()
-    
-    # Procesa cierta información utilizada en todos los procesos
-    id_radiales                = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
-
-    df_salidas_radiales        = df_salidas[df_salidas['programa']==int(id_radiales)]
-    df_estaciones_radiales     = df_estaciones[df_estaciones['programa']==int(id_radiales)]
-  
-    # Fechas y horas por defecto
-    fecha_actual        = datetime.date.today()
-    hora_defecto_inicio = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
-    hora_defecto_final  = datetime.time(14,30,0,0,tzinfo = datetime.timezone.utc)  
-  
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    entradas     = ['Añadir salida al mar','Modificar salidas realizadas','Consultar salidas realizadas','Personal participante']
+    entradas     = ['Añadir salida al mar', 'Rersonal participante','Consultar o modificar salidas realizadas']
     tipo_entrada = st.sidebar.radio("Indicar la consulta a realizar",entradas)
     
 
@@ -695,36 +678,206 @@ def entrada_salidas_mar():
     if tipo_entrada == entradas[0]:  
         
         st.subheader('Salida al mar')
+        
+        # Recupera la tabla con los buques disponibles en la base de datos, como un dataframe
+        conn = init_connection()
+        df_buques            = psql.read_sql('SELECT * FROM buques', conn)
+        df_config_perfilador = psql.read_sql('SELECT * FROM configuracion_perfilador', conn)
+        df_config_superficie = psql.read_sql('SELECT * FROM configuracion_superficie', conn)
+        conn.close()
+        
+        # Recupera tablas con información utilizada
+        conn                       = init_connection()
+        
+        # Personal disponible
+        df_personal                = psql.read_sql('SELECT * FROM personal_salidas', conn)
+        df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
+        df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
+        # Salidas realizadas 
+        df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
+        # Estaciones de muestreo (radiales)
+        df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+        df_estaciones_radiales = df_estaciones[df_estaciones['programa']==3]
+        
+        conn.close()
+        
 
         # tipos de salida en las radiales
         tipos_radiales = ['MENSUAL','SEMANAL']
-
-        # Despliega los formularios 
+        
+        
+        fecha_actual        = datetime.date.today()
+        
+        hora_defecto_inicio = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
+        hora_defecto_final  = datetime.time(14,30,0,0,tzinfo = datetime.timezone.utc)
+        
+        # Despliega un formulario para seleccionar las fechas de inicio y final
         with st.form("Formulario seleccion"):
                    
-            col1, col2 = st.columns(2,gap="small")
+            nombre_salida        = st.text_input('Nombre de la salida', value="")
+            
+            col1, col2,col3= st.columns(3,gap="small")
             
             with col1:
+                
                 tipo_salida     = st.selectbox('Tipo de radial',(tipos_radiales))
-           
-            with col2:
-                nombre_salida        = st.text_input('Nombre de la salida', value="")                
-            
+                
+                buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']))
+                id_buque_elegido = int(df_buques['id_buque'][df_buques['nombre_buque']==buque_elegido].values[0])               
 
-            # Selección de fechas, personal, y estaciones        
-            personal_comisionado_previo    = None
-            personal_no_comisionado_previo = None
-            estaciones_previas             = None 
-            id_buque_previo                = None 
-            id_perfil_previo               = None 
-            id_sup_previo                  = None
-            fecha_salida,hora_salida,fecha_regreso,hora_regreso,json_comisionados,json_no_comisionados,json_estaciones,id_buque_elegido,id_configurador_perfil,id_configurador_sup = FUNCIONES_AUXILIARES.menu_metadatos_radiales(fecha_actual,hora_defecto_inicio,fecha_actual,hora_defecto_final,df_personal,personal_comisionado_previo,personal_no_comisionado_previo,estaciones_previas,df_estaciones_radiales,id_buque_previo,df_buques,id_perfil_previo,df_config_perfilador,id_sup_previo,df_config_superficie)
-    
+                   
+            with col2:               
+                fecha_salida  = st.date_input('Fecha de salida',max_value=fecha_actual,value=fecha_actual)
+
+                hora_salida   = st.time_input('Hora de salida (UTC)', value=hora_defecto_inicio)
+
+            with col3:
+                
+                fecha_regreso = st.date_input('Fecha de regreso',max_value=fecha_actual,value=fecha_actual)
+
+                hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto_final)
+                
+            
+            col1, col2 = st.columns(2,gap="small")
+            
+            with col1:     
+                id_configurador_perfil     = st.selectbox('Id.configuracion perfilador',(df_config_perfilador['id_config_perfil']))
+
+            with col2:
+                id_configurador_sup        = st.selectbox('Id.configuracion continuo',(df_config_superficie['id_config_superficie']))
+
+
+            personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])
+            json_comisionados       = json.dumps(personal_comisionado)
+
+            personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])
+            if len(personal_no_comisionado)>0:
+                json_no_comisionados = json.dumps(personal_no_comisionado)
+            else:
+                json_no_comisionados = None  
+            
+            estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
+            json_estaciones         = json.dumps(estaciones_muestreadas)
+            
+            
+            # Selecciona las variables muestreadas
+            st.subheader('Variables muestreadas')
+            
+            st.markdown('BOTELLAS')
+
+            json_variables = []
+            col1, col2, col3, col4= st.columns(4,gap="small")
+            
+            with col1:
+                oxigenos = st.checkbox('Oxigenos', value=True)
+                if oxigenos:
+                    json_variables = json_variables + ['Oxigenos']
                     
-            # Selección de variables medidas con botellas y continuo
-            json_variables_previas = []
-            json_variables    = FUNCIONES_AUXILIARES.menu_variables_radiales(json_variables_previas)
-            json_variables    = json.dumps(json_variables)
+                alcalinidad = st.checkbox('Alcalinidad', value=True)
+                if alcalinidad:
+                    json_variables = json_variables + ['Alcalinidad']
+                    
+                ph = st.checkbox('pH', value=True)
+                if ph:
+                    json_variables = json_variables + ['pH']
+                    
+                nut_a = st.checkbox('Nutrientes (A)', value=True)
+                if nut_a:
+                    json_variables = json_variables + ['Nutrientes (A)']
+                    
+                nut_b = st.checkbox('Nutrientes (B)', value=True)
+                if nut_b:
+                    json_variables = json_variables + ['Nutrientes (B)']
+                   
+                    
+            with col2:                                       
+                citometria = st.checkbox('Citometria', value=True)
+                if citometria:
+                    json_variables = json_variables + ['Citometria']
+                                        
+                ciliados = st.checkbox('Ciliados', value=True)
+                if ciliados:
+                    json_variables = json_variables + ['Ciliados']
+                    
+                zoop_meso = st.checkbox('Zoop. (meso)', value=True)
+                if zoop_meso:
+                    json_variables = json_variables + ['Zoop. (meso)']
+                    
+                zoop_micro = st.checkbox('Zoop. (micro)', value=True)
+                if zoop_micro:
+                    json_variables = json_variables + ['Zoop. (micro)']   
+                    
+                zoop_ictio = st.checkbox('Zoop. (ictio)', value=False)
+                if zoop_ictio:
+                    json_variables = json_variables + ['Zoop. (ictio)']   
+
+
+            with col3:
+                colorofilas = st.checkbox('Clorofilas', value=True)
+                if colorofilas:
+                    json_variables = json_variables + ['Clorofilas'] 
+
+                prod_prim = st.checkbox('Prod.Primaria', value=True)
+                if prod_prim:
+                    json_variables = json_variables + ['Prod.Primaria']
+                                        
+                flow_cam = st.checkbox('Flow Cam', value=True)
+                if flow_cam:
+                    json_variables = json_variables + ['Flow Cam'] 
+                    
+                adn = st.checkbox('ADN', value=True)
+                if adn:
+                    json_variables = json_variables + ['ADN'] 
+                    
+                dom = st.checkbox('DOM', value=True)
+                if dom:
+                    json_variables = json_variables + ['DOM']
+            
+            
+            with col4:
+                
+                toc = st.checkbox('TOC', value=True)
+                if toc:
+                    json_variables = json_variables + ['TOC']
+                    
+                poc = st.checkbox('POC', value=True)
+                if poc:
+                    json_variables = json_variables + ['POC']
+                                    
+                ppl = st.checkbox('PPL', value=False)
+                if ppl:
+                    json_variables = json_variables + ['PPL']
+                    
+                otros = st.text_input('Otros:')
+                if otros:
+                    json_variables = json_variables + [otros]
+                    
+                    
+            st.markdown('CONTINUO')
+            col1, col2, col3, col4= st.columns(4,gap="small")
+            
+            with col1:
+                oxigenos_continuo = st.checkbox('Oxigeno (Cont.)', value=True)
+                if oxigenos_continuo:
+                    json_variables = json_variables + ['Oxigeno (Cont.)']  
+
+            with col2:
+                ph_continuo = st.checkbox('pH (Cont.)', value=True)
+                if ph_continuo:
+                    json_variables = json_variables + ['pH (Cont.)']            
+
+            with col3:
+                cdom_continuo = st.checkbox('CDOM (Cont.)', value=False)
+                if cdom_continuo:
+                    json_variables = json_variables + ['CDOM (Cont.)'] 
+            
+            with col4:
+                clorofilas_continuo = st.checkbox('Clorofila (Cont.)', value=False)
+                if clorofilas_continuo:
+                    json_variables = json_variables + ['Clorofila (Cont.)'] 
+                    
+            
                     
             json_variables         = json.dumps(json_variables)
 
@@ -753,23 +906,20 @@ def entrada_salidas_mar():
                     st.warning(texto_error, icon="⚠️")
                 
                 else:
-                                
+                
                     io_incluido = 0
                     for isalida in range(df_salidas_radiales.shape[0]):
                         if df_salidas_radiales['fecha_salida'].iloc[isalida] == fecha_salida and df_salidas_radiales['tipo_salida'].iloc[isalida] == tipo_salida:
                             io_incluido = 1
     
-                    if io_incluido == 0:   
+                    if io_incluido == 0:                     
                         
-                        # Determina el id de la salida
-                        id_salida = int(max(df_salidas['id_salida']) + 1)
-                        
-                        instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones,estaciones,variables_muestreadas,configuracion_perfilador,configuracion_superficie)
-                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO NOTHING;''' 
+                        instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones,estaciones,variables_muestreadas,configuracion_perfilador,configuracion_superficie)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (id_salida) DO UPDATE SET (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,participantes_comisionados,participantes_no_comisionados,observaciones,estaciones,variables_muestreadas,configuracion_perfilador,configuracion_superficie) = ROW(EXCLUDED.nombre_salida,EXCLUDED.programa,EXCLUDED.nombre_programa,EXCLUDED.tipo_salida,EXCLUDED.fecha_salida,EXCLUDED.hora_salida,EXCLUDED.fecha_retorno,EXCLUDED.hora_retorno,EXCLUDED.buque,EXCLUDED.participantes_comisionados,EXCLUDED.participantes_no_comisionados,EXCLUDED.observaciones,EXCLUDED.estaciones,EXCLUDED.variables_muestreadas,EXCLUDED.configuracion_perfilador,EXCLUDED.configuracion_superficie);''' 
                                 
                         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                         cursor = conn.cursor()
-                        cursor.execute(instruccion_sql, (id_salida,nombre_salida,3,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_comisionados,json_no_comisionados,observaciones,json_estaciones,json_variables,id_configurador_perfil,id_configurador_sup))
+                        cursor.execute(instruccion_sql, (nombre_salida,3,'RADIAL CORUÑA',tipo_salida,fecha_salida,hora_salida,fecha_regreso,hora_regreso,id_buque_elegido,json_comisionados,json_no_comisionados,observaciones,json_estaciones,json_variables,id_configurador_perfil,id_configurador_sup))
                         conn.commit()
                         cursor.close()
                         conn.close()
@@ -777,168 +927,28 @@ def entrada_salidas_mar():
                         texto_exito = 'Salida añadida correctamente'
                         st.success(texto_exito)
                         
-                        st.cache_data.clear()
-                        
                     else:
-                        texto_error = 'La base de datos ya contiene una salida ' + tipo_salida.lower() + ' para la fecha seleccionada. Puede modificar los datos de esa salida en la pestaña correspondiente'
+                        texto_error = 'La base de datos ya contiene una salida ' + tipo_salida.lower() + ' para la fecha seleccionada'
                         st.warning(texto_error, icon="⚠️")                      
                         
     
-    
-    # Modificar datos correspondientes a una salida de radial
-    if tipo_entrada == entradas[1]:                    
 
-        # Modifica una salida
-        st.subheader('Modifica salida al mar')
-                         
-        
-        # Despliega menús de selección del programa, tipo de salida, año y fecha               
-        col1, col2= st.columns(2,gap="small")
-     
-        with col1:
-            tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_radiales['tipo_salida'].unique()))   
-            df_salidas_seleccion      = df_salidas_radiales[df_salidas_radiales['tipo_salida']==tipo_salida_seleccionada]
-        
-            # Añade la variable año al dataframe
-            indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
-            df_salidas_seleccion['id_temp'] = indices_dataframe
-            df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
-            
-            # Define los años con salidas asociadas
-            df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
-            for idato in range(df_salidas_seleccion.shape[0]):
-                df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
-            df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
-            
-            listado_anhos              = df_salidas_seleccion['año'].unique()
-        
-        with col2:
-            anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
-            df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
-    
-        salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
-    
-        # Despliega un formulario para modificar los datos de la salida 
-        with st.form("Formulario seleccion"):    
-    
-                    
-            datos_salida_seleccionada      = df_salidas[df_salidas['nombre_salida']==salida]
-            id_salida                      = datos_salida_seleccionada['id_salida'].iloc[0]
-            
-            # Selección de fechas, personal, y estaciones
-            fecha_salida                   = datos_salida_seleccionada['fecha_salida'].iloc[0]
-            hora_salida                    = datos_salida_seleccionada['hora_salida'].iloc[0]
-            fecha_regreso                  = datos_salida_seleccionada['fecha_retorno'].iloc[0]
-            hora_regreso                   = datos_salida_seleccionada['hora_retorno'].iloc[0]
-            personal_comisionado_previo    = datos_salida_seleccionada['participantes_comisionados'].iloc[0]
-            personal_no_comisionado_previo = datos_salida_seleccionada['participantes_no_comisionados'].iloc[0]
-            estaciones_previas             = datos_salida_seleccionada['estaciones'].iloc[0] 
-            id_buque_previo                = datos_salida_seleccionada['buque'].iloc[0] - 1
-            
-            
-            
-            
-            listado_config_perfilador      = datos_salida_seleccionada['configuracion_perfilador']
-            listado_config_perfilador      = [ int(x) for x in listado_config_perfilador]
-            listado_config_sup             = datos_salida_seleccionada['configuracion_superficie']
-            listado_config_sup             = [ int(x) for x in listado_config_sup]            
-            id_perfil_previo               = listado_config_perfilador.index(int(datos_salida_seleccionada['configuracion_perfilador'].iloc[0]))
-            id_sup_previo                  = listado_config_sup.index(int(datos_salida_seleccionada['configuracion_superficie'].iloc[0]))
-            
-            fecha_salida,hora_salida,fecha_regreso,hora_regreso,json_comisionados,json_no_comisionados,json_estaciones,id_buque_elegido,id_configurador_perfil,id_configurador_sup = FUNCIONES_AUXILIARES.menu_metadatos_radiales(fecha_salida,hora_salida,fecha_regreso,hora_regreso,df_personal,personal_comisionado_previo,personal_no_comisionado_previo,estaciones_previas,df_estaciones_radiales,id_buque_previo,df_buques,id_perfil_previo,df_config_perfilador,id_sup_previo,df_config_superficie)
-            
-            # Selección de fechas, personal, y estaciones
-            json_variables_previas         = datos_salida_seleccionada['variables_muestreadas'].iloc[0]
-            json_variables                 = FUNCIONES_AUXILIARES.menu_variables_radiales(json_variables_previas)
-            json_variables                 = json.dumps(json_variables)
-
-            observaciones_previas          = datos_salida_seleccionada['observaciones'].iloc[0] 
-            observaciones                  = st.text_input('Observaciones', value=observaciones_previas)
-    
-            submit = st.form_submit_button("Actualizar salida")
-    
-            if submit == True:
-                           
-                instruccion_sql = '''UPDATE salidas_muestreos SET fecha_salida = %s, hora_salida = %s, fecha_retorno = %s,hora_retorno = %s, buque = %s, participantes_comisionados = %s ,participantes_no_comisionados = %s,observaciones = %s,estaciones = %s,variables_muestreadas = %s WHERE id_salida = %s;''' 
-                        
-                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                cursor = conn.cursor()
-                cursor.execute(instruccion_sql, (fecha_salida,hora_salida,fecha_regreso,hora_regreso,int(id_buque_elegido),json_comisionados,json_no_comisionados,observaciones,json_estaciones,json_variables,int(id_salida)))
-                conn.commit()
-                cursor.close()
-                conn.close()
-
-
-                texto_exito = 'Salida ' + salida + ' actualizada correctamente'
-                st.success(texto_exito)
-                
-                st.cache_data.clear()
-
-
-
-    # Consulta las salidas realizadas
-    if tipo_entrada == entradas[2]: 
-        
-        st.subheader('Consultar salidas al mar realizadas')
-       
-        # Añade una columna con el nombre del buque utilizado
-        df_salidas_radiales['Buque'] = None
-        for isalida in range(df_salidas_radiales.shape[0]):
-            if df_salidas_radiales['buque'].iloc[isalida].is_integer():
-                df_salidas_radiales['Buque'].iloc[isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]].iloc[0]
-
-        # Elimina las columnas que no interesa mostrar
-        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','buque','configuracion_perfilador','configuracion_superficie'])
-    
-        # Renombra las columnas
-        df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados'})
-    
-        # Ajusta el formato de las fechas
-        for idato in range(df_salidas_radiales.shape[0]):
-            df_salidas_radiales['Fecha salida'].iloc[idato]   =  df_salidas_radiales['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
-            df_salidas_radiales['Fecha retorno'].iloc[idato]  =  df_salidas_radiales['Fecha retorno'].iloc[idato].strftime("%Y-%m-%d")
-
-        # Ordena los valores por fechas
-        df_salidas_radiales = df_salidas_radiales.sort_values('Fecha salida',ascending=False)
-
-        # Mueve los identificadores de muestreo al final del dataframe
-        listado_cols = df_salidas_radiales.columns.tolist()
-        listado_cols.append(listado_cols.pop(listado_cols.index('Observaciones')))   
-        df_salidas_radiales = df_salidas_radiales[listado_cols]
-          
-        # Muestra una tabla con las salidas realizadas
-        st.dataframe(df_salidas_radiales,use_container_width=True)
-
-        # Botón para descargar las salidas disponibles
-        nombre_archivo =  'DATOS_SALIDAS.xlsx'
-    
-        output = BytesIO()
-        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-        df_salidas_radiales.to_excel(writer, index=False, sheet_name='DATOS')
-        # workbook = writer.book
-        # worksheet = writer.sheets['DATOS']
-        writer.sheets['DATOS']        
-        writer.save()
-        df_salidas_radiales = output.getvalue()
-    
-        st.download_button(
-            label="DESCARGA EXCEL CON LAS SALIDAS REALIZADAS",
-            data=df_salidas_radiales,
-            file_name=nombre_archivo,
-            help= 'Descarga un archivo .csv con los datos solicitados',
-            mime="application/vnd.ms-excel")
-        
 
 
 
     # Añade personal participante en las salidas de radial
-    if tipo_entrada == entradas[3]: 
+    if tipo_entrada == entradas[1]: 
 
         st.subheader('Personal participante')
         
+        # Recupera la tabla con el personal ya introducido, como un dataframe
+        conn = init_connection()
+        df_personal = psql.read_sql('SELECT * FROM personal_salidas', conn)
+        conn.close()
+
         # Muestra una tabla con el personal ya incluido en la base de datos
         st.dataframe(df_personal,height=250)
-                
+        
         st.subheader('Añadir personal participante')
         # Despliega un formulario para introducir los datos
         with st.form("Formulario seleccion"):
@@ -958,35 +968,437 @@ def entrada_salidas_mar():
                 
                 if io_incluido == 0:
 
-                    id_asignado =  int(max(df_personal['id_personal']) + 1)
-
-                    instruccion_sql = '''INSERT INTO personal_salidas (id_personal,nombre_apellidos,comisionado)
-                        VALUES (%s,%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.comisionado);''' 
-                                            
+                    instruccion_sql = '''INSERT INTO personal_salidas (nombre_apellidos,comisionado)
+                        VALUES (%s,%s) ON CONFLICT (id_personal) DO UPDATE SET (nombre_apellidos,comisionado) = ROW(EXCLUDED.nombre_apellidos,EXCLUDED.correo,EXCLUDED.comisionado);''' 
+                            
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
-                    cursor.execute(instruccion_sql, (id_asignado,nombre_participante,comision))                     
+                    cursor.execute(instruccion_sql, (nombre_participante,comision))
                     conn.commit()
                     cursor.close()
                     conn.close()
 
                     texto_exito = 'Participante añadido correctamente'
                     st.success(texto_exito)
-                    
-                    st.cache_data.clear()
         
                 else:
                     texto_error = 'El participante introducido ya se encuentra en la base de datos '
                     st.warning(texto_error, icon="⚠️")  
 
 
+    # Consulta las salidas realizadas
+    if tipo_entrada == entradas[2]: 
+        
+        st.subheader('Salidas al mar realizadas')
 
+        # Muestra las salidas realizadas
+
+        # Recupera la tabla con las salidas disponibles, como un dataframe
+        conn = init_connection()
+        df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
+        df_buques = psql.read_sql('SELECT * FROM buques', conn)
+        conn.close()
+        
+        # Añade una columna con el nombre del buque utilizado
+        df_salidas_radiales['Buque'] = None
+        for isalida in range(df_salidas_radiales.shape[0]):
+            if df_salidas_radiales['buque'].iloc[isalida].is_integer():
+                #st.text(df_salidas_radiales['buque'].iloc[isalida])
+                df_salidas_radiales['Buque'].iloc[isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]].iloc[0]
+
+        # Elimina las columnas que no interesa mostrar
+        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','buque'])
+    
+        # Renombra las columnas
+        df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados'})
+    
+        # Ajusta el formato de las fechas
+        for idato in range(df_salidas_radiales.shape[0]):
+            df_salidas_radiales['Fecha salida'].iloc[idato]   =  df_salidas_radiales['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
+            df_salidas_radiales['Fecha retorno'].iloc[idato]  =  df_salidas_radiales['Fecha retorno'].iloc[idato].strftime("%Y-%m-%d")
+
+        # Ordena los valores por fechas
+        df_salidas_radiales = df_salidas_radiales.sort_values('Fecha salida')
+
+        # Mueve os identificadores de muestreo al final del dataframe
+        listado_cols = df_salidas_radiales.columns.tolist()
+        listado_cols.append(listado_cols.pop(listado_cols.index('Observaciones')))
+        #listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud')))    
+        df_salidas_radiales = df_salidas_radiales[listado_cols]
+          
+        
+        # Muestra una tabla con las salidas realizadas
+        st.dataframe(df_salidas_radiales,use_container_width=True)
+        # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_salidas_radiales)
+        # gridOptions = gb.build()
+        # st_aggrid.AgGrid(df_salidas_radiales,gridOptions=gridOptions,enable_enterprise_modules=True,allow_unsafe_jscode=True,reload_data=True)    
+
+
+        # Botón para descargar las salidas disponibles
+        nombre_archivo =  'DATOS_SALIDAS.xlsx'
+    
+        output = BytesIO()
+        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+        df_salidas_radiales.to_excel(writer, index=False, sheet_name='DATOS')
+        workbook = writer.book
+        worksheet = writer.sheets['DATOS']
+        writer.save()
+        df_salidas_radiales = output.getvalue()
+    
+        st.download_button(
+            label="DESCARGA EXCEL CON LAS SALIDAS REALIZADAS",
+            data=df_salidas_radiales,
+            file_name=nombre_archivo,
+            help= 'Descarga un archivo .csv con los datos solicitados',
+            mime="application/vnd.ms-excel"
+        )
+        
         
                
 
 
 
+        # Modifica una salida
+        st.subheader('Modifica salida al mar')
+        
+        # Recupera la tabla con los buques disponibles en la base de datos, como un dataframe
+        conn = init_connection()
+        df_buques = psql.read_sql('SELECT * FROM buques', conn)
+        conn.close()
+          
+        # Recupera tablas con información utilizada
+        conn                       = init_connection()
+          
+        # Personal disponible
+        df_personal                = psql.read_sql('SELECT * FROM personal_salidas', conn)
+        df_personal_comisionado    = df_personal[df_personal['comisionado']==True]
+        df_personal_no_comisionado = df_personal[df_personal['comisionado']==False]
+        # Salidas realizadas 
+        df_salidas = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_salidas_radiales = df_salidas[df_salidas['nombre_programa']=='RADIAL CORUÑA']
+        # Estaciones de muestreo (radiales)
+        df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+        df_estaciones_radiales = df_estaciones[df_estaciones['programa']==3]
+        
+        conn.close()
+      
+        # Recupera tablas con informacion utilizada en el procesado
+        conn                = init_connection()
+        df_salidas          = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_programas        = psql.read_sql('SELECT * FROM programas', conn)
+        conn.close()    
+        
+        id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+        #id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
 
+
+        fecha_actual        = datetime.date.today()
+        
+        hora_defecto_inicio = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
+        hora_defecto_final  = datetime.time(14,30,0,0,tzinfo = datetime.timezone.utc)
+        
+        
+        # Despliega menús de selección del programa, tipo de salida, año y fecha               
+        col1, col2, col3= st.columns(3,gap="small")
+     
+        with col1: 
+            programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
+            df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
+            
+        
+        with col2:
+            tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
+            df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+        
+            # Añade la variable año al dataframe
+            indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+            df_salidas_seleccion['id_temp'] = indices_dataframe
+            df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
+            
+            # Define los años con salidas asociadas
+            df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
+            for idato in range(df_salidas_seleccion.shape[0]):
+                df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+            df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
+            
+            listado_anhos              = df_salidas_seleccion['año'].unique()
+        
+        with col3:
+            anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
+            df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+    
+        salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
+    
+    
+    
+        # Recupera propiedades de la salida seleccionada
+        datos_salida_seleccionada  = df_salidas[df_salidas['nombre_salida']==salida]
+        
+        id_salida                      = datos_salida_seleccionada['id_salida'].iloc[0]
+        fecha_salida                   = datos_salida_seleccionada['fecha_salida'].iloc[0] 
+        json_variables_previas         = datos_salida_seleccionada['variables_muestreadas'].iloc[0]
+        personal_comisionado_previo    = datos_salida_seleccionada['participantes_comisionados'].iloc[0]
+        personal_no_comisionado_previo = datos_salida_seleccionada['participantes_no_comisionados'].iloc[0]           
+        estaciones_previas             = datos_salida_seleccionada['estaciones'].iloc[0]
+        observaciones_previas          = datos_salida_seleccionada['observaciones'].iloc[0]
+
+        # Si no hay variables previas, genero una lista con un None para evitar problemas
+        if json_variables_previas is None:
+            json_variables_previas = [None]    
+        
+
+        # Recupera el personal de la salida seleccionada
+        
+        # Despliega un formulario para modificar los datos de la salida 
+        with st.form("Formulario seleccion"):
+                   
+            col1, col2,col3= st.columns(3,gap="small")
+            
+            with col1:
+                                
+                buque_elegido = st.selectbox('Selecciona el buque utilizado',(df_buques['nombre_buque']))
+                id_buque_elegido = int(df_buques['id_buque'][df_buques['nombre_buque']==buque_elegido].values[0])               
+
+                   
+            with col2:               
+                fecha_salida  = st.date_input('Fecha de salida',max_value=fecha_actual,value=fecha_salida)
+
+                hora_salida   = st.time_input('Hora de salida (UTC)', value=hora_defecto_inicio)
+
+            with col3:
+                
+                fecha_regreso = st.date_input('Fecha de regreso',max_value=fecha_actual,value=fecha_salida)
+
+                hora_regreso  = st.time_input('Hora de regreso (UTC)', value=hora_defecto_final)
+
+            if personal_comisionado_previo is not None:
+                personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'],default=personal_comisionado_previo)
+            else:
+                personal_comisionado    = st.multiselect('Personal comisionado participante',df_personal_comisionado['nombre_apellidos'])                
+            json_comisionados       = json.dumps(personal_comisionado)
+
+            if personal_no_comisionado_previo is not None:            
+                personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'],default=personal_no_comisionado_previo)
+            else:
+                personal_no_comisionado = st.multiselect('Personal no comisionado participante',df_personal_no_comisionado['nombre_apellidos'])                
+            if len(personal_no_comisionado)>0:
+                json_no_comisionados    = json.dumps(personal_no_comisionado)
+            else:
+                json_no_comisionados    = None
+            
+            if len(estaciones_previas):
+                estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'],default=estaciones_previas)
+            else:                
+                estaciones_muestreadas  = st.multiselect('Estaciones muestreadas',df_estaciones_radiales['nombre_estacion'])
+            json_estaciones         = json.dumps(estaciones_muestreadas)
+
+
+            # Selecciona las variables muestreadas
+            st.subheader('Variables muestreadas')
+
+            st.markdown('BOTELLAS')
+
+            json_variables = []
+            col1, col2, col3, col4= st.columns(4,gap="small")
+        
+            with col1:
+                if 'Oxigenos' in json_variables_previas:
+                    oxigenos = st.checkbox('Oxigenos', value=True)
+                else:
+                    oxigenos = st.checkbox('Oxigenos', value=False)                    
+                if oxigenos:
+                    json_variables = json_variables + ['Oxigenos']
+                    
+                if 'Alcalinidad' in json_variables_previas:
+                    alcalinidad = st.checkbox('Alcalinidad', value=True)
+                else:
+                    alcalinidad = st.checkbox('Alcalinidad', value=False)                    
+                if alcalinidad:
+                    json_variables = json_variables + ['Alcalinidad']
+
+                if 'pH' in json_variables_previas:                    
+                    ph = st.checkbox('pH', value=True)
+                else:
+                    ph = st.checkbox('pH', value=False)                
+                if ph:
+                    json_variables = json_variables + ['pH']
+                    
+                if 'Nutrientes (A)' in json_variables_previas:                 
+                    nut_a = st.checkbox('Nutrientes (A)', value=True)
+                else:
+                    nut_a = st.checkbox('Nutrientes (A)', value=False)                    
+                if nut_a:
+                    json_variables = json_variables + ['Nutrientes (A)']
+                    
+                if 'Nutrientes (B)' in json_variables_previas:                 
+                    nut_b = st.checkbox('Nutrientes (B)', value=True)
+                else:
+                    nut_b = st.checkbox('Nutrientes (B)', value=False)                     
+                if nut_b:
+                    json_variables = json_variables + ['Nutrientes (B)']
+                   
+                    
+            with col2:                                       
+                if 'Citometria' in json_variables_previas:   
+                    citometria = st.checkbox('Citometria', value=True)
+                else:
+                    citometria = st.checkbox('Citometria', value=False)                    
+                if citometria:
+                    json_variables = json_variables + ['Citometría']
+
+                if 'Ciliados' in json_variables_previas:                                         
+                    ciliados = st.checkbox('Ciliados', value=True)
+                else:
+                    ciliados = st.checkbox('Ciliados', value=False)                    
+                if ciliados:
+                    json_variables = json_variables + ['Ciliados']
+
+                if 'Zoop. (meso)' in json_variables_previas:                     
+                    zoop_meso = st.checkbox('Zoop. (meso)', value=True)
+                else:
+                    zoop_meso = st.checkbox('Zoop. (meso)', value=False)                    
+                if zoop_meso:
+                    json_variables = json_variables + ['Zoop. (meso)']
+
+                if 'Zoop. (micro)' in json_variables_previas:                     
+                    zoop_micro = st.checkbox('Zoop. (micro)', value=True)
+                else:
+                    zoop_micro = st.checkbox('Zoop. (micro)', value=False)                    
+                if zoop_micro:
+                    json_variables = json_variables + ['Zoop. (micro)']   
+                   
+                if 'Zoop. (ictio)' in json_variables_previas: 
+                    zoop_ictio = st.checkbox('Zoop. (ictio)', value=True)
+                else:
+                    zoop_ictio = st.checkbox('Zoop. (ictio)', value=False)                    
+                if zoop_ictio:
+                    json_variables = json_variables + ['Zoop. (ictio)']   
+
+
+            with col3:
+                if 'Clorofilas' in json_variables_previas: 
+                    colorofilas = st.checkbox('Clorofilas', value=True)
+                else:
+                    colorofilas = st.checkbox('Clorofilas', value=False)                    
+                if colorofilas:
+                    json_variables = json_variables + ['Clorofilas'] 
+
+                if 'Prod.Primaria' in json_variables_previas: 
+                    prod_prim = st.checkbox('Prod.Primaria', value=True)
+                else:
+                    prod_prim = st.checkbox('Prod.Primaria', value=False)                    
+                if prod_prim:
+                    json_variables = json_variables + ['Prod.Primaria']
+                                        
+                if 'Flow Cam' in json_variables_previas:                     
+                    flow_cam = st.checkbox('Flow Cam', value=True)
+                else:
+                    flow_cam = st.checkbox('Flow Cam', value=False)
+                if flow_cam:
+                    json_variables = json_variables + ['Flow Cam'] 
+                    
+                if 'ADN' in json_variables_previas:                    
+                    adn = st.checkbox('ADN', value=True)
+                else:
+                    adn = st.checkbox('ADN', value=False)                    
+                if adn:
+                    json_variables = json_variables + ['ADN'] 
+
+                if 'DOM' in json_variables_previas:                     
+                    dom = st.checkbox('DOM', value=True)
+                else:
+                    dom = st.checkbox('DOM', value=False)                
+                if dom:
+                    json_variables = json_variables + ['DOM']
+            
+            
+            with col4:
+                if 'TOC' in json_variables_previas:                 
+                    toc = st.checkbox('TOC', value=True)
+                else:
+                    toc = st.checkbox('TOC', value=False)                    
+                if toc:
+                    json_variables = json_variables + ['TOC']
+                    
+                if 'POC' in json_variables_previas:    
+                    poc = st.checkbox('POC', value=True)
+                else:
+                    poc = st.checkbox('POC', value=False)                    
+                if poc:
+                    json_variables = json_variables + ['POC']
+
+                if 'PPL' in json_variables_previas:                                    
+                    ppl = st.checkbox('PPL', value=True)
+                else:
+                    ppl = st.checkbox('PPL', value=False)                    
+                if ppl:
+                    json_variables = json_variables + ['PPL']
+                    
+                otros = st.text_input('Otros:')
+                if otros:
+                    json_variables = json_variables + [otros]
+
+            st.markdown('CONTINUO')
+            col1, col2, col3, col4= st.columns(4,gap="small")
+            
+            with col1:
+                if 'Oxigeno (Cont.)' in json_variables_previas:
+                    oxigenos_continuo = st.checkbox('Oxigeno (Cont.)', value=True)
+                else:
+                    oxigenos_continuo = st.checkbox('Oxigeno (Cont.)', value=False)
+                if oxigenos_continuo:
+                    json_variables = json_variables + ['Oxigeno (Cont.)']  
+
+            with col2:
+                if 'pH (Cont.)' in json_variables_previas:
+                    ph_continuo = st.checkbox('pH (Cont.)', value=True)
+                else:
+                    ph_continuo = st.checkbox('pH (Cont.)', value=False)
+                if ph_continuo:
+                    json_variables = json_variables + ['pH (Cont.)']            
+
+            with col3:
+                if 'CDOM (Cont.)' in json_variables_previas:
+                    cdom_continuo = st.checkbox('CDOM (Cont.)', value=True)
+                else:
+                    cdom_continuo = st.checkbox('CDOM (Cont.)', value=False)                    
+                if cdom_continuo:
+                    json_variables = json_variables + ['CDOM (Cont.)'] 
+            
+            with col4:
+                if 'Clorofila (Cont.)' in json_variables_previas:
+                    clorofilas_continuo = st.checkbox('Clorofila (Cont.)', value=True)
+                else:
+                    clorofilas_continuo = st.checkbox('Clorofila (Cont.)', value=False)
+                if clorofilas_continuo:
+                    json_variables = json_variables + ['Clorofila (Cont.)'] 
+                    
+                    
+            json_variables         = json.dumps(json_variables)
+
+            observaciones = st.text_input('Observaciones', value=observaciones_previas)
+    
+            submit = st.form_submit_button("Actualizar salida")
+    
+            if submit == True:
+                           
+                instruccion_sql = '''UPDATE salidas_muestreos SET fecha_salida = %s, hora_salida = %s, fecha_retorno = %s,hora_retorno = %s, buque = %s, participantes_comisionados = %s ,participantes_no_comisionados = %s,observaciones = %s,estaciones = %s,variables_muestreadas = %s WHERE id_salida = %s;''' 
+                        
+                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()
+                cursor.execute(instruccion_sql, (fecha_salida,hora_salida,fecha_regreso,hora_regreso,int(id_buque_elegido),json_comisionados,json_no_comisionados,observaciones,json_estaciones,json_variables,int(id_salida)))
+                conn.commit()
+                cursor.close()
+                conn.close()
+
+
+                texto_exito = 'Salida ' + salida + ' actualizada correctamente'
+                st.success(texto_exito)
+                
+                time.sleep(5)
+                    
+                st.experimental_rerun()
 
 
 
@@ -1073,7 +1485,8 @@ def entrada_condiciones_ambientales():
     
         # recupera los datos disponibles en la base de datos para asignar valores por defecto
         df_condicion_introducida = df_condiciones[(df_condiciones['salida']==id_salida) & (df_condiciones['estacion']==id_estacion_elegida)]               
-            
+    
+        
         if df_condicion_introducida.shape[0] == 1:
             
                
@@ -1173,8 +1586,7 @@ def entrada_condiciones_ambientales():
     
             with col3:
                  altura_ola  = st.number_input('Altura de ola (m):',value=float(altura_ola_defecto),min_value=float(0),step =0.5)
-                 indice_prop = len(estado_mar_nombre)-1
-                 for idato_estado in range(len(estado_mar_nombre)):    
+                 for idato_estado in range(len(estado_mar_nombre)):
                      if altura_ola >= estado_mar_hmin[idato_estado] and altura_ola <= estado_mar_hmax[idato_estado]:
                          indice_prop = idato_estado
                  #mar_douglas = st.selectbox('Mar Douglas:',(douglas_nombre),index=indice_prop)
@@ -1199,7 +1611,7 @@ def entrada_condiciones_ambientales():
                 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                 cursor = conn.cursor()
                 
-                if io_previo == 1:
+                if io_previo == 0:
  
                     instruccion_sql_consulta = '''SELECT id_condicion FROM condiciones_ambientales_muestreos WHERE salida = %s and estacion = %s ''' 
                     cursor.execute(instruccion_sql_consulta, (int(id_salida),int(id_estacion_elegida)))
@@ -1223,8 +1635,6 @@ def entrada_condiciones_ambientales():
                     texto_exito = 'Datos de las estación ' + estacion_elegida + ' durante la salida '  + salida  + ' actualizados correctamente'
                     
                 st.success(texto_exito)                
-                 
-        st.cache_data.clear()
                 
     # Descarga datos ambientales
     if tipo_entrada == entradas[1]:    
@@ -1264,7 +1674,8 @@ def entrada_condiciones_ambientales():
             output = BytesIO()
             writer = pandas.ExcelWriter(output, engine='xlsxwriter')
             df_salidas_seleccion.to_excel(writer, index=False, sheet_name='DATOS')
-            writer.sheets['DATOS']
+            workbook = writer.book
+            worksheet = writer.sheets['DATOS']
             writer.save()
             df_salidas_seleccion = output.getvalue()
         
@@ -1287,17 +1698,18 @@ def entrada_condiciones_ambientales():
 def entrada_archivos_roseta():
     
     # Función para cargar en caché los datos a utilizar
-    @st.cache_data(ttl=600,show_spinner='Recuperando información de la base de datos')
+    @st.cache_data(show_spinner=False,ttl=600)
     def carga_datos_entrada_archivo_roseta():
         conn                      = init_connection()
         df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
         df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_datos_discretos        = psql.read_sql('SELECT * FROM datos_discretos', conn)
+        df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+        df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
         df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_programas              = psql.read_sql('SELECT * FROM programas', conn)
         df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
         conn.close()
-        return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad
+        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad
         
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
@@ -1319,7 +1731,7 @@ def entrada_archivos_roseta():
         st.subheader('Entrada de datos procedentes de botellas y perfiles') 
     
         # Recupera tablas con informacion utilizada en el procesado
-        df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
+        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas = carga_datos_entrada_archivo_roseta()
         
         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
 
@@ -1401,66 +1813,30 @@ def entrada_archivos_roseta():
                     if fecha_salida_archivo == fecha_salida:
                     
                         ### DATOS DE BOTELLERO ###
-                        mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_btl,datos_archivo)
-                      
-                        datos_botellas['id_estacion_temp']         = id_estacion
-                        datos_botellas['estacion']                 = id_estacion
-                        datos_botellas['programa']                 = id_programa
-
-                        profundidades_referencia = tabla_estaciones_programa['profundidades_referencia'][tabla_estaciones_programa['nombre_estacion']==nombre_estacion].iloc[0]
-                        # Añade una columna con la profundidad de referencia
-                        if profundidades_referencia is not None:
-                            datos_botellas['prof_referencia'] = numpy.zeros(datos_botellas.shape[0],dtype=int)
-                            for idato in range(datos_botellas.shape[0]):
-                                    # Encuentra la profundidad de referencia más cercana a cada dato
-                                    idx = (numpy.abs(profundidades_referencia - datos_botellas['presion_ctd'][idato])).argmin()
-                                    datos_botellas['prof_referencia'][idato] =  profundidades_referencia[idx]
-                        else:
-                            datos_botellas['prof_referencia'] = [None]*datos_botellas.shape[0]
-
-                        
-                      
-                        # Cambia los nombre de las botellas.        
-                        if id_estacion == 1: #E2
-                            listado_equiv_ctd = [1,3,5,7,9,11]
-                            listado_equiv_real = [1,2,3,4,5,6]
-                            for ibotella in range(datos_botellas.shape[0]):
-                                for iequiv in range(len(listado_equiv_ctd)):
-                                    if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                                        datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
-
-                        if id_estacion == 5: #E4
-                            
-                            datos_botellas['botella_temp'] = datos_botellas['botella']
-                            datos_botellas = datos_botellas.drop(datos_botellas[datos_botellas.botella_temp == 11].index)
-                            
-                            listado_equiv_ctd = [1,3,5,7,9,11]
-                            listado_equiv_real = [8,9,10,11,12,None]
-                            for ibotella in range(datos_botellas.shape[0]):
-                                for iequiv in range(len(listado_equiv_ctd)):
-                                    if datos_botellas['botella_temp'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                                        datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
-                                        
-                            datos_botellas = datos_botellas.drop(columns=['botella_temp'])  
-                      
+                        mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_btl,datos_archivo,programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+           
                         # Asigna lat/lon de la estación si esa información no etá incluia en el .btl
                         for imuestreo in range(datos_botellas.shape[0]):
                             if datos_botellas['latitud'].iloc[imuestreo] is None:
                                 datos_botellas['latitud'].iloc[imuestreo] = tabla_estaciones_programa['latitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
                             if datos_botellas['longitud'].iloc[imuestreo] is None:
                                 datos_botellas['longitud'].iloc[imuestreo] = tabla_estaciones_programa['longitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
-                                
+                     
+           
+            
+           
                         # Asigna identificadores de salida al mar y estación
                         datos_botellas['id_estacion_temp'] = datos_botellas['estacion']
                         datos_botellas ['id_salida']       =  id_salida
                         
                         # Aplica control de calidad
-                        datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
+                        datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
            
                         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
                         datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
-                        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
+                        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+                        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
                         
                     else:
                     
@@ -1477,7 +1853,9 @@ def entrada_archivos_roseta():
                         nombre_archivo_cnv    = nombre_archivo_cnv.replace('.cnv','.btl')
                                            
                         if nombre_archivo_cnv == nombre_archivo_btl:
-                                                                                    
+                            
+                            configuracion_perfilador = 1 # Cambiar esto en el futuro
+                                                        
                             datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
                                           
                             datos_perfil,df_perfiles,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
@@ -1490,14 +1868,14 @@ def entrada_archivos_roseta():
                             cursor = conn.cursor() 
                             
                             # Obtén el identificador del perfil en la base de datos
-                            instruccion_sql = '''INSERT INTO perfiles_verticales (nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,longitud_muestreo,latitud_muestreo)
-                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast) DO NOTHING;''' 
+                            instruccion_sql = '''INSERT INTO perfiles_verticales (nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,longitud_muestreo,latitud_muestreo,configuracion_perfilador)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast) DO NOTHING;''' 
                             
                             nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
                             
                             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                             cursor = conn.cursor()    
-                            cursor.execute(instruccion_sql,(nombre_perfil,int(id_estacion),int(id_salida),int(cast_muestreo),fecha_muestreo,hora_muestreo,lon_muestreo,lat_muestreo))
+                            cursor.execute(instruccion_sql,(nombre_perfil,int(id_estacion),int(id_salida),int(cast_muestreo),fecha_muestreo,hora_muestreo,lon_muestreo,lat_muestreo,int(configuracion_perfilador)))
                             conn.commit() 
         
                             instruccion_sql = "SELECT perfil FROM perfiles_verticales WHERE nombre_perfil = '" + nombre_perfil + "';" 
@@ -1532,9 +1910,7 @@ def entrada_archivos_roseta():
                                  df_botella['longitud']               = lon_muestreo
                                  df_botella['prof_referencia']        = 0
                                  df_botella['fecha_muestreo']         = fecha_muestreo
-                                 
-                                 
-                                 df_botella = df_botella.drop(columns = ['c0S/m','flag'])
+                                 df_botella = df_botella.drop(columns = ['c0S/m','sigma-é00','flag'])
                                  try:
                                      df_botella = df_botella.drop(columns = ['sbeox0V','sbeox0ML/L'])
                                      df_botella['oxigeno_ctd_qf']   = 1
@@ -1549,8 +1925,8 @@ def entrada_archivos_roseta():
                                  df_botella['programa']               = id_programa    
                                  df_botella['num_cast']               = cast_muestreo 
                                  
-                                 # Añade botella (7) y hora de muestreo (nulas) para evitar errores en el procesado
-                                 df_botella['botella']                = 7
+                                 # Añade botella y hora de muestreo (nulas) para evitar errores en el procesado
+                                 df_botella['botella']                = None
                                  df_botella['hora_muestreo']          = None
                           
                                  # Añade qf 
@@ -1582,7 +1958,9 @@ def entrada_archivos_roseta():
         variables_procesado    = ['Temperatura','Salinidad','PAR','Fluorescencia','O2(CTD)']    
         variables_procesado_bd = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
         variables_unidades     = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
-
+        variable_tabla         = ['discreto_fisica','discreto_fisica','discreto_fisica','discreto_bgq','discreto_bgq']
+        variable_tabla         = ['datos_discretos_fisica','datos_discretos_fisica','datos_discretos_fisica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica']
+    
         # Toma los datos de la caché    
         df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
 
@@ -1601,7 +1979,7 @@ def entrada_archivos_roseta():
          
         # Añade columna con información del año
         df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
-               
+        
         # Borra los dataframes que ya no hagan falta para ahorrar memoria
         del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos)
         
@@ -1613,14 +1991,13 @@ def entrada_archivos_roseta():
         indice_variable          = variables_procesado_bd.index(variable_seleccionada)
         nombre_completo_variable = variables_procesado[indice_variable] 
         unidades_variable        = variables_unidades[indice_variable]
-        tabla_insercion          = 'datos_discretos'
-                        
-                                                        
+        tabla_insercion          = variable_tabla[indice_variable]
+                                                                              
         # Selecciona los datos correspondientes al programa, estación, salida y cast seleccionados
         datos_procesados     = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion) & (df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
 
         df_datos_disponibles = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion)]
-        
+            
         FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset,tabla_insercion)
 
 
@@ -1673,14 +2050,14 @@ def procesado_nutrientes():
         conn                      = init_connection()
         df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
         df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_datos_discretos        = psql.read_sql('SELECT * FROM datos_discretos', conn)
+        df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+        df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
         df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_programas              = psql.read_sql('SELECT * FROM programas', conn)
         df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
-        df_rmns_bajos             = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
-        df_rmns_altos             = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
+        df_rmns                   = psql.read_sql('SELECT * FROM rmn_nutrientes', conn)
         conn.close()
-        return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos
+        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns
         
 
 
@@ -1693,7 +2070,7 @@ def procesado_nutrientes():
     puerto           = st.secrets["postgres"].port
     
    
-    df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos = carga_datos_procesado_nutrientes()
+    df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns = carga_datos_procesado_nutrientes()
 
     
  
@@ -1720,28 +2097,24 @@ def procesado_nutrientes():
         
         st.subheader('Procesado de datos de nutrientes')
         
-        canales_autoanalizador = ['ton','nitrito','silicato','fosfato']
+        variables_run = ['ton','nitrito','silicato','fosfato'] 
+
     
         with st.form("Formulario", clear_on_submit=False):
               
             # Despliega un formulario para subir los archivos del AA y las referencias
-            col1, col2,col3,col4 = st.columns(4,gap="small")
+            col1, col2,col3 = st.columns(3,gap="small")
             with col1:
                 temperatura_laboratorio = st.number_input('Temperatura laboratorio:',value=20.5)
             with col2:
                 rendimiento_columna     = st.number_input('Rendimiento columna:',value=float(100),min_value=float(0),max_value=float(100))
             with col3:            
-                rmn_elegida_bajo             = st.selectbox("Selecciona RMN **BAJO**", (df_rmns_bajos['nombre_rmn']))
-                df_referencias_bajas    = df_rmns_bajos[df_rmns_bajos['nombre_rmn']==rmn_elegida_bajo]
-            with col4:            
-                rmn_elegida_alto             = st.selectbox("Selecciona RMN **ALTO**", (df_rmns_altos['nombre_rmn']))
-                df_referencias_altas    = df_rmns_altos[df_rmns_altos['nombre_rmn']==rmn_elegida_alto]
-            
-
+                rmn_elegida             = st.selectbox("Selecciona los RMNs utilizados", (df_rmns['nombre_rmn']))
+                df_referencias          = df_rmns[df_rmns['nombre_rmn']==rmn_elegida]
             
             archivo_AA                  = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
             
-            io_add_data                 = st.checkbox('Añadir datos procesados a la base de datos',value=True)
+            io_add_data                 = st.checkbox('Añadir datos procesados a la base de datos')
                             
             io_envio                    = st.form_submit_button("Procesar el archivo subido")        
         
@@ -1750,19 +2123,10 @@ def procesado_nutrientes():
         
             # Lectura del archivo con los resultados del AA
             datos_AA              = pandas.read_excel(archivo_AA,skiprows=15)            
-            datos_AA              = datos_AA.rename(columns={"Results 1":canales_autoanalizador[0],"Results 2":canales_autoanalizador[1],"Results 3":canales_autoanalizador[2],"Results 4":canales_autoanalizador[3]})
+            datos_AA              = datos_AA.rename(columns={"Results 1":variables_run[0],"Results 2":variables_run[1],"Results 3":variables_run[2],"Results 4":variables_run[3]})
                   
-            # Identifica qué canales/variables se han procesado
-            variables_procesadas = datos_AA.columns.tolist()
-            variables_run        = list(set(variables_procesadas).intersection(variables_procesado_bd))
-            
             # Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
-            df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")            
-            
-            # Adapta el nombre de las sw
-            for idato in range(datos_AA.shape[0]):
-                if datos_AA['Sample ID'].iloc[idato][0:2].lower()=='sw':
-                   datos_AA['Sample ID'].iloc[idato] ='sw' 
+            df_datos_disponibles  = pandas.merge(df_datos_fisicos, df_muestreos, on="muestreo")            
             
             # Encuentra las posiciones de las referencias de sw
             indices_referencias = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='sw']) - 1
@@ -1798,25 +2162,17 @@ def procesado_nutrientes():
             # En caso contrario procesa los datos
                         
                 # Aplica la corrección de deriva (DRIFT)                 
-                datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
-                                            
-                # Calcula el NO3 como diferencia entre el TON y el NO2 (sólo si se han procesado estos dos canales)
-                if 'ton' in variables_run and 'nitrito' in variables_run:
-                    datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
-                    datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
-                    
-                    # vuelvo a calcular el TON como NO3+NO2, por si hubiese corregido valores nulos
-                    datos_corregidos['ton'] = datos_corregidos['nitrato'] + datos_corregidos['nitrito']
-                    
-                    # añade nitrato a variables procesadas (para redondear decimales y añadir qf)
-                    variables_run = variables_run + ['nitrato']
+                datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias,variables_run,rendimiento_columna,temperatura_laboratorio)
+                                
+                # Calcula el NO3 como diferencia entre el TON y el NO2
+                datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
             
-                # Añade informacion de RMNs, temperaturas y rendimiento
-                datos_corregidos['rto_columna_procesado']  = rendimiento_columna
-                datos_corregidos['temp_lab_procesado']     = temperatura_laboratorio
-                datos_corregidos['rmn_bajo_procesado']     = int(df_referencias_bajas['id_rmn'].iloc[0])
-                datos_corregidos['rmn_alto_procesado']     = int(df_referencias_altas['id_rmn'].iloc[0])
-                
+                # corrige posibles valores negativos
+                datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
+                datos_corregidos['nitrito'][datos_corregidos['nitrito']<0]   = 0
+                datos_corregidos['silicato'][datos_corregidos['silicato']<0] = 0
+                datos_corregidos['fosfato'][datos_corregidos['fosfato']<0]   = 0
+            
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
                 
@@ -1824,22 +2180,29 @@ def procesado_nutrientes():
                 # Añade información de la base de datos (muestreo, biogeoquimica y fisica)
                 datos_corregidos = pandas.merge(datos_corregidos, df_muestreos, on="id_externo") # Esta unión elimina los registros que NO son muestras
                 
-                df_datos_discretos = df_datos_discretos.drop(columns=variables_procesado_bd) # Para eliminar las columnas previas con datos de nutrientes
-                datos_corregidos = pandas.merge(datos_corregidos, df_datos_discretos, on="muestreo",how='left')
+                df_datos_biogeoquimicos = df_datos_biogeoquimicos.drop(columns=variables_procesado_bd) # Para eliminar las columnas previas con datos de nutrientes
+                datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="muestreo",how='left')
                 
- 
+                datos_corregidos = pandas.merge(datos_corregidos, df_datos_fisicos, on="muestreo",how='left')  
                                 
-                # Reduce los decimales y asigna QF a los datos
-                variables_run_qf = []
-                for ivariable_procesada in range(len(variables_run)):
+                # Comprueba si en la base da datos ya hay registros de esa salida con QF de nutrientes
+                for ivariable_procesada in range(len(variables_procesado_bd)):
+                    nombre_variable_qf = variables_procesado_bd[ivariable_procesada] + '_qf'
+                    
+                    if datos_corregidos[nombre_variable_qf].isnull().all():
+                        pass
+                    else:
+                        texto = 'La base de datos contiene QF de ' + variables_procesado_bd[ivariable_procesada] + ' correspondientes a las muestras procesadas. Revisar y actualizar los flags.'
+                        st.warning(texto, icon="⚠️")
                         
                     #reduce los decimales 
-                    datos_corregidos[variables_run[ivariable_procesada]]=round(datos_corregidos[variables_run[ivariable_procesada]],3)
+                    datos_corregidos[variables_procesado_bd[ivariable_procesada]]=round(datos_corregidos[variables_procesado_bd[ivariable_procesada]],3)
                         
                     # Añade qf a los datos, asignando a las variables procesadas un qf de valor 1 (no evaluado)
-                    variables_run_qf                                        = variables_run_qf + [variables_run[ivariable_procesada] + '_qf']
-                    datos_corregidos[variables_run_qf[ivariable_procesada]] = numpy.ones(datos_corregidos.shape[0],dtype=int)
-  
+                    for ivar in range(len(variables_run)):
+                        qf_var = variables_run[ivar] + '_qf'
+                        datos_corregidos[qf_var] = numpy.ones(datos_corregidos.shape[0],dtype=int)
+                    datos_corregidos['nitrato_qf'] = numpy.ones(datos_corregidos.shape[0],dtype=int)   
                 
                 
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
@@ -1855,7 +2218,7 @@ def procesado_nutrientes():
                 datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
 
                 # Descarga los datos como una hoja Excel        
-                listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
+                listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd','ton','nitrato','nitrito','silicato','fosfato','ton_qf','nitrato_qf','nitrito_qf','silicato_qf','fosfato_qf']
                 datos_corregidos        = datos_corregidos[listado_columnas]
       
                 # Botón para descargar la información como Excel
@@ -1888,7 +2251,7 @@ def procesado_nutrientes():
         
         st.subheader('Inserción de datos de nutrientes')
         
-        FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_procesado,variables_procesado_bd,df_referencia)
+        FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_procesado,variables_procesado_bd,df_referencia)
 
         
 
@@ -1898,8 +2261,12 @@ def procesado_nutrientes():
         
         st.subheader('Control de calidad de datos procedentes de botellas')    
     
-         # Toma los datos de la caché    
-        df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns = carga_datos_procesado_nutrientes()
+        # Define las variables a utilizar
+
+        variable_tabla         = ['datos_discretos_biogeoquimica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica']
+        
+        # Toma los datos de la caché    
+        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns = carga_datos_procesado_nutrientes()
                 
         # # Mantén sólo las salidas de radiales
         # id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
@@ -1910,14 +2277,15 @@ def procesado_nutrientes():
         df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="id_salida")
         df_muestreos          = df_muestreos.rename(columns={"id_salida": "salida_mar"}) # Deshaz el cambio de nombre
                          
-        # compón un dataframe con la información de muestreo y los datos disponibles                                           
-        df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")
-                    
+        # compón un dataframe con la información de muestreo y datos biogeoquímicos                                            
+        df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
+        df_datos_disponibles  = pandas.merge(df_datos_disponibles, df_datos_fisicos, on="muestreo")
+         
         # Añade columna con información del año
         df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
         
         # Borra los dataframes que ya no hagan falta para ahorrar memoria
-        del(df_datos_discretos,df_muestreos)
+        del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos)
         
         # procesa ese dataframe
         io_control_calidad = 1
@@ -1927,7 +2295,7 @@ def procesado_nutrientes():
         indice_variable          = variables_procesado_bd.index(variable_seleccionada)
         nombre_completo_variable = variables_procesado[indice_variable] 
         unidades_variable        = variables_unidades[indice_variable]
-        tabla_insercion          = 'datos_discretos'
+        tabla_insercion          = variable_tabla[indice_variable]
                                                                       
         # Selecciona los datos correspondientes al programa, estación, salida y cast seleccionados
         datos_procesados     = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion) & (df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
@@ -1976,7 +2344,7 @@ def procesado_quimica():
     # Recupera tablas con informacion utilizada en el procesado
     conn                    = init_connection()
     df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-    df_datos_discretos     = psql.read_sql('SELECT * FROM datos_discretos', conn)
+    df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
     df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
     conn.close()     
  
@@ -1999,20 +2367,20 @@ def procesado_quimica():
     # Añade nuevos datos obtenidos en laboratorio
     if tipo_accion == acciones[0]:
         
-        FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_procesado,variables_procesado_bd,df_referencia)
+        FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_procesado,variables_procesado_bd,df_referencia)
 
     # Realiza control de calidad
     if tipo_accion == acciones[1]:
         
         # compón un dataframe con la información de muestreo y datos biogeoquímicos
         df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
-        df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")
+        df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
         
         # Añade columna con información del año
         df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
 
         # Borra los dataframes que ya no hagan falta para ahorrar memoria
-        del(df_datos_discretos,df_muestreos)
+        del(df_datos_biogeoquimicos,df_muestreos)
 
         # procesa ese dataframe
         FUNCIONES_PROCESADO.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades)
@@ -2043,10 +2411,9 @@ def entrada_datos_excel():
     conn.close()   
     
     
-       
-    
     # Despliega menús de selección de la variable, salida y la estación a controlar                
-    listado_tipos_salida  = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
+    listado_tipos_salida               = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
+    
     with st.form("Formulario", clear_on_submit=False):
     
         col1, col2 = st.columns(2,gap="small")
@@ -2056,55 +2423,19 @@ def entrada_datos_excel():
         with col2: 
             tipo_salida           = st.selectbox('Tipo de salida',(listado_tipos_salida))
             
-        nombre_entrada      = st.text_input('Nombre del muestreo **(solo para datos del programa "Otros")**')
+        archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
             
-        archivo_datos       = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
-            
-        io_envio            = st.form_submit_button("Procesar el archivo subido")
+        io_envio                    = st.form_submit_button("Procesar el archivo subido")
         
-    col1, col2= st.columns(2,gap="small")
-
-    with col1:
-        
-        st.markdown('Consulta las instrucciones para añadir información a la base de datos.')
-
-    with col2:
-
-        archivo_metadatos     = 'DATOS/Instrucciones_entrada.pdf'
-        with open(archivo_metadatos, "rb") as pdf_file:
-            PDFbyte = pdf_file.read()
-        
-        st.download_button(label="DESCARGA INSTRUCCIONES",
-                            data=PDFbyte,
-                            file_name="Instrucciones.pdf",
-                            mime='application/octet-stream')
-    
-   
-    
-        
-    
-    if programa_seleccionado == 'OTROS':
-        if len(nombre_entrada) <2:
-            st.warning('El nombre del muestreo no puede ser nulo en datos de programa "OTROS"')
-            st.stop()
-    else:
-        nombre_entrada = programa_seleccionado  
-    
- 
     if archivo_datos is not None and io_envio is True:
         
         df_datos_importacion  = pandas.read_excel(archivo_datos) 
-        
-        # Identifica las variables que contiene el archivo
-        variables_archivo = df_datos_importacion.columns.tolist()
-        variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
-        variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
-                                
+                
         # Corrige el formato de las fechas
         for idato in range(df_datos_importacion.shape[0]):
             df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
             if df_datos_importacion['fecha_muestreo'][idato]:
-                if 'hora_muestreo' in variables_archivo and isinstance(df_datos_importacion['hora_muestreo'][idato], str):
+                if isinstance(df_datos_importacion['hora_muestreo'][idato], str):
                     df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
 
         # Cambia el nombre del identificador 
@@ -2114,10 +2445,13 @@ def entrada_datos_excel():
             texto_aviso = "Los datos importados no contienen identificador."
             st.warning(texto_aviso, icon="⚠️")
 
-        
-
+        # Identifica las variables que contiene el archivo
+        variables_archivo = df_datos_importacion.columns.tolist()
+        variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
+        variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
+                
         # Realiza un control de calidad primario a los datos importados   
-        datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
+        datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
 
         # Recupera el identificador del programa de muestreo
         id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
@@ -2128,7 +2462,7 @@ def entrada_datos_excel():
             datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
             # Encuentra las salidas al mar correspondientes  
-            datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_entrada,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
      
         # Encuentra el identificador asociado a cada registro
         with st.spinner('Asignando el registro correspondiente a cada medida'):
@@ -2151,9 +2485,137 @@ def entrada_datos_excel():
                 
         texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
         st.success(texto_exito)
+
+
+
+
+
+# ###############################################################################
+# #### PÁGINA DE ENTRADA DE RMNs UTILIZADOS EN EL PROCESADO DE NUTRIENTES #######
+# ############################################################################### 
+
+def configuraciones_muestreo():
+
+    st.subheader('Portal de entrada de datos')
+    
+    # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port
+    
+    # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
+    acciones     = ['Añadir datos discretos', 'Consultar configuraciones muestreo']
+    tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)    
+    
+    if tipo_accion == acciones[0]:
+    
+        # Recupera los datos disponibles en la base de datos
+        conn                      = init_connection()
+        df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+        variables_bd              = psql.read_sql('SELECT * FROM variables_procesado', conn)
+        df_perfilador             = psql.read_sql('SELECT * FROM configuracion_perfilador', conn)
+        conn.close()    
         
+        
+        # Despliega menús de selección de la variable, salida y la estación a controlar                
+        listado_tipos_salida               = ['SEMANAL','MENSUAL','ANUAL','PUNTUAL']
+        listado_configuraciones_perfilador = ['Desconocido'] + df_perfilador['id_config_perfil'].tolist()
+        
+        col1, col2, col3 = st.columns(3,gap="small")
+        with col1: 
+            programa_seleccionado = st.selectbox('Programa',(df_programas['nombre_programa']))
 
+        with col2: 
+            tipo_salida           = st.selectbox('Tipo de salida',(listado_tipos_salida))
+            
+        with col3:
+            id_perfilador         = st.selectbox('Id. configuracion perfilador',listado_configuraciones_perfilador)
+                   
+        archivo_datos             = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
+            
+        if archivo_datos is not None:
+            
+            df_datos_importacion  = pandas.read_excel(archivo_datos) 
+            
+            # Asigna la configuracion de perfilador correspondiente
+            if id_perfilador  ==  listado_configuraciones_perfilador[0]:
+                df_datos_importacion['configuracion_perfilador'] = [None]*df_datos_importacion.shape[0]
+            else:
+                df_datos_importacion['configuracion_perfilador'] = int(id_perfilador)               
+            
+            # corrige el formato de las fechas
+            for idato in range(df_datos_importacion.shape[0]):
+                df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
+                if df_datos_importacion['fecha_muestreo'][idato]:
+                    if isinstance(df_datos_importacion['hora_muestreo'][idato], str):
+                        df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
+    
+            # Identifica las variables que contiene el archivo
+            variables_archivo = df_datos_importacion.columns.tolist()
+            variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
+            variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
+            
+            # Realiza un control de calidad primario a los datos importados   
+            datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion,direccion_host,base_datos,usuario,contrasena,puerto)  
+    
+            # Recupera el identificador del programa de muestreo
+            id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+            
+            
+            with st.spinner('Asignando la estación y salida al mar de cada medida'):
+                # Encuentra la estación asociada a cada registro
+                datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+                # Encuentra las salidas al mar correspondientes  
+                datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,programa_seleccionado,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+         
+            # Encuentra el identificador asociado a cada registro
+            with st.spinner('Asignando el registro correspondiente a cada medida'):
+                datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+           
+            # Añade datos físicos
+            if len(variables_fisica)>0:
+                                
+                with st.spinner('Añadiendo datos físicos'):
+                    
+                    FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
+    
+     
+     
+            # Añade datos biogeoquímicos
+            if len(variables_bgq)>0:
+                                
+                with st.spinner('Añadiendo datos biogeoquímicos'):
+    
+                    FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+    
+                    
+            texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
+            st.success(texto_exito)
 
+    if tipo_accion == acciones[1]:
+        
+        # Recupera los datos disponibles en la base de datos
+        conn                      = init_connection()
+        df_perfilador             = psql.read_sql('SELECT * FROM configuracion_perfilador', conn)
+        #df_superficie             = psql.read_sql('SELECT * FROM configuracion_superficie', conn)
+        conn.close()  
+
+        # Elimina las columnas que no interesa mostrar
+        df_perfilador = df_perfilador.drop(columns=['buque','centro_asociado','fecha_inicio','propietario_ctd','fecha_calibracion_ctd','ruta_configuracion_ctd','fecha_calibracion_par','fecha_calibracion_oxigeno','fecha_calibracion_fluorescencia','adcp','num_serie_adcp','fecha_calibracion_adcp'])
+
+        # Reordena columnas
+        cols          = df_perfilador.columns.tolist()
+        cols          = cols[-1:] + cols[:-1]
+        df_perfilador = df_perfilador[cols]
+ 
+        # Renombra las columnas
+        df_perfilador = df_perfilador.rename(columns={'nombre_configuracion':'Configuracion','id_config_perfil':'Id','sensor_ctd':'CTD','num_serie_ctd':'Num.serie(CTD)','sensor_par':'PAR','num_serie_par':'Num.serie(PAR)','sensor_oxigeno':'Optodo','num_serie_oxigeno':'Num.serie(Optodo)','sensor_fluorescencia':'Fluorescencia','num_serie_fluorescencia':'Num.serie(Fluor.)'})
+
+        # Muestra una tabla con las configuraciones 
+        st.dataframe(df_perfilador, height=150)
 
 
 
@@ -2175,87 +2637,414 @@ def referencias_nutrientes():
     puerto           = st.secrets["postgres"].port
 
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    acciones     = ['RMN Altos', 'RMN Bajos']
-    tipo_accion  = st.sidebar.radio("Seleccionar tipo de RMN ",acciones)    
-    
-    if tipo_accion == acciones[0]:
-        nombre_tabla     = 'rmn_alto_nutrientes'
-        texto_formulario = 'Nombre del RMN **ALTO**'
-        cabecera         = 'RMNs Altos'
-        
-        
-    if tipo_accion == acciones[1]:
-        nombre_tabla     = 'rmn_bajo_nutrientes'
-        texto_formulario = 'Nombre del RMN **BAJO**'
-        cabecera         = 'RMNs Bajos'
+    acciones     = ['Importar referencias desde Excel','Consultar o añadir referencias disponibles']
+    tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
 
-      
-    st.subheader(cabecera)
-    
-    # Despliega un formulario para introducir los datos de las muestras que se están analizando
-    with st.form("Formulario seleccion"):
-    
-        nombre_muestras = st.text_input(texto_formulario, value="")
-        
-        col1, col2, col3= st.columns(3,gap="small")
-        with col1:
-            salinidad = st.number_input('Salinidad (PSU):',value=float(35))
-            ton       = st.number_input('Nitrógeno total (µmol/L):',value=float(15))
-
-            
-        with col2:
-            nitrito   = st.number_input('Nitrito  (µmol/L):',value=float(0.5))
-            silicato  = st.number_input('Silicato (µmol/L):',value=float(8.5))
- 
-        with col3:
-            fosfato   = st.number_input('Fosfato  (µmol/L):',value=float(1))   
-
-        observaciones = st.text_input('**Observaciones**', value="")
-        
-        if len(observaciones) < 1:
-            observaciones = None
-
-        io_envio = st.form_submit_button('Actualizar la tabla de RMNs') 
-
-        if io_envio: 
-            
-            # Comprueba valores
-            if len(nombre_muestras) == 0 or salinidad is None or ton is None or nitrito is None or silicato is None or fosfato is None:
-                texto_error = 'IMPORTANTE. Los campos de nombre, TON, nitrito, silicato y fosfato no pueden ser nulos' 
-                st.warning(texto_error, icon="⚠️")
-                
-            else:
-            
-                with st.spinner('Añadiendo RMN a la base de datos'):
-                
-                    instruccion_sql = 'INSERT INTO ' + nombre_tabla + ' (nombre_rmn,salinidad,ton,nitrito,silicato,fosfato,observaciones) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato,EXCLUDED.observaciones);'
-                        
-                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                    cursor = conn.cursor()
-                    cursor.execute(instruccion_sql,(nombre_muestras,salinidad,ton,nitrito,silicato,fosfato,observaciones))
-                    conn.commit()                 
-                    cursor.close()
-                    conn.close()
-    
-                    texto_exito = 'Referencia añadida o actualizada correctamente'
-                    st.success(texto_exito)            
-        
     # Recupera la tabla con los RMNs utilizados 
     con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql  = create_engine(con_engine)
-    tabla_rmns_altos = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn_psql)
-    tabla_rmns_bajos = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn_psql)
-    conn_psql.dispose()                
-
-    st.markdown('RMNs incluidos en la base de datos')
-    
+    tabla_rmns = psql.read_sql('SELECT * FROM rmn_nutrientes', conn_psql)
+    conn_psql.dispose()
+        
+    # Acciones 0 y 1, importar informacion
     if tipo_accion == acciones[0]:
-        st.dataframe(tabla_rmns_altos)
+        
+        with st.form("Formulario", clear_on_submit=False):
+        
+            # Despliega un formulario para introducir la información
+            nombre_rmn    = st.text_input('Nombre del RMN',value="")
+ 
+            archivo_refs             = st.file_uploader("Arrastra o selecciona los archivos con las referencias", accept_multiple_files=False)
+            if archivo_refs is not None:
+    
+                # Lectura del archivo con las referencias
+                df_referencias        = pandas.read_excel(archivo_refs)  
+                
+                df_referencias_bajo = df_referencias[df_referencias['tipo']=='bajo']
+                salinidad_rmn_bajo  = df_referencias_bajo['salinidad'].iloc[0]
+                ton_rmn_bajo        = df_referencias_bajo['ton'].iloc[0]
+                nitrito_rmn_bajo    = df_referencias_bajo['nitrito'].iloc[0]
+                silicato_rmn_bajo   = df_referencias_bajo['silicato'].iloc[0]
+                fosfato_rmn_bajo    = df_referencias_bajo['fosfato'].iloc[0]                    
+
+                df_referencias_alto = df_referencias[df_referencias['tipo']=='alto']
+                salinidad_rmn_alto  = df_referencias_alto['salinidad'].iloc[0]
+                ton_rmn_alto        = df_referencias_alto['ton'].iloc[0]
+                nitrito_rmn_alto    = df_referencias_alto['nitrito'].iloc[0]
+                silicato_rmn_alto   = df_referencias_alto['silicato'].iloc[0]
+                fosfato_rmn_alto    = df_referencias_alto['fosfato'].iloc[0]                      
+
+        texto_observaciones    = st.text_input('Observaciones',value="")
+        observaciones          = json.dumps(texto_observaciones)
+
+        io_envio = st.form_submit_button("Añadir RMN a la base de datos")  
+
+        if io_envio:    
+            
+            # Comprueba si hay una referencia con el mismo nombre 
+            df_temporal = tabla_rmns[tabla_rmns['nombre_rmn']==nombre_rmn]
+            
+            if df_temporal.shape[0] != 0:
+      
+                # Busca el índice del registro con ese nombre
+                indice_rmn = int(tabla_rmns['id_rmn'][tabla_rmns['nombre_rmn']==nombre_rmn].iloc[0])
+      
+                # Tipo proceso
+                tipo_proceso = 'actualizados'
+            else:
+                
+                indice_rmn = tabla_rmns.shape[0]
+                
+                # Tipo proceso
+                tipo_proceso = 'introducidos'                
+      
+            instruccion_sql = "INSERT INTO rmn_nutrientes (id_rmn,nombre_rmn, salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones) = ROW(EXCLUDED.salinidad_rmn_bajo,EXCLUDED.ton_rmn_bajo,EXCLUDED.nitrito_rmn_bajo,EXCLUDED.silicato_rmn_bajo,EXCLUDED.fosfato_rmn_bajo,EXCLUDED.salinidad_rmn_alto,EXCLUDED.ton_rmn_alto,EXCLUDED.nitrito_rmn_alto,EXCLUDED.silicato_rmn_alto,EXCLUDED.fosfato_rmn_alto,EXCLUDED.observaciones);"                            
+            valores = [indice_rmn,nombre_rmn,salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones]
+        
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()
+            cursor.execute(instruccion_sql, (valores))
+            conn.commit()   
+            conn.close()
+            
+            texto_exito = 'Datos  del RMN ' + nombre_rmn + ' ' + tipo_proceso + ' correctamente'
+            st.success(texto_exito)
+
+    # Accion 2, mostrar los RMNs disponibles en la base de datos y/o modificarlos   
     if tipo_accion == acciones[1]:
-        st.dataframe(tabla_rmns_bajos)
+
+        with st.form("Formulario", clear_on_submit=False):
+
+            tabla_rmns_modificada = st.experimental_data_editor(tabla_rmns, num_rows="dynamic",key="data_editor")
+
+            io_envio = st.form_submit_button('Actualizar la tabla de RMNs') 
+    
+        if io_envio: 
+
+            # Inserta uno a uno los registros
+            instruccion_sql = '''INSERT INTO rmn_nutrientes (id_rmn,nombre_rmn,salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (id_rmn,salinidad_rmn_bajo,ton_rmn_bajo,nitrito_rmn_bajo,silicato_rmn_bajo,fosfato_rmn_bajo,salinidad_rmn_alto,ton_rmn_alto,nitrito_rmn_alto,silicato_rmn_alto,fosfato_rmn_alto,observaciones) = ROW(EXCLUDED.id_rmn,EXCLUDED.salinidad_rmn_bajo,EXCLUDED.ton_rmn_bajo,EXCLUDED.nitrito_rmn_bajo,EXCLUDED.silicato_rmn_bajo,EXCLUDED.fosfato_rmn_bajo,EXCLUDED.salinidad_rmn_alto,EXCLUDED.ton_rmn_alto,EXCLUDED.nitrito_rmn_alto,EXCLUDED.silicato_rmn_alto,EXCLUDED.fosfato_rmn_alto,EXCLUDED.observaciones);''' 
+            
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()
+            
+            with st.spinner('Actualizando la base de datos'):
+            
+                for idato in range(tabla_rmns_modificada.shape[0]):
+
+                    cursor.execute(instruccion_sql,(int(tabla_rmns_modificada['id_rmn'].iloc[idato]),tabla_rmns_modificada['nombre_rmn'].iloc[idato],tabla_rmns_modificada['salinidad_rmn_bajo'].iloc[idato],tabla_rmns_modificada['ton_rmn_bajo'].iloc[idato],tabla_rmns_modificada['nitrito_rmn_bajo'].iloc[idato],tabla_rmns_modificada['silicato_rmn_bajo'].iloc[idato],tabla_rmns_modificada['fosfato_rmn_bajo'].iloc[idato],tabla_rmns_modificada['salinidad_rmn_alto'].iloc[idato],tabla_rmns_modificada['ton_rmn_alto'].iloc[idato],tabla_rmns_modificada['nitrito_rmn_alto'].iloc[idato],tabla_rmns_modificada['silicato_rmn_alto'].iloc[idato],tabla_rmns_modificada['fosfato_rmn_alto'].iloc[idato],tabla_rmns_modificada['observaciones'].iloc[idato]))
+                    conn.commit() 
+            
+                cursor.close()
+                conn.close()
+
+            texto_exito = 'Referencias actualizadas correctamente'
+            st.success(texto_exito)            
+
+            st.experimental_rerun()
+
+
+
+# ###############################################################################
+# ################## PÁGINA DE ENTRADA DE ESTADILLOS #################
+# ###############################################################################    
+
+
+# def estadillos_radiales():
+        
+#     st.subheader('Procesado de variables químicas')
+    
+#     # Recupera tablas con informacion utilizada en el procesado
+#     conn                = init_connection()
+#     df_salidas          = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+#     df_programas        = psql.read_sql('SELECT * FROM programas', conn)
+#     conn.close()    
+    
+#     id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+    
+#     # Despliega menús de selección del programa, tipo de salida, año y fecha               
+#     col1, col2, col3= st.columns(3,gap="small")
+ 
+#     with col1: 
+#         programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
+#         df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
+        
+    
+#     with col2:
+#         tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
+#         df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+    
+#         # Añade la variable año al dataframe
+#         indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+#         df_salidas_seleccion['id_temp'] = indices_dataframe
+#         df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
+        
+#         # Define los años con salidas asociadas
+#         df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
+#         for idato in range(df_salidas_seleccion.shape[0]):
+#             df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+#         df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
+        
+#         listado_anhos              = df_salidas_seleccion['año'].unique()
+    
+#     with col3:
+#         anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
+#         df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+
+#     salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
+
+
+# ###############################################################################
+# ################## PÁGINA DE ENTRADA DE ESTADILLOS DE DATOS ###################
+# ###############################################################################
+        
+# def entrada_estadillos():
+    
+#     archivo_plantilla     = 'DATOS/PLANTILLA.xlsx'
+#     archivo_instrucciones = 'DATOS/PLANTILLA.zip'
+    
+#     # Encabezados y titulos 
+#     #st.set_page_config(page_title='ENTRADA DE DATOS', layout="wide",page_icon=logo_IEO_reducido) 
+#     st.title('Servicio de entrada de datos del C.O de A Coruña')
+
+#     # Recupera la tabla de los programas disponibles en la base de datos, como un dataframe
+#     conn = init_connection()
+#     df_programas = psql.read_sql('SELECT * FROM programas', conn)
+#     conn.close()
+
+
+#     # Despliega un formulario para elegir el programa y la fecha a consultar
+#     with st.form("Formulario seleccion"):
+
+#         col1, col2 = st.columns(2,gap="small")
+#         #nombre_programa, tiempo_consulta = st.columns((1, 1))
+#         with col1:
+#             programa_elegido  = st.selectbox('Selecciona el programa al que corresponde la información',(df_programas['nombre_programa']))
+#         with col2:
+#             email_contacto    = st.text_input('Correo de contacto', "...@ieo.csic.es")
+
+#         # Botón de envío para confirmar selección
+#         st.form_submit_button("Enviar")
+
+
+
+#     ### Recupera los identificadores de la selección hecha
+
+#     # Recupera el identificador del programa seleccionado
+#     id_programa_elegido = int(df_programas['id_programa'][df_programas['nombre_programa']==programa_elegido].values[0])
+
+                    
+#     # Recordar que se ajusten a la plantilla y facilitar la misma
+#     texto_error = 'IMPORTANTE. Los datos a subir deben ajustarse a la plantilla facilitada' 
+#     st.warning(texto_error, icon="⚠️")
+
+#     with open(archivo_instrucciones, "rb") as fp:
+#         st.download_button(
+#             label="DESCARGAR PLANTILLA E INSTRUCCIONES",
+#             data=fp,
+#             file_name="PLANTILLA.zip",
+#             mime="application/zip"
+#         )
+            
+        
+#     fecha_actualizacion = datetime.date.today()    
+        
+#     ### Subida de archivos
+
+#     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+#     direccion_host = st.secrets["postgres"].host
+#     base_datos     = st.secrets["postgres"].dbname
+#     usuario        = st.secrets["postgres"].user
+#     contrasena     = st.secrets["postgres"].password
+#     puerto         = st.secrets["postgres"].port
+
+#     col1 = st.columns(1)
+
+#     # Boton para subir los archivos de datos
+#     listado_archivos_subidos = st.file_uploader("Arrastra los archivos a insertar en la base de datos del COAC", accept_multiple_files=True)
+#     for archivo_subido in listado_archivos_subidos:
+
+#         # Lectura del estadillo con datos de entrada
+#         try:
+#             datos,texto_error = FUNCIONES_LECTURA.lectura_datos_estadillo(archivo_subido,archivo_plantilla)
+#             texto_exito = 'Archivo ' + archivo_subido.name + ' leído correctamente'
+#             st.success(texto_exito)
+#             if len(texto_error)>0:
+#                 for iaviso in range(len(texto_error)):
+#                     st.warning(texto_error[iaviso], icon="⚠️")
+        
+#         except:
+#             texto_error = 'Error en la lectura del archivo ' + archivo_subido.name
+#             st.warning(texto_error, icon="⚠️")
+
+
+#         # Realiza un control de calidad primario a los datos importados   
+#         try:
+#             datos,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos,direccion_host,base_datos,usuario,contrasena,puerto) 
+#             texto_exito = 'Control de calidad de los datos del archivo ' + archivo_subido.name + ' realizado correctamente'
+#             st.success(texto_exito)
+#             if len(textos_aviso)>0:
+#                 for iaviso in range(len(textos_aviso)):
+#                     st.warning(textos_aviso[iaviso], icon="⚠️")
+            
+#         except:
+#             texto_error = 'Error en el control de calidad de los datos del archivo ' + archivo_subido.name
+#             st.warning(texto_error, icon="⚠️")
+
+#         # Introduce los datos en la base de datos
+#         # try:
+     
+#         with st.spinner('Insertando datos en la base de datos'):
+
+#             datos = FUNCIONES_PROCESADO.evalua_estaciones(datos,id_programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)  
+
+#             datos = FUNCIONES_PROCESADO.evalua_registros(datos,programa_elegido,direccion_host,base_datos,usuario,contrasena,puerto)
+
+#             FUNCIONES_PROCESADO.inserta_datos_fisica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+
+#             FUNCIONES_PROCESADO.inserta_datos_biogeoquimica(datos,direccion_host,base_datos,usuario,contrasena,puerto)
+            
+#         texto_exito = 'Datos del archivo ' + archivo_subido.name + ' insertados en la base de datos correctamente'
+#         st.success(texto_exito)
+
+
+#         try:
+#             id_opcion_elegida = 3
+#             FUNCIONES_AUXILIARES.actualiza_estado(datos,fecha_actualizacion,id_programa_elegido,programa_elegido,id_opcion_elegida,email_contacto,direccion_host,base_datos,usuario,contrasena,puerto)
          
+#             texto_exito = 'Las fechas de procesado contenidas en la base de datos han sido actualizadas correctamente'
+#             st.success(texto_exito)    
+#         except:
+#             texto_error = 'Error al actualizar las fechas de procesado en la base de datos'
+#             st.warning(texto_error, icon="⚠️")    
+          
+# ###############################################################################
+# ################# PÁGINA DE CONSULTA DE ESTADILLOS ############################
+# ###############################################################################    
+    
+    
+# def consulta_estadillos():    
+    
+#     ### Encabezados y titulos 
+#     #st.set_page_config(page_title='CONSULTA ESTADILLOS', layout="wide",page_icon=logo_IEO_reducido) 
+#     st.title('Servicio de consulta de estadillos de datos muestreados')
+    
+#     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+#     direccion_host = st.secrets["postgres"].host
+#     base_datos     = st.secrets["postgres"].dbname
+#     usuario        = st.secrets["postgres"].user
+#     contrasena     = st.secrets["postgres"].password
+#     puerto         = st.secrets["postgres"].port
+    
+    
+#     # Recupera las tablas de los programas y estaciones disponibles como  dataframes
+#     conn = init_connection()
+#     df_programas  = psql.read_sql('SELECT * FROM programas', conn)
+#     df_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+#     conn.close()
+    
+    
+#     # Selecciona el programa del que se quieren buscar estadillos
+#     nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere recuperar el estadillo',(df_programas['nombre_programa']))
+    
+#     id_programa      = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
+    
+    
+#     # Determina las fechas de las que hay información de datos de nutrientes
+#     estaciones_programa = df_estaciones[df_estaciones['programa'] == id_programa]
+    
+#     indices_dataframe   = numpy.arange(0,estaciones_programa.shape[0],1,dtype=int) 
+    
+#     # # Primero recupera los registros correspondientes al periodo evaluado y al año consultado
+#     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    
+#     cursor = conn.cursor()
+#     instruccion_sql = "SELECT id_muestreo,nombre_muestreo,fecha_muestreo,hora_muestreo,estacion,botella,presion_ctd,id_tubo_nutrientes FROM muestreos_discretos INNER JOIN estaciones ON muestreos_discretos.estacion = estaciones.id_estacion WHERE estaciones.programa = %s;"
+#     cursor.execute(instruccion_sql,(str(id_programa)))
+#     registros_consulta = cursor.fetchall()
+#     conn.commit()
+#     cursor.close()
+#     conn.close()
+    
+    
+#     dataframe_registros = pandas.DataFrame(registros_consulta, columns=['id_muestreo','nombre_muestreo','fecha_muestreo','hora_muestreo','estacion','botella','presion_ctd','id_tubo_nutrientes'])
+    
+#     # Mantén sólo los registros con datos de id_nutrientes
+#     dataframe_registros = dataframe_registros[dataframe_registros['id_tubo_nutrientes'].notna()]
+    
+#     # Busca las fechas disponibles 
+#     dataframe_temporal = dataframe_registros.drop_duplicates('fecha_muestreo')
+#     listado_fechas     = dataframe_temporal['fecha_muestreo']
+    
+#     if len(listado_fechas) > 0:
+    
+#         # Seleccionas una fecha
+#         fecha_seleccionada = st.selectbox('Selecciona la fecha de la que se quiere recuperar el estadillo',(listado_fechas))
+        
+#         # Recupera los registros correspondientes a esa fecha
+#         dataframe_fecha = dataframe_registros[dataframe_registros['fecha_muestreo']==fecha_seleccionada]
+        
+#         # Ajusta el numero de los indices
+#         indices_dataframe          = numpy.arange(0,dataframe_fecha.shape[0],1,dtype=int)    
+#         dataframe_fecha['id_temp'] = indices_dataframe
+#         dataframe_fecha.set_index('id_temp',drop=True,append=False,inplace=True)
+        
+#         # Recupera las coordenadas a partir de la estación asignada
+#         dataframe_fecha['latitud'] = numpy.zeros(dataframe_fecha.shape[0])
+#         dataframe_fecha['longitud'] = numpy.zeros(dataframe_fecha.shape[0])
+#         for idato in range(dataframe_fecha.shape[0]):
+#             dataframe_fecha['latitud'][idato]  = estaciones_programa['latitud'][estaciones_programa['id_estacion']==dataframe_fecha['estacion'][idato]]
+#             dataframe_fecha['longitud'][idato] = estaciones_programa['longitud'][estaciones_programa['id_estacion']==dataframe_fecha['estacion'][idato]]
+        
+#         # Recupera las propiedades físicas del registro (temperatura, salinidad....)
+#         conn = init_connection()
+#         tabla_registros_fisica    = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+#         conn.close()
+#         dataframe_fecha['temperatura_ctd'] = numpy.zeros(dataframe_fecha.shape[0])
+#         dataframe_fecha['salinidad_ctd'] = numpy.zeros(dataframe_fecha.shape[0])
+#         for idato in range(dataframe_fecha.shape[0]):
+#             dataframe_fecha['temperatura_ctd'][idato]  = tabla_registros_fisica['temperatura_ctd'][tabla_registros_fisica['muestreo']==dataframe_fecha['id_muestreo'][idato]]
+#             dataframe_fecha['salinidad_ctd'][idato]    = tabla_registros_fisica['salinidad_ctd'][tabla_registros_fisica['muestreo']==dataframe_fecha['id_muestreo'][idato]]
+        
+#         # Quita la columna de estación
+#         dataframe_fecha = dataframe_fecha.drop(columns=['estacion','id_muestreo'])
+        
+#         # Ajusta el orden de las columnas
+#         dataframe_fecha = dataframe_fecha[['nombre_muestreo','fecha_muestreo','hora_muestreo','latitud','longitud','botella','id_tubo_nutrientes','presion_ctd','temperatura_ctd','salinidad_ctd']]
+        
+#         # Ordena en función del número de tubo
+#         dataframe_fecha = dataframe_fecha.sort_values(by=['id_tubo_nutrientes'])
+       
+#         ## Botón para exportar los resultados
+#         nombre_archivo =  'ESTADILLO_' + nombre_programa + '_' + fecha_seleccionada.strftime("%m/%d/%Y") + '.xlsx'
+    
+#         output = BytesIO()
+#         writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+#         dataframe_fecha.to_excel(writer, index=False, sheet_name='DATOS')
+#         workbook = writer.book
+#         worksheet = writer.sheets['DATOS']
+#         writer.save()
+#         datos_exporta = output.getvalue()
+    
+#         st.download_button(
+#             label="DESCARGA LOS DATOS SELECCIONADOS",
+#             data=datos_exporta,
+#             file_name=nombre_archivo,
+#             help= 'Descarga un archivo .csv con el estadillo solicitado',
+#             mime="application/vnd.ms-excel"
+#         )
+        
+#     else:
+        
+#         texto_error = 'No hay estadillos de entrada correspondientes al programa ' + nombre_programa
+#         st.warning(texto_error, icon="⚠️")
 
 
+        
+     
+        
+     
+        
      
         
      
