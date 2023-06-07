@@ -767,7 +767,7 @@ def consulta_botellas():
         df_exporta.dropna(how='all', axis=1, inplace=True)
         
         # Añade unidades al nombre de cada variable
-        listado_variables = df_variables['variables'].tolist() 
+        listado_variables_bd = df_variables['variables'].tolist() 
         listado_unidades  = df_variables['unidades_variables'].tolist() 
  
     
@@ -776,12 +776,18 @@ def consulta_botellas():
         
         listado_variables_df = df_exporta.columns.tolist()
         for ivariable_df in range(len(listado_variables_df)):
-            if listado_variables_df[ivariable_df] in listado_variables:
-                indice     = listado_variables.index(listado_variables_df[ivariable_df])
-                if listado_variables[indice] is not None:
-                    st.text(indice)
-                    nombre_uds = listado_variables[indice] + '(' + listado_unidades[indice] + ')'
-                    df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})
+            for ivariable_bd in range(len(listado_variables_bd)):
+                if listado_variables_df[ivariable_df] == listado_variables_bd[ivariable_bd] and  listado_variables_bd[ivariable_bd] is not None:    
+            
+                    nombre_uds = listado_variables_bd[ivariable_bd] + '(' + listado_unidades[ivariable_bd] + ')'
+                    df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})        
+            
+            # if listado_variables_df[ivariable_df] in listado_variables:
+            #     indice     = listado_variables.index(listado_variables_df[ivariable_df])
+            #     if listado_variables[indice] is not None:
+            #         st.text(indice)
+            #         nombre_uds = listado_variables[indice] + '(' + listado_unidades[indice] + ')'
+            #         df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})
 
         ## Botón para exportar los resultados
         nombre_archivo =  'DATOS_BOTELLAS.xlsx'
