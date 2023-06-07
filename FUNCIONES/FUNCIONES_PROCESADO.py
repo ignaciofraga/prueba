@@ -604,6 +604,63 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     return datos
 
 
+
+
+
+
+#########################################################################
+######## FUNCION PARA ENCONTRAR EL IDENTIFICADOR DE CADA PERFIL  ########
+#########################################################################
+
+def evalua_perfiles(nombre_perfil,datos_muestreo_perfil,direccion_host,base_datos,usuario,contrasena,puerto):
+    
+
+    # Recupera la tabla con los registros de los muestreos
+    con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    conn_psql        = create_engine(con_engine)
+    tabla_perfiles   = psql.read_sql('SELECT * FROM perfiles_verticales', conn_psql)
+    conn_psql.dispose() 
+    
+    # si no hay ningun valor en la tabla de registro, meter directamente todos los datos registrados
+    if tabla_perfiles.shape[0] == 0:
+    
+        id_perfil = 0
+                   
+        instruccion_sql = "INSERT INTO perfiles_verticales (perfil,nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,longitud_muestreo,latitud_muestreo)  VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast) DO UPDATE SET (nombre_perfil,salida_mar,hora_perfil,longitud_muestreo,latitud_muestreo) = ROW(EXCLUDED.nombre_perfil,EXCLUDED.salida_mar,EXCLUDED.hora_perfil,EXCLUDED.longitud_muestreo,EXCLUDED.latitud_muestreo);"      
+        
+        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        cursor = conn.cursor()    
+        cursor.execute(instruccion_sql,(int(id_perfil),nombre_perfil,int(datos_muestreo_perfil['id_estacion'].iloc[0]),int(datos_muestreo_perfil['id_salida'].iloc[0]),int(datos_muestreo_perfil['cast_muestreo'].iloc[0]),datos_muestreo_perfil['fecha_muestreo'].iloc[0],datos_muestreo_perfil['hora_muestreo'].iloc[0],datos_muestreo_perfil['lon_muestreo'].iloc[0],datos_muestreo_perfil['lat_muestreo'].iloc[0]))
+        conn.commit() 
+
+    else:
+
+        # Comprueba si ya existe el perfil         
+        if datos_muestreo_perfil['hora_muestreo'].iloc[0] is not None:          
+            df_temp = tabla_perfiles[(tabla_perfiles['nombre_perfil']==nombre_perfil) & (tabla_perfiles['hora_perfil']==datos_muestreo_perfil['hora_muestreo'].iloc[0])]   
+        else:
+            df_temp = tabla_perfiles[tabla_perfiles['nombre_perfil']==nombre_perfil]           
+
+        if df_temp.shape[0]> 0:
+            id_perfil = df_temp['perfil'].iloc[0]
+            
+        else:
+            id_perfil = max(tabla_perfiles['perfil']) + 1
+            
+            instruccion_sql = "INSERT INTO perfiles_verticales (perfil,nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,longitud_muestreo,latitud_muestreo)  VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast) DO UPDATE SET (nombre_perfil,salida_mar,hora_perfil,longitud_muestreo,latitud_muestreo) = ROW(EXCLUDED.nombre_perfil,EXCLUDED.salida_mar,EXCLUDED.hora_perfil,EXCLUDED.longitud_muestreo,EXCLUDED.latitud_muestreo);"      
+            
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()    
+            cursor.execute(instruccion_sql,(int(id_perfil),nombre_perfil,int(datos_muestreo_perfil['id_estacion'].iloc[0]),int(datos_muestreo_perfil['id_salida'].iloc[0]),int(datos_muestreo_perfil['cast_muestreo'].iloc[0]),datos_muestreo_perfil['fecha_muestreo'].iloc[0],datos_muestreo_perfil['hora_muestreo'].iloc[0],datos_muestreo_perfil['lon_muestreo'].iloc[0],datos_muestreo_perfil['lat_muestreo'].iloc[0]))
+            conn.commit() 
+
+    datos_muestreo_perfil['perfil'] = int(id_perfil)
+    
+    return datos_muestreo_perfil
+
+
+
+
 ############################################################################
 ######## FUNCION PARA INSERTAR DATOS DISCRETOS EN LA BASE DE DATOS  ########
 ############################################################################

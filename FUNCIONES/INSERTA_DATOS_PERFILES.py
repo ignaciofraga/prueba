@@ -115,8 +115,7 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
         datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
      
-        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
                
         ### DATOS DE PERFILES
 
@@ -136,32 +135,21 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
             lectura_archivo = open(archivo, "r")  
             datos_archivo = lectura_archivo.readlines()
                        
-            datos_perfil,df_perfiles,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
-            
+            datos_perfil,df_perfiles,datos_muestreo_perfil = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
             
             # Define el nombre del perfil
-            nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
-            
-            # Obtén el identificador del perfil en la base de datos
-            instruccion_sql = "INSERT INTO perfiles_verticales (nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,longitud_muestreo,latitud_muestreo)  VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast) DO UPDATE SET (nombre_perfil,salida_mar,hora_perfil,longitud_muestreo,latitud_muestreo) = ROW(EXCLUDED.nombre_perfil,EXCLUDED.salida_mar,EXCLUDED.hora_perfil,EXCLUDED.longitud_muestreo,EXCLUDED.latitud_muestreo);"      
-            
-            nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
-            
-            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-            cursor = conn.cursor()    
-            cursor.execute(instruccion_sql,(nombre_perfil,int(id_estacion),int(id_salida),int(cast_muestreo),fecha_muestreo,hora_muestreo,lon_muestreo,lat_muestreo))
-            conn.commit() 
-           
-            instruccion_sql = "SELECT perfil FROM perfiles_verticales WHERE nombre_perfil = '" + nombre_perfil + "';" 
-            cursor = conn.cursor()    
-            cursor.execute(instruccion_sql)
-            id_perfil =cursor.fetchone()[0]
-            conn.commit()                  
-            
-            df_perfiles['perfil'] = id_perfil
-            
-            FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-            FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_bgq',direccion_host,base_datos,usuario,contrasena,puerto)        
+            nombre_perfil = abreviatura_programa + '_' + (datos_muestreo_perfil['fecha_muestreo'].iloc[0]).strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(datos_muestreo_perfil['cast_muestreo'].iloc[0])
+
+            # Recupera el identificador del perfil
+            datos_muestreo_perfil['id_estacion'] = id_estacion
+            datos_muestreo_perfil['id_salida']   = id_salida
+            datos_muestreo_perfil = FUNCIONES_PROCESADO.evalua_perfiles(nombre_perfil,datos_muestreo_perfil,direccion_host,base_datos,usuario,contrasena,puerto)
+
+            # Asigna el identificador al perfil
+            df_perfiles['perfil'] = datos_muestreo_perfil['perfil'].iloc[0]
+
+            #Inserta en la base de datos
+            FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto)       
                 
             
             if nombre_estacion == '2':  # Estacion 2 del programa radiales, añadir muestreo correspondiente a la botella en superficie
@@ -178,10 +166,10 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
     
     
                   # Asigna los datos correspondientes
-                  df_botella['latitud']                = lat_muestreo
-                  df_botella['longitud']               = lon_muestreo
+                  df_botella['latitud']                = datos_muestreo_perfil['lat_muestreo'].iloc[0]
+                  df_botella['longitud']               = datos_muestreo_perfil['lon_muestreo'].iloc[0]
                   df_botella['prof_referencia']        = 0
-                  df_botella['fecha_muestreo']         = fecha_muestreo
+                  df_botella['fecha_muestreo']         = datos_muestreo_perfil['fecha_muestreo'].iloc[0]
                   df_botella = df_botella.drop(columns = ['c0S/m','flag'])
                   try:
                       df_botella = df_botella.drop(columns = ['sbeox0V','sbeox0ML/L'])
@@ -191,10 +179,10 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
                   id_estacion                          = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
                   df_botella['id_estacion_temp']       = int(id_estacion) 
                   df_botella['id_salida']              = id_salida 
-                  df_botella['nombre_muestreo']        = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E2_P0' 
+                  df_botella['nombre_muestreo']        = abreviatura_programa + '_' + (datos_muestreo_perfil['fecha_muestreo'].iloc[0]).strftime("%Y%m%d") + '_E2_P0' 
                  
                   df_botella['programa']               = id_programa    
-                  df_botella['num_cast']               = cast_muestreo 
+                  df_botella['num_cast']               = datos_muestreo_perfil['cast_muestreo'].iloc[0] 
                   # Añade botella y hora de muestreo (nulas) para evitar errores en el procesado
                   df_botella['botella']                = 7
                   df_botella['hora_muestreo']          = None
@@ -207,24 +195,9 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
           
                   df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
         
-                  FUNCIONES_PROCESADO.inserta_datos(df_botella,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-                  FUNCIONES_PROCESADO.inserta_datos(df_botella,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)               
+                  FUNCIONES_PROCESADO.inserta_datos(df_botella,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)              
                 
        
 
  
-
-# # Parámetros de la base de datos
-# base_datos     = 'COAC'
-# usuario        = 'postgres'
-# contrasena     = 'm0nt34lt0'
-# puerto         = '5432'
-# direccion_host = '193.146.155.99'
-
-# # Parámetros
-# nombre_programa = 'RADIAL CORUÑA'
-# anho = 2022
-# ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
-
-
-# inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usuario,contrasena,puerto,direccion_host)       
+       

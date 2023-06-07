@@ -778,7 +778,6 @@ def consulta_botellas():
                     nombre_uds = listado_variables_bd[ivariable_bd] + '(' + listado_unidades[ivariable_bd] + ')'                    
                     df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})        
             
-
         ## Botón para exportar los resultados
         nombre_archivo =  'DATOS_BOTELLAS.xlsx'
     

@@ -449,22 +449,7 @@ def lectura_archivo_perfiles(datos_archivo):
                     hora_muestreo = datetime.datetime.strptime(listado_textos[-1],'%H:%M').time()
 
                     
-            
-                                
-            # if texto_linea[0:22] == '* System UpLoad Time =': # Línea con hora del cast
-            #     listado_textos   = texto_linea.split('= ') 
-            #     try:
-            #         datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
-            #     except:
-            #         datetime_sistema = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
-                                        
-            # if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast
-            #     listado_textos    = texto_linea.split('= ')  
-            #     try:
-            #         datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
-            #     except:
-            #         datetime_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
-                
+                            
             if texto_linea[0:6] == '# name': # Línea con variable muestreada
                 posicion_inicio    = texto_linea.find('=') + 2
                 posicion_final     = texto_linea.find(':')
@@ -495,22 +480,6 @@ def lectura_archivo_perfiles(datos_archivo):
             datos_perfil.append(listado_datos) 
             
             
-            
-    # # Determina el offset de tiempo
-    # if datetime_muestreo is not None:               
-    #     offset_tiempo     = (datetime_sistema - datetime_muestreo).seconds
-    # else:
-    #     mes_muestreo      = datetime_sistema.month
-    #     if mes_muestreo >=5 and mes_muestreo < 11: # Horario verano
-    #         offset_tiempo = 7200
-    #     else: #F Horario invierno
-    #         offset_tiempo = 3600
-            
-    # #Extrae la fecha y hora de muestreo
-    # fecha_muestreo = datetime_sistema.date()
-    # hora_muestreo  = datetime_sistema - datetime.timedelta(seconds=offset_tiempo)
-    
-    
     # Pasa los datos a un dataframe
     datos_perfil = pandas.DataFrame(datos_perfil, columns = listado_variables)
         
@@ -568,7 +537,20 @@ def lectura_archivo_perfiles(datos_archivo):
         pass    
     
 
-    return datos_perfil,df_perfiles,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo    
+    # Compón un dataframe con los metadatos del muestreo
+    metadatos_muestreo    = [[fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo]]
+    datos_muestreo_perfil = pandas.DataFrame(metadatos_muestreo, columns=['fecha_muestreo', 'hora_muestreo','cast_muestreo','lat_muestreo','lon_muestreo'])
+    
+    # datos_muestreo_perfil = pandas.DataFrame()
+    # datos_muestreo_perfil['fecha_muestreo'] = fecha_muestreo
+    # datos_muestreo_perfil['hora_muestreo'] = hora_muestreo
+    # datos_muestreo_perfil['cast_muestreo'] = cast_muestreo
+    # datos_muestreo_perfil['lat_muestreo'] = lat_muestreo
+    # datos_muestreo_perfil['lon_muestreo'] = lon_muestreo
+
+    return datos_perfil,df_perfiles,datos_muestreo_perfil    
+
+
 
 
     # # Predimensionamientos

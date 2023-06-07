@@ -64,7 +64,7 @@ def principal_radiales():
     st.image(imagen_pagina)
     st.caption('Fotografía de Mar Nieto Cid')
 
-
+    st.cache_data.clear()
 
 
 
