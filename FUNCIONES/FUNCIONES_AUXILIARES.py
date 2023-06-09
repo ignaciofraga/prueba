@@ -770,9 +770,6 @@ def consulta_botellas():
         listado_variables_final = list(df_exporta.columns)
         #variables_eliminadas    = list(set(listado_variables_final).difference(listado_variables_inicial))
         variables_eliminadas = numpy.setdiff1d(listado_variables_inicial,listado_variables_final)
-        st.text(variables_eliminadas)
-        st.text(listado_variables_final)
-        st.text(listado_variables_inicial)
         if len(variables_eliminadas) > 0:
             for ivar_eliminada in range(len(variables_eliminadas)):
                 var_eliminada_qf = variables_eliminadas[ivar_eliminada] + '_qf'
