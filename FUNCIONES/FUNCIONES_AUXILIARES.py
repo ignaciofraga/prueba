@@ -762,9 +762,17 @@ def consulta_botellas():
         #st.dataframe(df_exporta)
 
         # Elimina las columnas sin datos        
+        listado_variables_inicial = list(df_exporta.columns) 
         nan_value = float("NaN")
         df_exporta.replace("", nan_value, inplace=True)
         df_exporta.dropna(how='all', axis=1, inplace=True)
+        # Elimina también las columnas de QF de las variables sin datos
+        listado_variables_final = list(df_exporta.columns)
+        variables_eliminadas    = list(set(listado_variables_final).difference(listado_variables_inicial))
+        if len(variables_eliminadas) > 0:
+            for ivar_eliminada in range(len(variables_eliminadas)):
+                var_eliminada_qf = variables_eliminadas[ivar_eliminada] + '_qf'
+                df_exporta       = df_exporta.drop(var_eliminada_qf, axis=1)
         
         # Añade unidades al nombre de cada variable
         listado_variables_bd = df_variables['variables'].tolist() 

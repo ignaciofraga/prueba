@@ -83,7 +83,7 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
             lectura_archivo = open(archivo, "r")  
             datos_archivo = lectura_archivo.readlines()
                   
-            mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo,nombre_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+            mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo)
         
             for imuestreo in range(datos_botellas.shape[0]):
                 if datos_botellas['latitud'].iloc[imuestreo] is None:
@@ -93,9 +93,47 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
         
             # Aplica control de calidad
             #datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
-            datos_botellas['id_estacion_temp']         = datos_botellas['estacion']
+            datos_botellas['id_estacion_temp']         = id_estacion
 
             datos_botellas['fecha_muestreo']    = fecha_salida
+            
+            profundidades_referencia = tabla_estaciones_programa['profundidades_referencia'][tabla_estaciones_programa['nombre_estacion']==nombre_estacion].iloc[0]
+            # Añade una columna con la profundidad de referencia
+            if profundidades_referencia is not None:
+                datos_botellas['prof_referencia'] = numpy.zeros(datos_botellas.shape[0],dtype=int)
+                for idato in range(datos_botellas.shape[0]):
+                        # Encuentra la profundidad de referencia más cercana a cada dato
+                        idx = (numpy.abs(profundidades_referencia - datos_botellas['presion_ctd'][idato])).argmin()
+                        datos_botellas['prof_referencia'][idato] =  profundidades_referencia[idx]
+            else:
+                datos_botellas['prof_referencia'] = [None]*datos_botellas.shape[0]
+
+            
+          
+            # Cambia los nombre de las botellas.        
+            if id_estacion == 1: #E2
+                listado_equiv_ctd = [1,3,5,7,9,11]
+                listado_equiv_real = [1,2,3,4,5,6]
+                for ibotella in range(datos_botellas.shape[0]):
+                    for iequiv in range(len(listado_equiv_ctd)):
+                        if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                            datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+
+            if id_estacion == 5: #E4
+                
+                datos_botellas['botella_temp'] = datos_botellas['botella']
+                datos_botellas = datos_botellas.drop(datos_botellas[datos_botellas.botella_temp == 11].index)
+                
+                listado_equiv_ctd = [1,3,5,7,9,11]
+                listado_equiv_real = [8,9,10,11,12,None]
+                for ibotella in range(datos_botellas.shape[0]):
+                    for iequiv in range(len(listado_equiv_ctd)):
+                        if datos_botellas['botella_temp'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                            datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+                            
+                datos_botellas = datos_botellas.drop(columns=['botella_temp'])  
+            
+            
 
             df_acc = pandas.concat([df_acc, datos_botellas])
 
@@ -110,10 +148,10 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
         df_acc.set_index('id_temp',drop=False,append=False,inplace=True)
     
     
-        datos_botellas,textos_aviso = FUNCIONES_PROCESADO.control_calidad(df_acc,direccion_host,base_datos,usuario,contrasena,puerto)  
+        #datos_botellas,textos_aviso = FUNCIONES_PROCESADO.control_calidad(df_acc,direccion_host,base_datos,usuario,contrasena,puerto)  
     
         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-        datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+        datos_botellas = FUNCIONES_PROCESADO.evalua_registros(df_acc,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
      
         FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
                
@@ -148,55 +186,6 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
             # Asigna el identificador al perfil
             df_perfiles['perfil'] = datos_muestreo_perfil['perfil'].iloc[0]
 
-            #Inserta en la base de datos
-            FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto)       
-                
-            
-            if nombre_estacion == '2':  # Estacion 2 del programa radiales, añadir muestreo correspondiente a la botella en superficie
-    
-                  # Genera dataframe con el muestreo de la estacion 2
-                  pres_min                             = min(datos_perfil['presion_ctd'])
-                  df_temp                              = datos_perfil[datos_perfil['presion_ctd']==pres_min]
-                 
-                  # Elimina la fila correspondiente al comienzo del descenso
-                  if df_temp.shape[0] > 1:
-                      df_botella = df_temp.drop([0])
-                  else:
-                      df_botella = df_temp
-    
-    
-                  # Asigna los datos correspondientes
-                  df_botella['latitud']                = datos_muestreo_perfil['lat_muestreo'].iloc[0]
-                  df_botella['longitud']               = datos_muestreo_perfil['lon_muestreo'].iloc[0]
-                  df_botella['prof_referencia']        = 0
-                  df_botella['fecha_muestreo']         = datos_muestreo_perfil['fecha_muestreo'].iloc[0]
-                  df_botella = df_botella.drop(columns = ['c0S/m','flag'])
-                  try:
-                      df_botella = df_botella.drop(columns = ['sbeox0V','sbeox0ML/L'])
-                      df_botella['oxigeno_ctd_qf']   = 1
-                  except:
-                      pass
-                  id_estacion                          = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
-                  df_botella['id_estacion_temp']       = int(id_estacion) 
-                  df_botella['id_salida']              = id_salida 
-                  df_botella['nombre_muestreo']        = abreviatura_programa + '_' + (datos_muestreo_perfil['fecha_muestreo'].iloc[0]).strftime("%Y%m%d") + '_E2_P0' 
-                 
-                  df_botella['programa']               = id_programa    
-                  df_botella['num_cast']               = datos_muestreo_perfil['cast_muestreo'].iloc[0] 
-                  # Añade botella y hora de muestreo (nulas) para evitar errores en el procesado
-                  df_botella['botella']                = 7
-                  df_botella['hora_muestreo']          = None
-                  
-                  # Añade qf 
-                  df_botella['temperatura_ctd_qf']     = 1
-                  df_botella['salinidad_ctd_qf']       = 1
-                  df_botella['fluorescencia_ctd_qf']   = 1
-                  df_botella['par_ctd_qf']             = 1
-          
-                  df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-        
-                  FUNCIONES_PROCESADO.inserta_datos(df_botella,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)              
-                
        
 
  
