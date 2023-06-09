@@ -768,7 +768,8 @@ def consulta_botellas():
         df_exporta.dropna(how='all', axis=1, inplace=True)
         # Elimina también las columnas de QF de las variables sin datos
         listado_variables_final = list(df_exporta.columns)
-        variables_eliminadas    = list(set(listado_variables_final).difference(listado_variables_inicial))
+        #variables_eliminadas    = list(set(listado_variables_final).difference(listado_variables_inicial))
+        variables_eliminadas = numpy.setdiff1d(listado_variables_inicial,listado_variables_final)
         st.text(variables_eliminadas)
         st.text(listado_variables_final)
         st.text(listado_variables_inicial)
