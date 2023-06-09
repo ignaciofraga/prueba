@@ -769,6 +769,7 @@ def consulta_botellas():
         # Elimina también las columnas de QF de las variables sin datos
         listado_variables_final = list(df_exporta.columns)
         variables_eliminadas    = list(set(listado_variables_final).difference(listado_variables_inicial))
+        st.text(variables_eliminadas)
         if len(variables_eliminadas) > 0:
             for ivar_eliminada in range(len(variables_eliminadas)):
                 var_eliminada_qf = variables_eliminadas[ivar_eliminada] + '_qf'
