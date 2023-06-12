@@ -159,10 +159,6 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
         df_prog_anho_tipo_sel     = df_prog_anho_sel[df_prog_anho_sel['tipo_salida']==tipo_salida_seleccionada]
 
 
-    test = df_prog_anho_tipo_sel
-    test = test.drop(columns=['variables_muestreadas'])
-    st.dataframe(test)
-
     col1, col2 = st.columns(2,gap="small")
     with col1: 
 
@@ -216,13 +212,6 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
     
 
     return indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada
-    #return indice_programa,anho_seleccionado,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset
-
-
-
-    ## Selecciona los datos correspondientes a la estación y salida seleccionada
-    #indice_programa,anho_seleccionado,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada
-
 
 
 
@@ -234,7 +223,7 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
 ##################### FUNCION PARA INSERTAR DATOS DISCRETOS  ##################
 ############################################################################### 
 
-def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_procesado,variables_procesado_bd,df_referencia):
+def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_procesado,variables_procesado_bd,df_referencia,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph):
 
     # Recupera los datos de conexión
     direccion_host   = st.secrets["postgres"].host
@@ -243,15 +232,9 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
     contrasena       = st.secrets["postgres"].password
     puerto           = st.secrets["postgres"].port    
 
-    # Recupera tablas con informacion utilizada en el procesado
-    conn                    = init_connection()
-    df_indices_calidad      = psql.read_sql('SELECT * FROM indices_calidad', conn)
-    df_metodo_ph            = psql.read_sql('SELECT * FROM metodo_pH', conn)
-    conn.close()     
-   
+    
     # compón un dataframe con la información de muestreo y datos biogeoquímicos
-    df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
-    df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
+    df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")
     
     # Añade columna con información del año
     df_datos_disponibles['año']                = numpy.zeros(df_datos_disponibles.shape[0],dtype=int)
@@ -260,7 +243,12 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
             
     # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
     io_control_calidad = 0
-    df_seleccion,indice_estacion,variable_seleccionada,salida_seleccionada,meses_offset = menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad)
+    indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada = menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
+ 
+        
+    # Mantén sólo los datos de las salidas seleccionadas
+    df_seleccion = df_datos_disponibles[df_datos_disponibles['salida_mar'] == salida_seleccionada]
+    
     indice_seleccion = variables_procesado_bd.index(variable_seleccionada)
     variable_seleccionada_nombre = variables_procesado[indice_seleccion]
 

@@ -1979,17 +1979,29 @@ def procesado_nutrientes():
 ###############################################################################    
 
 
-def procesado_quimica():
+def entrada_datos_laboratorio():
         
-    st.subheader('Procesado de variables químicas')
-       
-    # Recupera tablas con informacion utilizada en el procesado
-    conn                    = init_connection()
-    df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-    df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-    df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-    conn.close()     
- 
+    st.subheader('Procesado de variables analizadas en laboratorio')
+    
+    
+    
+    # Función para cargar en caché los datos a utilizar
+    @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
+    def carga_datos_entrada_laboratorio():
+        conn                    = init_connection()
+        df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+        df_datos_discretos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
+        df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
+        df_programas            = psql.read_sql('SELECT * FROM programas', conn)
+        df_indices_calidad      = psql.read_sql('SELECT * FROM indices_calidad', conn)
+        df_metodo_ph            = psql.read_sql('SELECT * FROM metodo_ph', conn)
+        conn.close()
+        return df_muestreos,df_datos_discretos,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph
+        
+
+    df_muestreos,df_datos_discretos,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph = carga_datos_entrada_laboratorio()
+
     # Combina la información de muestreos y salidas en un único dataframe 
     df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
     df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
@@ -1998,18 +2010,20 @@ def procesado_quimica():
     acciones     = ['Añadir o modificar datos procesados', 'Realizar control de calidad de datos disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
  
-    variables_procesado    = ['pH','Alcalinidad','Oxígeno (Método Winkler)']    
-    variables_procesado_bd = ['ph','alcalinidad','oxigeno_wk']
-    variables_unidades     = [' ','\u03BCmol/kg','\u03BCmol/kg']
+    variables_procesado    = ['TOC/TON','pH','Alcalinidad','Oxígeno (Método Winkler)']    
+    variables_procesado_bd = ['toc','ph','alcalinidad','oxigeno_wk']
+    variables_unidades     = ['µmol/kg',' ','\u03BCmol/kg','\u03BCmol/kg']
     
     # Define unos valores de referencia 
-    df_referencia        = pandas.DataFrame(columns = ['ph', 'alcalinidad', 'oxigeno_wk'],index = [0])
-    df_referencia.loc[0] = [8.1,200.0,200.0]
+    df_referencia        = pandas.DataFrame(columns = ['toc','ph', 'alcalinidad', 'oxigeno_wk'],index = [0])
+    df_referencia.loc[0] = [0,8.1,200.0,200.0]
     
     # Añade nuevos datos obtenidos en laboratorio
     if tipo_accion == acciones[0]:
         
-        FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_procesado,variables_procesado_bd,df_referencia)
+        FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_procesado,variables_procesado_bd,df_referencia,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph)
+
+
 
     # Realiza control de calidad
     if tipo_accion == acciones[1]:
