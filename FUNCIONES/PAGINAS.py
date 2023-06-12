@@ -2026,7 +2026,7 @@ def entrada_datos_laboratorio():
     # Añade nuevos datos obtenidos en laboratorio
     if tipo_accion == acciones[0]:
         
-        FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_procesado,variables_procesado_bd,df_referencia,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph)
+        FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_procesado,variables_procesado_bd,variables_unidades,df_referencia,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph)
 
 
 

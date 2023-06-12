@@ -223,7 +223,7 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
 ##################### FUNCION PARA INSERTAR DATOS DISCRETOS  ##################
 ############################################################################### 
 
-def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_procesado,variables_procesado_bd,df_referencia,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph):
+def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_procesado,variables_procesado_bd,variables_unidades,df_referencia,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph):
 
     # Recupera los datos de conexión
     direccion_host   = st.secrets["postgres"].host
@@ -248,22 +248,16 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
    
     # Mantén sólo los datos de la salida y estación seleccionadas
     df_seleccion = df_datos_disponibles[(df_datos_disponibles['salida_mar'] == indice_salida) & (df_datos_disponibles['estacion'] == indice_estacion)]
-    
-    st.dataframe(df_seleccion)
-    
-    indice_seleccion = variables_procesado_bd.index(variable_seleccionada)
-    variable_seleccionada_nombre = variables_procesado[indice_seleccion]
+        
+    indice_seleccion               = variables_procesado_bd.index(variable_seleccionada)
+    variable_seleccionada_nombre   = variables_procesado[indice_seleccion]
+    variable_seleccionada_unidades = variables_unidades[indice_seleccion]
 
     # Si ya hay datos previos, mostrar un warning        
     if df_seleccion[variable_seleccionada].notnull().all():
         io_valores_prev = 1
         texto_error = "La base de datos ya contiene información para la salida, estación, cast y variable seleccionadas. Los datos introducidos reemplazarán los existentes."
         st.warning(texto_error, icon="⚠️") 
-    else:
-        io_valores_prev = 0    
-        texto_error = "La base de datos NO contiene información para la salida, estación, cast y variable seleccionadas."
-        st.warning(texto_error, icon="⚠️") 
-        
         
     df_seleccion    = df_seleccion.sort_values('botella')
     
@@ -300,7 +294,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
                 st.text(texto_profunidad)
 
             with col3: 
-                texto_variable = variable_seleccionada_nombre + ':'
+                texto_variable = variable_seleccionada_nombre + '(' + variable_seleccionada_unidades + '):'
                 if io_valores_prev == 1:
                     valor_entrada  = st.number_input(texto_variable,value=df_seleccion[variable_seleccionada].iloc[idato],key=idato,format = "%f")                                   
                 else:
