@@ -2033,11 +2033,12 @@ def entrada_datos_laboratorio():
         io_control_calidad = 1
         indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada = FUNCIONES_AUXILIARES.menu_seleccion(df_muestreos,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
  
+        df_datos             = pandas.merge(df_muestreos, df_datos_discretos, on="salida_mar")
+        
+        df_datos_disponibles = df_datos[(df_datos["programa"] == indice_programa) & (df_datos["estacion"] == indice_estacion)]
+                        
+        datos_procesados     = df_datos_disponibles[(df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
 
-        datos_procesados     = df_muestreos[(df_muestreos["estacion"] == indice_estacion) & (df_muestreos["salida_mar"] == indice_salida) & (df_muestreos["num_cast"] == cast_seleccionado)]
-
-        df_datos_disponibles = df_muestreos[(df_muestreos["programa"] == indice_programa) & (df_muestreos["estacion"] == indice_estacion)]
-                
         st.dataframe(datos_procesados)
         st.text(variable_seleccionada)
         
