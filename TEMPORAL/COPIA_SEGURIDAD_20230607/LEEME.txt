@@ -1,0 +1,1 @@
+Versión correspondiente a la base de datos en la que los datos discretos se almacenan en las tablas fisica y biogeoquimica

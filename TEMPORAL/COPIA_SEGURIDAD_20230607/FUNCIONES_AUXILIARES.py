@@ -345,14 +345,14 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_
        
                 # Diferente instrucción si es pH (hay que especificar el tipo de medida)
                 if variable_seleccionada == 'ph': 
-                    instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, ph_metodo = %s WHERE muestreo = %s;'
+                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, ph_metodo = %s WHERE muestreo = %s;'
                     for idato in range(df_seleccion.shape[0]):
         
                         cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(id_tipo_analisis),int(df_seleccion['muestreo'].iloc[idato])))
                         conn.commit()             
                         
                 else:
-                    instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
+                    instruccion_sql = "UPDATE datos_discretos_biogeoquimica SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
 
                     for idato in range(df_seleccion.shape[0]):
         
@@ -502,19 +502,20 @@ def consulta_botellas():
         df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_programas            = psql.read_sql('SELECT * FROM programas', conn)
         df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-        df_datos_discretos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
+        df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+        df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
         df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
         df_variables            = psql.read_sql('SELECT * FROM variables_procesado', conn)
         df_rmn_altos            = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
         df_rmn_bajos            = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
         conn.close() 
-        return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_variables,df_rmn_altos,df_rmn_bajos
+        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_variables,df_rmn_altos,df_rmn_bajos
            
     st.subheader('Consulta los datos de botellas disponibles') 
 
 
     # carga de la caché los datos 
-    df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_variables,df_rmn_altos,df_rmn_bajos = carga_datos_consulta_botellas()
+    df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_variables,df_rmn_altos,df_rmn_bajos = carga_datos_consulta_botellas()
 
     listado_programas       = df_programas['nombre_programa'].tolist()
     id_radiales             = listado_programas.index('RADIAL CORUÑA')
@@ -580,7 +581,7 @@ def consulta_botellas():
                 listado_variables = listado_variables + ['turbidez_ctd'] + ['turbidez_ctd_qf']
                 
     # Recorta el dataframe de datos físicos con las variables seleccionadas
-    df_datos_fisicos_seleccion = df_datos_discretos.loc[:, listado_variables]
+    df_datos_fisicos_seleccion = df_datos_fisicos.loc[:, listado_variables]
                     
     listado_variables =['muestreo']
                 
@@ -687,7 +688,7 @@ def consulta_botellas():
            io_factores_correccion_nutrientes = st.checkbox('Factores de corrección nutrientes', value=False)           
                 
     # Recorta el dataframe de datos biogeoquimicos con las variables seleccionadas
-    df_datos_biogeoquimicos_seleccion = df_datos_discretos.loc[:, listado_variables]
+    df_datos_biogeoquimicos_seleccion = df_datos_biogeoquimicos.loc[:, listado_variables]
                        
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
     
@@ -762,31 +763,30 @@ def consulta_botellas():
         #st.dataframe(df_exporta)
 
         # Elimina las columnas sin datos        
-        listado_variables_inicial = list(df_exporta.columns) 
         nan_value = float("NaN")
         df_exporta.replace("", nan_value, inplace=True)
         df_exporta.dropna(how='all', axis=1, inplace=True)
-        # Elimina también las columnas de QF de las variables sin datos
-        listado_variables_final = list(df_exporta.columns)
-        #variables_eliminadas    = list(set(listado_variables_final).difference(listado_variables_inicial))
-        variables_eliminadas = numpy.setdiff1d(listado_variables_inicial,listado_variables_final)
-        if len(variables_eliminadas) > 0:
-            for ivar_eliminada in range(len(variables_eliminadas)):
-                var_eliminada_qf = variables_eliminadas[ivar_eliminada] + '_qf'
-                df_exporta       = df_exporta.drop(var_eliminada_qf, axis=1)
+        
         
         # Añade unidades al nombre de cada variable
-        listado_variables_bd = df_variables['variables'].tolist() 
-        listado_unidades  = df_variables['unidades_variables'].tolist() 
+        listado_variables_fisicas = df_variables['variables_fisicas'].tolist() 
+        listado_unidades_fisicas  = df_variables['unidades_fisica'].tolist() 
+        listado_variables_bgq = df_variables['variables_biogeoquimicas'].tolist() 
+        listado_unidades_bgq  = df_variables['unidades_bgq'].tolist() 
         
         listado_variables_df = df_exporta.columns.tolist()
         for ivariable_df in range(len(listado_variables_df)):
-            for ivariable_bd in range(len(listado_variables_bd)):
-                if listado_variables_df[ivariable_df] == listado_variables_bd[ivariable_bd] and  listado_unidades[ivariable_bd] is not None:    
-            
-                    nombre_uds = listado_variables_bd[ivariable_bd] + '(' + listado_unidades[ivariable_bd] + ')'                    
-                    df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})        
-            
+            if listado_variables_df[ivariable_df] in listado_variables_fisicas:
+                indice     = listado_variables_fisicas.index(listado_variables_df[ivariable_df])
+                if listado_unidades_fisicas[indice] is not None:
+                    nombre_uds = listado_variables_fisicas[indice] + '(' + listado_unidades_fisicas[indice] + ')'
+                    df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})
+            if listado_variables_df[ivariable_df] in listado_variables_bgq:
+                indice     = listado_variables_bgq.index(listado_variables_df[ivariable_df])
+                if listado_unidades_bgq[indice] is not None:
+                    nombre_uds = listado_variables_bgq[indice] + '(' + listado_unidades_bgq[indice] + ')'
+                    df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})
+                
         ## Botón para exportar los resultados
         nombre_archivo =  'DATOS_BOTELLAS.xlsx'
     
@@ -842,17 +842,18 @@ def consulta_perfiles():
         df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_programas            = psql.read_sql('SELECT * FROM programas', conn)
         df_perfiles             = psql.read_sql('SELECT * FROM perfiles_verticales', conn)
-        df_datos_perfiles       = psql.read_sql('SELECT * FROM datos_perfiles', conn)
+        df_datos_fisicos        = psql.read_sql('SELECT * FROM datos_perfil_fisica', conn)
+        df_datos_biogeoquimicos = psql.read_sql('SELECT * FROM datos_perfil_biogeoquimica', conn)
         df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
         conn.close()    
         
-        return df_salidas,df_programas,df_perfiles,df_datos_perfiles,df_estaciones
+        return df_salidas,df_programas,df_perfiles,df_datos_fisicos,df_datos_biogeoquimicos,df_estaciones
  
     
     st.subheader('Consulta los datos de perfiles disponibles') 
 
     # Carga la información de la base de datos de la caché
-    df_salidas,df_programas,df_perfiles,df_datos_perfiles,df_estaciones = carga_datos_consulta_perfiles()
+    df_salidas,df_programas,df_perfiles,df_datos_fisicos,df_datos_biogeoquimicos,df_estaciones = carga_datos_consulta_perfiles()
 
     id_radiales             = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].iloc[0]
     df_salidas_seleccion    = df_salidas[df_salidas['programa']==int(id_radiales)]
@@ -888,7 +889,7 @@ def consulta_perfiles():
     id_salida_seleccionada          = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida_seleccionada].iloc[0]
     
     df_perfiles_seleccion  = df_perfiles[df_perfiles['salida_mar']==int(id_salida_seleccionada)]
-    df_datos_combinado     = pandas.merge(df_datos_perfiles, df_perfiles, on="perfil")
+    df_datos_combinado     = pandas.merge(df_datos_fisicos, df_datos_biogeoquimicos, on="perfil")
         
     # Comprueba si hay datos disponibles
     if df_perfiles_seleccion.shape[0] == 0:
