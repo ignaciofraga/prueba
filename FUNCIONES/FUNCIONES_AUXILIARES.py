@@ -246,8 +246,8 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
     indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada = menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
  
    
-    # Mantén sólo los datos de las salidas seleccionadas
-    df_seleccion = df_datos_disponibles[df_datos_disponibles['salida_mar'] == indice_salida]
+    # Mantén sólo los datos de la salida y estación seleccionadas
+    df_seleccion = df_datos_disponibles[(df_datos_disponibles['salida_mar'] == indice_salida) & (df_datos_disponibles['estacion'] == indice_estacion)]
     
     st.dataframe(df_seleccion)
     

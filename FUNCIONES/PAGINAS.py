@@ -2002,11 +2002,15 @@ def entrada_datos_laboratorio():
 
     df_muestreos,df_datos_discretos,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph = carga_datos_entrada_laboratorio()
 
+    # Mantén sólo las salidas de radiales
+    id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+    df_salidas  = df_salidas[df_salidas['programa']==int(id_radiales)]
+
     # Combina la información de muestreos y salidas en un único dataframe 
     df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
     df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
     df_salidas            = df_salidas.rename(columns={"salida_mar": "id_salida"})        
-                  
+                      
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
     acciones     = ['Añadir o modificar datos procesados', 'Realizar control de calidad de datos disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
