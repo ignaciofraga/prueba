@@ -249,7 +249,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
     st.text(salida_seleccionada)
    
     # Mantén sólo los datos de las salidas seleccionadas
-    df_seleccion = df_datos_disponibles[df_datos_disponibles['salida_mar'] == salida_seleccionada]
+    df_seleccion = df_datos_disponibles[df_datos_disponibles['salida_mar'] == indice_salida]
     
     st.dataframe(df_seleccion)
     
