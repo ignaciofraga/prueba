@@ -2038,6 +2038,9 @@ def entrada_datos_laboratorio():
 
         df_datos_disponibles = df_muestreos[(df_muestreos["programa"] == indice_programa) & (df_muestreos["estacion"] == indice_estacion)]
                 
+        st.dataframe(datos_procesados)
+        st.text(variable_seleccionada)
+        
         if not datos_procesados[variable_seleccionada].isnull().all():         
   
             indice_seleccion               = variables_procesado_bd.index(variable_seleccionada)
