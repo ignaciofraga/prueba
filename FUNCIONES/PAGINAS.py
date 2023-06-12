@@ -2005,7 +2005,8 @@ def entrada_datos_laboratorio():
     # Combina la información de muestreos y salidas en un único dataframe 
     df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
     df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
-                         
+    df_salidas            = df_salidas.rename(columns={"salida_mar": "id_salida"})        
+                  
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
     acciones     = ['Añadir o modificar datos procesados', 'Realizar control de calidad de datos disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
