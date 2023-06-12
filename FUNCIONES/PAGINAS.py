@@ -1919,18 +1919,9 @@ def procesado_nutrientes():
         df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="id_salida")
         df_muestreos          = df_muestreos.rename(columns={"id_salida": "salida_mar"}) # Deshaz el cambio de nombre
                          
-        # compón un dataframe con la información de muestreo y los datos disponibles                                           
-        df_temporal           = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
-        if df_temporal.shape[0] > 0:
-            df_datos_disponibles  = df_temporal
-        else: 
-            df_datos_disponibles = df_muestreos
-            
-        df_temporal           = pandas.merge(df_datos_disponibles, df_datos_fisicos, on="muestreo") 
-        if df_temporal.shape[0] > 0:
-            df_datos_disponibles  = df_temporal
-        else:
-            df_datos_disponibles = df_muestreos           
+        # compón un dataframe con la información de muestreo y datos disponibles                                            
+        df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
+        df_datos_disponibles  = pandas.merge(df_datos_disponibles, df_datos_fisicos, on="muestreo")
          
         # Añade columna con información del año
         df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year

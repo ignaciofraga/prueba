@@ -612,12 +612,14 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
   
     if tipo_datos     == 'discreto_fisica':
         variables     = 'variables_fisicas'
-        tabla_destino = 'datos_discretos_fisica'
+        #tabla_destino = 'datos_discretos_fisica'
+        tabla_destino = 'datos_discretos'
         puntero       = 'muestreo'
     
     elif tipo_datos   == 'discreto_bgq':
         variables     = 'variables_biogeoquimicas'  
-        tabla_destino = 'datos_discretos_biogeoquimica'
+        #tabla_destino = 'datos_discretos_biogeoquimica'
+        tabla_destino = 'datos_discretos'
         puntero       = 'muestreo'
         
     elif tipo_datos   == 'perfil_fisica':

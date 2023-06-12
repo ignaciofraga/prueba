@@ -586,6 +586,106 @@ direccion_host = '193.146.155.99'
 
 # ### TABLAS CON DATOS MUESTREADOS ####
 
+########################################################
+## TABLA CON DATOS PROCEDENTES DE MUESTREOS PUNTUALES ##
+########################################################
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()
+
+nombre_tabla = 'datos_discretos'
+
+# Borra la table si ya existía
+instruccion_sql = 'DROP TABLE IF EXISTS ' + nombre_tabla + ' CASCADE;'
+cursor.execute(instruccion_sql)
+conn.commit()
+
+# Crea la tabla de nuevo
+listado_variables = ('(muestreo int,'
+' temperatura_ctd NUMERIC (4, 2),'
+' temperatura_ctd_qf int DEFAULT 9,'
+' salinidad_ctd NUMERIC (5, 3),'
+' salinidad_ctd_qf int DEFAULT 9,'
+' par_ctd NUMERIC (8, 3),'
+' par_ctd_qf int DEFAULT 9,'
+' turbidez_ctd NUMERIC (6, 3),'
+' turbidez_ctd_qf int DEFAULT 9,'
+' sigmat NUMERIC (6, 4),'
+' fluorescencia_ctd NUMERIC (7, 4),'
+' fluorescencia_ctd_qf int DEFAULT 9,'
+' oxigeno_ctd NUMERIC (4, 1),'
+' oxigeno_ctd_qf int DEFAULT 9,'
+' oxigeno_wk NUMERIC (4, 1),'
+' oxigeno_wk_qf int DEFAULT 9,'
+' ton NUMERIC (5, 2),'
+' ton_qf int DEFAULT 9,'
+' nitrato NUMERIC (5, 2),'
+' nitrato_qf int DEFAULT 9,'
+' nitrito NUMERIC (5, 2),'
+' nitrito_qf int DEFAULT 9,'
+' amonio NUMERIC (5, 2),'
+' amonio_qf int DEFAULT 9,'
+' fosfato NUMERIC (5, 2),'
+' fosfato_qf int DEFAULT 9,'
+' silicato NUMERIC (5, 2),'
+' silicato_qf int DEFAULT 9,'
+' cc_nutrientes int DEFAULT 1,'
+' tcarbn NUMERIC (6, 1),'
+' tcarbn_qf int DEFAULT 9,'
+' doc NUMERIC (6, 3),'
+' doc_qf int DEFAULT 9,'
+' cdom NUMERIC (6, 3),'
+' cdom_qf int DEFAULT 9,'
+' clorofila_a NUMERIC (5, 3),'
+' clorofila_a_qf int DEFAULT 9,'
+' clorofila_b NUMERIC (5, 3),'
+' clorofila_b_qf int DEFAULT 9,'
+' clorofila_c NUMERIC (5, 3),'
+' clorofila_c_qf int DEFAULT 9,'
+' alcalinidad NUMERIC (9, 4),'
+' alcalinidad_qf int DEFAULT 9,'
+' ph NUMERIC (5, 4),'
+' ph_qf int DEFAULT 9,'
+' ph_metodo int DEFAULT 1,'
+' prod_primaria NUMERIC (5, 2),'
+' r_clor NUMERIC (10, 8),'
+' r_clor_qf int DEFAULT 9,'
+' r_per NUMERIC (10, 8),'
+' r_per_qf int DEFAULT 9,'
+' co3_temp NUMERIC (3, 1),'
+' cop NUMERIC (5, 2),'
+' nop NUMERIC (4, 2),'
+' rmn_alto_procesado int,'
+' rmn_bajo_procesado int,'
+' temp_lab_procesado int,'
+' rto_columna_procesado NUMERIC (4, 2),'
+' tubo_nutrientes text,'
+) 
+
+listado_dependencias = ('FOREIGN KEY (muestreo)'
+'REFERENCES muestreos_discretos (muestreo)'
+'ON UPDATE CASCADE ON DELETE CASCADE,'
+'FOREIGN KEY (cc_nutrientes)'
+'REFERENCES control_calidad_nutrientes (id_control)'
+'ON UPDATE CASCADE ON DELETE CASCADE,'
+'FOREIGN KEY (pH_metodo)'
+'REFERENCES metodo_pH (id_metodo)'
+'ON UPDATE CASCADE ON DELETE CASCADE,'
+'FOREIGN KEY (rmn_alto_procesado)'
+'REFERENCES rmn_alto_nutrientes (id_rmn)'
+'ON UPDATE CASCADE ON DELETE CASCADE,'
+'FOREIGN KEY (rmn_bajo_procesado)'
+'REFERENCES rmn_bajo_nutrientes (id_rmn)'
+'ON UPDATE CASCADE ON DELETE CASCADE'
+)
+
+listado_unicidades = (', UNIQUE (muestreo))')
+
+instruccion_sql = 'CREATE TABLE IF NOT EXISTS ' + nombre_tabla + ' ' + listado_variables + ' ' + listado_dependencias + ' ' + listado_unicidades
+cursor.execute(instruccion_sql)
+conn.commit()
+cursor.close()
+conn.close()
+
 
 # #######################################################################
 # ## TABLA CON DATOS BIOGEOQUÍMICOS PROCEDENTES DE MUESTREOS PUNTUALES ##
