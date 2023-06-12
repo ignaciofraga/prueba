@@ -2038,10 +2038,7 @@ def entrada_datos_laboratorio():
         df_datos_disponibles = df_datos[(df_datos["programa"] == indice_programa) & (df_datos["estacion"] == indice_estacion)]
                         
         datos_procesados     = df_datos_disponibles[(df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
-
-        st.dataframe(datos_procesados)
-        st.text(variable_seleccionada)
-        
+      
         if not datos_procesados[variable_seleccionada].isnull().all():         
   
             indice_seleccion               = variables_procesado_bd.index(variable_seleccionada)
