@@ -1585,8 +1585,7 @@ def entrada_archivos_roseta():
         variables_procesado_bd = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
         variables_unidades     = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
         variable_tabla         = ['discreto_fisica','discreto_fisica','discreto_fisica','discreto_bgq','discreto_bgq']
-        variable_tabla         = ['datos_discretos_fisica','datos_discretos_fisica','datos_discretos_fisica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica']
-    
+
         # Toma los datos de la caché    
         df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
 
@@ -1617,7 +1616,6 @@ def entrada_archivos_roseta():
         indice_variable          = variables_procesado_bd.index(variable_seleccionada)
         nombre_completo_variable = variables_procesado[indice_variable] 
         unidades_variable        = variables_unidades[indice_variable]
-        tabla_insercion          = variable_tabla[indice_variable]
                         
                                                         
         # Selecciona los datos correspondientes al programa, estación, salida y cast seleccionados
@@ -1625,7 +1623,7 @@ def entrada_archivos_roseta():
 
         df_datos_disponibles = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion)]
         
-        FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset,tabla_insercion)
+        FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset)
 
 
 
@@ -1902,11 +1900,7 @@ def procesado_nutrientes():
     if tipo_accion == acciones[2]: 
         
         st.subheader('Control de calidad de datos procedentes de botellas')    
-    
-        # Define las variables a utilizar
-
-        variable_tabla         = ['datos_discretos_biogeoquimica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica','datos_discretos_biogeoquimica']
-        
+            
         # Toma los datos de la caché    
         df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns = carga_datos_procesado_nutrientes()
                 
@@ -1937,7 +1931,6 @@ def procesado_nutrientes():
         indice_variable          = variables_procesado_bd.index(variable_seleccionada)
         nombre_completo_variable = variables_procesado[indice_variable] 
         unidades_variable        = variables_unidades[indice_variable]
-        tabla_insercion          = variable_tabla[indice_variable]
                                                                       
         # Selecciona los datos correspondientes al programa, estación, salida y cast seleccionados
         datos_procesados     = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion) & (df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
@@ -1946,7 +1939,7 @@ def procesado_nutrientes():
                 
         if not datos_procesados[variable_seleccionada].isnull().all():         
   
-            FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset,tabla_insercion)
+            FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset)
 
         else:
             
@@ -2028,24 +2021,35 @@ def entrada_datos_laboratorio():
         
         FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_procesado,variables_procesado_bd,variables_unidades,df_referencia,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph)
 
-
-
-    # # Realiza control de calidad
-    # if tipo_accion == acciones[1]:
+    
+    # Realiza control de calidad
+    if tipo_accion == acciones[1]:
         
-    #     # compón un dataframe con la información de muestreo y datos biogeoquímicos
-    #     df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
-    #     df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
+        # Añade columna con información del año
+        df_muestreos['año'] = pandas.DatetimeIndex(df_muestreos['fecha_muestreo']).year
+
         
-    #     # Añade columna con información del año
-    #     df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
+        # Despliega menú de selección del programa, año, salida, estación, cast y variable                 
+        io_control_calidad = 1
+        indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada = FUNCIONES_AUXILIARES.menu_seleccion(df_muestreos,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
+ 
 
-    #     # Borra los dataframes que ya no hagan falta para ahorrar memoria
-    #     del(df_datos_biogeoquimicos,df_muestreos)
+        datos_procesados     = df_muestreos[(df_muestreos["estacion"] == indice_estacion) & (df_muestreos["salida_mar"] == indice_salida) & (df_muestreos["num_cast"] == cast_seleccionado)]
 
-    #     # procesa ese dataframe
-    #     FUNCIONES_PROCESADO.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades)
+        df_datos_disponibles = df_muestreos[(df_muestreos["programa"] == indice_programa) & (df_muestreos["estacion"] == indice_estacion)]
+                
+        if not datos_procesados[variable_seleccionada].isnull().all():         
+  
+            indice_seleccion               = variables_procesado_bd.index(variable_seleccionada)
+            variable_seleccionada_nombre   = variables_procesado[indice_seleccion]
+            variable_seleccionada_unidades = variables_unidades[indice_seleccion]          
+  
+            FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,variable_seleccionada_nombre,variable_seleccionada_unidades,df_indices_calidad,meses_offset)
 
+        else:
+
+            texto_aviso = 'La base de datos no contiene información de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada 
+            st.warning(texto_aviso)
  
 # ###############################################################################
 # ################## PÁGINA DE ENTRADA DE ESTADILLOS #################

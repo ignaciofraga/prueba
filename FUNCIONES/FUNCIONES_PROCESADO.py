@@ -713,7 +713,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
 ###############################################################################
 ###### FUNCION PARA REALIZAR CONTROL DE CALDIAD DE DATOS BIOGEOQUIMICOS #######
 ###############################################################################
-def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable_procesada,nombre_completo_variable_procesada,unidades_variable,df_indices_calidad,meses_offset,tabla_insercion):
+def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable_procesada,nombre_completo_variable_procesada,unidades_variable,df_indices_calidad,meses_offset):
 
     import streamlit as st
     import matplotlib.pyplot as plt
@@ -1274,7 +1274,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                     # Introducir los valores en la base de datos
                     conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()  
-                    instruccion_sql = "UPDATE " + tabla_insercion + " SET " + qf_variable_procesada +  ' = %s WHERE muestreo = %s;'
+                    instruccion_sql = "UPDATE datos_discretos SET " + qf_variable_procesada +  ' = %s WHERE muestreo = %s;'
            
                     for idato in range(datos_procesados.shape[0]):
         
