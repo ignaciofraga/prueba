@@ -2033,6 +2033,8 @@ def entrada_datos_laboratorio():
         io_control_calidad = 1
         indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada = FUNCIONES_AUXILIARES.menu_seleccion(df_muestreos,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
  
+        st.dataframe(df_muestreos)   
+ 
         df_datos             = pandas.merge(df_muestreos, df_datos_discretos, on="salida_mar")
         
         df_datos_disponibles = df_datos[(df_datos["programa"] == indice_programa) & (df_datos["estacion"] == indice_estacion)]
