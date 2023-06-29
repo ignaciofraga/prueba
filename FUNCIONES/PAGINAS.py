@@ -1487,10 +1487,10 @@ def entrada_archivos_roseta():
                                                                                     
                             datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
                                           
-                            datos_perfil,df_perfiles,listado_variables,fecha_muestreo,hora_muestreo,cast_muestreo,lat_muestreo,lon_muestreo = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
+                            datos_perfil,df_perfiles,datos_muestreo_perfil = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
                                                                                                 
                             # Define el nombre del perfil
-                            nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
+                            nombre_perfil = abreviatura_programa + '_' + (datos_muestreo_perfil['fecha_muestreo'].iloc[0]).strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(datos_muestreo_perfil['cast_muestreo'].iloc[0])
                             
                             # Conecta con la base de datos
                             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
@@ -1500,11 +1500,11 @@ def entrada_archivos_roseta():
                             instruccion_sql = '''INSERT INTO perfiles_verticales (nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,longitud_muestreo,latitud_muestreo)
                             VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast) DO NOTHING;''' 
                             
-                            nombre_perfil = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(cast_muestreo)
+                            nombre_perfil = abreviatura_programa + '_' + (datos_muestreo_perfil['fecha_muestreo'].iloc[0]).strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(datos_muestreo_perfil['cast_muestreo'].iloc[0])
                             
                             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                             cursor = conn.cursor()    
-                            cursor.execute(instruccion_sql,(nombre_perfil,int(id_estacion),int(id_salida),int(cast_muestreo),fecha_muestreo,hora_muestreo,lon_muestreo,lat_muestreo))
+                            cursor.execute(instruccion_sql,(nombre_perfil,int(id_estacion),int(id_salida),int(datos_muestreo_perfil['cast_muestreo'].iloc[0]),datos_muestreo_perfil['fecha_muestreo'].iloc[0],datos_muestreo_perfil['hora_muestreo'].iloc[0],datos_muestreo_perfil['lon_muestreo'].iloc[0],datos_muestreo_perfil['lat_muestreo'].iloc[0]))
                             conn.commit() 
         
                             instruccion_sql = "SELECT perfil FROM perfiles_verticales WHERE nombre_perfil = '" + nombre_perfil + "';" 
@@ -1518,8 +1518,8 @@ def entrada_archivos_roseta():
                             
                             df_perfiles['perfil'] = int(id_perfil)
                                                         
-                            FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-                            FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil_bgq',direccion_host,base_datos,usuario,contrasena,puerto)               
+                            FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto)
+               
                                 
                                 
                             if nombre_estacion == '2' and programa_seleccionado == 'RADIAL CORUÑA' :  # Estacion 2 del programa radiales, añadir muestreo correspondiente a la botella en superficie
@@ -1535,10 +1535,10 @@ def entrada_archivos_roseta():
                                     df_botella = df_temp
 
                                  # Asigna los datos correspondientes
-                                 df_botella['latitud']                = lat_muestreo
-                                 df_botella['longitud']               = lon_muestreo
+                                 df_botella['latitud']                = datos_muestreo_perfil['lat_muestreo'].iloc[0]
+                                 df_botella['longitud']               = datos_muestreo_perfil['lon_muestreo'].iloc[0]
                                  df_botella['prof_referencia']        = 0
-                                 df_botella['fecha_muestreo']         = fecha_muestreo
+                                 df_botella['fecha_muestreo']         = datos_muestreo_perfil['fecha_muestreo'].iloc[0]
                                  
                                  
                                  df_botella = df_botella.drop(columns = ['c0S/m','flag'])
@@ -1551,10 +1551,10 @@ def entrada_archivos_roseta():
                                  id_estacion                          = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
                                  df_botella['id_estacion_temp']       = int(id_estacion) 
                                  df_botella['id_salida']              = id_salida 
-                                 df_botella['nombre_muestreo']        = abreviatura_programa + '_' + fecha_muestreo.strftime("%Y%m%d") + '_E2_P0' 
+                                 df_botella['nombre_muestreo']        = abreviatura_programa + '_' + (datos_muestreo_perfil['fecha_muestreo'].iloc[0]).strftime("%Y%m%d") + '_E2_P0' 
                                  
                                  df_botella['programa']               = id_programa    
-                                 df_botella['num_cast']               = cast_muestreo 
+                                 df_botella['num_cast']               = datos_muestreo_perfil['cast_muestreo'].iloc[0]
                                  
                                  # Añade botella (7) y hora de muestreo (nulas) para evitar errores en el procesado
                                  df_botella['botella']                = 7
