@@ -910,6 +910,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                
         io_plot = 0
         if not datos_procesados['oxigeno_ctd'].isnull().all(): 
+            datos_procesados.oxigeno_ctd.fillna(value=numpy.nan, inplace=True)
             az.plot(datos_procesados['oxigeno_ctd'],datos_procesados['presion_ctd'],'.',color='#006633',label='OXIMETRO')
             io_plot = 1
                 
