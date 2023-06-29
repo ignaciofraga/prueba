@@ -610,28 +610,14 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
 def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,contrasena,puerto):
   
-    if tipo_datos     == 'discreto_fisica':
-        variables     = 'variables_fisicas'
-        #tabla_destino = 'datos_discretos_fisica'
+    if tipo_datos     == 'discreto':
         tabla_destino = 'datos_discretos'
         puntero       = 'muestreo'
     
-    elif tipo_datos   == 'discreto_bgq':
-        variables     = 'variables_biogeoquimicas'  
-        #tabla_destino = 'datos_discretos_biogeoquimica'
-        tabla_destino = 'datos_discretos'
-        puntero       = 'muestreo'
-        
-    elif tipo_datos   == 'perfil_fisica':
-        variables     = 'variables_fisicas'  
-        tabla_destino = 'datos_perfil_fisica'
+    elif tipo_datos   == 'perfil':
+        tabla_destino = 'datos_perfil'
         puntero       = 'perfil'            
-            
-    elif tipo_datos   == 'perfil_bgq':
-        variables     = 'variables_biogeoquimicas'  
-        tabla_destino = 'datos_perfil_biogeoquimica'
-        puntero       = 'perfil'
-        
+                    
     # Recupera la tabla con los registros de muestreos físicos
     con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql          = create_engine(con_engine)
@@ -641,7 +627,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     conn_psql.dispose()
         
     # Lee las variables de cada tipo a utilizar en el control de calidad
-    variables_bd  = [x for x in tabla_variables[variables] if str(x) != 'None']    
+    variables_bd  = [x for x in tabla_variables['variables'] if str(x) != 'None']    
   
     # Busca qué variables están incluidas en los datos a importar
     listado_variables_datos   = datos_insercion.columns.tolist()

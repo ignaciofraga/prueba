@@ -1466,8 +1466,8 @@ def entrada_archivos_roseta():
                         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
                         datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
-                        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-                        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+                        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
+
                         
                     else:
                     
@@ -1569,9 +1569,7 @@ def entrada_archivos_roseta():
                           
                                  df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
-                                 FUNCIONES_PROCESADO.inserta_datos(df_botella,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-                                 FUNCIONES_PROCESADO.inserta_datos(df_botella,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)               
-                                
+                                 FUNCIONES_PROCESADO.inserta_datos(df_botella,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
 
                 texto_exito = 'Estación ' + nombre_estacion + ' procesada correctamente. Información subida a la base de datos'
                 st.success(texto_exito)                            
@@ -1589,7 +1587,6 @@ def entrada_archivos_roseta():
         variables_procesado    = ['Temperatura','Salinidad','PAR','Fluorescencia','O2(CTD)']    
         variables_procesado_bd = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
         variables_unidades     = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
-        variable_tabla         = ['discreto_fisica','discreto_fisica','discreto_fisica','discreto_bgq','discreto_bgq']
 
         # Toma los datos de la caché    
         df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
@@ -2135,9 +2132,9 @@ def entrada_datos_excel():
         df_datos_importacion  = pandas.read_excel(archivo_datos) 
         
         # Identifica las variables que contiene el archivo
-        variables_archivo = df_datos_importacion.columns.tolist()
-        variables_fisica  = list(set(variables_bd['variables_fisicas']).intersection(variables_archivo))
-        variables_bgq     = list(set(variables_bd['variables_biogeoquimicas']).intersection(variables_archivo))
+        variables_archivo    = df_datos_importacion.columns.tolist()
+        variables_discretas  = list(set(variables_bd['variables']).intersection(variables_archivo))
+
                                 
         # Corrige el formato de las fechas
         for idato in range(df_datos_importacion.shape[0]):
@@ -2174,19 +2171,11 @@ def entrada_datos_excel():
             datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
         # Añade datos físicos
-        if len(variables_fisica)>0:
+        if len(variables_discretas)>0:
                             
-            with st.spinner('Añadiendo datos físicos'):
+            with st.spinner('Añadiendo datos discretos'):
                 
-                FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-
-        # Añade datos biogeoquímicos
-        if len(variables_bgq)>0:
-                            
-            with st.spinner('Añadiendo datos biogeoquímicos'):
-
-                FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
-
+                FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
                 
         texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
         st.success(texto_exito)
