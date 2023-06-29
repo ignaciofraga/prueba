@@ -852,8 +852,6 @@ def entrada_salidas_mar():
             # Selección de fechas, personal, y estaciones
             json_variables_previas         = datos_salida_seleccionada['variables_muestreadas'].iloc[0]
             
-            st.text(json_variables_previas)
-            
             json_variables                 = FUNCIONES_AUXILIARES.menu_variables_radiales(json_variables_previas)
             json_variables                 = json.dumps(json_variables)
 
