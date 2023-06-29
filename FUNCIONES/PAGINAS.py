@@ -1297,13 +1297,12 @@ def entrada_archivos_roseta():
         conn                      = init_connection()
         df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
         df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-        df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+        df_datos_discretos        = psql.read_sql('SELECT * FROM datos_discretos', conn)
         df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_programas              = psql.read_sql('SELECT * FROM programas', conn)
         df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
         conn.close()
-        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad
+        return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad
         
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
@@ -1325,7 +1324,7 @@ def entrada_archivos_roseta():
         st.subheader('Entrada de datos procedentes de botellas y perfiles') 
     
         # Recupera tablas con informacion utilizada en el procesado
-        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
+        df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
         
         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
 
@@ -1589,7 +1588,7 @@ def entrada_archivos_roseta():
         variables_unidades     = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
 
         # Toma los datos de la caché    
-        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
+        df_muestreos,df_estaciones,df_datos_discretos_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
 
         # Mantén sólo las salidas de radiales
         id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
@@ -1601,8 +1600,7 @@ def entrada_archivos_roseta():
         df_muestreos          = df_muestreos.rename(columns={"id_salida": "salida_mar"}) # Deshaz el cambio de nombre
                          
         # compón un dataframe con la información de muestreo y datos biogeoquímicos                                            
-        df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
-        df_datos_disponibles  = pandas.merge(df_datos_disponibles, df_datos_fisicos, on="muestreo")
+        df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")
          
         # Añade columna con información del año
         df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
