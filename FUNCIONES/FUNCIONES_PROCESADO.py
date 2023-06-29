@@ -917,6 +917,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             az.plot(datos_procesados['oxigeno_wk'],datos_procesados['presion_ctd'],'.',color='#00CC66',label='WINKLER')
             io_plot = 1
             
+        st.dataframe(datos_procesados)
+            
         if io_plot == 1:
             az.set(xlabel='Oxigeno (\u03BCmol/kg)')
             az.yaxis.set_visible(False)
