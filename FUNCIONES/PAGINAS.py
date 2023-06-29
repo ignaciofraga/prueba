@@ -890,7 +890,7 @@ def entrada_salidas_mar():
                 df_salidas_radiales['Buque'].iloc[isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]].iloc[0]
 
         # Elimina las columnas que no interesa mostrar
-        df_salidas_radiales = df_salidas_radiales.drop(columns=['variables_muestreadas','id_salida','programa','nombre_programa','buque','configuracion_perfilador','configuracion_superficie'])
+        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','buque','configuracion_perfilador','configuracion_superficie'])
     
         # Renombra las columnas
         df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados'})
