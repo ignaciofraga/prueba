@@ -943,7 +943,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
           
             # Añade la leyenda
             az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
-
+        
+        st.text(buf)
         buf = BytesIO()
         fig.savefig(buf, format="png")
         st.image(buf)
