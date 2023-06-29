@@ -907,6 +907,8 @@ def entrada_salidas_mar():
         listado_cols = df_salidas_radiales.columns.tolist()
         listado_cols.append(listado_cols.pop(listado_cols.index('Observaciones')))   
         df_salidas_radiales = df_salidas_radiales[listado_cols]
+        
+        st.text(df_salidas_radiales['variables_muestreadas'])
           
         # Muestra una tabla con las salidas realizadas
         st.dataframe(df_salidas_radiales,use_container_width=True)
