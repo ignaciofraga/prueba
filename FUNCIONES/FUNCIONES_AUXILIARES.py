@@ -1089,6 +1089,9 @@ def menu_variables_radiales(json_variables_previas):
 
     st.markdown('BOTELLAS')
 
+    if json_variables_previas is None:
+        json_variables_previas = []
+
     json_variables = []
     col1, col2, col3, col4= st.columns(4,gap="small")
 
