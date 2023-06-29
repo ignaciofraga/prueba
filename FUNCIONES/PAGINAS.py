@@ -1588,8 +1588,8 @@ def entrada_archivos_roseta():
         variables_unidades     = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
 
         # Toma los datos de la caché    
-        df_muestreos,df_estaciones,df_datos_discretos_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
-
+        df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
+        
         # Mantén sólo las salidas de radiales
         id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
         df_salidas  = df_salidas[df_salidas['programa']==int(id_radiales)]
