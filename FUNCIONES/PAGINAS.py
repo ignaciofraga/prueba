@@ -63,6 +63,8 @@ def principal_radiales():
     imagen_pagina = Image.open(foto_lura) 
     st.image(imagen_pagina)
     st.caption('Fotografía de Mar Nieto Cid')
+    
+    st.cache_data.clear()
 
 
 
