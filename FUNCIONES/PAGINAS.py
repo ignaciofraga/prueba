@@ -1606,7 +1606,7 @@ def entrada_archivos_roseta():
         df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
                
         # Borra los dataframes que ya no hagan falta para ahorrar memoria
-        del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos)
+        del(df_datos_discretos,df_muestreos)
         
         # procesa ese dataframe
         io_control_calidad = 1
