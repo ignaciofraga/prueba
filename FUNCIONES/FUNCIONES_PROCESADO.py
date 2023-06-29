@@ -615,7 +615,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
         puntero       = 'muestreo'
     
     elif tipo_datos   == 'perfil':
-        tabla_destino = 'datos_perfil'
+        tabla_destino = 'datos_perfiles'
         puntero       = 'perfil'            
                     
     # Recupera la tabla con los registros de muestreos físicos
