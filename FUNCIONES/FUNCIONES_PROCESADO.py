@@ -880,11 +880,11 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         ax.plot(datos_procesados[variable_procesada],datos_procesados['presion_ctd'],'.r',label='PROCESADO' )
         
         # ### FORMATO,ETIQUETAS Y NOMBRES DE EJES ###
-        # texto_eje = nombre_completo_variable_procesada + '(' + unidades_variable + ')'
-        # ax.set(xlabel=texto_eje)
-        # ax.set(ylabel='Presion (db)')
-        # ax.invert_yaxis()
-        # ax.set_xlim([vmin_rango, vmax_rango])
+        texto_eje = nombre_completo_variable_procesada + '(' + unidades_variable + ')'
+        ax.set(xlabel=texto_eje)
+        ax.set(ylabel='Presion (db)')
+        ax.invert_yaxis()
+        ax.set_xlim([vmin_rango, vmax_rango])
         # rango_profs = ax.get_ylim()
         # # Añade el nombre de cada punto
         # nombre_muestreos = [None]*datos_procesados.shape[0]
