@@ -1434,6 +1434,31 @@ def entrada_archivos_roseta():
                                 for iequiv in range(len(listado_equiv_ctd)):
                                     if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
                                         datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+                                        
+                            if id_estacion == 2: #E3A
+                                listado_equiv_ctd = [1,3,5,7,9,11]
+                                listado_equiv_real = [13,131,132,133,134,135]
+                                for ibotella in range(datos_botellas.shape[0]):
+                                    for iequiv in range(len(listado_equiv_ctd)):
+                                        if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                                            datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+
+                            if id_estacion == 3: #E3C
+                                listado_equiv_ctd = [1,3,5,7,9,11]
+                                listado_equiv_real = [14,141,142,143,144,145]
+                                for ibotella in range(datos_botellas.shape[0]):
+                                    for iequiv in range(len(listado_equiv_ctd)):
+                                        if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                                            datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+                                            
+                            if id_estacion == 4: #E3B
+                                listado_equiv_ctd = [1,3,5,7,9,11]
+                                listado_equiv_real = [15,151,152,153,154,155]
+                                for ibotella in range(datos_botellas.shape[0]):
+                                    for iequiv in range(len(listado_equiv_ctd)):
+                                        if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                                            datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]                                            
+                                        
 
                         if id_estacion == 5: #E4
                             
