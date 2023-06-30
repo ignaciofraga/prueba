@@ -876,39 +876,39 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         
         st.dataframe(datos_procesados)
         
-        ### DATOS PROCESADOS ###        
-        ax.plot(datos_procesados[variable_procesada],datos_procesados['presion_ctd'],'.r',label='PROCESADO' )
+        # ### DATOS PROCESADOS ###        
+        # ax.plot(datos_procesados[variable_procesada],datos_procesados['presion_ctd'],'.r',label='PROCESADO' )
         
-        ### FORMATO,ETIQUETAS Y NOMBRES DE EJES ###
-        texto_eje = nombre_completo_variable_procesada + '(' + unidades_variable + ')'
-        ax.set(xlabel=texto_eje)
-        ax.set(ylabel='Presion (db)')
-        ax.invert_yaxis()
-        ax.set_xlim([vmin_rango, vmax_rango])
-        rango_profs = ax.get_ylim()
-        # Añade el nombre de cada punto
-        nombre_muestreos = [None]*datos_procesados.shape[0]
-        for ipunto in range(datos_procesados.shape[0]):     
-            if datos_procesados['botella'].iloc[ipunto] is None:
-                nombre_muestreos[ipunto] = 'Prof.' + str(int(datos_procesados['presion_ctd'].iloc[ipunto]))
-            else:
-                nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
-            ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]))
+        # ### FORMATO,ETIQUETAS Y NOMBRES DE EJES ###
+        # texto_eje = nombre_completo_variable_procesada + '(' + unidades_variable + ')'
+        # ax.set(xlabel=texto_eje)
+        # ax.set(ylabel='Presion (db)')
+        # ax.invert_yaxis()
+        # ax.set_xlim([vmin_rango, vmax_rango])
+        # rango_profs = ax.get_ylim()
+        # # Añade el nombre de cada punto
+        # nombre_muestreos = [None]*datos_procesados.shape[0]
+        # for ipunto in range(datos_procesados.shape[0]):     
+        #     if datos_procesados['botella'].iloc[ipunto] is None:
+        #         nombre_muestreos[ipunto] = 'Prof.' + str(int(datos_procesados['presion_ctd'].iloc[ipunto]))
+        #     else:
+        #         nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
+        #     ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]))
                 
-            st.text(nombre_muestreos[ipunto])
+        #     st.text(nombre_muestreos[ipunto])
             
-        # Ajusta el rango de las x 
-        custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
-        ax.set_xticks(custom_ticks)
-        ax.set_xticklabels(custom_ticks)
-        ax.set_xlim([vmin_rango, vmax_rango])
-        ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))   
+        # # Ajusta el rango de las x 
+        # custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
+        # ax.set_xticks(custom_ticks)
+        # ax.set_xticklabels(custom_ticks)
+        # ax.set_xlim([vmin_rango, vmax_rango])
+        # ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))   
 
-        # Reduce el tamaño de los ejes
-        ax.tick_params(axis='both', which='major', labelsize=8)
+        # # Reduce el tamaño de los ejes
+        # ax.tick_params(axis='both', which='major', labelsize=8)
 
-        # Añade la leyenda
-        ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
+        # # Añade la leyenda
+        # ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
                
         io_plot = 0
         if not datos_procesados['oxigeno_ctd'].isnull().all(): 
