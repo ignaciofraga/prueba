@@ -1164,7 +1164,7 @@ def entrada_condiciones_ambientales():
             col1, col2,col3,col4= st.columns(4,gap="small")
     
             with col1:
-                hora_llegada  = st.time_input('Hora de llegada (local)',value=hora_llegada_defecto)
+                hora_llegada  = st.time_input('Hora de llegada (local)',value=hora_llegada_defecto,step=300)
                 profundidad   = st.number_input('Profundidad (m):',format='%i',value=int(profundidad_defecto),min_value=0)
                 nubosidad        = st.number_input('Nubosidad (%) :',format='%i',value=int(nubosidad_defecto),min_value=0)
                 lluvia           = st.selectbox('LLuvia:',(seleccion_SN),index=indice_lluvia_defecto)
