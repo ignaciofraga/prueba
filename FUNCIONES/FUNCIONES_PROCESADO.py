@@ -874,7 +874,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         if io_rango:
             ax.plot(df_rango_temporal[variable_procesada],df_rango_temporal['presion_ctd'],'.',color=color_rango,label='BUENO (INTERVALO)')
         
-        
+        st.dataframe(datos_procesados)
         
         ### DATOS PROCESADOS ###        
         ax.plot(datos_procesados[variable_procesada],datos_procesados['presion_ctd'],'.r',label='PROCESADO' )
