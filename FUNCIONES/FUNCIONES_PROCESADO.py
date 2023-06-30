@@ -898,8 +898,6 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     
                 ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]))
                     
-        #     st.text(nombre_muestreos[ipunto])
-            
         # # Ajusta el rango de las x 
         # custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
         # ax.set_xticks(custom_ticks)
@@ -1259,9 +1257,11 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             texto_indice      = df_indices_calidad['descripcion'].tolist()
            
             for idato in range(datos_procesados.shape[0]):
-                enunciado                                           = 'QF del muestreo ' + nombre_muestreos[idato]
-                valor_asignado                                      = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
-                datos_procesados[qf_variable_procesada].iloc[idato] = int(indice_validacion[texto_indice.index(valor_asignado)])
+                
+                if nombre_muestreos[idato] is not None:
+                    enunciado                                           = 'QF del muestreo ' + nombre_muestreos[idato]
+                    valor_asignado                                      = st.radio(enunciado,texto_indice,horizontal=True,key = idato,index = 1)
+                    datos_procesados[qf_variable_procesada].iloc[idato] = int(indice_validacion[texto_indice.index(valor_asignado)])
             
            
             io_envio = st.form_submit_button("Asignar los valores de QF seleccionados")  
