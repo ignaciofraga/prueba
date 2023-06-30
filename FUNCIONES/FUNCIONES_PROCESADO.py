@@ -912,6 +912,13 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         if not datos_procesados['oxigeno_ctd'].isnull().all(): 
             
             df_oxigeno = datos_procesados.loc[datos_procesados['oxigeno_ctd'].notnull(), ['oxigeno_ctd','presion_ctd']]
+            
+            # Define una columna índice
+            indices_dataframe         = numpy.arange(0,df_oxigeno.shape[0],1,dtype=int)
+            df_oxigeno['id_temp'] = indices_dataframe
+            df_oxigeno.set_index('id_temp',drop=True,append=False,inplace=True)
+            
+            
             az.plot(df_oxigeno['oxigeno_ctd'],df_oxigeno['presion_ctd'],'.',color='#006633',label='OXIMETRO')
             #az.plot(datos_procesados['oxigeno_ctd'],datos_procesados['presion_ctd'],'.',color='#006633',label='OXIMETRO')
             io_plot = 1
