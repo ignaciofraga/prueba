@@ -898,7 +898,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 prof_representa          = 0
             else:                
                 prof_representa          = datos_procesados['presion_ctd'].iloc[ipunto]
-            ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], prof_representa))
+            #ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], prof_representa))
                 
         #     st.text(nombre_muestreos[ipunto])
             
