@@ -876,8 +876,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         
         st.dataframe(datos_procesados)
         
-        # ### DATOS PROCESADOS ###        
-        # ax.plot(datos_procesados[variable_procesada],datos_procesados['presion_ctd'],'.r',label='PROCESADO' )
+        ### DATOS PROCESADOS ###        
+        ax.plot(datos_procesados[variable_procesada],datos_procesados['presion_ctd'],'.r',label='PROCESADO' )
         
         # ### FORMATO,ETIQUETAS Y NOMBRES DE EJES ###
         # texto_eje = nombre_completo_variable_procesada + '(' + unidades_variable + ')'
