@@ -910,10 +910,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                
         io_plot = 0
         if not datos_procesados['oxigeno_ctd'].isnull().all(): 
-#            datos_procesados.oxigeno_ctd.fillna(value=numpy.nan, inplace=True)
-#            
+            
             df_oxigeno = datos_procesados.loc[datos_procesados['oxigeno_ctd'].notnull(), ['oxigeno_ctd','presion_ctd']]
-            st.dataframe(df_oxigeno)
             az.plot(df_oxigeno['oxigeno_ctd'],df_oxigeno['presion_ctd'],'.',color='#006633',label='OXIMETRO')
             #az.plot(datos_procesados['oxigeno_ctd'],datos_procesados['presion_ctd'],'.',color='#006633',label='OXIMETRO')
             io_plot = 1
@@ -923,8 +921,6 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             az.plot(datos_procesados['oxigeno_wk'],datos_procesados['presion_ctd'],'.',color='#00CC66',label='WINKLER')
             io_plot = 1
 
-            
-        st.dataframe(datos_procesados)
             
         if io_plot == 1:
             az.set(xlabel='Oxigeno (\u03BCmol/kg)')
