@@ -889,19 +889,15 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         # Añade el nombre de cada punto
         nombre_muestreos = [None]*datos_procesados.shape[0]
         for ipunto in range(datos_procesados.shape[0]):     
-            if datos_procesados['botella'].iloc[ipunto] is None:
-                nombre_muestreos[ipunto] = 'Prof.' + str(int(datos_procesados['presion_ctd'].iloc[ipunto]))
-            else:
-                nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
-                
-            if datos_procesados['presion_ctd'].iloc[ipunto] is None:
-                prof_representa          = 0
-            else:                
-                prof_representa          = datos_procesados['presion_ctd'].iloc[ipunto]
-                
-            st.text(prof_representa)
-            #ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], prof_representa))
-                
+            
+            if datos_procesados[variable_procesada].iloc[ipunto] is not None:
+                if datos_procesados['botella'].iloc[ipunto] is None:
+                    nombre_muestreos[ipunto] = 'Prof.' + str(int(datos_procesados['presion_ctd'].iloc[ipunto]))
+                else:
+                    nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
+    
+                ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]))
+                    
         #     st.text(nombre_muestreos[ipunto])
             
         # # Ajusta el rango de las x 
