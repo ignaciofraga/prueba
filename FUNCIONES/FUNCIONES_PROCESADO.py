@@ -908,43 +908,43 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         # Añade la leyenda
         ax.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=2, fancybox=True,fontsize=7)
                
-        io_plot = 0
-        if not datos_procesados['oxigeno_ctd'].isnull().all(): 
+        # io_plot = 0
+        # if not datos_procesados['oxigeno_ctd'].isnull().all(): 
             
-            df_oxigeno = datos_procesados.loc[datos_procesados['oxigeno_ctd'].notnull(), ['oxigeno_ctd','presion_ctd']]
+        #     df_oxigeno = datos_procesados.loc[datos_procesados['oxigeno_ctd'].notnull(), ['oxigeno_ctd','presion_ctd']]
             
-            # Define una columna índice
-            indices_dataframe         = numpy.arange(0,df_oxigeno.shape[0],1,dtype=int)
-            df_oxigeno['id_temp'] = indices_dataframe
-            df_oxigeno.set_index('id_temp',drop=True,append=False,inplace=True)
+        #     # Define una columna índice
+        #     indices_dataframe         = numpy.arange(0,df_oxigeno.shape[0],1,dtype=int)
+        #     df_oxigeno['id_temp'] = indices_dataframe
+        #     df_oxigeno.set_index('id_temp',drop=True,append=False,inplace=True)
             
             
-            st.dataframe(df_oxigeno)
+        #     st.dataframe(df_oxigeno)
             
-            az.plot(df_oxigeno['oxigeno_ctd'],df_oxigeno['presion_ctd'],'.',color='#006633',label='OXIMETRO')
-            #az.plot(datos_procesados['oxigeno_ctd'],datos_procesados['presion_ctd'],'.',color='#006633',label='OXIMETRO')
-            io_plot = 1
+        #     az.plot(df_oxigeno['oxigeno_ctd'],df_oxigeno['presion_ctd'],'.',color='#006633',label='OXIMETRO')
+        #     #az.plot(datos_procesados['oxigeno_ctd'],datos_procesados['presion_ctd'],'.',color='#006633',label='OXIMETRO')
+        #     io_plot = 1
 
                 
-        if not datos_procesados['oxigeno_wk'].isnull().all(): 
-            az.plot(datos_procesados['oxigeno_wk'],datos_procesados['presion_ctd'],'.',color='#00CC66',label='WINKLER')
-            io_plot = 1
+        # if not datos_procesados['oxigeno_wk'].isnull().all(): 
+        #     az.plot(datos_procesados['oxigeno_wk'],datos_procesados['presion_ctd'],'.',color='#00CC66',label='WINKLER')
+        #     io_plot = 1
 
             
-        if io_plot == 1:
-            az.set(xlabel='Oxigeno (\u03BCmol/kg)')
-            az.yaxis.set_visible(False)
-            az.invert_yaxis()
-            az.set_ylim(rango_profs)
+        # if io_plot == 1:
+        #     az.set(xlabel='Oxigeno (\u03BCmol/kg)')
+        #     az.yaxis.set_visible(False)
+        #     az.invert_yaxis()
+        #     az.set_ylim(rango_profs)
             
-            # Ajusta el rango de las x
-            rango_oxigenos = az.get_xlim()
-            num_intervalos = 2
-            val_intervalo  =  (math.ceil(rango_oxigenos[-1]) - math.floor(rango_oxigenos[0]))/num_intervalos
-            az.set_xlim([math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])])
-            az.set_xticks(numpy.arange(math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])+val_intervalo,val_intervalo))
-            az.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
-            az.tick_params(axis='both', which='major', labelsize=8)
+        #     # Ajusta el rango de las x
+        #     rango_oxigenos = az.get_xlim()
+        #     num_intervalos = 2
+        #     val_intervalo  =  (math.ceil(rango_oxigenos[-1]) - math.floor(rango_oxigenos[0]))/num_intervalos
+        #     az.set_xlim([math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])])
+        #     az.set_xticks(numpy.arange(math.floor(rango_oxigenos[0]),math.ceil(rango_oxigenos[-1])+val_intervalo,val_intervalo))
+        #     az.xaxis.set_major_formatter(FormatStrFormatter('%.0f'))
+        #     az.tick_params(axis='both', which='major', labelsize=8)
           
             # Añade la leyenda
             #az.legend(loc='upper center',bbox_to_anchor=(0.5, 1.15),ncol=1, fancybox=True,fontsize=7)
