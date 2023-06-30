@@ -1047,9 +1047,9 @@ def entrada_condiciones_ambientales():
         
         # Vectores con los valores de las variables que tienen opciones concretas
         seleccion_SN = ['Si','No']
-        direcciones  = ['N','NW','W','SW','S','SE','E','NE'] 
+        direcciones  = [None,'N','NW','W','SW','S','SE','E','NE'] 
         
-        estado_mar_nombre = ['Mar rizada (1)','Marejadilla (2)', 'Marejada (3)', 'Fuerte marejada (4)', 'Gruesa (5)', 'Muy Gruesa (6)']
+        estado_mar_nombre = ['Calma (0)','Mar rizada (1)','Marejadilla (2)', 'Marejada (3)', 'Fuerte marejada (4)', 'Gruesa (5)', 'Muy Gruesa (6)']
         estado_mar_hmin   = [0  , 0.1 , 0.50 , 1.25, 2.5, 4]
         estado_mar_hmax   = [0.1, 0.5 , 1.25 , 2.50, 4.0, 6]
     
