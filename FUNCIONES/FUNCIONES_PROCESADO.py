@@ -919,6 +919,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             df_oxigeno.set_index('id_temp',drop=True,append=False,inplace=True)
             
             
+            st.dataframe(df_oxigeno)
+            
             az.plot(df_oxigeno['oxigeno_ctd'],df_oxigeno['presion_ctd'],'.',color='#006633',label='OXIMETRO')
             #az.plot(datos_procesados['oxigeno_ctd'],datos_procesados['presion_ctd'],'.',color='#006633',label='OXIMETRO')
             io_plot = 1
