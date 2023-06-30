@@ -885,15 +885,15 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         ax.set(ylabel='Presion (db)')
         ax.invert_yaxis()
         ax.set_xlim([vmin_rango, vmax_rango])
-        # rango_profs = ax.get_ylim()
-        # # Añade el nombre de cada punto
-        # nombre_muestreos = [None]*datos_procesados.shape[0]
-        # for ipunto in range(datos_procesados.shape[0]):     
-        #     if datos_procesados['botella'].iloc[ipunto] is None:
-        #         nombre_muestreos[ipunto] = 'Prof.' + str(int(datos_procesados['presion_ctd'].iloc[ipunto]))
-        #     else:
-        #         nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
-        #     ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]))
+        rango_profs = ax.get_ylim()
+        # Añade el nombre de cada punto
+        nombre_muestreos = [None]*datos_procesados.shape[0]
+        for ipunto in range(datos_procesados.shape[0]):     
+            if datos_procesados['botella'].iloc[ipunto] is None:
+                nombre_muestreos[ipunto] = 'Prof.' + str(int(datos_procesados['presion_ctd'].iloc[ipunto]))
+            else:
+                nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
+            ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]))
                 
         #     st.text(nombre_muestreos[ipunto])
             
