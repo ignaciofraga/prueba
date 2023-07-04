@@ -785,7 +785,8 @@ def consulta_botellas():
         df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
         # workbook = writer.book
         # worksheet = writer.sheets['DATOS']
-        writer.save()
+        # writer.save()
+        writer.close()
         datos_exporta = output.getvalue()
     
         st.download_button(
