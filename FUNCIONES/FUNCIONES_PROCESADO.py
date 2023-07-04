@@ -318,18 +318,20 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
 
     if tipo_salida == 'ANUAL':
 
+        
+        # Añade una columna a las salidas con el año
+        tabla_salidas['año_salida']= numpy.zeros(datos.shape[0])
+        for idato in range(tabla_salidas.shape[0]):
+            tabla_salidas['año_salida'].iloc[idato] =  tabla_salidas['fecha_salida'].iloc[idato].year    
+            
+
         anhos_salida_mar = datos['año'].unique()
         
         for ianho in range(len(anhos_salida_mar)):    
  
             subset_anual     = datos[datos['año']==anhos_salida_mar[ianho]] 
             
-            # Busca las fechas de salida y llegada
-            fechas_anuales   = subset_anual['fecha_muestreo'].unique()
-            fecha_salida     = min(fechas_anuales)
-            fecha_llegada    = max(fechas_anuales)            
-            
-            df_temporal = tabla_salidas[(tabla_salidas['fecha_salida']==fecha_salida) & (tabla_salidas['programa']==id_programa)]
+            df_temporal = tabla_salidas[(tabla_salidas['año_salida']==anhos_salida_mar[ianho]) & (tabla_salidas['programa']==id_programa)]
     
             # Salida ya incluida en la base de datos. Recuperar identificador
             if df_temporal.shape[0]>0:
@@ -337,6 +339,11 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                 
             # Salida no incluida. Añadirla a la base de datos.
             else:
+                
+                # Busca las fechas de salida y llegada
+                fechas_anuales   = subset_anual['fecha_muestreo'].unique()
+                fecha_salida     = min(fechas_anuales)
+                fecha_llegada    = max(fechas_anuales)  
             
                 id_salida           = id_ultima_salida_bd + iconta_nueva_salida
                 iconta_nueva_salida = iconta_nueva_salida + 1
@@ -350,7 +357,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                 json_estaciones        = json.dumps(estaciones_muestreadas)
                    
                 # Define nombre
-                nombre_salida = nombre_programa + ' ' + str(anhos_salida_mar[ianho])
+                nombre_salida = nombre_programa + ' ' + str(int(anhos_salida_mar[ianho]))
           
                 # Inserta en la base de datos
                 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
