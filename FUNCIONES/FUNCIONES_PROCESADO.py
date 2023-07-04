@@ -320,7 +320,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
 
         
         # Añade una columna a las salidas con el año
-        tabla_salidas['año_salida']= numpy.zeros(datos.shape[0])
+        tabla_salidas['año_salida']= numpy.zeros(tabla_salidas.shape[0])
         for idato in range(tabla_salidas.shape[0]):
             tabla_salidas['año_salida'].iloc[idato] =  tabla_salidas['fecha_salida'].iloc[idato].year    
             
