@@ -2181,7 +2181,10 @@ def entrada_datos_excel():
         # Si los datos incluyen informacion del tubo de nutrientes, cambiar el nombre a texto 
         if 'tubo_nutrientes' in variables_discretas:
             for idato in range(df_datos_importacion.shape[0]):
-                df_datos_importacion['tubo_nutrientes'].iloc[idato] = str(int(df_datos_importacion['tubo_nutrientes'].iloc[idato]))
+                try:
+                    df_datos_importacion['tubo_nutrientes'].iloc[idato] = str(int(df_datos_importacion['tubo_nutrientes'].iloc[idato]))
+                except:
+                    pass
 
         # Realiza un control de calidad primario a los datos importados   
         datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
