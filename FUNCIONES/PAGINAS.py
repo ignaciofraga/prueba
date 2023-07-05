@@ -1869,6 +1869,7 @@ def procesado_nutrientes():
                     datos_corregidos[variables_run_qf[ivariable_procesada]] = numpy.ones(datos_corregidos.shape[0],dtype=int)
   
                 
+                datos_corregidos = datos_corregidos.drop(columns='tubo_nutrientes')
                 
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
                 if io_add_data is True:
