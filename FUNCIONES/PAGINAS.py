@@ -1723,8 +1723,6 @@ def procesado_nutrientes():
    
     df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos = carga_datos_procesado_nutrientes()
 
-    
- 
     # Combina la información de muestreos y salidas en un único dataframe 
     df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
     df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
@@ -1786,6 +1784,8 @@ def procesado_nutrientes():
             
             # Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
             df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")            
+            
+            st.dataframe(df_datos_disponibles)
             
             # Adapta el nombre de las sw
             for idato in range(datos_AA.shape[0]):
