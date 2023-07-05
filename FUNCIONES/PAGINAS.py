@@ -2166,10 +2166,10 @@ def entrada_datos_excel():
                                 
         # Corrige el formato de las fechas
         for idato in range(df_datos_importacion.shape[0]):
-            df_datos_importacion['fecha_muestreo'][idato] = (df_datos_importacion['fecha_muestreo'][idato]).date()           
-            if df_datos_importacion['fecha_muestreo'][idato]:
-                if 'hora_muestreo' in variables_archivo and isinstance(df_datos_importacion['hora_muestreo'][idato], str):
-                    df_datos_importacion['hora_muestreo'][idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'][idato], '%H:%M:%S').time()
+            df_datos_importacion['fecha_muestreo'].iloc[idato] = (df_datos_importacion['fecha_muestreo'].iloc[idato]).date()           
+            if df_datos_importacion['fecha_muestreo'].iloc[idato]:
+                if 'hora_muestreo' in variables_archivo and isinstance(df_datos_importacion['hora_muestreo'].iloc[idato], str):
+                    df_datos_importacion['hora_muestreo'].iloc[idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'].iloc[idato], '%H:%M:%S').time()
 
         # Cambia el nombre del identificador 
         try:
@@ -2178,7 +2178,10 @@ def entrada_datos_excel():
             texto_aviso = "Los datos importados no contienen identificador."
             st.warning(texto_aviso, icon="⚠️")
 
-        
+        # Si los datos incluyen informacion del tubo de nutrientes, cambiar el nombre a texto 
+        if 'tubo_nutrientes' in variables_discretas:
+            for idato in range(df_datos_importacion.shape[0]):
+                df_datos_importacion['tubo_nutrientes'].iloc[idato] = str(int(df_datos_importacion['tubo_nutrientes'].iloc[idato]))
 
         # Realiza un control de calidad primario a los datos importados   
         datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
