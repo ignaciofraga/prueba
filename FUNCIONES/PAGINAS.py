@@ -2127,7 +2127,7 @@ def entrada_datos_excel():
                     
         archivo_datos       = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
         
-        iq_elegido = st.radio("Indice de calidad asignado a los datos subidos",('Bueno', 'No evaluado'))
+        iq_elegido = st.radio("Indice de calidad asignado a los datos subidos",('Bueno', 'No evaluado'),horizontal=True)
         if iq_elegido == 'Bueno':
             iq_asignado = 2
         if iq_elegido == 'No evaluado':
