@@ -36,6 +36,8 @@ df_programas              = psql.read_sql('SELECT * FROM programas', conn)
 df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
 conn.dispose()   
 
+FUNCIONES_PROCESADO.inserta_datos(df_datos_fisicos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
+
 FUNCIONES_PROCESADO.inserta_datos(df_datos_biogeoquimicos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
 
 

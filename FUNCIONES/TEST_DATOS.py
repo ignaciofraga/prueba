@@ -52,7 +52,7 @@ df_muestreos          = df_muestreos.rename(columns={"id_salida": "salida_mar"})
 # compón un dataframe con la información de muestreo y datos biogeoquímicos                                            
 df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")
 
-indice_salida        = 3818
+indice_salida        = 645
 datos_procesados     = df_datos_disponibles[df_datos_disponibles["salida_mar"] == indice_salida]
  
 
