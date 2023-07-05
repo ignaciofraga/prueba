@@ -1871,6 +1871,10 @@ def procesado_nutrientes():
                 datos_exporta = datos_corregidos[variables_exporta]
                 
                 st.dataframe(datos_exporta)
+                datos_exporta['rto_columna_procesado']  = None
+                datos_exporta['temp_lab_procesado']     = None
+                datos_exporta['rmn_bajo_procesado']     = None
+                datos_exporta['rmn_alto_procesado']     = None
                 
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
                 if io_add_data is True:
