@@ -2124,9 +2124,16 @@ def entrada_datos_excel():
             tipo_salida           = st.selectbox('Tipo de salida',(listado_tipos_salida))
             
         nombre_entrada      = st.text_input('Nombre del muestreo **(solo para datos del programa "Otros")**')
-            
+                    
         archivo_datos       = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
-            
+        
+        iq_elegido = st.radio("Indice de calidad asignado a los datos subidos",('Bueno', 'No evaluado'))
+        if iq_elegido == 'Bueno':
+            iq_asignado = 2
+        if iq_elegido == 'No evaluado':
+            iq_asignado = 1
+    
+  
         io_envio            = st.form_submit_button("Procesar el archivo subido")
         
     col1, col2= st.columns(2,gap="small")
@@ -2193,7 +2200,7 @@ def entrada_datos_excel():
         for ivariable in range(len(variables_discretas)):
             nombre_variable_qf = variables_discretas[ivariable] + '_qf'
             if nombre_variable_qf not in variables_discretas:
-                df_datos_importacion[nombre_variable_qf] = numpy.ones(df_datos_importacion.shape[0],dtype=int)
+                df_datos_importacion[nombre_variable_qf] = int(iq_asignado) #numpy.ones(df_datos_importacion.shape[0],dtype=int)
             
 
 
