@@ -1848,7 +1848,6 @@ def procesado_nutrientes():
                 texto_exito = 'Muestreos disponibles procesados correctamente'
                 st.success(texto_exito)
                 
-                st.dataframe(datos_corregidos)
                 
                 # Añade información de la base de datos (muestreo, biogeoquimica y fisica)
                 datos_corregidos = pandas.merge(datos_corregidos, df_muestreos, on="id_externo") # Esta unión elimina los registros que NO son muestras
