@@ -1785,7 +1785,8 @@ def procesado_nutrientes():
             # Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
             df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")            
             
-            st.dataframe(df_datos_disponibles)
+            st.dataframe(df_datos_discretos)
+            st.dataframe(df_muestreos)
             
             # Adapta el nombre de las sw
             for idato in range(datos_AA.shape[0]):
