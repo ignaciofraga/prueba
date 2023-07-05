@@ -1855,12 +1855,8 @@ def procesado_nutrientes():
                 
                 variables_elimina       = variables_procesado_bd + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado']
                 df_datos_biogeoquimicos = df_datos_discretos.drop(columns=variables_elimina) # Para eliminar las columnas previas con datos de nutrientes
-                #df_datos_biogeoquimicos = df_datos_discretos.drop(columns=variables_procesado_bd) # Para eliminar las columnas previas con datos de nutrientes
+
                 datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="muestreo",how='left')
-                
-                #datos_corregidos = pandas.merge(datos_corregidos, df_datos_discretos, on="muestreo",how='left')  
-                                
-                st.dataframe(datos_corregidos)
                 
                 # Reduce los decimales y asigna QF a los datos
                 variables_run_qf = []
@@ -2191,9 +2187,7 @@ def entrada_datos_excel():
 
         # Recupera el identificador del programa de muestreo
         id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
-        
-        st.dataframe(datos_corregidos)
-        
+                
         with st.spinner('Asignando la estación y salida al mar de cada medida'):
             # Encuentra la estación asociada a cada registro
             datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
