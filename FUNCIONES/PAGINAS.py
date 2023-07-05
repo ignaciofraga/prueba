@@ -1701,15 +1701,14 @@ def procesado_nutrientes():
         conn                      = init_connection()
         df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
         df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-        df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+        df_datos_discretos        = psql.read_sql('SELECT * FROM datos_discretos', conn)
         df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_programas              = psql.read_sql('SELECT * FROM programas', conn)
         df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
         df_rmns_bajos             = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
         df_rmns_altos             = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
         conn.close()
-        return df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos
+        return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos
         
 
 
@@ -1722,7 +1721,7 @@ def procesado_nutrientes():
     puerto           = st.secrets["postgres"].port
     
    
-    df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos = carga_datos_procesado_nutrientes()
+    df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos = carga_datos_procesado_nutrientes()
 
     
  
@@ -1786,7 +1785,7 @@ def procesado_nutrientes():
             variables_run        = list(set(variables_procesadas).intersection(variables_procesado_bd))
             
             # Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
-            df_datos_disponibles  = pandas.merge(df_datos_fisicos, df_muestreos, on="muestreo")            
+            df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")            
             
             # Adapta el nombre de las sw
             for idato in range(datos_AA.shape[0]):
@@ -1853,10 +1852,10 @@ def procesado_nutrientes():
                 # Añade información de la base de datos (muestreo, biogeoquimica y fisica)
                 datos_corregidos = pandas.merge(datos_corregidos, df_muestreos, on="id_externo") # Esta unión elimina los registros que NO son muestras
                 
-                df_datos_biogeoquimicos = df_datos_biogeoquimicos.drop(columns=variables_procesado_bd) # Para eliminar las columnas previas con datos de nutrientes
-                datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="muestreo",how='left')
+                # df_datos_biogeoquimicos = df_datos_discretos.drop(columns=variables_procesado_bd) # Para eliminar las columnas previas con datos de nutrientes
+                # datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="muestreo",how='left')
                 
-                datos_corregidos = pandas.merge(datos_corregidos, df_datos_fisicos, on="muestreo",how='left')  
+                # datos_corregidos = pandas.merge(datos_corregidos, df_datos_discretos, on="muestreo",how='left')  
                                 
                 # Reduce los decimales y asigna QF a los datos
                 variables_run_qf = []
@@ -1874,7 +1873,7 @@ def procesado_nutrientes():
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
                 if io_add_data is True:
                                         
-                    FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+                    FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
                         
                     texto_exito = 'Información introducida correctamente en la base de datos'
                     st.success(texto_exito)
@@ -1893,7 +1892,7 @@ def procesado_nutrientes():
                 output = BytesIO()
                 writer = pandas.ExcelWriter(output, engine='xlsxwriter')
                 datos_excel = datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
-                writer.save()
+                writer.close()
                 datos_excel = output.getvalue()
             
                 st.download_button(
