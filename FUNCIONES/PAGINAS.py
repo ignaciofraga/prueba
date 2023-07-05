@@ -1867,7 +1867,7 @@ def procesado_nutrientes():
                     datos_corregidos[variables_run_qf[ivariable_procesada]] = numpy.ones(datos_corregidos.shape[0],dtype=int)
   
                 
-                variables_exporta =  variables_procesado_bd + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado','muestreo']
+                variables_exporta =  variables_procesado_bd + variables_run_qf + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado','muestreo']
                 datos_exporta = datos_corregidos[variables_exporta]
                 
                 st.dataframe(datos_exporta)
@@ -2188,6 +2188,14 @@ def entrada_datos_excel():
                     df_datos_importacion['tubo_nutrientes'].iloc[idato] = str(int(df_datos_importacion['tubo_nutrientes'].iloc[idato]))
                 except:
                     pass
+                
+        # Añade un qf de 1 (no evaluado) a las variables subidas que no tienen un índice de calidad asignado
+        for ivariable in range(len(variables_discretas)):
+            nombre_variable_qf = variables_discretas[ivariable] + '_qf'
+            if nombre_variable_qf not in variables_discretas:
+                df_datos_importacion[nombre_variable_qf] = numpy.ones(df_datos_importacion.shape[0],dtype=int)
+            
+
 
         # Realiza un control de calidad primario a los datos importados   
         datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
