@@ -1763,9 +1763,13 @@ def procesado_nutrientes():
                 rmn_elegida_alto             = st.selectbox("Selecciona RMN **ALTO**", (df_rmns_altos['nombre_rmn']))
                 df_referencias_altas    = df_rmns_altos[df_rmns_altos['nombre_rmn']==rmn_elegida_alto]
             
-
-            
             archivo_AA                  = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
+            
+            iq_elegido = st.radio("Indice de calidad asignado a los datos procesados",('Bueno', 'No evaluado'),horizontal=True)
+            if iq_elegido == 'Bueno':
+                iq_asignado = 2
+            if iq_elegido == 'No evaluado':
+                iq_asignado = 1
             
             io_add_data                 = st.checkbox('Añadir datos procesados a la base de datos',value=True)
                             
@@ -1862,19 +1866,13 @@ def procesado_nutrientes():
                     #reduce los decimales 
                     datos_corregidos[variables_run[ivariable_procesada]]=round(datos_corregidos[variables_run[ivariable_procesada]],3)
                         
-                    # Añade qf a los datos, asignando a las variables procesadas un qf de valor 1 (no evaluado)
+                    # Añade qf a los datos, asignando a las variables procesadas el qf elegido
                     variables_run_qf                                        = variables_run_qf + [variables_run[ivariable_procesada] + '_qf']
-                    datos_corregidos[variables_run_qf[ivariable_procesada]] = numpy.ones(datos_corregidos.shape[0],dtype=int)
+                    datos_corregidos[variables_run_qf[ivariable_procesada]] = int(iq_asignado) #numpy.ones(datos_corregidos.shape[0],dtype=int)
   
                 
                 variables_exporta =  variables_procesado_bd + variables_run_qf + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado','muestreo']
                 datos_exporta = datos_corregidos[variables_exporta]
-                
-                st.dataframe(datos_exporta)
-                #datos_exporta['rto_columna_procesado']  = None
-                #datos_exporta['temp_lab_procesado']     = None
-                #datos_exporta['rmn_bajo_procesado']     = None
-                #datos_exporta['rmn_alto_procesado']     = None
                 
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
                 if io_add_data is True:
