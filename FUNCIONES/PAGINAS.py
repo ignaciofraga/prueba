@@ -1869,6 +1869,8 @@ def procesado_nutrientes():
                 
                 datos_corregidos = datos_corregidos.drop(columns='tubo_nutrientes')
                 
+                st.dataframe(datos_corregidos)
+                
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
                 if io_add_data is True:
                                         
