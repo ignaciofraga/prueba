@@ -763,7 +763,10 @@ def consulta_botellas():
         if len(variables_eliminadas) > 0:
             for ivar_eliminada in range(len(variables_eliminadas)):
                 var_eliminada_qf = variables_eliminadas[ivar_eliminada] + '_qf'
-                df_exporta       = df_exporta.drop(var_eliminada_qf, axis=1)
+                try:
+                    df_exporta       = df_exporta.drop(var_eliminada_qf, axis=1)
+                except:
+                    pass
         
         # Añade unidades al nombre de cada variable
         listado_variables_bd = df_variables['variables'].tolist() 
