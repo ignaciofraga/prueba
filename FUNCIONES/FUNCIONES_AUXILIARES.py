@@ -344,43 +344,43 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
                 
 
 
-        io_envio = st.button("Asignar valores e índices de calidad definidos")  
+    io_envio = st.button("Asignar valores e índices de calidad definidos")  
 
-        if io_envio:
-            
-            with st.spinner('Actualizando la base de datos'):
-           
-                # Introducir los valores en la base de datos
-                conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                cursor = conn.cursor()  
+    if io_envio:
+        
+        with st.spinner('Actualizando la base de datos'):
        
-                # Diferente instrucción si es pH (hay que especificar el tipo de medida)
-                if variable_seleccionada == 'ph': 
-                    instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, ph_metodo = %s WHERE muestreo = %s;'
-                    for idato in range(df_seleccion.shape[0]):
-        
-                        cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(id_tipo_analisis),int(df_seleccion['muestreo'].iloc[idato])))
-                        conn.commit()             
-                        
-                else:
-                    instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
-
-                    for idato in range(df_seleccion.shape[0]):
-        
-                        cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(df_seleccion['muestreo'].iloc[idato])))
-                        conn.commit() 
-    
-                cursor.close()
-                conn.close()   
-          
-            if io_valores_prev == 1:        
-                texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' actualizados correctamente'
-            else:
-                texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
-
-            st.success(texto_exito)
+            # Introducir los valores en la base de datos
+            conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()  
    
-            st.cache_data.clear()
+            # Diferente instrucción si es pH (hay que especificar el tipo de medida)
+            if variable_seleccionada == 'ph': 
+                instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, ph_metodo = %s WHERE muestreo = %s;'
+                for idato in range(df_seleccion.shape[0]):
+    
+                    cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(id_tipo_analisis),int(df_seleccion['muestreo'].iloc[idato])))
+                    conn.commit()             
+                    
+            else:
+                instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
+
+                for idato in range(df_seleccion.shape[0]):
+    
+                    cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(df_seleccion['muestreo'].iloc[idato])))
+                    conn.commit() 
+
+            cursor.close()
+            conn.close()   
+      
+        if io_valores_prev == 1:        
+            texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' actualizados correctamente'
+        else:
+            texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
+
+        st.success(texto_exito)
+   
+        st.cache_data.clear()
 
 
 
