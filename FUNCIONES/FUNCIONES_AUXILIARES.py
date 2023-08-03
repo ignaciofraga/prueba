@@ -298,7 +298,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
 
             with col3: 
 
-                io_disponible = st.checkbox('Dato disponible', value='True',key=idato)
+                io_disponible = st.checkbox('Dato disponible', value='True',key=(idato + df_seleccion.shape[0]))
 
                 
             with col4:
