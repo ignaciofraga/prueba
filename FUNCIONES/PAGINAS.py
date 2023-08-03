@@ -2045,7 +2045,7 @@ def entrada_datos_laboratorio():
     
     # Define unos valores de referencia 
     df_referencia        = pandas.DataFrame(columns = ['toc','ph', 'alcalinidad', 'oxigeno_wk'],index = [0])
-    df_referencia.loc[0] = [0.0,8.1,200.0,200.0]
+    df_referencia.loc[0] = [None,8.1,200.0,200.0]
     
     # Añade nuevos datos obtenidos en laboratorio
     if tipo_accion == acciones[0]:
