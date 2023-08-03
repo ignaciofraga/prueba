@@ -277,7 +277,8 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
             id_tipo_analisis  = df_metodo_ph['id_metodo'][df_metodo_ph['descripcion_metodo_ph']==tipo_analisis].iloc[0] 
             
 
-                
+             
+        io_disponible = ['None']*df_seleccion.shape[0]  
 
         for idato in range(df_seleccion.shape[0]):
           
@@ -299,15 +300,15 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
 
             with col3: 
 
-                io_disponible = st.checkbox('Dato disponible', value='True',key=idato)
+                io_disponible[idato] = st.checkbox('Dato disponible', value='True',key=idato)
 
-                st.text(io_disponible)
+                st.text(io_disponible[idato])
                 
             with col4:
 
                 texto_variable = variable_seleccionada_nombre + '(' + variable_seleccionada_unidades + '):'
                 
-                if io_disponible:
+                if io_disponible[idato]:
                     if io_valores_prev == 1:
                         valor_entrada  = st.number_input(texto_variable,value=df_seleccion[variable_seleccionada].iloc[idato],key=(idato + df_seleccion.shape[0]),format = "%f")                                   
                     else:
@@ -330,7 +331,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
                     indice_qf_seleccionado = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
                 else:
                     
-                    if io_disponible:
+                    if io_disponible[idato]:
                         qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']),key=(idato + 1 + 2*df_seleccion.shape[0]))
                                                
                         indice_qf_seleccionado = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
