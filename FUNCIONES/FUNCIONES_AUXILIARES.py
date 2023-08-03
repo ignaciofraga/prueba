@@ -632,29 +632,31 @@ def consulta_botellas():
                                 
                                
         with col3:
-            io_tcarb           = st.checkbox('Carbono total', value=False)
-            if io_tcarb:
+            io_inorg_tcarb           = st.checkbox('Carbono inorganico total', value=False)
+            if io_inorg_tcarb:
                 listado_variables = listado_variables + ['tcarbn'] + ['tcarbn_qf']
+                
+            io_org_tcarb           = st.checkbox('Carbono organico total', value=False)
+            if io_org_tcarb:
+                listado_variables = listado_variables + ['toc'] + ['toc_qf']
                 
             io_doc           = st.checkbox('DOC', value=False)
             if io_doc:
                  listado_variables = listado_variables + ['doc'] + ['doc_qf']
+                 
+            io_doc           = st.checkbox('COP', value=False)
+            if io_doc:
+                listado_variables = listado_variables + ['cop'] 
+
+            io_cdom           = st.checkbox('NOP', value=False)
+            if io_cdom:
+               listado_variables = listado_variables + ['nop'] 
 
             io_cdom           = st.checkbox('CDOM', value=False)
             if io_cdom:
                 listado_variables = listado_variables + ['cdom'] + ['cdom_qf']            
                 
-            io_clorofila_a         = st.checkbox('Clorofila (a)', value=False)
-            if io_clorofila_a:
-                 listado_variables = listado_variables + ['clorofila_a'] + ['clorofila_a_qf']                 
-  
-            io_clorofila_b         = st.checkbox('Clorofila (b)', value=False)
-            if io_clorofila_b:
-                 listado_variables = listado_variables + ['clorofila_b'] + ['clorofila_b_qf']                   
-  
-            io_clorofila_c         = st.checkbox('Clorofila (c)', value=False)
-            if io_clorofila_c:
-                 listado_variables = listado_variables + ['clorofila_c'] + ['clorofila_c_qf']    
+ 
                  
                  
         with col4:
@@ -662,13 +664,17 @@ def consulta_botellas():
            if io_pp:
                listado_variables = listado_variables + ['prod_primaria'] 
                
-           io_doc           = st.checkbox('COP', value=False)
-           if io_doc:
-                listado_variables = listado_variables + ['cop'] 
-
-           io_cdom           = st.checkbox('NOP', value=False)
-           if io_cdom:
-               listado_variables = listado_variables + ['nop']           
+           io_clorofila_a         = st.checkbox('Clorofila (a)', value=False)
+           if io_clorofila_a:
+                 listado_variables = listado_variables + ['clorofila_a'] + ['clorofila_a_qf']                 
+  
+           io_clorofila_b         = st.checkbox('Clorofila (b)', value=False)
+           if io_clorofila_b:
+                 listado_variables = listado_variables + ['clorofila_b'] + ['clorofila_b_qf']                   
+  
+           io_clorofila_c         = st.checkbox('Clorofila (c)', value=False)
+           if io_clorofila_c:
+                 listado_variables = listado_variables + ['clorofila_c'] + ['clorofila_c_qf']            
                
            io_parametros_nutrientes = st.checkbox('Parametros análisis nutrientes', value=False)
            if io_parametros_nutrientes:
