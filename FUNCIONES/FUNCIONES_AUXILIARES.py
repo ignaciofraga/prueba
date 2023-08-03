@@ -277,7 +277,8 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
             id_tipo_analisis  = df_metodo_ph['id_metodo'][df_metodo_ph['descripcion_metodo_ph']==tipo_analisis].iloc[0] 
             
 
-        listado_estados = list(df_indices_calidad['descripcion']) + ['No disponible']
+        listado_estados        = list(df_indices_calidad['descripcion']) + ['No disponible']
+        listado_estados_indice = list(df_indices_calidad['indice']) + ['9']
         indice_qf_seleccionado = numpy.zeros(df_seleccion.shape[0],dtype=int)
 
         for idato in range(df_seleccion.shape[0]):
@@ -304,9 +305,9 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
                 variable_seleccionada_cc = variable_seleccionada + '_qf'
                 
                 if io_valores_prev == 1:
-                    indice_calidad_inicial = numpy.where(df_indices_calidad["indice"] ==df_seleccion[variable_seleccionada_cc].iloc[idato])[0][0]
-                    listado_indices        = df_indices_calidad['descripcion']
-                    qf_seleccionado        = st.selectbox('Índice calidad',(listado_indices),index=int(indice_calidad_inicial),key=(idato + 1 + 2*df_seleccion.shape[0]))                    
+                    
+                    indice_calidad_inicial = listado_estados_indice.index(df_seleccion[variable_seleccionada_cc].iloc[idato])
+                    qf_seleccionado        = st.selectbox('Índice calidad',(listado_estados),index=int(indice_calidad_inicial),key=(idato + 1 + 2*df_seleccion.shape[0]))                    
                     indice_qf_seleccionado[idato] = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
                 else:
                     
