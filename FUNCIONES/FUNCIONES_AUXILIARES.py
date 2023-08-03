@@ -278,11 +278,11 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
             
 
              
-        io_disponible = ['None']*df_seleccion.shape[0]  
+        indice_qf_seleccionado = numpy.zeros(df_seleccion.shape[0],dtype=int)
 
         for idato in range(df_seleccion.shape[0]):
           
-            col1, col2,col3,col4,col5 = st.columns(5,gap="small")
+            col1, col2,col3,col4 = st.columns(4,gap="small")
             with col1: 
                 if df_seleccion['botella'].iloc[idato] is not None and math.isnan(df_seleccion['botella'].iloc[idato]) is False:
                     texto_botella = 'Botella:' + str(int(df_seleccion['botella'].iloc[idato]))
@@ -298,17 +298,39 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
                 st.text(texto_profunidad)
 
 
+
             with col3: 
+                
+                variable_seleccionada_cc = variable_seleccionada + '_qf'
+                
+                if io_valores_prev == 1:
+                    indice_calidad_inicial = numpy.where(df_indices_calidad["indice"] ==df_seleccion[variable_seleccionada_cc].iloc[idato])[0][0]
+                    listado_indices        = df_indices_calidad['descripcion']
+                    qf_seleccionado        = st.selectbox('Índice calidad',(listado_indices),index=int(indice_calidad_inicial),key=(idato + 1 + 2*df_seleccion.shape[0]))                    
+                    indice_qf_seleccionado[idato] = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
+                else:
+                    
+                    listado_estados = df_indices_calidad['descripcion'] + ['No disponible']
+                        
+                    qf_seleccionado        = st.selectbox('Índice calidad',(listado_estados),key=(idato + 1 + 2*df_seleccion.shape[0]))
+                        
+                    if qf_seleccionado == 'No disponible':
 
-                io_disponible[idato] = st.checkbox('Dato disponible', value='True',key=idato)
+                        indice_qf_seleccionado[idato] = 9
+                        
+                    else:
+                        
+                        indice_qf_seleccionado[idato] = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
+                
 
-                st.text(io_disponible[idato])
+                df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado[idato])
+
                 
             with col4:
 
                 texto_variable = variable_seleccionada_nombre + '(' + variable_seleccionada_unidades + '):'
                 
-                if io_disponible[idato]:
+                if indice_qf_seleccionado[idato] != 9:
                     if io_valores_prev == 1:
                         valor_entrada  = st.number_input(texto_variable,value=df_seleccion[variable_seleccionada].iloc[idato],key=(idato + df_seleccion.shape[0]),format = "%f")                                   
                     else:
@@ -320,29 +342,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
                     df_seleccion[variable_seleccionada].iloc[idato] = None
                 
                 
-            with col5: 
-                
-                variable_seleccionada_cc = variable_seleccionada + '_qf'
-                
-                if io_valores_prev == 1:
-                    indice_calidad_inicial = numpy.where(df_indices_calidad["indice"] ==df_seleccion[variable_seleccionada_cc].iloc[idato])[0][0]
-                    listado_indices        = df_indices_calidad['descripcion']
-                    qf_seleccionado        = st.selectbox('Índice calidad',(listado_indices),index=int(indice_calidad_inicial),key=(idato + 1 + 2*df_seleccion.shape[0]))                    
-                    indice_qf_seleccionado = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
-                else:
-                    
-                    if io_disponible[idato]:
-                        qf_seleccionado        = st.selectbox('Índice calidad',(df_indices_calidad['descripcion']),key=(idato + 1 + 2*df_seleccion.shape[0]))
-                                               
-                        indice_qf_seleccionado = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
-                
-                    else:
-                        
-                        qf_seleccionado        = st.selectbox('Índice calidad',(['No disponible']),key=(idato + 1 + 2*df_seleccion.shape[0]))
-                        
-                        indice_qf_seleccionado = 9
-                
-                df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado)
+
 
         io_envio = st.form_submit_button("Asignar valores e índices de calidad definidos")  
 
