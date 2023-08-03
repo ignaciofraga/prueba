@@ -35,8 +35,7 @@ con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccio
 conn        = create_engine(con_engine)
 df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
 df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
-df_datos_biogeoquimicos   = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
-df_datos_fisicos          = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
+df_datos_discretos        = psql.read_sql('SELECT * FROM datos_discretos', conn)
 df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
 df_programas              = psql.read_sql('SELECT * FROM programas', conn)
 df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
@@ -70,9 +69,7 @@ df_muestreos          = df_muestreos.rename(columns={"id_salida": "salida_mar"})
 
 
 # compón un dataframe con la información de muestreo y datos biogeoquímicos                                            
-df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
-df_datos_disponibles  = pandas.merge(df_datos_disponibles, df_datos_fisicos, on="muestreo")
- 
+df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")
 
 
 # Añade columna con información del año
@@ -86,7 +83,7 @@ io_control_calidad = 1
 #indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada = FUNCIONES_AUXILIARES.menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
 indice_programa       = 3
 indice_estacion       = 1
-indice_salida         = 3682
+indice_salida         = 180
 cast_seleccionado     = 1
 meses_offset          = 1
 #variable_seleccionada = 'temperatura_ctd'
@@ -102,9 +99,11 @@ unidades_variable        = variables_unidades[indice_variable]
 tabla_insercion          = variable_tabla[indice_variable]
                                                                       
 # Selecciona los datos correspondientes al programa, estación, salida y cast seleccionados
-datos_procesados     = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion) & (df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
+#datos_procesados     = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion) & (df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
+datos_procesados     = df_datos_disponibles[df_datos_disponibles["salida_mar"] == indice_salida]
 
-df_datos_disponibles = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion)]
+
+#df_datos_disponibles = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion)]
     
 
 
