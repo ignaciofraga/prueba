@@ -347,11 +347,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
     
                 cursor.close()
                 conn.close()   
-    
-                st.text(df_seleccion['muestreo'].iloc[idato])
-                st.text(df_seleccion[variable_seleccionada].iloc[idato])
-    
-    
+          
             if io_valores_prev == 1:        
                 texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' actualizados correctamente'
             else:
