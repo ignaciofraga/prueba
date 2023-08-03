@@ -632,9 +632,9 @@ def consulta_botellas():
                                 
                                
         with col3:
-            io_tcarb           = st.checkbox('Carbono total', value=False)
+            io_tcarb           = st.checkbox('Carbono organico total', value=False)
             if io_tcarb:
-                listado_variables = listado_variables + ['tcarbn'] + ['tcarbn_qf']
+                listado_variables = listado_variables + ['toc'] + ['toc_qf']
                 
             io_doc           = st.checkbox('DOC', value=False)
             if io_doc:
