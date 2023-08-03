@@ -268,237 +268,119 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
     #df_seleccion = df_seleccion.fillna(None)
 
 
+    with st.form("Formulario", clear_on_submit=True):
 
-
-    # Si los datos a introducir son de pH, especificar si la medida es con reactivo purificado o no purificado            
-    if variable_seleccionada == 'ph':
-   
-        listado_metodos   = df_metodo_ph['descripcion_metodo_ph'].tolist()                
-        tipo_analisis     = st.radio('Selecciona el tipo de análisis realizado',listado_metodos,horizontal=True,key = 5*df_seleccion.shape[0],index = 0)
-        id_tipo_analisis  = df_metodo_ph['id_metodo'][df_metodo_ph['descripcion_metodo_ph']==tipo_analisis].iloc[0] 
-        
-
-    listado_estados        = list(df_indices_calidad['descripcion']) + ['No disponible']
-    listado_estados_indice = list(df_indices_calidad['indice']) + ['9']
-    indice_qf_seleccionado = numpy.zeros(df_seleccion.shape[0],dtype=int)
-
-    for idato in range(df_seleccion.shape[0]):
-      
-        col1, col2,col3,col4 = st.columns(4,gap="small")
-        with col1: 
-            if df_seleccion['botella'].iloc[idato] is not None and math.isnan(df_seleccion['botella'].iloc[idato]) is False:
-                texto_botella = 'Botella:' + str(int(df_seleccion['botella'].iloc[idato]))
-                st.text(texto_botella)
+        # Si los datos a introducir son de pH, especificar si la medida es con reactivo purificado o no purificado            
+        if variable_seleccionada == 'ph':
+       
+            listado_metodos   = df_metodo_ph['descripcion_metodo_ph'].tolist()                
+            tipo_analisis     = st.radio('Selecciona el tipo de análisis realizado',listado_metodos,horizontal=True,key = 5*df_seleccion.shape[0],index = 0)
+            id_tipo_analisis  = df_metodo_ph['id_metodo'][df_metodo_ph['descripcion_metodo_ph']==tipo_analisis].iloc[0] 
             
-        with col2: 
-            
-            if df_seleccion['prof_referencia'].iloc[idato] is not None:
-                texto_profunidad = 'Profundidad (m):' + str(int(df_seleccion['prof_referencia'].iloc[idato]))
-            
-            else:
-                texto_profunidad = 'Presion CTD (db):' + str(round(df_seleccion['presion_ctd'].iloc[idato]))
-            st.text(texto_profunidad)
 
+        listado_estados        = list(df_indices_calidad['descripcion']) + ['No disponible']
+        listado_estados_indice = list(df_indices_calidad['indice']) + ['9']
+        indice_qf_seleccionado = numpy.zeros(df_seleccion.shape[0],dtype=int)
 
-
-        with col3: 
-            
-            variable_seleccionada_cc = variable_seleccionada + '_qf'
-            
-            if io_valores_prev == 1:
+        for idato in range(df_seleccion.shape[0]):
+          
+            col1, col2,col3,col4 = st.columns(4,gap="small")
+            with col1: 
+                if df_seleccion['botella'].iloc[idato] is not None and math.isnan(df_seleccion['botella'].iloc[idato]) is False:
+                    texto_botella = 'Botella:' + str(int(df_seleccion['botella'].iloc[idato]))
+                    st.text(texto_botella)
                 
-                indice_calidad_inicial = listado_estados_indice.index(df_seleccion[variable_seleccionada_cc].iloc[idato])
-                qf_seleccionado        = st.selectbox('Índice calidad',(listado_estados),index=int(indice_calidad_inicial),key=(idato + 1 + 2*df_seleccion.shape[0]))                    
-                indice_qf_seleccionado[idato] = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
-            else:
+            with col2: 
                 
-                qf_seleccionado        = st.selectbox('Índice calidad',(listado_estados),key=(idato + 1 + 2*df_seleccion.shape[0]))
-                    
-                if qf_seleccionado == 'No disponible':
-
-                    indice_qf_seleccionado[idato] = 9
-                    
+                if df_seleccion['prof_referencia'].iloc[idato] is not None:
+                    texto_profunidad = 'Profundidad (m):' + str(int(df_seleccion['prof_referencia'].iloc[idato]))
+                
                 else:
-                    
-                    indice_qf_seleccionado[idato] = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
-            
+                    texto_profunidad = 'Presion CTD (db):' + str(round(df_seleccion['presion_ctd'].iloc[idato]))
+                st.text(texto_profunidad)
 
-            df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado[idato])
 
-            
-        with col4:
 
-            texto_variable = variable_seleccionada_nombre + '(' + variable_seleccionada_unidades + '):'
-            
-            if indice_qf_seleccionado[idato] != 9:
+            with col3: 
+                
+                variable_seleccionada_cc = variable_seleccionada + '_qf'
+                
                 if io_valores_prev == 1:
-                    valor_entrada  = st.number_input(texto_variable,value=df_seleccion[variable_seleccionada].iloc[idato],key=(idato + df_seleccion.shape[0]),format = "%f")                                   
+                    
+                    indice_calidad_inicial = listado_estados_indice.index(df_seleccion[variable_seleccionada_cc].iloc[idato])
+                    qf_seleccionado        = st.selectbox('Índice calidad',(listado_estados),index=int(indice_calidad_inicial),key=(idato + 1 + 2*df_seleccion.shape[0]))                    
+                    indice_qf_seleccionado[idato] = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
                 else:
-                    valor_entrada  = st.number_input(texto_variable,value=df_referencia[variable_seleccionada][0],key=(idato + 1 + df_seleccion.shape[0]),format = "%f")               
-                df_seleccion[variable_seleccionada].iloc[idato] = valor_entrada
-            
-            else:
-                st.text(texto_variable)
-                df_seleccion[variable_seleccionada].iloc[idato] = None
-                
-                
-
-
-    io_envio = st.button("Asignar valores e índices de calidad definidos")  
-
-    if io_envio:
-        
-        with st.spinner('Actualizando la base de datos'):
-       
-            # Introducir los valores en la base de datos
-            conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-            cursor = conn.cursor()  
-   
-            # Diferente instrucción si es pH (hay que especificar el tipo de medida)
-            if variable_seleccionada == 'ph': 
-                instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, ph_metodo = %s WHERE muestreo = %s;'
-                for idato in range(df_seleccion.shape[0]):
-    
-                    cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(id_tipo_analisis),int(df_seleccion['muestreo'].iloc[idato])))
-                    conn.commit()             
                     
-            else:
-                instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
+                    qf_seleccionado        = st.selectbox('Índice calidad',(listado_estados),key=(idato + 1 + 2*df_seleccion.shape[0]))
+                        
+                    if qf_seleccionado == 'No disponible':
 
-                for idato in range(df_seleccion.shape[0]):
-    
-                    cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(df_seleccion['muestreo'].iloc[idato])))
-                    conn.commit() 
+                        indice_qf_seleccionado[idato] = 9
+                        
+                    else:
+                        
+                        indice_qf_seleccionado[idato] = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
+                
 
-            cursor.close()
-            conn.close()   
-      
-        if io_valores_prev == 1:        
-            texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' actualizados correctamente'
-        else:
-            texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
+                df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado[idato])
 
-        st.success(texto_exito)
-   
-        st.cache_data.clear()
+                
+            with col4:
+
+                texto_variable = variable_seleccionada_nombre + '(' + variable_seleccionada_unidades + '):'
+                
+                if indice_qf_seleccionado[idato] != 9:
+                    if io_valores_prev == 1:
+                        valor_entrada  = st.number_input(texto_variable,value=df_seleccion[variable_seleccionada].iloc[idato],key=(idato + df_seleccion.shape[0]),format = "%f")                                   
+                    else:
+                        valor_entrada  = st.number_input(texto_variable,value=df_referencia[variable_seleccionada][0],key=(idato + 1 + df_seleccion.shape[0]),format = "%f")               
+                    df_seleccion[variable_seleccionada].iloc[idato] = valor_entrada
+                
+                else:
+                    st.text(texto_variable)
+                    df_seleccion[variable_seleccionada].iloc[idato] = None
+                
+                
 
 
+        io_envio = st.form_submit_button("Asignar valores e índices de calidad definidos")  
 
-
-
-    # with st.form("Formulario", clear_on_submit=False):
-
-    #     # Si los datos a introducir son de pH, especificar si la medida es con reactivo purificado o no purificado            
-    #     if variable_seleccionada == 'ph':
-       
-    #         listado_metodos   = df_metodo_ph['descripcion_metodo_ph'].tolist()                
-    #         tipo_analisis     = st.radio('Selecciona el tipo de análisis realizado',listado_metodos,horizontal=True,key = 5*df_seleccion.shape[0],index = 0)
-    #         id_tipo_analisis  = df_metodo_ph['id_metodo'][df_metodo_ph['descripcion_metodo_ph']==tipo_analisis].iloc[0] 
+        if io_envio:
             
-
-    #     listado_estados        = list(df_indices_calidad['descripcion']) + ['No disponible']
-    #     listado_estados_indice = list(df_indices_calidad['indice']) + ['9']
-    #     indice_qf_seleccionado = numpy.zeros(df_seleccion.shape[0],dtype=int)
-
-    #     for idato in range(df_seleccion.shape[0]):
-          
-    #         col1, col2,col3,col4 = st.columns(4,gap="small")
-    #         with col1: 
-    #             if df_seleccion['botella'].iloc[idato] is not None and math.isnan(df_seleccion['botella'].iloc[idato]) is False:
-    #                 texto_botella = 'Botella:' + str(int(df_seleccion['botella'].iloc[idato]))
-    #                 st.text(texto_botella)
-                
-    #         with col2: 
-                
-    #             if df_seleccion['prof_referencia'].iloc[idato] is not None:
-    #                 texto_profunidad = 'Profundidad (m):' + str(int(df_seleccion['prof_referencia'].iloc[idato]))
-                
-    #             else:
-    #                 texto_profunidad = 'Presion CTD (db):' + str(round(df_seleccion['presion_ctd'].iloc[idato]))
-    #             st.text(texto_profunidad)
-
-
-
-    #         with col3: 
-                
-    #             variable_seleccionada_cc = variable_seleccionada + '_qf'
-                
-    #             if io_valores_prev == 1:
-                    
-    #                 indice_calidad_inicial = listado_estados_indice.index(df_seleccion[variable_seleccionada_cc].iloc[idato])
-    #                 qf_seleccionado        = st.selectbox('Índice calidad',(listado_estados),index=int(indice_calidad_inicial),key=(idato + 1 + 2*df_seleccion.shape[0]))                    
-    #                 indice_qf_seleccionado[idato] = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
-    #             else:
-                    
-    #                 qf_seleccionado        = st.selectbox('Índice calidad',(listado_estados),key=(idato + 1 + 2*df_seleccion.shape[0]))
-                        
-    #                 if qf_seleccionado == 'No disponible':
-
-    #                     indice_qf_seleccionado[idato] = 9
-                        
-    #                 else:
-                        
-    #                     indice_qf_seleccionado[idato] = df_indices_calidad['indice'][df_indices_calidad['descripcion']==qf_seleccionado]
-                
-
-    #             df_seleccion[variable_seleccionada_cc].iloc[idato] = int(indice_qf_seleccionado[idato])
-
-                
-    #         with col4:
-
-    #             texto_variable = variable_seleccionada_nombre + '(' + variable_seleccionada_unidades + '):'
-                
-    #             if indice_qf_seleccionado[idato] != 9:
-    #                 if io_valores_prev == 1:
-    #                     valor_entrada  = st.number_input(texto_variable,value=df_seleccion[variable_seleccionada].iloc[idato],key=(idato + df_seleccion.shape[0]),format = "%f")                                   
-    #                 else:
-    #                     valor_entrada  = st.number_input(texto_variable,value=df_referencia[variable_seleccionada][0],key=(idato + 1 + df_seleccion.shape[0]),format = "%f")               
-    #                 df_seleccion[variable_seleccionada].iloc[idato] = valor_entrada
-                
-    #             else:
-    #                 st.text(texto_variable)
-    #                 df_seleccion[variable_seleccionada].iloc[idato] = None
-                
-                
-
-
-    #     io_envio = st.form_submit_button("Asignar valores e índices de calidad definidos")  
-
-    #     if io_envio:
-            
-    #         with st.spinner('Actualizando la base de datos'):
+            with st.spinner('Actualizando la base de datos'):
            
-    #             # Introducir los valores en la base de datos
-    #             conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    #             cursor = conn.cursor()  
+                # Introducir los valores en la base de datos
+                conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()  
        
-    #             # Diferente instrucción si es pH (hay que especificar el tipo de medida)
-    #             if variable_seleccionada == 'ph': 
-    #                 instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, ph_metodo = %s WHERE muestreo = %s;'
-    #                 for idato in range(df_seleccion.shape[0]):
+                # Diferente instrucción si es pH (hay que especificar el tipo de medida)
+                if variable_seleccionada == 'ph': 
+                    instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, ph_metodo = %s WHERE muestreo = %s;'
+                    for idato in range(df_seleccion.shape[0]):
         
-    #                     cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(id_tipo_analisis),int(df_seleccion['muestreo'].iloc[idato])))
-    #                     conn.commit()             
+                        cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(id_tipo_analisis),int(df_seleccion['muestreo'].iloc[idato])))
+                        conn.commit()             
                         
-    #             else:
-    #                 instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
+                else:
+                    instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
 
-    #                 for idato in range(df_seleccion.shape[0]):
+                    for idato in range(df_seleccion.shape[0]):
         
-    #                     cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(df_seleccion['muestreo'].iloc[idato])))
-    #                     conn.commit() 
+                        cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(df_seleccion['muestreo'].iloc[idato])))
+                        conn.commit() 
     
-    #             cursor.close()
-    #             conn.close()   
+                cursor.close()
+                conn.close()   
           
-    #         if io_valores_prev == 1:        
-    #             texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' actualizados correctamente'
-    #         else:
-    #             texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
+            if io_valores_prev == 1:        
+                texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' actualizados correctamente'
+            else:
+                texto_exito = 'Datos de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada + ' añadidos correctamente'
 
-    #         st.success(texto_exito)
+            st.success(texto_exito)
    
-    #         st.cache_data.clear()
+            st.cache_data.clear()
 
 
 
