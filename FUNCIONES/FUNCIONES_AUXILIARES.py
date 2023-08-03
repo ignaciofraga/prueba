@@ -330,17 +330,13 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
 
                 texto_variable = variable_seleccionada_nombre + '(' + variable_seleccionada_unidades + '):'
                 
-                if indice_qf_seleccionado[idato] != 9:
-                    if io_valores_prev == 1:
-                        valor_entrada  = st.number_input(texto_variable,value=df_seleccion[variable_seleccionada].iloc[idato],key=(idato + df_seleccion.shape[0]),format = "%f")                                   
-                    else:
-                        valor_entrada  = st.number_input(texto_variable,value=df_referencia[variable_seleccionada][0],key=(idato + 1 + df_seleccion.shape[0]),format = "%f")               
-                    df_seleccion[variable_seleccionada].iloc[idato] = valor_entrada
-                
+                if io_valores_prev == 1:
+                    valor_entrada  = st.number_input(texto_variable,value=df_seleccion[variable_seleccionada].iloc[idato],key=(idato + df_seleccion.shape[0]),format = "%f")                                   
                 else:
-                    st.text(texto_variable)
-                    df_seleccion[variable_seleccionada].iloc[idato] = None
-                
+                    valor_entrada  = st.number_input(texto_variable,value=df_referencia[variable_seleccionada][0],key=(idato + 1 + df_seleccion.shape[0]),format = "%f")               
+                df_seleccion[variable_seleccionada].iloc[idato] = valor_entrada
+            
+            
                 
 
 
