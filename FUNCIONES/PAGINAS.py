@@ -2041,7 +2041,7 @@ def entrada_datos_laboratorio():
  
     variables_procesado    = ['TOC','pH','Alcalinidad','Oxígeno (Método Winkler)']    
     variables_procesado_bd = ['toc','ph','alcalinidad','oxigeno_wk']
-    variables_unidades     = ['µmol/kg',' ','\u03BCmol/kg','\u03BCmol/kg']
+    variables_unidades     = ['µmol/L',' ','\u03BCmol/kg','\u03BCmol/kg']
     
     # Define unos valores de referencia 
     df_referencia        = pandas.DataFrame(columns = ['toc','ph', 'alcalinidad', 'oxigeno_wk'],index = [0])
