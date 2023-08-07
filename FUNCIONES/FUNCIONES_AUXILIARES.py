@@ -592,7 +592,7 @@ def consulta_botellas():
                     
     listado_variables =['muestreo']
                 
-    with st.expander("Variables biogeoquímicas",expanded=False):
+    with st.expander("Variables biogeoquímicas",expanded=True):
     
         st.write("Selecciona las variables biogeoquímicas a exportar")    
     
