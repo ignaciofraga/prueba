@@ -564,7 +564,7 @@ def consulta_botellas():
     listado_variables =['muestreo']  
   
     # Selecciona las variables a exportar
-    with st.expander("Variables físicas",expanded=False):
+    with st.expander("Variables físicas",expanded=True):
     
         st.write("Selecciona las variables físicas a exportar")    
     
