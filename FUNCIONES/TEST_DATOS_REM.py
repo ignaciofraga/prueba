@@ -59,17 +59,17 @@ df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_
 # procesa ese dataframe
 io_control_calidad = 1
 #indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada = FUNCIONES_AUXILIARES.menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
-indice_programa       = 3
+indice_programa       = 1
 indice_estacion       = 1
-indice_salida         = 180
+indice_salida         = 645
 cast_seleccionado     = 1
 meses_offset          = 1
 #variable_seleccionada = 'temperatura_ctd'
-variable_seleccionada = 'toc'                                      
+#variable_seleccionada = 'toc'                                      
 
-df_datos_disponibles_store = df_datos_disponibles
+# df_datos_disponibles_store = df_datos_disponibles
 datos_procesados     = df_datos_disponibles[df_datos_disponibles["salida_mar"] == indice_salida]
 
-datos_variable = datos_procesados[['estacion','botella','presion_ctd',variable_seleccionada]]
-datos_variable = datos_variable.sort_values(['estacion', 'presion_ctd'], ascending=[True, False])
+# datos_variable = datos_procesados[['estacion','botella','presion_ctd',variable_seleccionada]]
+# datos_variable = datos_variable.sort_values(['estacion', 'presion_ctd'], ascending=[True, False])
 
