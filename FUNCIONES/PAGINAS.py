@@ -1933,8 +1933,9 @@ def procesado_nutrientes():
         st.subheader('Control de calidad de datos procedentes de botellas')    
             
         # Toma los datos de la caché    
-        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns = carga_datos_procesado_nutrientes()
-                
+#        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns = carga_datos_procesado_nutrientes()
+        df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos = carga_datos_procesado_nutrientes()       
+        
         # # Mantén sólo las salidas de radiales
         # id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
         # df_salidas  = df_salidas[df_salidas['programa']==int(id_radiales)]
@@ -1945,14 +1946,13 @@ def procesado_nutrientes():
         df_muestreos          = df_muestreos.rename(columns={"id_salida": "salida_mar"}) # Deshaz el cambio de nombre
                          
         # compón un dataframe con la información de muestreo y datos disponibles                                            
-        df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
-        df_datos_disponibles  = pandas.merge(df_datos_disponibles, df_datos_fisicos, on="muestreo")
+        df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")
          
         # Añade columna con información del año
         df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
         
         # Borra los dataframes que ya no hagan falta para ahorrar memoria
-        del(df_datos_biogeoquimicos,df_datos_fisicos,df_muestreos)
+        del(df_datos_discretos,df_muestreos)
         
         # procesa ese dataframe
         io_control_calidad = 1
