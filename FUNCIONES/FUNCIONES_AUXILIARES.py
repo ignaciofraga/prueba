@@ -512,17 +512,17 @@ def consulta_botellas():
         df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
         df_datos_discretos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
         df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_variables            = psql.read_sql('SELECT * FROM variables_procesado', conn)
+        variables_bd            = psql.read_sql('SELECT * FROM variables_procesado', conn)
         df_rmn_altos            = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
         df_rmn_bajos            = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
         conn.close() 
-        return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_variables,df_rmn_altos,df_rmn_bajos
+        return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,variables_bd,df_rmn_altos,df_rmn_bajos
            
     st.subheader('Consulta los datos de botellas disponibles') 
 
 
     # carga de la caché los datos 
-    df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_variables,df_rmn_altos,df_rmn_bajos = carga_datos_consulta_botellas()
+    df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,variables_bd,df_rmn_altos,df_rmn_bajos = carga_datos_consulta_botellas()
 
     listado_programas       = df_programas['nombre_programa'].tolist()
     id_radiales             = listado_programas.index('RADIAL CORUÑA')
@@ -793,6 +793,8 @@ def consulta_botellas():
                     pass
         
         # Añade unidades al nombre de cada variable
+        df_variables = variables_bd[variables_bd['tipo']=='variable_procesado']
+        
         listado_variables_bd = df_variables['variables'].tolist() 
         listado_unidades  = df_variables['unidades_variables'].tolist() 
         

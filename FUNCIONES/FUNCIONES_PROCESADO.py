@@ -468,16 +468,20 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     
     listado_variables_datos   = datos.columns.tolist()
     
+    df_variables = tabla_variables[tabla_variables['tipo']=='parametro_muestreo']
+    
     datos['muestreo']  = numpy.zeros(datos.shape[0],dtype=int)
     
     # si no hay ningun valor en la tabla de registro, meter directamente todos los datos registrados
     if tabla_muestreos.shape[0] == 0:
     
         # Mantén sólo las columnas que interesan
-        variables_bd  = [x for x in tabla_variables['parametros_muestreo'] if str(x) != 'None']
+        
+        
+        #variables_bd  = [x for x in tabla_variables['parametros_muestreo'] if str(x) != 'None']
         
         # Busca qué variables están incluidas en los datos a importar
-        listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
+        listado_variables_comunes = list(set(listado_variables_datos).intersection(df_variables['nombre']))
         listado_adicional         = ['id_estacion_temp','id_salida'] + listado_variables_comunes
         exporta_registros         = datos[listado_adicional]
 
@@ -569,10 +573,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             nuevos_muestreos  = datos[datos['io_nuevo_muestreo']==1]
             
             # Mantén sólo las columnas que interesan
-            variables_bd  = [x for x in tabla_variables['parametros_muestreo'] if str(x) != 'None']
             
             # Busca qué variables están incluidas en los datos a importar
-            listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
+            listado_variables_comunes = list(set(listado_variables_datos).intersection(df_variables['nombre']))
             listado_adicional         = ['muestreo','id_estacion_temp','id_salida'] + listado_variables_comunes
             exporta_registros         = nuevos_muestreos[listado_adicional]
              
@@ -634,7 +637,8 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     conn_psql.dispose()
         
     # Lee las variables de cada tipo a utilizar en el control de calidad
-    variables_bd  = [x for x in tabla_variables['variables'] if str(x) != 'None']    
+    df_variables = tabla_variables[tabla_variables['tipo']=='variable_procesado']
+    variables_bd = df_variables['nombre']    
   
     # Busca qué variables están incluidas en los datos a importar
     listado_variables_datos   = datos_insercion.columns.tolist()

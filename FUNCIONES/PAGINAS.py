@@ -2168,8 +2168,11 @@ def entrada_datos_excel():
         df_datos_importacion  = pandas.read_excel(archivo_datos) 
         
         # Identifica las variables que contiene el archivo
+        df_variables = variables_bd[variables_bd['tipo']=='variable_procesado']
+        
+        
         variables_archivo    = df_datos_importacion.columns.tolist()
-        variables_discretas  = list(set(variables_bd['variables']).intersection(variables_archivo))
+        variables_discretas  = list(set(df_variables['nombre']).intersection(variables_archivo))
 
                                 
         # Corrige el formato de las fechas
