@@ -795,8 +795,8 @@ def consulta_botellas():
         # Añade unidades al nombre de cada variable
         df_variables = variables_bd[variables_bd['tipo']=='variable_procesado']
         
-        listado_variables_bd = df_variables['variables'].tolist() 
-        listado_unidades  = df_variables['unidades_variables'].tolist() 
+        listado_variables_bd = df_variables['nombre'].tolist() 
+        listado_unidades  = df_variables['unidades'].tolist() 
         
         listado_variables_df = df_exporta.columns.tolist()
         for ivariable_df in range(len(listado_variables_df)):
@@ -805,6 +805,10 @@ def consulta_botellas():
             
                     nombre_uds = listado_variables_bd[ivariable_bd] + '(' + listado_unidades[ivariable_bd] + ')'                    
                     df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})        
+            
+        # Cambia el nombre a WHP
+        
+            
             
         ## Botón para exportar los resultados
         nombre_archivo =  'DATOS_BOTELLAS.xlsx'
