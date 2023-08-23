@@ -799,6 +799,10 @@ def consulta_botellas():
         listado_variables_bd_whp = df_variables['nombre_WHP'].tolist()
         listado_unidades         = df_variables['unidades'].tolist() 
         
+        st.text(listado_variables_bd)
+        st.text(listado_variables_bd_whp)
+        st.text(listado_unidades)
+        
         io_whp = 1
         
         listado_variables_df = df_exporta.columns.tolist()
