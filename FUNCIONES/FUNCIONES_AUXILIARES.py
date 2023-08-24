@@ -777,8 +777,8 @@ def consulta_botellas():
     
         if io_whp :
             st.dataframe(df_salidas_seleccion)
-            dt_temporal = df_salidas_seleccion['salida_mar','expocode']
-            df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, dt_temporal, on="salida_mar")
+            dt_temporal = df_salidas_seleccion['id_salida','expocode']
+            df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, dt_temporal, on="id_salida")
     
     
         # Mueve los identificadores de muestreo al final del dataframe
