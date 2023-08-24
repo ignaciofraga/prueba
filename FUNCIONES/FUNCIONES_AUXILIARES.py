@@ -799,34 +799,32 @@ def consulta_botellas():
         listado_variables_bd     = df_variables['nombre'].tolist()
         listado_variables_bd_whp = df_variables['nombre_WHP'].tolist()
         listado_unidades         = df_variables['unidades'].tolist() 
-        
-        st.text(listado_variables_bd)
-        st.text(listado_variables_bd_whp)
-        st.text(listado_unidades)
-        
+                
         io_whp = 1
+        io_uds = 1
+        
+        if io_whp == 1:
+            listado_nombres = df_variables['nombre_WHP'].tolist()
+        else:
+            listado_nombres = df_variables['nombre'].tolist()
         
         listado_variables_df = df_exporta.columns.tolist()
         for ivariable_df in range(len(listado_variables_df)):
             for ivariable_bd in range(len(listado_variables_bd)):
                 
                 if listado_variables_df[ivariable_df] == listado_variables_bd[ivariable_bd]:
-                    st.text(listado_variables_df[ivariable_df])
-                    st.text(listado_variables_bd[ivariable_bd])
-                    st.text(listado_unidades[ivariable_bd])
-                    st.text(listado_variables_bd_whp[ivariable_bd])
-                
-                if listado_variables_df[ivariable_df] == listado_variables_bd[ivariable_bd] and  listado_unidades[ivariable_bd] is not None:    
+                                   
+                    if io_uds == 1 and listado_unidades[ivariable_bd] is not None:    
             
-                    nombre_uds = listado_variables_bd[ivariable_bd] + '(' + listado_unidades[ivariable_bd] + ')'                    
-                    
-                    if io_whp == 1:
+                        nombre_uds = listado_nombres[ivariable_bd] + '(' + listado_unidades[ivariable_bd] + ')'
+                
+                    else:
                         
-                        nombre_uds = listado_variables_bd_whp[ivariable_bd] + '(' + listado_unidades[ivariable_bd] + ')'  
-                    
+                        nombre_uds = listado_nombres[ivariable_bd]
+                        
                     df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})        
             
-        # Cambia el nombre a WHP
+
         
             
             
