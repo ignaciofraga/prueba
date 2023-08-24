@@ -777,7 +777,7 @@ def consulta_botellas():
     
         if io_whp :
             st.dataframe(df_salidas_seleccion)
-            dt_temporal = df_salidas_seleccion['id_salida','expocode']
+            dt_temporal = df_salidas_seleccion[['id_salida','expocode']]
             df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, dt_temporal, on="id_salida")
     
     
