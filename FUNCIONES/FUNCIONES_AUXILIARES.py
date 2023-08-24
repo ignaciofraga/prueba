@@ -809,9 +809,10 @@ def consulta_botellas():
         for ivariable_df in range(len(listado_variables_df)):
             for ivariable_bd in range(len(listado_variables_bd)):
                 
-                st.text(listado_variables_df[ivariable_df])
-                st.text(listado_variables_bd[ivariable_bd])
-                st.text(listado_unidades[ivariable_bd])
+                if listado_variables_df[ivariable_df] == listado_variables_bd[ivariable_bd]:
+                    st.text(listado_variables_df[ivariable_df])
+                    st.text(listado_variables_bd[ivariable_bd])
+                    st.text(listado_unidades[ivariable_bd])
                 
                 if listado_variables_df[ivariable_df] == listado_variables_bd[ivariable_bd] and  listado_unidades[ivariable_bd] is not None:    
             
