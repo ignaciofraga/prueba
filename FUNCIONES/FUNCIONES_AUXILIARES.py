@@ -773,9 +773,12 @@ def consulta_botellas():
 
             
         # Elimina las columnas que no interesan
-        df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
+        df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion','csr'])
     
-        #st.dataframe(df_exporta)
+        if io_whp is False:
+            df_exporta                  = df_muestreos_seleccionados.drop(columns=['expocode'])
+    
+    
     
         # Mueve los identificadores de muestreo al final del dataframe
         listado_cols = df_exporta.columns.tolist()
@@ -807,7 +810,7 @@ def consulta_botellas():
                 except:
                     pass
         
-        # Añade unidades al nombre de cada variable
+        # Añade unidades al nombre de cada variable (opcional) y cambia a nombre WHP (también opcional)
         #df_variables = variables_bd[variables_bd['tipo']=='variable_muestreo']
         df_variables = variables_bd
         
@@ -838,8 +841,10 @@ def consulta_botellas():
                         df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})        
             
 
-        
-            
+        # Ajusta el formato de la fecha si se exporta en WHP
+        if io_whp:
+            for idato in range(df_exporta.shape[0]):
+                df_exporta['DATE'].iloc[idato] = df_exporta['DATE'].iloc[idato].strftime('%Y%m%d')
             
         ## Botón para exportar los resultados
         nombre_archivo =  'DATOS_BOTELLAS.xlsx'
