@@ -824,7 +824,9 @@ def consulta_botellas():
                         
                         nombre_uds = listado_nombres[ivariable_bd]
                         
-                    df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})        
+                    if nombre_uds :
+                    
+                        df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})        
             
 
         
