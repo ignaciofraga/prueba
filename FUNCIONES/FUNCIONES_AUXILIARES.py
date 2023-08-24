@@ -773,11 +773,11 @@ def consulta_botellas():
 
             
         # Elimina las columnas que no interesan
-        df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion','csr'])
+        df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
     
-        if io_whp is False:
-            df_exporta                  = df_muestreos_seleccionados.drop(columns=['expocode'])
-    
+        if io_whp :
+            dt_temporal = df_salidas_seleccion['salida_mar','expocode']
+            df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, dt_temporal, on="salida_mar")
     
     
         # Mueve los identificadores de muestreo al final del dataframe
