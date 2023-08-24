@@ -776,6 +776,7 @@ def consulta_botellas():
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
     
         if io_whp :
+            st.dataframe(df_salidas_seleccion)
             dt_temporal = df_salidas_seleccion['salida_mar','expocode']
             df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, dt_temporal, on="salida_mar")
     
