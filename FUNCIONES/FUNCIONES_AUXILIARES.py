@@ -813,6 +813,7 @@ def consulta_botellas():
                     st.text(listado_variables_df[ivariable_df])
                     st.text(listado_variables_bd[ivariable_bd])
                     st.text(listado_unidades[ivariable_bd])
+                    st.text(listado_variables_bd_whp[ivariable_bd])
                 
                 if listado_variables_df[ivariable_df] == listado_variables_bd[ivariable_bd] and  listado_unidades[ivariable_bd] is not None:    
             
