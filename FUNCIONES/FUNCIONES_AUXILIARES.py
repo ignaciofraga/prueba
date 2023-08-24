@@ -702,6 +702,21 @@ def consulta_botellas():
                 
     # Recorta el dataframe de datos biogeoquimicos con las variables seleccionadas
     df_datos_biogeoquimicos_seleccion = df_datos_discretos.loc[:, listado_variables]
+
+
+    with st.expander("Formatos de salida",expanded=True):
+   
+       st.write("Selecciona el formato de salida de datos")    
+   
+       # Selecciona mostrar o no datos malos y dudosos
+       col1, col2 = st.columns(2,gap="small")
+       with col1:
+           io_whp   = st.checkbox('Formato WHP', value=False)
+               
+       with col2:
+           io_uds     = st.checkbox('Incluir unidades en nombre de cabecera', value=False)
+               
+
                        
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
     
@@ -797,15 +812,11 @@ def consulta_botellas():
         df_variables = variables_bd
         
         listado_variables_bd     = df_variables['nombre'].tolist()
-        listado_variables_bd_whp = df_variables['nombre_WHP'].tolist()
         listado_unidades         = df_variables['unidades'].tolist() 
               
         st.dataframe(df_exporta)
-        
-        io_whp = 1
-        io_uds = 1
-        
-        if io_whp == 1:
+                
+        if io_whp:
             listado_nombres = df_variables['nombre_WHP'].tolist()
         else:
             listado_nombres = df_variables['nombre'].tolist()
@@ -816,7 +827,7 @@ def consulta_botellas():
                 
                 if listado_variables_df[ivariable_df] == listado_variables_bd[ivariable_bd]:
                                    
-                    if io_uds == 1 and listado_unidades[ivariable_bd] is not None:    
+                    if io_uds is True and listado_unidades[ivariable_bd] is not None:    
             
                         nombre_uds = listado_nombres[ivariable_bd] + '(' + listado_unidades[ivariable_bd] + ')'
                 
