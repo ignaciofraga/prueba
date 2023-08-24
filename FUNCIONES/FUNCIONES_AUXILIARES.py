@@ -793,7 +793,8 @@ def consulta_botellas():
                     pass
         
         # Añade unidades al nombre de cada variable
-        df_variables = variables_bd[variables_bd['tipo']=='variable_muestreo']
+        #df_variables = variables_bd[variables_bd['tipo']=='variable_muestreo']
+        df_variables = variables_bd
         
         listado_variables_bd     = df_variables['nombre'].tolist()
         listado_variables_bd_whp = df_variables['nombre_WHP'].tolist()
