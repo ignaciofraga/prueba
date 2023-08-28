@@ -785,13 +785,13 @@ def consulta_botellas():
     
         # Mueve los identificadores de muestreo al final del dataframe
         listado_cols = df_exporta.columns.tolist()
-        if io_whp and 'EXPOCODE' in listado_cols:
-            listado_cols.insert(0, listado_cols.pop(listado_cols.index('EXPOCODE')))
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))     
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))    
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
+        if io_whp and 'EXPOCODE' in listado_cols:
+            listado_cols.insert(0, listado_cols.pop(listado_cols.index('EXPOCODE')))
         df_exporta = df_exporta[listado_cols]
         
         # Ordena los valores por fechas
