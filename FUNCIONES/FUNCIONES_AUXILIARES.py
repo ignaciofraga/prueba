@@ -771,11 +771,11 @@ def consulta_botellas():
             
         if io_whp :
             st.dataframe(df_salidas_seleccion)
-            dt_temporal = df_salidas_seleccion[['id_salida','expocode']]
-            dt_temporal = dt_temporal.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas
-            #st.dataframe(dt_temporal)
+            dt_temporal                 = df_salidas_seleccion[['id_salida','expocode']]
+            dt_temporal                 = dt_temporal.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas
             df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, dt_temporal, on="salida_mar")
-            #st.dataframe(df_muestreos_seleccionados)
+            df_muestreos_seleccionados  = df_muestreos_seleccionados.rename(columns={"expocode": "EXPOCODE"})
+
 
             
         # Elimina las columnas que no interesan
@@ -785,6 +785,9 @@ def consulta_botellas():
     
         # Mueve los identificadores de muestreo al final del dataframe
         listado_cols = df_exporta.columns.tolist()
+        if io_whp and 'EXPOCODE' in listado_cols:
+            listado_cols.insert(0, listado_cols.pop(listado_cols.index('EXPOCODE')))
+        listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))     
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))    
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
