@@ -134,7 +134,7 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
 
      
     # Renombra las columnas para mantener un mismo esquema de nombres   
-    datos_radiales = datos_radiales.rename(columns={"DATE": "fecha_muestreo", "STNNBR": "estacion", 'EXPOCODE':'nombre_muestreo',
+    datos_radiales = datos_radiales.rename(columns={"DATE": "fecha_muestreo", "STNNBR": "nombre_estacion", 'EXPOCODE':'nombre_muestreo',
                                                     "LATITUDE":"latitud","LONGITUDE":"longitud","BTLNBR":"botella","CTDPRS":"presion_ctd",
                                                     "CTDTMP":"temperatura_ctd","CTDSAL":"salinidad_ctd","CTDSAL_FLAG_W":"salinidad_ctd_qf",
                                                     "CTDOXY":"oxigeno_ctd","CTDOXY_FLAG_W":"oxigeno_ctd_qf","CTDPAR":"par_ctd","CTDPAR_FLAG_W":"par_ctd_qf",
@@ -333,14 +333,14 @@ def lectura_datos_radprof(nombre_archivo):
        
 
     # Renombra las columnas para mantener una denominación homogénea
-    datos_radprof = datos_radprof.rename(columns={"Sta":"estacion","Niskin":"botella","Cast":'num_cast',
+    datos_radprof = datos_radprof.rename(columns={"Sta":"nombre_estacion","Niskin":"botella","Cast":'num_cast',
                                                   "Lat":"latitud","Lon":"longitud","CTDPRS":"presion_ctd","CTDtemp":"temperatura_ctd","SALCTD":"salinidad_ctd",
                                                   "SiO2 umol/Kg":"silicato","Flag_SiO2":"silicato_qf",
                                                   "NO2 umol/kg":"nitrito","Flag_NO2":"nitrito_qf","PO4 umol/Kg":"fosfato","Flag_PO4":"fosfato_qf","ID":"id_externo"
                                                   })
 
     # Mantén solo las columnas que interesan
-    datos_radprof_recorte = datos_radprof[['estacion','botella','fecha_muestreo','hora_muestreo','latitud','longitud','presion_ctd','num_cast','temperatura_ctd','salinidad_ctd',
+    datos_radprof_recorte = datos_radprof[['nombre_estacion','botella','fecha_muestreo','hora_muestreo','latitud','longitud','presion_ctd','num_cast','temperatura_ctd','salinidad_ctd',
                                             'nitrato','nitrato_qf','nitrito','nitrito_qf','silicato','silicato_qf','fosfato','fosfato_qf','id_externo']]
     
 

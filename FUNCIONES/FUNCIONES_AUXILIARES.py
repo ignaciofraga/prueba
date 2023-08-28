@@ -790,9 +790,14 @@ def consulta_botellas():
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
+        
         if io_whp and 'EXPOCODE' in listado_cols:
             listado_cols.insert(0, listado_cols.pop(listado_cols.index('EXPOCODE')))
         df_exporta = df_exporta[listado_cols]
+        
+        # Elimina la columna id_externo si se exporta la información en formato WHP
+        if io_whp and 'id_externo' in listado_cols:
+            df_exporta  = df_exporta.drop(columns=['id_externo'])
         
         # Ordena los valores por fechas
         df_exporta = df_exporta.sort_values('fecha_muestreo')
