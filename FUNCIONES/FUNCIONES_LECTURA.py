@@ -333,27 +333,35 @@ def lectura_datos_radprof(nombre_archivo):
        
 
     # Renombra las columnas para mantener una denominación homogénea
-    datos_radprof = datos_radprof.rename(columns={"st":"estacion","Niskin":"botella","Cast":'num_cast',
+    datos_radprof = datos_radprof.rename(columns={"Sta":"estacion","Niskin":"botella","Cast":'num_cast',
                                                   "Lat":"latitud","Lon":"longitud","CTDPRS":"presion_ctd","CTDtemp":"temperatura_ctd","SALCTD":"salinidad_ctd",
                                                   "SiO2 umol/Kg":"silicato","Flag_SiO2":"silicato_qf",
-                                                  "NO2 umol/kg":"nitrito","Flag_NO2":"nitrito_qf","PO4 umol/Kg":"fosfato","Flag_PO4":"fosfato_qf"
+                                                  "NO2 umol/kg":"nitrito","Flag_NO2":"nitrito_qf","PO4 umol/Kg":"fosfato","Flag_PO4":"fosfato_qf","ID":"id_externo"
                                                   })
 
     # Mantén solo las columnas que interesan
     datos_radprof_recorte = datos_radprof[['estacion','botella','fecha_muestreo','hora_muestreo','latitud','longitud','presion_ctd','num_cast','temperatura_ctd','salinidad_ctd',
-                                            'nitrato','nitrato_qf','nitrito','nitrito_qf','silicato','silicato_qf','fosfato','fosfato_qf']]
+                                            'nitrato','nitrato_qf','nitrito','nitrito_qf','silicato','silicato_qf','fosfato','fosfato_qf','id_externo']]
     
 
-    # # Renombra las columnas para mantener una denominación homogénea
-    # datos_radprof = datos_radprof.rename(columns={"st":"estacion","Niskin":"botella","Cast":'num_cast',
-    #                                               "Lat":"latitud","Lon":"longitud","CTDPRS":"presion_ctd","CTDtemp":"temperatura_ctd","SALCTD":"salinidad_ctd",
-    #                                               "silica":"silicato","SiO2_flag":"silicato_qf","nitra":"nitrato","NO3_flag":"nitrato_qf",
-    #                                               "nitri":"nitrito","NO2_flag":"nitrito_qf","phospha":"fosfato","PO4_flag":"fosfato_qf","ammonia":"amonio"
-    #                                               })   
-    
-    # # Mantén solo las columnas que interesan
-    # datos_radprof_recorte = datos_radprof[['estacion','botella','fecha_muestreo','hora_muestreo','latitud','longitud','presion_ctd','num_cast','temperatura_ctd','salinidad_ctd',
-    #                                        'nitrato','nitrato_qf','nitrito','nitrito_qf','silicato','silicato_qf','fosfato','fosfato_qf','amonio','configuracion_superficie','configuracion_perfilador']]
+    # Añade qf a los datos del CTD
+    listado_variables = datos_radprof_recorte.columns.tolist()
+    if 'temperatura_ctd' in listado_variables and 'temperatura_ctd_qf' not in listado_variables:
+        datos_radprof_recorte['temperatura_ctd_qf'] = 2
+        
+    if 'salinidad_ctd' in listado_variables and 'salinidad_ctd_qf' not in listado_variables:
+        datos_radprof_recorte['salinidad_ctd_qf'] = 2        
+
+    for idato in range(datos_radprof_recorte.shape[0]):
+        if math.isnan(datos_radprof_recorte['temperatura_ctd'].iloc[idato]):
+            datos_radprof_recorte['temperatura_ctd_qf'].iloc[idato] = 9
+        if math.isnan(datos_radprof_recorte['salinidad_ctd'].iloc[idato]):
+            datos_radprof_recorte['salinidad_ctd_qf'].iloc[idato] = 9            
+            
+    # Añade una columna con lat/lon muestreo
+    datos_radprof_recorte['latitud_muestreo']=datos_radprof_recorte['latitud']
+    datos_radprof_recorte['longitud_muestreo']=datos_radprof_recorte['longitud']   
+
 
     del(datos_radprof)
 

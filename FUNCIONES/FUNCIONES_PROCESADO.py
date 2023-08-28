@@ -637,7 +637,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     conn_psql.dispose()
         
     # Lee las variables de cada tipo a utilizar en el control de calidad
-    df_variables = tabla_variables[tabla_variables['tipo']=='variable_procesado']
+    df_variables = tabla_variables[tabla_variables['tipo']=='variable_muestreo']
     variables_bd = df_variables['nombre']    
   
     # Busca qué variables están incluidas en los datos a importar

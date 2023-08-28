@@ -37,20 +37,19 @@ email_contacto    = 'prueba@ieo.csic.es'
 
 fecha_actualizacion = datetime.date.today()
 
-anho_consulta = 2023
-programa_seleccionado = 'RADIAL CORUÑA'
-tipo_salida           = 'MENSUAL'
+anho_consulta = 2021
+programa_seleccionado = 'RADPROF'
+tipo_salida           = 'ANUAL'
 ###### PROCESADO ########
 
 
-con_engine      = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-conn            = create_engine(con_engine)
-df_programas    = psql.read_sql('SELECT * FROM programas', conn)
-variables_bd    = psql.read_sql('SELECT * FROM variables_procesado', conn)
-df_salidas      = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-df_muestreos    = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-df_datos_fisica = psql.read_sql('SELECT * FROM datos_discretos_fisica', conn)
-df_datos_bgq    = psql.read_sql('SELECT * FROM datos_discretos_biogeoquimica', conn)
+con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+conn               = create_engine(con_engine)
+df_programas       = psql.read_sql('SELECT * FROM programas', conn)
+variables_bd       = psql.read_sql('SELECT * FROM variables_procesado', conn)
+df_salidas         = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+df_muestreos       = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+df_datos_discretos = psql.read_sql('SELECT * FROM datos_discretos', conn)
 conn.dispose() 
 
 
@@ -69,6 +68,6 @@ listado_salidas      = df_salidas_seleccion['id_salida']
 
 df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(listado_salidas)]
 
-df_datos = pandas.merge(df_muestreos_seleccionados, df_datos_fisica, on="muestreo")
-df_datos = pandas.merge(df_datos, df_datos_bgq, on="muestreo")
+df_datos = pandas.merge(df_muestreos_seleccionados, df_datos_discretos, on="muestreo")
+
 
