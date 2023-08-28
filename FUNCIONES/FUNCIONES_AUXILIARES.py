@@ -769,19 +769,19 @@ def consulta_botellas():
         if io_factores_correccion_nutrientes:
             df_muestreos_seleccionados = recupera_factores_nutrientes(df_muestreos_seleccionados)
             
-
+        if io_whp :
+            st.dataframe(df_salidas_seleccion)
+            dt_temporal = df_salidas_seleccion[['id_salida','expocode']]
+            dt_temporal = dt_temporal.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas
+            #st.dataframe(dt_temporal)
+            df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, dt_temporal, on="salida_mar")
+            #st.dataframe(df_muestreos_seleccionados)
 
             
         # Elimina las columnas que no interesan
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
     
-        if io_whp :
-            st.dataframe(df_salidas_seleccion)
-            dt_temporal = df_salidas_seleccion[['id_salida','expocode']]
-            dt_temporal = dt_temporal.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas
-            st.dataframe(dt_temporal)
-            df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, dt_temporal, on="salida_mar")
-    
+
     
         # Mueve los identificadores de muestreo al final del dataframe
         listado_cols = df_exporta.columns.tolist()
