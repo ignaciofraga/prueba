@@ -779,6 +779,7 @@ def consulta_botellas():
             st.dataframe(df_salidas_seleccion)
             dt_temporal = df_salidas_seleccion[['id_salida','expocode']]
             dt_temporal = dt_temporal.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas
+            st.dataframe(dt_temporal)
             df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, dt_temporal, on="salida_mar")
     
     
