@@ -700,6 +700,8 @@ def consulta_botellas():
                 
            io_factores_correccion_nutrientes = st.checkbox('Factores de corrección nutrientes', value=False)           
                 
+    listado_variables_bgq = listado_variables
+    
     # Recorta el dataframe de datos biogeoquimicos con las variables seleccionadas
     df_datos_biogeoquimicos_seleccion = df_datos_discretos.loc[:, listado_variables]
 
@@ -709,13 +711,20 @@ def consulta_botellas():
        st.write("Selecciona el formato de salida de datos")    
    
        # Selecciona mostrar o no datos malos y dudosos
-       col1, col2 = st.columns(2,gap="small")
+       col1, col2, col3 = st.columns(3,gap="small")
        with col1:
            io_whp   = st.checkbox('Formato WHP', value=False)
                
        with col2:
-           io_uds     = st.checkbox('Incluir unidades en nombre de cabecera', value=False)
-               
+           io_uds     = st.checkbox('Incluir unidades en cabeceras', value=False)
+
+       with col3:
+           io_qc2     = st.checkbox('Exportar para análisis QC2', value=False)    
+
+       # si se selecciona exportar para QC2 forzar a formato WHP
+       if io_qc2:
+           io_whp = True
+                   
 
                        
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
@@ -770,7 +779,6 @@ def consulta_botellas():
             df_muestreos_seleccionados = recupera_factores_nutrientes(df_muestreos_seleccionados)
             
         if io_whp :
-            st.dataframe(df_salidas_seleccion)
             dt_temporal                 = df_salidas_seleccion[['id_salida','expocode']]
             dt_temporal                 = dt_temporal.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas
             df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, dt_temporal, on="salida_mar")
@@ -802,8 +810,7 @@ def consulta_botellas():
         # Ordena los valores por fechas
         df_exporta = df_exporta.sort_values('fecha_muestreo')
         
-        #st.dataframe(df_exporta)
-
+ 
         # Elimina las columnas sin datos        
         listado_variables_inicial = list(df_exporta.columns) 
         nan_value = float("NaN")
@@ -857,15 +864,22 @@ def consulta_botellas():
             for idato in range(df_exporta.shape[0]):
                 df_exporta['DATE'].iloc[idato] = df_exporta['DATE'].iloc[idato].strftime('%Y%m%d')
             
+            
+        st.dataframe(df_exporta)
+            
+        # Elimina los registros sin datos (si se exporta para QC2)
+        if io_qc2:
+            df_exporta = df_exporta.dropna(0,how='any',subset=listado_variables_bgq)
+  
+        st.dataframe(df_exporta)          
+  
+            
         ## Botón para exportar los resultados
         nombre_archivo =  'DATOS_BOTELLAS.xlsx'
     
         output = BytesIO()
         writer = pandas.ExcelWriter(output, engine='xlsxwriter')
         df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
-        # workbook = writer.book
-        # worksheet = writer.sheets['DATOS']
-        # writer.save()
         writer.close()
         datos_exporta = output.getvalue()
     
@@ -873,7 +887,7 @@ def consulta_botellas():
             label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
             data=datos_exporta,
             file_name=nombre_archivo,
-            help= 'Descarga un archivo .csv con los datos solicitados',
+            help= 'Descarga un archivo con los datos solicitados',
             mime="application/vnd.ms-excel"
         )
 
