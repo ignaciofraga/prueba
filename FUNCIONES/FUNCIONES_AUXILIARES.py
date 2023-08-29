@@ -828,17 +828,13 @@ def consulta_botellas():
                 except:
                     pass
                 
-        st.dataframe(df_exporta)
             
         # Elimina los registros sin datos (si se exporta para QC2)
         if io_qc2:
-            listado_real_variables_bgq = list(set(listado_variables_bgq).intersection(list(df_exporta.columns)))
-            
+            listado_real_variables_bgq = list(set(listado_variables_bgq).intersection(list(df_exporta.columns)))            
             df_exporta = df_exporta.dropna(axis='index',how='any',subset=listado_real_variables_bgq)
-            #df_exporta = df_exporta.dropna(0,how='any',subset=listado_variables_bgq)
   
-        st.dataframe(df_exporta)    
-                
+
         
         # Añade unidades al nombre de cada variable (opcional) y cambia a nombre WHP (también opcional)
         #df_variables = variables_bd[variables_bd['tipo']=='variable_muestreo']
@@ -881,20 +877,32 @@ def consulta_botellas():
   
             
         ## Botón para exportar los resultados
-        nombre_archivo =  'DATOS_BOTELLAS.xlsx'
+        
+        if io_qc2:
+            nombre_archivo = 'DATOS_BOTELLAS.csv'
+            tipo_mime      = "text/csv"
+            datos_exporta  = df_exporta.to_csv(index=False).encode('utf-8')
+            
+        else:
+        
+            nombre_archivo = 'DATOS_BOTELLAS.xlsx'
+            tipo_mime      = "application/vnd.ms-excel"
     
-        output = BytesIO()
-        writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-        df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
-        writer.close()
-        datos_exporta = output.getvalue()
+            output = BytesIO()
+            writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+            df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
+            writer.close()
+            datos_exporta = output.getvalue()
+    
+    
+    
     
         st.download_button(
             label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
             data=datos_exporta,
             file_name=nombre_archivo,
             help= 'Descarga un archivo con los datos solicitados',
-            mime="application/vnd.ms-excel"
+            mime=tipo_mime
         )
 
   
