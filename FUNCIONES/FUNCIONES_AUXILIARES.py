@@ -832,7 +832,9 @@ def consulta_botellas():
             
         # Elimina los registros sin datos (si se exporta para QC2)
         if io_qc2:
-            df_exporta = df_exporta.dropna(axis='index',how='any',subset=listado_variables_bgq)
+            listado_real_variables_bgq = list(set(listado_variables_bgq).intersection(list(df_exporta.columns)))
+            
+            df_exporta = df_exporta.dropna(axis='index',how='any',subset=listado_real_variables_bgq)
             #df_exporta = df_exporta.dropna(0,how='any',subset=listado_variables_bgq)
   
         st.dataframe(df_exporta)    
