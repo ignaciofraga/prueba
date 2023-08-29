@@ -879,7 +879,14 @@ def consulta_botellas():
         ## Botón para exportar los resultados
         
         if io_qc2:
-            nombre_archivo = 'DATOS_BOTELLAS.csv'
+            listado_expocodes = df_exporta['EXPOCODE'].unique()
+            if len(listado_expocodes) == 1:
+                nombre_archivo = listado_expocodes[0] + '.csv'
+            else:
+                texto_aviso = "Los datos seleccionados corresponden a más de un EXPOCODE. No se podrá utilizar el código para el QC2"
+                st.warning(texto_aviso, icon="⚠️")
+                nombre_archivo = 'DATOS_BOTELLAS.csv'
+                
             tipo_mime      = "text/csv"
             datos_exporta  = df_exporta.to_csv(index=False).encode('utf-8')
             
