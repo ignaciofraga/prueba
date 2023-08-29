@@ -827,6 +827,16 @@ def consulta_botellas():
                     df_exporta       = df_exporta.drop(var_eliminada_qf, axis=1)
                 except:
                     pass
+                
+        st.dataframe(df_exporta)
+            
+        # Elimina los registros sin datos (si se exporta para QC2)
+        if io_qc2:
+            df_exporta = df_exporta.dropna(axis='index',how='any',subset=listado_variables_bgq)
+            #df_exporta = df_exporta.dropna(0,how='any',subset=listado_variables_bgq)
+  
+        st.dataframe(df_exporta)    
+                
         
         # Añade unidades al nombre de cada variable (opcional) y cambia a nombre WHP (también opcional)
         #df_variables = variables_bd[variables_bd['tipo']=='variable_muestreo']
@@ -865,14 +875,7 @@ def consulta_botellas():
                 df_exporta['DATE'].iloc[idato] = df_exporta['DATE'].iloc[idato].strftime('%Y%m%d')
             
             
-        st.dataframe(df_exporta)
-            
-        # Elimina los registros sin datos (si se exporta para QC2)
-        if io_qc2:
-            df_exporta = df_exporta.dropna(axis='index',how='any',subset=listado_variables_bgq)
-            #df_exporta = df_exporta.dropna(0,how='any',subset=listado_variables_bgq)
-  
-        st.dataframe(df_exporta)          
+      
   
             
         ## Botón para exportar los resultados
