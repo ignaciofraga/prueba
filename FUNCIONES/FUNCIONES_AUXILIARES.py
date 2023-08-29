@@ -829,11 +829,22 @@ def consulta_botellas():
                     pass
                 
             
-        # Elimina los registros sin datos (si se exporta para QC2)
+        # Comprueba que los datos disponen de expocode y elimina los registros sin datos (si se exporta para QC2)
         if io_qc2:
-            listado_real_variables_bgq = list(set(listado_variables_bgq).intersection(list(df_exporta.columns)))            
-            df_exporta = df_exporta.dropna(axis='index',how='any',subset=listado_real_variables_bgq)
-  
+            if 'EXPOCODE' in df_exporta.columns:
+
+                listado_real_variables_bgq = list(set(listado_variables_bgq).intersection(list(df_exporta.columns)))            
+                df_exporta = df_exporta.dropna(axis='index',how='any',subset=listado_real_variables_bgq)
+
+                if  df_exporta.shape[0] == 0:
+                    texto_aviso = "No hay datos almacenados de la salida y variables seleccionadas"
+                    st.warning(texto_aviso, icon="⚠️")
+
+            else:
+                
+                texto_aviso = "La salida seleccionada no dispone de EXPOCODE. No se podrá utilizar el código para el QC2"
+                st.warning(texto_aviso, icon="⚠️")    
+                st.stop()
 
         
         # Añade unidades al nombre de cada variable (opcional) y cambia a nombre WHP (también opcional)
