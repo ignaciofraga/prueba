@@ -1329,48 +1329,50 @@ def entrada_archivos_roseta():
         
         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
 
-        with st.form("Formulario seleccion"): 
+        #with st.form("Formulario seleccion"): 
         
-            # Despliega menús de selección del programa, tipo de salida, año y fecha               
-            col1, col2, col3= st.columns(3,gap="small")
-         
-            with col1: 
-                programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
-                df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
-                abreviatura_programa      = df_programas['abreviatura'][df_programas['nombre_programa']==programa_seleccionado].iloc[0] 
-                id_programa               = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0] 
+        # Despliega menús de selección del programa, tipo de salida, año y fecha               
+        col1, col2, col3= st.columns(3,gap="small")
+     
+        with col1: 
+            programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
+            df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
+            abreviatura_programa      = df_programas['abreviatura'][df_programas['nombre_programa']==programa_seleccionado].iloc[0] 
+            id_programa               = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0] 
+        
+        with col2:
+            tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
+            df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+        
+            # Añade la variable año al dataframe
+            indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+            df_salidas_seleccion['id_temp'] = indices_dataframe
+            df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
             
-            with col2:
-                tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
-                df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+            # Define los años con salidas asociadas
+            df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
+            for idato in range(df_salidas_seleccion.shape[0]):
+                df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+            df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
             
-                # Añade la variable año al dataframe
-                indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
-                df_salidas_seleccion['id_temp'] = indices_dataframe
-                df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
-                
-                # Define los años con salidas asociadas
-                df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
-                for idato in range(df_salidas_seleccion.shape[0]):
-                    df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
-                df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
-                
-                listado_anhos              = df_salidas_seleccion['año'].unique()
-            
-            with col3:
-                anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
-                df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+            listado_anhos              = df_salidas_seleccion['año'].unique()
         
-            salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
-        
-            # Recupera el identificador de la salida seleccionada
-            id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
-        
-            fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
-           
-            tabla_estaciones_programa = df_estaciones[df_estaciones['programa']==int(id_programa)]
+        with col3:
+            anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
+            df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+    
+        salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
+    
+        # Recupera el identificador de la salida seleccionada
+        id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+    
+        fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+       
+        tabla_estaciones_programa = df_estaciones[df_estaciones['programa']==int(id_programa)]
     
         
+        with st.form("Formulario seleccion"): 
+    
             # Despliega la extensión para subir los archivos .btl y .cnv
             col1, col2 = st.columns(2,gap="small")
             

@@ -37,9 +37,9 @@ email_contacto    = 'prueba@ieo.csic.es'
 
 fecha_actualizacion = datetime.date.today()
 
-anho_consulta = 2022
-programa_seleccionado = 'RADIAL CORUÑA'
-tipo_salida           = 'MENSUAL'
+anho_consulta = 2021
+programa_seleccionado = 'RADPROF'
+tipo_salida           = 'ANUAL'
 ###### PROCESADO ########
 
 
@@ -70,4 +70,23 @@ df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(listad
 
 df_datos = pandas.merge(df_muestreos_seleccionados, df_datos_discretos, on="muestreo")
 
+from scipy.io import savemat
+import numpy
 
+a = numpy.arange(20)
+
+mdic = {"a": a}
+
+df_datos = df_datos.replace({numpy.nan: None})
+
+df_datos['fecha_muestreo']=df_datos['fecha_muestreo'].astype(str)
+df_datos['hora_muestreo']=df_datos['hora_muestreo'].astype(str)
+
+listado_variables = df_datos.columns
+for ivar in range(df_datos.shape[1]):
+    mdic[listado_variables[ivar]]=df_datos[listado_variables[ivar]].to_numpy()
+    #mdic[listado_variables[ivar]]=df_datos[listado_variables[ivar]].values
+    
+
+
+savemat("matlab_matrix.mat", mdic)
