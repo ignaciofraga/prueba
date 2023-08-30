@@ -1411,82 +1411,8 @@ def entrada_archivos_roseta():
                         ### DATOS DE BOTELLERO ###
                         mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_btl,datos_archivo)
                       
-                        datos_botellas['id_estacion_temp']         = id_estacion
-                        datos_botellas['estacion']                 = id_estacion
-                        datos_botellas['programa']                 = id_programa
-
-                        profundidades_referencia = tabla_estaciones_programa['profundidades_referencia'][tabla_estaciones_programa['nombre_estacion']==nombre_estacion].iloc[0]
-                        # Añade una columna con la profundidad de referencia
-                        if profundidades_referencia is not None:
-                            datos_botellas['prof_referencia'] = numpy.zeros(datos_botellas.shape[0],dtype=int)
-                            for idato in range(datos_botellas.shape[0]):
-                                    # Encuentra la profundidad de referencia más cercana a cada dato
-                                    idx = (numpy.abs(profundidades_referencia - datos_botellas['presion_ctd'][idato])).argmin()
-                                    datos_botellas['prof_referencia'][idato] =  profundidades_referencia[idx]
-                        else:
-                            datos_botellas['prof_referencia'] = [None]*datos_botellas.shape[0]
-
-                        
+                        datos_botellas = FUNCIONES_PROCESADO.procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_salida,tabla_estaciones_programa)
                       
-                        # Cambia los nombre de las botellas.        
-                        if id_estacion == 1: #E2
-                            listado_equiv_ctd = [1,3,5,7,9,11]
-                            listado_equiv_real = [1,2,3,4,5,6]
-                            for ibotella in range(datos_botellas.shape[0]):
-                                for iequiv in range(len(listado_equiv_ctd)):
-                                    if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                                        datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
-                                        
-                        if id_estacion == 2: #E3A
-                            listado_equiv_ctd = [1,3,5,7,9,11]
-                            listado_equiv_real = [13,131,132,133,134,135]
-                            for ibotella in range(datos_botellas.shape[0]):
-                                for iequiv in range(len(listado_equiv_ctd)):
-                                    if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                                        datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
-
-                        if id_estacion == 3: #E3C
-                            listado_equiv_ctd = [1,3,5,7,9,11]
-                            listado_equiv_real = [14,141,142,143,144,145]
-                            for ibotella in range(datos_botellas.shape[0]):
-                                for iequiv in range(len(listado_equiv_ctd)):
-                                    if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                                        datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
-                                        
-                        if id_estacion == 4: #E3B
-                            listado_equiv_ctd = [1,3,5,7,9,11]
-                            listado_equiv_real = [15,151,152,153,154,155]
-                            for ibotella in range(datos_botellas.shape[0]):
-                                for iequiv in range(len(listado_equiv_ctd)):
-                                    if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                                        datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]                                            
-                                    
-
-                        if id_estacion == 5: #E4
-                            
-                            datos_botellas['botella_temp'] = datos_botellas['botella']
-                            datos_botellas = datos_botellas.drop(datos_botellas[datos_botellas.botella_temp == 11].index)
-                            
-                            listado_equiv_ctd = [1,3,5,7,9,11]
-                            listado_equiv_real = [8,9,10,11,12,None]
-                            for ibotella in range(datos_botellas.shape[0]):
-                                for iequiv in range(len(listado_equiv_ctd)):
-                                    if datos_botellas['botella_temp'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                                        datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
-                                        
-                            datos_botellas = datos_botellas.drop(columns=['botella_temp'])  
-                      
-                        # Asigna lat/lon de la estación si esa información no etá incluia en el .btl
-                        for imuestreo in range(datos_botellas.shape[0]):
-                            if datos_botellas['latitud'].iloc[imuestreo] is None:
-                                datos_botellas['latitud'].iloc[imuestreo] = tabla_estaciones_programa['latitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
-                            if datos_botellas['longitud'].iloc[imuestreo] is None:
-                                datos_botellas['longitud'].iloc[imuestreo] = tabla_estaciones_programa['longitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
-                                
-                        # Asigna identificadores de salida al mar y estación
-                        datos_botellas['id_estacion_temp'] = datos_botellas['estacion']
-                        datos_botellas ['id_salida']       =  id_salida
-                        
                         # Aplica control de calidad
                         datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
            
@@ -1571,7 +1497,7 @@ def entrada_archivos_roseta():
                                  df_botella = df_botella.drop(columns = ['c0S/m','flag'])
                                  try:
                                      df_botella = df_botella.drop(columns = ['sbeox0V','sbeox0ML/L'])
-                                     df_botella['oxigeno_ctd_qf']   = 1
+                                     df_botella['oxigeno_ctd_qf']   = 2
                                  except:
                                      pass   
                                  
@@ -1588,10 +1514,10 @@ def entrada_archivos_roseta():
                                  df_botella['hora_muestreo']          = None
                           
                                  # Añade qf 
-                                 df_botella['temperatura_ctd_qf']     = 1
-                                 df_botella['salinidad_ctd_qf']       = 1
-                                 df_botella['fluorescencia_ctd_qf']   = 1
-                                 df_botella['par_ctd_qf']             = 1
+                                 df_botella['temperatura_ctd_qf']     = 2
+                                 df_botella['salinidad_ctd_qf']       = 2
+                                 df_botella['fluorescencia_ctd_qf']   = 2
+                                 df_botella['par_ctd_qf']             = 2
                             
                           
                                  df_botella                           = FUNCIONES_PROCESADO.evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)

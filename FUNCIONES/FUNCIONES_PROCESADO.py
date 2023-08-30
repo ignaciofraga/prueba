@@ -1417,32 +1417,95 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
        
     return datos_corregidos
     
+
+
+
+
+
+
+
 ################################################################
-######## FUNCION PARA ASOCIAR A CADA DATO EL FACTOR CORRECTOR DE QC2 DE NUTRIENTES ########
+######## FUNCION PARA PROCESAR DATOS DE BOTELLAS ########
 ################################################################    
 
-def recupera_factores_nutrientes(df_muestreos_seleccionados):
+def procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_salida,tabla_estaciones_programa):
     
-    import streamlit as st
-    from FUNCIONES.FUNCIONES_AUXILIARES import menu_seleccion   
-    from FUNCIONES.FUNCIONES_AUXILIARES import init_connection 
-    
-    # Recupera los datos de conexión
-    direccion_host   = st.secrets["postgres"].host
-    base_datos       = st.secrets["postgres"].dbname
-    usuario          = st.secrets["postgres"].user
-    contrasena       = st.secrets["postgres"].password
-    puerto           = st.secrets["postgres"].port
+    datos_botellas['id_estacion_temp']         = id_estacion
+    datos_botellas['estacion']                 = id_estacion
+    datos_botellas['programa']                 = id_programa
 
-    # Recupera información de la base de datos
-    conn                      = init_connection()
-    df_factores_nutrientes    = psql.read_sql('SELECT * FROM factores_correctores_nutrientes', conn)
-    df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-    conn.close()
+    profundidades_referencia = tabla_estaciones_programa['profundidades_referencia'][tabla_estaciones_programa['nombre_estacion']==nombre_estacion].iloc[0]
+    # Añade una columna con la profundidad de referencia
+    if profundidades_referencia is not None:
+        datos_botellas['prof_referencia'] = numpy.zeros(datos_botellas.shape[0],dtype=int)
+        for idato in range(datos_botellas.shape[0]):
+                # Encuentra la profundidad de referencia más cercana a cada dato
+                idx = (numpy.abs(profundidades_referencia - datos_botellas['presion_ctd'][idato])).argmin()
+                datos_botellas['prof_referencia'][idato] =  profundidades_referencia[idx]
+    else:
+        datos_botellas['prof_referencia'] = [None]*datos_botellas.shape[0]
 
+    
+  
+    # Cambia los nombre de las botellas.        
+    if id_estacion == 1: #E2
+        listado_equiv_ctd = [1,3,5,7,9,11]
+        listado_equiv_real = [1,2,3,4,5,6]
+        for ibotella in range(datos_botellas.shape[0]):
+            for iequiv in range(len(listado_equiv_ctd)):
+                if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                    datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+                    
+    if id_estacion == 2: #E3A
+        listado_equiv_ctd = [1,3,5,7,9,11]
+        listado_equiv_real = [13,131,132,133,134,135]
+        for ibotella in range(datos_botellas.shape[0]):
+            for iequiv in range(len(listado_equiv_ctd)):
+                if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                    datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
 
-    # Carga la tabla con los factores de corrección
+    if id_estacion == 3: #E3C
+        listado_equiv_ctd = [1,3,5,7,9,11]
+        listado_equiv_real = [14,141,142,143,144,145]
+        for ibotella in range(datos_botellas.shape[0]):
+            for iequiv in range(len(listado_equiv_ctd)):
+                if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                    datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+                    
+    if id_estacion == 4: #E3B
+        listado_equiv_ctd = [1,3,5,7,9,11]
+        listado_equiv_real = [15,151,152,153,154,155]
+        for ibotella in range(datos_botellas.shape[0]):
+            for iequiv in range(len(listado_equiv_ctd)):
+                if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                    datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]                                            
+                
+
+    if id_estacion == 5: #E4
+        
+        datos_botellas['botella_temp'] = datos_botellas['botella']
+        datos_botellas = datos_botellas.drop(datos_botellas[datos_botellas.botella_temp == 11].index)
+        
+        listado_equiv_ctd = [1,3,5,7,9,11]
+        listado_equiv_real = [8,9,10,11,12,None]
+        for ibotella in range(datos_botellas.shape[0]):
+            for iequiv in range(len(listado_equiv_ctd)):
+                if datos_botellas['botella_temp'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                    datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+                    
+        datos_botellas = datos_botellas.drop(columns=['botella_temp'])  
+  
+    # Asigna lat/lon de la estación si esa información no etá incluia en el .btl
+    for imuestreo in range(datos_botellas.shape[0]):
+        if datos_botellas['latitud'].iloc[imuestreo] is None:
+            datos_botellas['latitud'].iloc[imuestreo] = tabla_estaciones_programa['latitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
+        if datos_botellas['longitud'].iloc[imuestreo] is None:
+            datos_botellas['longitud'].iloc[imuestreo] = tabla_estaciones_programa['longitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
+            
+    # Asigna identificadores de salida al mar y estación
+    datos_botellas['id_estacion_temp'] = datos_botellas['estacion']
+    datos_botellas ['id_salida']       =  id_salida
     
     
     
-    return df_muestreos_seleccionados
+    return datos_botellas
