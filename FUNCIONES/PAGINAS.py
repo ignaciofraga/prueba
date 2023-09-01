@@ -883,43 +883,47 @@ def entrada_salidas_mar():
     if tipo_entrada == entradas[2]: 
         
         st.subheader('Consultar salidas al mar realizadas')
+        
+        tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_radiales['tipo_salida'].unique()))   
+        df_salidas_seleccion      = df_salidas_radiales[df_salidas_radiales['tipo_salida']==tipo_salida_seleccionada]
+        
        
         # Añade una columna con el nombre del buque utilizado
-        df_salidas_radiales['Buque'] = None
-        for isalida in range(df_salidas_radiales.shape[0]):
-            if df_salidas_radiales['buque'].iloc[isalida].is_integer():
-                df_salidas_radiales['Buque'].iloc[isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_radiales['buque'].iloc[isalida]].iloc[0]
+        df_salidas_seleccion['Buque'] = None
+        for isalida in range(df_salidas_seleccion.shape[0]):
+            if df_salidas_seleccion['buque'].iloc[isalida].is_integer():
+                df_salidas_seleccion['Buque'].iloc[isalida] = df_buques['nombre_buque'][df_buques['id_buque']==df_salidas_seleccion['buque'].iloc[isalida]].iloc[0]
 
         # Elimina las columnas que no interesa mostrar
-        df_salidas_radiales = df_salidas_radiales.drop(columns=['id_salida','programa','nombre_programa','buque','configuracion_perfilador','configuracion_superficie'])
+        df_salidas_seleccion = df_salidas_seleccion.drop(columns=['id_salida','programa','nombre_programa','buque','configuracion_perfilador','configuracion_superficie'])
     
         # Renombra las columnas
-        df_salidas_radiales = df_salidas_radiales.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados'})
+        df_salidas_seleccion = df_salidas_seleccion.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados'})
     
         # Ajusta el formato de las fechas
-        for idato in range(df_salidas_radiales.shape[0]):
-            df_salidas_radiales['Fecha salida'].iloc[idato]   =  df_salidas_radiales['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
-            df_salidas_radiales['Fecha retorno'].iloc[idato]  =  df_salidas_radiales['Fecha retorno'].iloc[idato].strftime("%Y-%m-%d")
+        for idato in range(df_salidas_seleccion.shape[0]):
+            df_salidas_seleccion['Fecha salida'].iloc[idato]   =  df_salidas_seleccion['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
+            df_salidas_seleccion['Fecha retorno'].iloc[idato]  =  df_salidas_seleccion['Fecha retorno'].iloc[idato].strftime("%Y-%m-%d")
 
         # Ordena los valores por fechas
-        df_salidas_radiales = df_salidas_radiales.sort_values('Fecha salida',ascending=False)
+        df_salidas_seleccion = df_salidas_seleccion.sort_values('Fecha salida',ascending=False)
 
         # Mueve los identificadores de muestreo al final del dataframe
-        listado_cols = df_salidas_radiales.columns.tolist()
+        listado_cols = df_salidas_seleccion.columns.tolist()
         listado_cols.append(listado_cols.pop(listado_cols.index('Observaciones')))   
-        df_salidas_radiales = df_salidas_radiales[listado_cols]
+        df_salidas_seleccion = df_salidas_seleccion[listado_cols]
         
         #st.text(df_salidas_radiales['variables_muestreadas'])
           
         # Muestra una tabla con las salidas realizadas
-        st.dataframe(df_salidas_radiales,use_container_width=True)
+        st.dataframe(df_salidas_seleccion,use_container_width=True)
 
         # Botón para descargar las salidas disponibles
         nombre_archivo =  'DATOS_SALIDAS.xlsx'
     
         output = BytesIO()
         writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-        df_salidas_radiales.to_excel(writer, index=False, sheet_name='DATOS')
+        df_salidas_seleccion.to_excel(writer, index=False, sheet_name='DATOS')
         # workbook = writer.book
         # worksheet = writer.sheets['DATOS']
         writer.sheets['DATOS']        
