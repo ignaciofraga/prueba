@@ -1239,7 +1239,7 @@ def entrada_condiciones_ambientales():
                     
                 st.success(texto_exito)                
                  
-        st.cache_data.clear()
+                st.cache_data.clear()
                 
     # Descarga datos ambientales
     if tipo_entrada == entradas[1]:    
