@@ -132,7 +132,7 @@ def estado_procesos(altura_tabla):
 #################################################################################
 def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas):
     
-    st.dataframe(df_programas)
+    
     
     # Despliega menús de selección de la variable, salida y la estación a controlar                
     col1, col2, col3 = st.columns(3,gap="small")
@@ -140,6 +140,7 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
         
         listado_programas         = datos_procesados['programa'].unique()
         df_programas_muestreados  = df_programas[df_programas['id_programa'].isin(listado_programas)]
+        st.dataframe(df_programas_muestreados)
         programa_seleccionado     = st.selectbox('Programa',(df_programas_muestreados['nombre_programa']))
         indice_programa           = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0]
 
