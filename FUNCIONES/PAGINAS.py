@@ -916,7 +916,7 @@ def entrada_salidas_mar():
         # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
         indices_dataframe        = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
         df_salidas_seleccion['id_temp'] = indices_dataframe
-        df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
+        df_salidas_seleccion.set_index('id_temp',drop=True,append=False,inplace=True)
           
         # Muestra una tabla con las salidas realizadas
         st.dataframe(df_salidas_seleccion,use_container_width=True)
