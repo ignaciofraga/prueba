@@ -915,8 +915,8 @@ def entrada_salidas_mar():
         
         # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
         indices_dataframe        = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
-        df_salidas_seleccion['id_temp'] = indices_dataframe
-        df_salidas_seleccion.set_index('id_temp',drop=True,append=False,inplace=True)
+        df_salidas_seleccion['id'] = indices_dataframe
+        df_salidas_seleccion.set_index('id',drop=True,append=False,inplace=True)
           
         # Muestra una tabla con las salidas realizadas
         st.dataframe(df_salidas_seleccion,use_container_width=True)
@@ -1067,14 +1067,14 @@ def entrada_condiciones_ambientales():
         salida                 = st.selectbox('Salida',(df_salidas_radiales['nombre_salida']))   
         id_salida              = df_salidas_radiales['id_salida'][df_salidas_radiales['nombre_salida']==salida].iloc[0]
     
-        # Aviso de que ya hay información de esa salida y muestra la información    
-        df_condiciones_salida_seleccionada = df_condiciones[(df_condiciones['salida']==id_salida)]
-        if df_condiciones_salida_seleccionada.shape[0] > 0:
-            texto_error = 'Ya existen datos correspondientes a la salida seleccionada.'
-            st.warning(texto_error, icon="⚠️")       
+        # # Aviso de que ya hay información de esa salida y muestra la información    
+        # df_condiciones_salida_seleccionada = df_condiciones[(df_condiciones['salida']==id_salida)]
+        # if df_condiciones_salida_seleccionada.shape[0] > 0:
+        #     texto_error = 'Ya existen datos correspondientes a la salida seleccionada.'
+        #     st.warning(texto_error, icon="⚠️")       
     
-            for idato in range(df_condiciones_salida_seleccionada.shape[0]):
-                df_condiciones_salida_seleccionada['estacion'].iloc[idato] =  df_estaciones['nombre_estacion'][df_estaciones['id_estacion'] == df_condiciones_salida_seleccionada['estacion'].iloc[idato]] 
+        #     for idato in range(df_condiciones_salida_seleccionada.shape[0]):
+        #         df_condiciones_salida_seleccionada['estacion'].iloc[idato] =  df_estaciones['nombre_estacion'][df_estaciones['id_estacion'] == df_condiciones_salida_seleccionada['estacion'].iloc[idato]] 
 
         # Extrae las estaciones visitadas en la salida seleccionada
         listado_estaciones = df_salidas_radiales['estaciones'][df_salidas_radiales['id_salida']==id_salida].iloc[0] 
@@ -1086,9 +1086,11 @@ def entrada_condiciones_ambientales():
         # recupera los datos disponibles en la base de datos para asignar valores por defecto
         df_condicion_introducida = df_condiciones[(df_condiciones['salida']==id_salida) & (df_condiciones['estacion']==id_estacion_elegida)]               
             
-        if df_condicion_introducida.shape[0] == 1:
-            
-               
+        # Aviso de que ya hay información de esa salida y estacion   
+        if df_condicion_introducida.shape[0] > 0:
+            texto_error = 'Ya existen datos correspondientes a la salida y estación seleccionadas.'
+            st.warning(texto_error, icon="⚠️")          
+                           
             # Asigna como valores por defecto los que ya estaban en la base de datos
             hora_llegada_defecto            = df_condicion_introducida['hora_llegada'].iloc[0]
             profundidad_defecto             = df_condicion_introducida['profundidad'].iloc[0]
