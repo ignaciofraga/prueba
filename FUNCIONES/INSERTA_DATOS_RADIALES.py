@@ -85,7 +85,7 @@ directorio_datos           = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_
 
 # DATOS DEL 21-23
 # # Parámetros
-anhos = [2022]
+anhos = [2023]
 ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
 import INSERTA_DATOS_PERFILES
 for ianho in range(len(anhos)):

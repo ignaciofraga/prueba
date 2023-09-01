@@ -114,16 +114,8 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
                        
             datos_perfil,df_perfiles,datos_muestreo_perfil = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo)
             
-            # Define el nombre del perfil
-            nombre_perfil = abreviatura_programa + '_' + (datos_muestreo_perfil['fecha_muestreo'].iloc[0]).strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(datos_muestreo_perfil['cast_muestreo'].iloc[0])
-
-            # Recupera el identificador del perfil
-            datos_muestreo_perfil['id_estacion'] = id_estacion
-            datos_muestreo_perfil['id_salida']   = id_salida
-            datos_muestreo_perfil = FUNCIONES_PROCESADO.evalua_perfiles(nombre_perfil,datos_muestreo_perfil,direccion_host,base_datos,usuario,contrasena,puerto)
-
-            # Asigna el identificador al perfil
-            df_perfiles['perfil'] = datos_muestreo_perfil['perfil'].iloc[0]
+            FUNCIONES_PROCESADO.procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,id_programa,abreviatura_programa,nombre_estacion,id_estacion,direccion_host,base_datos,usuario,contrasena,puerto)
+                                    
 
        
 
