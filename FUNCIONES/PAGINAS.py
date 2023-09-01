@@ -913,7 +913,10 @@ def entrada_salidas_mar():
         listado_cols.append(listado_cols.pop(listado_cols.index('Observaciones')))   
         df_salidas_seleccion = df_salidas_seleccion[listado_cols]
         
-        #st.text(df_salidas_radiales['variables_muestreadas'])
+        # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
+        indices_dataframe        = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+        df_salidas_seleccion['id_temp'] = indices_dataframe
+        df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
           
         # Muestra una tabla con las salidas realizadas
         st.dataframe(df_salidas_seleccion,use_container_width=True)
@@ -924,10 +927,8 @@ def entrada_salidas_mar():
         output = BytesIO()
         writer = pandas.ExcelWriter(output, engine='xlsxwriter')
         df_salidas_seleccion.to_excel(writer, index=False, sheet_name='DATOS')
-        # workbook = writer.book
-        # worksheet = writer.sheets['DATOS']
         writer.sheets['DATOS']        
-        writer.save()
+        writer.close()
         df_salidas_radiales = output.getvalue()
     
         st.download_button(
@@ -937,6 +938,8 @@ def entrada_salidas_mar():
             help= 'Descarga un archivo .csv con los datos solicitados',
             mime="application/vnd.ms-excel")
         
+
+
 
 
 
@@ -1275,7 +1278,7 @@ def entrada_condiciones_ambientales():
             writer = pandas.ExcelWriter(output, engine='xlsxwriter')
             df_salidas_seleccion.to_excel(writer, index=False, sheet_name='DATOS')
             writer.sheets['DATOS']
-            writer.save()
+            writer.close()
             df_salidas_seleccion = output.getvalue()
         
             st.download_button(
