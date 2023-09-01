@@ -132,6 +132,8 @@ def estado_procesos(altura_tabla):
 #################################################################################
 def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas):
     
+    st.dataframe(df_programas)
+    
     # Despliega menús de selección de la variable, salida y la estación a controlar                
     col1, col2, col3 = st.columns(3,gap="small")
     with col1: 
