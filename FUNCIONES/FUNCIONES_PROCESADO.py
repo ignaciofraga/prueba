@@ -1425,7 +1425,7 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
 
 
 ################################################################
-######## FUNCION PARA PROCESAR DATOS DE BOTELLAS ########
+########### FUNCION PARA PROCESAR DATOS DE BOTELLAS ############
 ################################################################    
 
 def procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_salida,tabla_estaciones_programa):
@@ -1509,3 +1509,93 @@ def procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_
     
     
     return datos_botellas
+
+
+
+# ################################################################
+# ########### FUNCION PARA PROCESAR DATOS DE PERFILES ############
+# ################################################################    
+
+def procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,id_programa,abreviatura_programa,nombre_estacion,id_estacion,direccion_host,base_datos,usuario,contrasena,puerto):
+
+
+    # Define el nombre del perfil
+    nombre_perfil = abreviatura_programa + '_' + (datos_muestreo_perfil['fecha_muestreo'].iloc[0]).strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(datos_muestreo_perfil['cast_muestreo'].iloc[0])
+    
+    # Conecta con la base de datos
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor() 
+    
+    # Obtén el identificador del perfil en la base de datos
+    instruccion_sql = '''INSERT INTO perfiles_verticales (nombre_perfil,estacion,salida_mar,num_cast,fecha_perfil,hora_perfil,longitud_muestreo,latitud_muestreo)
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (estacion,fecha_perfil,num_cast) DO NOTHING;''' 
+    
+    nombre_perfil = abreviatura_programa + '_' + (datos_muestreo_perfil['fecha_muestreo'].iloc[0]).strftime("%Y%m%d") + '_E' + str(nombre_estacion) + '_C' + str(datos_muestreo_perfil['cast_muestreo'].iloc[0])
+    
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor()    
+    cursor.execute(instruccion_sql,(nombre_perfil,int(id_estacion),int(id_salida),int(datos_muestreo_perfil['cast_muestreo'].iloc[0]),datos_muestreo_perfil['fecha_muestreo'].iloc[0],datos_muestreo_perfil['hora_muestreo'].iloc[0],datos_muestreo_perfil['lon_muestreo'].iloc[0],datos_muestreo_perfil['lat_muestreo'].iloc[0]))
+    conn.commit() 
+
+    instruccion_sql = "SELECT perfil FROM perfiles_verticales WHERE nombre_perfil = '" + nombre_perfil + "';" 
+    cursor = conn.cursor()    
+    cursor.execute(instruccion_sql)
+    id_perfil =cursor.fetchone()[0]
+    conn.commit()       
+    
+    cursor.close()
+    conn.close() 
+    
+    df_perfiles['perfil'] = int(id_perfil)
+                                
+    inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto)
+   
+        
+        
+    if nombre_estacion == '2' and abreviatura_programa == 'RADCOR' :  # Estacion 2 del programa radiales, añadir muestreo correspondiente a la botella en superficie
+
+          # Genera dataframe con el muestreo de la estacion 2
+          pres_min                             = min(datos_perfil['presion_ctd'])
+          df_temp                              = datos_perfil[datos_perfil['presion_ctd']==pres_min]
+         
+          # Elimina la fila correspondiente al comienzo del descenso
+          if df_temp.shape[0] > 1:
+            df_botella = df_temp.drop([0])
+          else:
+            df_botella = df_temp
+
+          # Asigna los datos correspondientes
+          df_botella['latitud']                = datos_muestreo_perfil['lat_muestreo'].iloc[0]
+          df_botella['longitud']               = datos_muestreo_perfil['lon_muestreo'].iloc[0]
+          df_botella['prof_referencia']        = 0
+          df_botella['fecha_muestreo']         = datos_muestreo_perfil['fecha_muestreo'].iloc[0]
+         
+         
+          df_botella = df_botella.drop(columns = ['c0S/m','flag'])
+          try:
+              df_botella = df_botella.drop(columns = ['sbeox0V','sbeox0ML/L'])
+              df_botella['oxigeno_ctd_qf']   = 2
+          except:
+              pass   
+         
+          df_botella['id_estacion_temp']       = int(id_estacion) 
+          df_botella['id_salida']              = id_salida 
+          df_botella['nombre_muestreo']        = abreviatura_programa + '_' + (datos_muestreo_perfil['fecha_muestreo'].iloc[0]).strftime("%Y%m%d") + '_E2_P0' 
+         
+          df_botella['programa']               = id_programa    
+          df_botella['num_cast']               = datos_muestreo_perfil['cast_muestreo'].iloc[0]
+         
+          # Añade botella (7) y hora de muestreo (nulas) para evitar errores en el procesado
+          df_botella['botella']                = 7
+          df_botella['hora_muestreo']          = None
+  
+          # Añade qf 
+          df_botella['temperatura_ctd_qf']     = 2
+          df_botella['salinidad_ctd_qf']       = 2
+          df_botella['fluorescencia_ctd_qf']   = 2
+          df_botella['par_ctd_qf']             = 2
+    
+  
+          df_botella                           = evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+ 
+          inserta_datos(df_botella,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)

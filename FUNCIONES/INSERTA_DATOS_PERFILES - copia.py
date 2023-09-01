@@ -61,7 +61,9 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
         except:
             ruta_botelleros = listado_salidas[isalida] + 'btl+PAR+flscufa'        
             os.chdir(ruta_botelleros)
-                
+        
+        df_acc = pandas.DataFrame()
+        
         for archivo in glob("*.btl"):
 
             # Encuentra el identificador de la estación
@@ -82,17 +84,76 @@ def inserta_radiales_historico(ruta_archivos,anho,nombre_programa,base_datos,usu
             datos_archivo = lectura_archivo.readlines()
                   
             mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo,datos_archivo)
-            
-            datos_botellas = FUNCIONES_PROCESADO.procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_salida,tabla_estaciones_programa)
-   
+        
+            for imuestreo in range(datos_botellas.shape[0]):
+                if datos_botellas['latitud'].iloc[imuestreo] is None:
+                    datos_botellas['latitud'].iloc[imuestreo] = tabla_estaciones_programa['latitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
+                if datos_botellas['longitud'].iloc[imuestreo] is None:
+                    datos_botellas['longitud'].iloc[imuestreo] = tabla_estaciones_programa['longitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
+        
             # Aplica control de calidad
-            datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
-   
-            # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-            datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
- 
-            FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)    
-   
+            #datos_botellas,textos_aviso                = FUNCIONES_PROCESADO.control_calidad(datos_botellas,direccion_host,base_datos,usuario,contrasena,puerto)            
+            datos_botellas['id_estacion_temp']         = id_estacion
+
+            datos_botellas['fecha_muestreo']    = fecha_salida
+            
+            profundidades_referencia = tabla_estaciones_programa['profundidades_referencia'][tabla_estaciones_programa['nombre_estacion']==nombre_estacion].iloc[0]
+            # Añade una columna con la profundidad de referencia
+            if profundidades_referencia is not None:
+                datos_botellas['prof_referencia'] = numpy.zeros(datos_botellas.shape[0],dtype=int)
+                for idato in range(datos_botellas.shape[0]):
+                        # Encuentra la profundidad de referencia más cercana a cada dato
+                        idx = (numpy.abs(profundidades_referencia - datos_botellas['presion_ctd'][idato])).argmin()
+                        datos_botellas['prof_referencia'][idato] =  profundidades_referencia[idx]
+            else:
+                datos_botellas['prof_referencia'] = [None]*datos_botellas.shape[0]
+
+            
+          
+            # Cambia los nombre de las botellas.        
+            if id_estacion == 1: #E2
+                listado_equiv_ctd = [1,3,5,7,9,11]
+                listado_equiv_real = [1,2,3,4,5,6]
+                for ibotella in range(datos_botellas.shape[0]):
+                    for iequiv in range(len(listado_equiv_ctd)):
+                        if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                            datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+
+            if id_estacion == 5: #E4
+                
+                datos_botellas['botella_temp'] = datos_botellas['botella']
+                datos_botellas = datos_botellas.drop(datos_botellas[datos_botellas.botella_temp == 11].index)
+                
+                listado_equiv_ctd = [1,3,5,7,9,11]
+                listado_equiv_real = [8,9,10,11,12,None]
+                for ibotella in range(datos_botellas.shape[0]):
+                    for iequiv in range(len(listado_equiv_ctd)):
+                        if datos_botellas['botella_temp'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                            datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+                            
+                datos_botellas = datos_botellas.drop(columns=['botella_temp'])  
+            
+            
+
+            df_acc = pandas.concat([df_acc, datos_botellas])
+
+
+        
+        # Asigna el identificador de la salida al mar
+        df_acc['id_salida'] =  id_salida
+        
+        # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
+        indices_dataframe        = numpy.arange(0,df_acc.shape[0],1,dtype=int)    
+        df_acc['id_temp'] = indices_dataframe
+        df_acc.set_index('id_temp',drop=False,append=False,inplace=True)
+    
+    
+        #datos_botellas,textos_aviso = FUNCIONES_PROCESADO.control_calidad(df_acc,direccion_host,base_datos,usuario,contrasena,puerto)  
+    
+        # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+        datos_botellas = FUNCIONES_PROCESADO.evalua_registros(df_acc,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+     
+        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
                
         ### DATOS DE PERFILES
 
