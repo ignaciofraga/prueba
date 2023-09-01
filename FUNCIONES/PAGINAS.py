@@ -1483,6 +1483,8 @@ def entrada_archivos_roseta():
         # Borra los dataframes que ya no hagan falta para ahorrar memoria
         del(df_datos_discretos,df_muestreos)
         
+        st.dataframe(df_datos_disponibles)
+        
         # procesa ese dataframe
         io_control_calidad = 1
         indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada = FUNCIONES_AUXILIARES.menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
