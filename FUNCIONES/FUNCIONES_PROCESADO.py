@@ -1116,16 +1116,13 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 ax.plot(df_temp['nitrato'],df_temp['fosfato'],'.',color=color_buenos,label='BUENO')
                 #ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
   
-    
-            st.dataframe(df_datos_dudosos)
-            st.dataframe(df_datos_malos)
-            st.dataframe(df_rango_temporal)
-            st.dataframe(df_datos_buenos)
-            
-            
 
-    
-            ax.plot(datos_procesados['nitrato'],datos_procesados['fosfato'],'.r' )
+
+            df_temp = datos_procesados[['nitrato','fosfato']]
+            df_temp = df_temp[df_temp.nitrato.notnull()]
+            df_temp = df_temp[df_temp.fosfato.notnull()]
+            ax.plot(df_temp['nitrato'],df_temp['fosfato'],'.',color=color_buenos,label='BUENO')
+            #ax.plot(datos_procesados['nitrato'],datos_procesados['fosfato'],'.r' )
             
             ax.set(xlabel='Nitrato (\u03BCmol/kg)')
             ax.set(ylabel='Fosfato (\u03BCmol/kg)')
