@@ -908,9 +908,10 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 else:
                     nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
     
-                ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]),bbox=bbox)
+                #ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]),bbox=bbox)
+                ax.annotate(nombre_muestreos[ipunto], xy=(datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]),xytext=(datos_procesados[variable_procesada].iloc[ipunto]*1.25, datos_procesados['presion_ctd'].iloc[ipunto]),bbox=bbox)
                  
-                
+               
                 
                 
                 
