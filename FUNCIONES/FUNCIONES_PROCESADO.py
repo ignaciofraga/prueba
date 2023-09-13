@@ -1252,7 +1252,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 fig.savefig(buf, format="png")
                 st.image(buf) 
 
-        st.dataframe(datos_procesados)
+
     
         ################# FORMULARIOS CALIDAD ################        
     
