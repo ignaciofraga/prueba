@@ -1086,43 +1086,43 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
     
             ### GRAFICO FOSFATO vs NITRATO
             if io_buenos:
-                df_temp = df_datos_buenos[['nitrato','fosfato']]
-                df_temp = df_temp[df_temp.nitrato.notnull()]
-                df_temp = df_temp[df_temp.fosfato.notnull()]
-                ax.plot(df_temp['nitrato'],df_temp['fosfato'],'.',color=color_buenos,label='BUENO')
-                #ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
+                # df_temp = df_datos_buenos[['nitrato','fosfato']]
+                # df_temp = df_temp[df_temp.nitrato.notnull()]
+                # df_temp = df_temp[df_temp.fosfato.notnull()]
+                # ax.plot(df_temp['nitrato'],df_temp['fosfato'],'.',color=color_buenos,label='BUENO')
+                ax.plot(df_datos_buenos['nitrato'],df_datos_buenos['fosfato'],'.',color=color_buenos,label='BUENO')
             
             # Representa los datos dentro del intervalo de meses en otro color
             if io_rango:
-                df_temp = df_rango_temporal[['nitrato','fosfato']]
-                df_temp = df_temp[df_temp.nitrato.notnull()]
-                df_temp = df_temp[df_temp.fosfato.notnull()]
-                ax.plot(df_temp['nitrato'],df_temp['fosfato'],'.',color=color_buenos,label='BUENO')
-                #ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
+                # df_temp = df_rango_temporal[['nitrato','fosfato']]
+                # df_temp = df_temp[df_temp.nitrato.notnull()]
+                # df_temp = df_temp[df_temp.fosfato.notnull()]
+                # ax.plot(df_temp['nitrato'],df_temp['fosfato'],'.',color=color_buenos,label='BUENO')
+                ax.plot(df_rango_temporal['nitrato'],df_rango_temporal['fosfato'],'.',color=color_rango,label='BUENO (INTERVALO)')
             
             # Representa los datos con QF malos si se seleccionó esta opción   
             if io_malos:
-                df_temp = df_datos_malos[['nitrato','fosfato']]
-                df_temp = df_temp[df_temp.nitrato.notnull()]
-                df_temp = df_temp[df_temp.fosfato.notnull()]
-                ax.plot(df_temp['nitrato'],df_temp['fosfato'],'.',color=color_buenos,label='BUENO')
-                #ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
+                # df_temp = df_datos_malos[['nitrato','fosfato']]
+                # df_temp = df_temp[df_temp.nitrato.notnull()]
+                # df_temp = df_temp[df_temp.fosfato.notnull()]
+                # ax.plot(df_temp['nitrato'],df_temp['fosfato'],'.',color=color_buenos,label='BUENO')
+                ax.plot(df_datos_malos['nitrato'],df_datos_malos['fosfato'],'.',color=color_malos,label='MALO')    
 
             # Representa los datos con QF dudoso si se seleccionó esta opción   
             if io_dudosos:
-                df_temp = df_datos_dudosos[['nitrato','fosfato']]
-                df_temp = df_temp[df_temp.nitrato.notnull()]
-                df_temp = df_temp[df_temp.fosfato.notnull()]
-                ax.plot(df_temp['nitrato'],df_temp['fosfato'],'.',color=color_buenos,label='BUENO')
-                #ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
+                # df_temp = df_datos_dudosos[['nitrato','fosfato']]
+                # df_temp = df_temp[df_temp.nitrato.notnull()]
+                # df_temp = df_temp[df_temp.fosfato.notnull()]
+                # ax.plot(df_temp['nitrato'],df_temp['fosfato'],'.',color=color_buenos,label='BUENO')
+                ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
   
 
 
-            df_temp = datos_procesados[['nitrato','fosfato']]
-            df_temp = df_temp[df_temp.nitrato.notnull()]
-            df_temp = df_temp[df_temp.fosfato.notnull()]
-            ax.plot(df_temp['nitrato'],df_temp['fosfato'],'.',color=color_buenos,label='BUENO')
-            #ax.plot(datos_procesados['nitrato'],datos_procesados['fosfato'],'.r' )
+            # df_temp = datos_procesados[['nitrato','fosfato']]
+            # df_temp = df_temp[df_temp.nitrato.notnull()]
+            # df_temp = df_temp[df_temp.fosfato.notnull()]
+            # ax.plot(df_temp['nitrato'],df_temp['fosfato'],'.',color=color_buenos,label='BUENO')
+            ax.plot(datos_procesados['nitrato'],datos_procesados['fosfato'],'.r' )
             
             ax.set(xlabel='Nitrato (\u03BCmol/kg)')
             ax.set(ylabel='Fosfato (\u03BCmol/kg)')
