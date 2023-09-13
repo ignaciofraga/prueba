@@ -97,20 +97,26 @@ programa_muestreo = 'RADIAL CORUÑA'
 # ####################
 # # Nutrientes 21-22 #
 # ####################
-# nombre_archivo    = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/SOLO_NUTRIENTES/NUTRIENTES-21-22.xlsx'
+nombre_archivo    = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/SOLO_NUTRIENTES/NUTRIENTES-21-22.xlsx'
 
-# datos_radiales = pandas.read_excel(nombre_archivo)
-# datos_radiales_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radiales)  
+datos_radiales = pandas.read_excel(nombre_archivo)
+datos_radiales_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radiales)  
 
-# # Recupera el identificador del programa de muestreo
-# id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+datos_radiales_corregido['nitrato']    = datos_radiales_corregido['ton'] - datos_radiales_corregido['nitrito']
+datos_radiales_corregido['nitrato_qf'] = 9
+for idato in range(datos_radiales_corregido.shape[0]):
+    if datos_radiales_corregido['ton_qf'].iloc[idato] == 2 and datos_radiales_corregido['nitrito_qf'].iloc[idato]:
+       datos_radiales_corregido['nitrato_qf'].iloc[idato] = 2 
 
-# # Encuentra el identificador asociado a cada registro
-# print('Asignando el registro correspondiente a cada medida')
-# datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+# Recupera el identificador del programa de muestreo
+id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+
+# Encuentra el identificador asociado a cada registro
+print('Asignando el registro correspondiente a cada medida')
+datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
-# print('Introduciendo los datos en la base de datos')
-# FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
+print('Introduciendo los datos en la base de datos')
+FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
 
   
 

@@ -888,6 +888,9 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         ax.plot(datos_procesados[variable_procesada],datos_procesados['presion_ctd'],'.r',label='PROCESADO' )
         
         # ### FORMATO,ETIQUETAS Y NOMBRES DE EJES ###
+        
+        bbox = dict(boxstyle="round", fc="0.8")
+        
         texto_eje = nombre_completo_variable_procesada + '(' + unidades_variable + ')'
         ax.set(xlabel=texto_eje)
         ax.set(ylabel='Presion (db)')
@@ -904,7 +907,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 else:
                     nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
     
-                ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]))
+                ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]),bbox=bbox)
                     
         # Ajusta el rango de las x 
         custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
