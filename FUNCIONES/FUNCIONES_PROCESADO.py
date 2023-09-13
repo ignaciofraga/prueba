@@ -1139,7 +1139,11 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                     nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
                 
                 if datos_procesados['nitrato'].iloc[ipunto] is not None and datos_procesados['fosfato'].iloc[ipunto] is not None:
-                    ax.annotate(nombre_muestreos[ipunto], (datos_procesados['nitrato'].iloc[ipunto], datos_procesados['fosfato'].iloc[ipunto]))
+                    #ax.annotate(nombre_muestreos[ipunto], (datos_procesados['nitrato'].iloc[ipunto], datos_procesados['fosfato'].iloc[ipunto]))
+    
+                    if io_etiquetas:
+                          ax.annotate(nombre_muestreos[ipunto], xy=(datos_procesados['nitrato'].iloc[ipunto], datos_procesados['fosfato'].iloc[ipunto]),xytext=(datos_procesados['nitrato'].iloc[ipunto]*1.25, datos_procesados['fosfato'].iloc[ipunto]),bbox=bbox)
+
     
             if not datos_procesados['ph'].isnull().all(): 
                 if io_buenos:
