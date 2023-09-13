@@ -71,12 +71,19 @@ def inserta_radiales_historico(nombre_archivo,base_datos,usuario,contrasena,puer
     datos_radiales['silicato'] = [None]*datos_radiales.shape[0]
     
     
-    datos_radiales['ton_qf']      = numpy.ones(datos_radiales.shape[0])
-    datos_radiales['nitrato_qf']  = numpy.ones(datos_radiales.shape[0])
-    datos_radiales['nitrito_qf']  = numpy.ones(datos_radiales.shape[0])
-    datos_radiales['amonio_qf']   = numpy.ones(datos_radiales.shape[0])
-    datos_radiales['fosfato_qf']  = numpy.ones(datos_radiales.shape[0])
-    datos_radiales['silicato_qf'] = numpy.ones(datos_radiales.shape[0])
+    # datos_radiales['ton_qf']      = numpy.ones(datos_radiales.shape[0])
+    # datos_radiales['nitrato_qf']  = numpy.ones(datos_radiales.shape[0])
+    # datos_radiales['nitrito_qf']  = numpy.ones(datos_radiales.shape[0])
+    # datos_radiales['amonio_qf']   = numpy.ones(datos_radiales.shape[0])
+    # datos_radiales['fosfato_qf']  = numpy.ones(datos_radiales.shape[0])
+    # datos_radiales['silicato_qf'] = numpy.ones(datos_radiales.shape[0])
+    
+    datos_radiales['ton_qf']      = 2
+    datos_radiales['nitrato_qf']  = 2
+    datos_radiales['nitrito_qf']  = 2
+    datos_radiales['amonio_qf']   = 2
+    datos_radiales['fosfato_qf']  = 2
+    datos_radiales['silicato_qf'] = 2
     
     datos_radiales['botella']       = [None]*datos_radiales.shape[0]
     datos_radiales['hora_muestreo'] = [None]*datos_radiales.shape[0]
@@ -191,8 +198,8 @@ def inserta_radiales_historico(nombre_archivo,base_datos,usuario,contrasena,puer
        
     # # # # # Introduce los datos en la base de datos
     print('Introduciendo los datos en la base de datos')
-    FUNCIONES_PROCESADO.inserta_datos(datos_radiales,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-    FUNCIONES_PROCESADO.inserta_datos(datos_radiales,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_PROCESADO.inserta_datos(datos_radiales,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
+
 
 
 

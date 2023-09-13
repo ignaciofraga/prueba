@@ -134,7 +134,7 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
 
      
     # Renombra las columnas para mantener un mismo esquema de nombres   
-    datos_radiales = datos_radiales.rename(columns={"DATE": "fecha_muestreo", "STNNBR": "nombre_estacion", 'EXPOCODE':'nombre_muestreo',
+    datos_radiales = datos_radiales.rename(columns={"DATE": "fecha_muestreo", "STNNBR": "estacion", 
                                                     "LATITUDE":"latitud","LONGITUDE":"longitud","BTLNBR":"botella","CTDPRS":"presion_ctd",
                                                     "CTDTMP":"temperatura_ctd","CTDSAL":"salinidad_ctd","CTDSAL_FLAG_W":"salinidad_ctd_qf",
                                                     "CTDOXY":"oxigeno_ctd","CTDOXY_FLAG_W":"oxigeno_ctd_qf","CTDPAR":"par_ctd","CTDPAR_FLAG_W":"par_ctd_qf",

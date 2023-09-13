@@ -136,8 +136,8 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     tabla_estaciones['nombre_estacion'] = tabla_estaciones['nombre_estacion'].apply(lambda x:x.lower())
     
     # Cambia los nombres a minusculas
-    datos['nombre_estacion'] = datos['nombre_estacion'].astype(str)
-    datos['nombre_estacion'] = datos['nombre_estacion'].apply(lambda x:x.lower())
+    datos['estacion'] = datos['estacion'].astype(str)
+    datos['estacion'] = datos['estacion'].apply(lambda x:x.lower())
     
     # Columna para punteros de estaciones
     datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
@@ -155,7 +155,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         datos['longitud'] = [None]*datos.shape[0]   
         
     # Genera un dataframe con las estaciones incluidas en el muestreo
-    estaciones_muestreadas                      = datos['nombre_estacion'].unique()
+    estaciones_muestreadas                      = datos['estacion'].unique()
     estaciones_muestreadas                      = pandas.DataFrame(data=estaciones_muestreadas,columns=['nombre_estacion'])  
     estaciones_muestreadas['id_estacion']       = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
     estaciones_muestreadas['io_nueva_estacion'] = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
@@ -202,7 +202,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                 estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
           
         # Asigna el identificador de estación a los datos importados
-        datos['id_estacion_temp'][datos['nombre_estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]=estaciones_muestreadas['id_estacion'][iestacion]
+        datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]=estaciones_muestreadas['id_estacion'][iestacion]
             
 
 
@@ -852,6 +852,9 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
 
         #Reemplaza nan por None
         datos_procesados             = datos_procesados.replace(numpy.nan, None)            
+
+        # Ordena según botellas
+        datos_procesados = datos_procesados.sort_values('botella')
 
     
         ################# GRAFICOS ################
