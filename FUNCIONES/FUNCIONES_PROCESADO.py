@@ -890,6 +890,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
         # ### FORMATO,ETIQUETAS Y NOMBRES DE EJES ###
         
         bbox = dict(boxstyle="round", fc="0.8")
+        from matplotlib.offsetbox import (TextArea, DrawingArea, OffsetImage,
+                                  AnnotationBbox)
         
         texto_eje = nombre_completo_variable_procesada + '(' + unidades_variable + ')'
         ax.set(xlabel=texto_eje)
@@ -907,8 +909,21 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 else:
                     nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
     
-                ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]),bbox=bbox)
-                    
+                ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]))
+                
+                offsetbox = TextArea(nombre_muestreos[ipunto])
+
+                ab = AnnotationBbox(offsetbox, datos_procesados['presion_ctd'],
+                    xybox=(1.02, datos_procesados['presion_ctd'].iloc[ipunto]),
+                    xycoords='data',
+                    boxcoords=("axes fraction", "data"),
+                    box_alignment=(0., 0.5),
+                    arrowprops=dict(arrowstyle="->"))
+                ax.add_artist(ab)    
+                
+                
+                
+                
         # Ajusta el rango de las x 
         custom_ticks = numpy.linspace(vmin_rango, vmax_rango, 5, dtype=float)
         ax.set_xticks(custom_ticks)
