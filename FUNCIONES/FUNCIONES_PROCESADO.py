@@ -1241,13 +1241,15 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                         nombre_muestreos[ipunto] = 'Prof.' + str(datos_procesados['presion_ctd'].iloc[ipunto])
                     else:
                         nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
-                    plt.annotate(nombre_muestreos[ipunto], (datos_procesados['silicato'].iloc[ipunto], datos_procesados['alcalinidad'].iloc[ipunto]))
+                    
+                    if datos_procesados['silicato'].iloc[ipunto] is not None and datos_procesados['alcalinidad'].iloc[ipunto] is not None:
+                        plt.annotate(nombre_muestreos[ipunto], (datos_procesados['silicato'].iloc[ipunto], datos_procesados['alcalinidad'].iloc[ipunto]))
                           
                 buf = BytesIO()
                 fig.savefig(buf, format="png")
                 st.image(buf) 
 
-    
+        st.dataframe(datos_procesados)
     
         ################# FORMULARIOS CALIDAD ################        
     
