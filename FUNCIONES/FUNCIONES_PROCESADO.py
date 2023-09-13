@@ -827,6 +827,7 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 color_dudosos = st.color_picker('Color', '#00f900',label_visibility="collapsed")
             with col5:
                 io_no_eval    = st.checkbox('No evaluados', value=True)
+                io_etiquetas  = st.checkbox('Mostrar etiquetas', value=True)
             with col6:
                 color_no_eval = st.color_picker('Color', '#03b6fc',label_visibility="collapsed")
 
@@ -908,8 +909,8 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                 else:
                     nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
     
-                #ax.annotate(nombre_muestreos[ipunto], (datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]),bbox=bbox)
-                ax.annotate(nombre_muestreos[ipunto], xy=(datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]),xytext=(datos_procesados[variable_procesada].iloc[ipunto]*1.25, datos_procesados['presion_ctd'].iloc[ipunto]),bbox=bbox)
+                if io_etiquetas:
+                    ax.annotate(nombre_muestreos[ipunto], xy=(datos_procesados[variable_procesada].iloc[ipunto], datos_procesados['presion_ctd'].iloc[ipunto]),xytext=(datos_procesados[variable_procesada].iloc[ipunto]*1.25, datos_procesados['presion_ctd'].iloc[ipunto]),bbox=bbox)
                  
                
                 
@@ -1032,7 +1033,11 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                     nombre_muestreos[ipunto] = 'Prof.' + str(datos_procesados['presion_ctd'].iloc[ipunto])
                 else:
                     nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
-                ax.annotate(nombre_muestreos[ipunto], (datos_procesados['nitrato'].iloc[ipunto], datos_procesados['fosfato'].iloc[ipunto]))
+                
+                if io_etiquetas:
+                    ax.annotate(nombre_muestreos[ipunto], xy=(datos_procesados['nitrato'].iloc[ipunto], datos_procesados['fosfato'].iloc[ipunto]),xytext=(datos_procesados['nitrato'].iloc[ipunto]*1.25, datos_procesados['fosfato'].iloc[ipunto]),bbox=bbox)
+                 
+        
         
             buf = BytesIO()
             fig.savefig(buf, format="png")
@@ -1174,7 +1179,9 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                         nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
                     
                     if datos_procesados['nitrato'].iloc[ipunto] is not None and datos_procesados['ph'].iloc[ipunto] is not None:
-                        az.annotate(nombre_muestreos[ipunto], (datos_procesados['nitrato'].iloc[ipunto], datos_procesados['ph'].iloc[ipunto]))
+                        
+                        if io_etiquetas:
+                              az.annotate(nombre_muestreos[ipunto], xy=(datos_procesados['nitrato'].iloc[ipunto], datos_procesados['ph'].iloc[ipunto]),xytext=(datos_procesados['nitrato'].iloc[ipunto]*1.25, datos_procesados['ph'].iloc[ipunto]),bbox=bbox)
 
             buf = BytesIO()
             fig.savefig(buf, format="png")
@@ -1255,8 +1262,14 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
                         nombre_muestreos[ipunto] = 'Bot.' + str(int(datos_procesados['botella'].iloc[ipunto]))
                     
                     if datos_procesados['silicato'].iloc[ipunto] is not None and datos_procesados['alcalinidad'].iloc[ipunto] is not None:
-                        plt.annotate(nombre_muestreos[ipunto], (datos_procesados['silicato'].iloc[ipunto], datos_procesados['alcalinidad'].iloc[ipunto]))
+                        #plt.annotate(nombre_muestreos[ipunto], (datos_procesados['silicato'].iloc[ipunto], datos_procesados['alcalinidad'].iloc[ipunto]))
                           
+                        if io_etiquetas:
+                              plt.annotate(nombre_muestreos[ipunto], xy=(datos_procesados['silicato'].iloc[ipunto], datos_procesados['alcalinidad'].iloc[ipunto]),xytext=(datos_procesados['silicato'].iloc[ipunto]*1.25, datos_procesados['alcalinidad'].iloc[ipunto]),bbox=bbox)
+
+                        
+                        
+                        
                 buf = BytesIO()
                 fig.savefig(buf, format="png")
                 st.image(buf) 
