@@ -1100,6 +1100,12 @@ def control_calidad_biogeoquimica(datos_procesados,datos_disponibles_bd,variable
             if io_dudosos:
                 ax.plot(df_datos_dudosos['nitrato'],df_datos_dudosos['fosfato'],'.',color=color_dudosos,label='DUDOSO')    
   
+    
+            st.dataframe(df_datos_dudosos)
+            st.dataframe(df_datos_malos)
+            st.dataframe(df_rango_temporal)
+            st.dataframe(df_datos_buenos)
+    
             ax.plot(datos_procesados['nitrato'],datos_procesados['fosfato'],'.r' )
             
             ax.set(xlabel='Nitrato (\u03BCmol/kg)')
