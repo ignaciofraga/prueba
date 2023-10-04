@@ -1897,13 +1897,13 @@ def entrada_datos_laboratorio():
     acciones     = ['Añadir o modificar datos procesados', 'Realizar control de calidad de datos disponibles']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
  
-    variables_procesado    = ['TOC','pH','Alcalinidad','Oxígeno (Método Winkler)']    
-    variables_procesado_bd = ['toc','ph','alcalinidad','oxigeno_wk']
-    variables_unidades     = ['µmol/L',' ','\u03BCmol/kg','\u03BCmol/kg']
+    variables_procesado    = ['TOC','TN','pH','Alcalinidad','Oxígeno (Método Winkler)']    
+    variables_procesado_bd = ['toc','tdn','ph','alcalinidad','oxigeno_wk']
+    variables_unidades     = ['µmol/L','µmol/L','\u03BCmol/kg','\u03BCmol/kg']
     
     # Define unos valores de referencia 
-    df_referencia        = pandas.DataFrame(columns = ['toc','ph', 'alcalinidad', 'oxigeno_wk'],index = [0])
-    df_referencia.loc[0] = [0.0,8.1,200.0,200.0]
+    df_referencia        = pandas.DataFrame(columns = ['toc','tdn','ph', 'alcalinidad', 'oxigeno_wk'],index = [0])
+    df_referencia.loc[0] = [0.0,0.0,8.1,200.0,200.0]
     
     # Añade nuevos datos obtenidos en laboratorio
     if tipo_accion == acciones[0]:
