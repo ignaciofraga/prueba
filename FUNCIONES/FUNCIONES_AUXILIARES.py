@@ -269,7 +269,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
     #df_seleccion = df_seleccion.fillna(None)
 
 
-    with st.form("Formulario", clear_on_submit=True):
+    with st.form("Formulario", clear_on_submit=False):
 
         # Si los datos a introducir son de pH, especificar si la medida es con reactivo purificado o no purificado            
         if variable_seleccionada == 'ph':
@@ -655,9 +655,13 @@ def consulta_botellas():
             if io_inorg_tcarb:
                 listado_variables = listado_variables + ['tcarbn'] + ['tcarbn_qf']
                 
-            io_org_tcarb           = st.checkbox('Carbono organico total', value=False)
+            io_org_tcarb           = st.checkbox('NPOC', value=False)
             if io_org_tcarb:
                 listado_variables = listado_variables + ['toc'] + ['toc_qf']
+                
+            io_tn           = st.checkbox('TDN', value=False)
+            if io_tn:
+                listado_variables = listado_variables + ['tdn'] + ['tdn_qf']
                 
             io_doc           = st.checkbox('DOC', value=False)
             if io_doc:
