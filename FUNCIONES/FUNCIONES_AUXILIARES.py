@@ -269,7 +269,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
     #df_seleccion = df_seleccion.fillna(None)
 
 
-    with st.form("Formulario", clear_on_submit=False):
+    with st.form("Formulario", clear_on_submit=True):
 
         # Si los datos a introducir son de pH, especificar si la medida es con reactivo purificado o no purificado            
         if variable_seleccionada == 'ph':
