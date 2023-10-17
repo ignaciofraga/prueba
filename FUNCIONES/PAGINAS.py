@@ -1713,8 +1713,10 @@ def procesado_nutrientes():
                         datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
                         datos_AA['io_procesado'].iloc[idato]  = 1
                     else:
-                        texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
-                        st.warning(texto_error, icon="⚠️")                        
+                        if datos_AA['Sample ID'].iloc[idato].lower() != 'sw' or 'rmn' in datos_AA['Sample ID'].iloc[idato].lower() is False: 
+                        
+                            texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
+                            st.warning(texto_error, icon="⚠️")                        
        
             # comprobación por si no hay ningún dato a procesar
             if datos_AA['io_procesado'].isnull().all():
