@@ -1611,8 +1611,7 @@ def procesado_nutrientes():
         with col1: 
             
             listado_programas         = df_salidas['nombre_programa'].unique()
-            df_programas_muestreados  = df_programas[df_programas['id_programa'].isin(listado_programas)]
-            programa_seleccionado     = st.selectbox('Programa',(df_programas_muestreados['nombre_programa']))
+            programa_seleccionado     = st.selectbox('Programa',(listado_programas))
             indice_programa           = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0]
 
         with col2:
