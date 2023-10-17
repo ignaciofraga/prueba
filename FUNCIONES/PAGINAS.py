@@ -1684,6 +1684,8 @@ def procesado_nutrientes():
             listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
 
             st.text(listado_refs)
+            st.text(listado_refs[0])
+            st.text(listado_refs[1])
 
             ref_inicial        = listado_refs[0][-1] + 1
             ref_final          = listado_refs[1][0]
