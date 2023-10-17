@@ -2079,10 +2079,7 @@ def entrada_datos_excel():
         # Encuentra el identificador asociado a cada registro
         with st.spinner('Asignando el registro correspondiente a cada medida'):
             datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-             
-            
-        st.dataframe(datos_corregidos)
-        st.text(variables_discretas)
+
             
         # Añade datos físicos
         if len(variables_discretas)>0:
