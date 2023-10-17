@@ -1624,6 +1624,13 @@ def procesado_nutrientes():
             anhos_disponibles         = df_prog_sel['año'].unique()
             anho_seleccionado         = st.selectbox('Año',(anhos_disponibles))
         
+            salidas_seleccionadas = df_prog_sel[df_prog_sel['año']==anho_seleccionado]
+            listado_salidas       = salidas_seleccionadas['id_salida']
+    
+            st.text(listado_salidas)
+    #df_seleccion = df_datos_disponibles[(df_datos_disponibles['salida_mar'] == indice_salida) & (df_datos_disponibles['estacion'] == indice_estacion)]
+     
+    
     
         with st.form("Formulario", clear_on_submit=False):
               
