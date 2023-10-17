@@ -1715,6 +1715,8 @@ def procesado_nutrientes():
                     else:
                         if datos_AA['Sample ID'].iloc[idato].lower() != 'sw' or 'rmn' in datos_AA['Sample ID'].iloc[idato].lower() is False: 
                         
+                            st.text('rmn' in datos_AA['Sample ID'].iloc[idato].lower())
+                            st.text('rmn' in datos_AA['Sample ID'].iloc[idato])
                             texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
                             st.warning(texto_error, icon="⚠️")                        
        
