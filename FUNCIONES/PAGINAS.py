@@ -1678,11 +1678,16 @@ def procesado_nutrientes():
                    datos_AA['Sample ID'].iloc[idato] ='sw' 
             
             # Encuentra las posiciones de las referencias de sw
+            # indices_referencias = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='sw']) - 1
+            # # Agrupa en dos tandas, las iniciales y las finales
+            # spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
+            # listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
 
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_alto)]
             ref_inicial       = datos_referencias['Peak Number'].iloc[0]
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
-            ref_final         = datos_referencias['Peak Number'].iloc[0]
+            ref_final         = datos_referencias['Peak Number'].iloc[1]
+            
             
             # Encuentra la salinidad de cada muestra
             datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
