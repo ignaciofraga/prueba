@@ -1625,10 +1625,11 @@ def procesado_nutrientes():
             anho_seleccionado         = st.selectbox('Año',(anhos_disponibles))
         
             salidas_seleccionadas = df_prog_sel[df_prog_sel['año']==anho_seleccionado]
-            st.dataframe(salidas_seleccionadas)
-            listado_salidas       = salidas_seleccionadas['id_salida']
+            listado_salidas       = salidas_seleccionadas['salida_mar']
     
-            st.text(listado_salidas)
+
+        df_muestreos_salidas_seleccionadas = df_muestreos[df_muestreos['salida_mar'].isin(listado_salidas)]
+        df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos_salidas_seleccionadas, on="muestreo") 
     #df_seleccion = df_datos_disponibles[(df_datos_disponibles['salida_mar'] == indice_salida) & (df_datos_disponibles['estacion'] == indice_estacion)]
      
     
@@ -1671,8 +1672,8 @@ def procesado_nutrientes():
             variables_procesadas = datos_AA.columns.tolist()
             variables_run        = list(set(variables_procesadas).intersection(variables_procesado_bd))
             
-            # Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
-            df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")            
+            ### Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
+                       
                         
             # Adapta el nombre de las sw
             for idato in range(datos_AA.shape[0]):
