@@ -2026,7 +2026,7 @@ def entrada_datos_excel():
         df_datos_importacion  = pandas.read_excel(archivo_datos) 
         
         # Identifica las variables que contiene el archivo
-        df_variables = variables_bd[variables_bd['tipo']=='variable_procesado']
+        df_variables = variables_bd[variables_bd['tipo']=='variable_muestreo']
         
         
         variables_archivo    = df_datos_importacion.columns.tolist()
