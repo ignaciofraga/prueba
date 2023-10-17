@@ -1686,6 +1686,10 @@ def procesado_nutrientes():
             st.text(listado_refs)
             st.text(listado_refs[0])
             st.text(listado_refs[1])
+            
+            
+            contain_values = datos_AA[datos_AA['Sample ID'].str.contains('rmn_elegida_bajo')]
+            st.dataframe(contain_values)
 
             ref_inicial        = listado_refs[0][-1] + 1
             ref_final          = listado_refs[1][0]
