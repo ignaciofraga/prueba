@@ -1630,6 +1630,8 @@ def procesado_nutrientes():
 
         df_muestreos_salidas_seleccionadas = df_muestreos[df_muestreos['salida_mar'].isin(listado_salidas)]
         df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos_salidas_seleccionadas, on="muestreo") 
+    
+        st.dataframe(df_datos_disponibles)
     #df_seleccion = df_datos_disponibles[(df_datos_disponibles['salida_mar'] == indice_salida) & (df_datos_disponibles['estacion'] == indice_estacion)]
      
     
