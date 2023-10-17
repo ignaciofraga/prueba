@@ -1683,6 +1683,8 @@ def procesado_nutrientes():
             spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
             listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
 
+            st.text(listado_refs)
+
             ref_inicial        = listado_refs[0][-1] + 1
             ref_final          = listado_refs[1][0]
             
