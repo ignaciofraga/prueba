@@ -1749,7 +1749,7 @@ def procesado_nutrientes():
                 
                 variables_elimina       = variables_procesado_bd + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado']
                 df_datos_biogeoquimicos = df_datos_disponibles.drop(columns=variables_elimina)
-                datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="muestreo",how='left')
+                datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="id_externo",how='left')
                 
                 
                 
