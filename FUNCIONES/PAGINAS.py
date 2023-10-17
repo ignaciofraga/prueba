@@ -1737,12 +1737,22 @@ def procesado_nutrientes():
                 
                 
                 # Añade información de la base de datos (muestreo, biogeoquimica y fisica)
-                datos_corregidos = pandas.merge(datos_corregidos, df_muestreos, on="id_externo") # Esta unión elimina los registros que NO son muestras
+                # datos_corregidos = pandas.merge(datos_corregidos, df_muestreos, on="id_externo") # Esta unión elimina los registros que NO son muestras
+                
+                # variables_elimina       = variables_procesado_bd + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado']
+                # df_datos_biogeoquimicos = df_datos_discretos.drop(columns=variables_elimina) # Para eliminar las columnas previas con datos de nutrientes
+
+                # datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="muestreo",how='left')
+                
+                
+                
                 
                 variables_elimina       = variables_procesado_bd + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado']
-                df_datos_biogeoquimicos = df_datos_discretos.drop(columns=variables_elimina) # Para eliminar las columnas previas con datos de nutrientes
-
+                df_datos_biogeoquimicos = df_datos_disponibles.drop(columns=variables_elimina)
                 datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="muestreo",how='left')
+                
+                
+                
                 
                 # Reduce los decimales y asigna QF a los datos
                 variables_run_qf = []
