@@ -1678,28 +1678,11 @@ def procesado_nutrientes():
                    datos_AA['Sample ID'].iloc[idato] ='sw' 
             
             # Encuentra las posiciones de las referencias de sw
-            # indices_referencias = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='sw']) - 1
-            # # Agrupa en dos tandas, las iniciales y las finales
-            # spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
-            # listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
 
-            datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
+            datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_alto)]
             ref_inicial       = datos_referencias['Peak Number'].iloc[0]
-            ref_final         = datos_referencias['Peak Number'].iloc[1]
-            
-            # st.dataframe(contain_values)
-
-            # st.dataframe(datos_AA)
-
-            # st.text(listado_refs)
-            st.text(ref_inicial)
-            st.text(ref_final)
-            
-            
-
-
-            # ref_inicial        = listado_refs[0][-1] + 1
-            # ref_final          = listado_refs[1][0]
+            datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
+            ref_final         = datos_referencias['Peak Number'].iloc[0]
             
             # Encuentra la salinidad de cada muestra
             datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
@@ -1713,10 +1696,8 @@ def procesado_nutrientes():
                         datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
                         datos_AA['io_procesado'].iloc[idato]  = 1
                     else:
-                        if datos_AA['Sample ID'].iloc[idato].lower() != 'sw' or 'rmn' in datos_AA['Sample ID'].iloc[idato].lower() is False: 
+                        if datos_AA['Sample ID'].iloc[idato].lower() != 'sw': 
                         
-                            st.text('rmn' in datos_AA['Sample ID'].iloc[idato].lower())
-                            st.text('rmn' in datos_AA['Sample ID'].iloc[idato])
                             texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
                             st.warning(texto_error, icon="⚠️")                        
        
