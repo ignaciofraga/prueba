@@ -1630,9 +1630,7 @@ def procesado_nutrientes():
 
         df_muestreos_salidas_seleccionadas = df_muestreos[df_muestreos['salida_mar'].isin(listado_salidas)]
         df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos_salidas_seleccionadas, on="muestreo") 
-    
-        st.dataframe(df_datos_disponibles)
-    
+        
         with st.form("Formulario", clear_on_submit=False):
               
             # Despliega un formulario para subir los archivos del AA y las referencias
@@ -1743,10 +1741,7 @@ def procesado_nutrientes():
                 # df_datos_biogeoquimicos = df_datos_discretos.drop(columns=variables_elimina) # Para eliminar las columnas previas con datos de nutrientes
 
                 # datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="muestreo",how='left')
-                
-                
-                st.dataframe(datos_corregidos)
-                
+                                
                 variables_elimina       = variables_procesado_bd + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado']
                 df_datos_biogeoquimicos = df_datos_disponibles.drop(columns=variables_elimina)
                 datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="id_externo",how='left')
