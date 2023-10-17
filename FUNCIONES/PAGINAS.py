@@ -1692,8 +1692,8 @@ def procesado_nutrientes():
             # st.dataframe(datos_AA)
 
             # st.text(listado_refs)
-            # st.text(listado_refs[0])
-            # st.text(listado_refs[1])
+            st.text(ref_inicial)
+            st.text(ref_final)
             
             
 
