@@ -217,6 +217,43 @@ def menu_seleccion(datos_procesados,variables_procesado,variables_procesado_bd,i
 
 
 
+######################################################################
+######## FUNCION PARA DESPLEGAR MENUS DE SELECCION REDUCIDOS  ########
+######################################################################
+def menu_seleccion_reducido(datos_procesados,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas):
+    
+        
+    # Despliega menús de selección de la variable, salida y la estación a controlar                
+    col1, col2, col3 = st.columns(3,gap="small")
+    with col1: 
+        
+        listado_programas         = datos_procesados['programa'].unique()
+        df_programas_muestreados  = df_programas[df_programas['id_programa'].isin(listado_programas)]
+        programa_seleccionado     = st.selectbox('Programa',(df_programas_muestreados['nombre_programa']))
+        indice_programa           = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0]
+
+    with col2:
+        
+        df_prog_sel               = datos_procesados[datos_procesados['programa']==indice_programa]
+        df_prog_sel               = df_prog_sel.sort_values('año',ascending=False)
+        anhos_disponibles         = df_prog_sel['año'].unique()
+        anho_seleccionado         = st.selectbox('Año',(anhos_disponibles))
+        
+        df_prog_anho_sel          = df_prog_sel[df_prog_sel['año']==anho_seleccionado]
+        
+        
+    with col3:
+        
+        listado_tipos_salida      = datos_procesados['tipo_salida'].unique()
+        tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(listado_tipos_salida))
+        
+        df_prog_anho_tipo_sel     = df_prog_anho_sel[df_prog_anho_sel['tipo_salida']==tipo_salida_seleccionada]
+
+
+     
+
+    return indice_programa,anho_seleccionado,tipo_salida_seleccionada
+
 
 
 

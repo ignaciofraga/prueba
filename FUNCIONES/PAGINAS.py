@@ -1605,6 +1605,24 @@ def procesado_nutrientes():
         st.subheader('Procesado de datos de nutrientes')
         
         canales_autoanalizador = ['ton','nitrito','silicato','fosfato']
+        
+        # Selecciona campaña y año (para evitar problemas con id duplicados en años distintos)              
+        col1, col2 = st.columns(2,gap="small")
+        with col1: 
+            
+            listado_programas         = df_salidas['nombre_programa'].unique()
+            df_programas_muestreados  = df_programas[df_programas['id_programa'].isin(listado_programas)]
+            programa_seleccionado     = st.selectbox('Programa',(df_programas_muestreados['nombre_programa']))
+            indice_programa           = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0]
+
+        with col2:
+            
+            df_prog_sel               = df_salidas[df_salidas['programa']==indice_programa]
+            df_prog_sel['año']        = pandas.DatetimeIndex(df_salidas['fecha_salida']).year
+            df_prog_sel               = df_prog_sel.sort_values('año',ascending=False)
+            anhos_disponibles         = df_prog_sel['año'].unique()
+            anho_seleccionado         = st.selectbox('Año',(anhos_disponibles))
+        
     
         with st.form("Formulario", clear_on_submit=False):
               
