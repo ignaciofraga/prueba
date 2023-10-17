@@ -1625,6 +1625,7 @@ def procesado_nutrientes():
             anho_seleccionado         = st.selectbox('Año',(anhos_disponibles))
         
             salidas_seleccionadas = df_prog_sel[df_prog_sel['año']==anho_seleccionado]
+            st.dataframe(salidas_seleccionadas)
             listado_salidas       = salidas_seleccionadas['id_salida']
     
             st.text(listado_salidas)
