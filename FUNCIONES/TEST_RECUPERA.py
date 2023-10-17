@@ -37,9 +37,9 @@ email_contacto    = 'prueba@ieo.csic.es'
 
 fecha_actualizacion = datetime.date.today()
 
-anho_consulta = 2008
-programa_seleccionado = 'RADIAL CORUÑA'
-tipo_salida           = 'MENSUAL'
+anho_consulta = 2023
+programa_seleccionado = 'RADPROF'
+tipo_salida           = 'ANUAL'
 ###### PROCESADO ########
 
 
@@ -79,13 +79,13 @@ df_datos = pandas.merge(df_muestreos_seleccionados, df_datos_discretos, on="mues
 # conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
 # cursor = conn.cursor()  
 
-for idato in range(df_muestreos_seleccionados.shape[0]):
+# for idato in range(df_muestreos_seleccionados.shape[0]):
     
-    for icompara in range(idato+1,df_muestreos_seleccionados.shape[0]):
+#     for icompara in range(idato+1,df_muestreos_seleccionados.shape[0]):
                 
-        if df_muestreos_seleccionados['nombre_muestreo'].iloc[idato] == df_muestreos_seleccionados['nombre_muestreo'].iloc[icompara]:
+#         if df_muestreos_seleccionados['nombre_muestreo'].iloc[idato] == df_muestreos_seleccionados['nombre_muestreo'].iloc[icompara]:
             
-            print(df_muestreos_seleccionados['nombre_muestreo'].iloc[idato],df_muestreos_seleccionados['muestreo'].iloc[idato],df_muestreos_seleccionados['nombre_muestreo'].iloc[icompara],df_muestreos_seleccionados['muestreo'].iloc[icompara])
+#             print(df_muestreos_seleccionados['nombre_muestreo'].iloc[idato],df_muestreos_seleccionados['muestreo'].iloc[idato],df_muestreos_seleccionados['nombre_muestreo'].iloc[icompara],df_muestreos_seleccionados['muestreo'].iloc[icompara])
     
 #             instruccion_sql = "DELETE FROM muestreos_discretos WHERE muestreo=" + str(int(df_muestreos_seleccionados['muestreo'].iloc[icompara])) + ";" 
         
