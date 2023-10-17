@@ -1631,6 +1631,8 @@ def procesado_nutrientes():
         df_muestreos_salidas_seleccionadas = df_muestreos[df_muestreos['salida_mar'].isin(listado_salidas)]
         df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos_salidas_seleccionadas, on="muestreo") 
     
+        st.dataframe(df_datos_disponibles)
+    
         with st.form("Formulario", clear_on_submit=False):
               
             # Despliega un formulario para subir los archivos del AA y las referencias
