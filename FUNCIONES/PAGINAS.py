@@ -1678,25 +1678,28 @@ def procesado_nutrientes():
                    datos_AA['Sample ID'].iloc[idato] ='sw' 
             
             # Encuentra las posiciones de las referencias de sw
-            indices_referencias = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='sw']) - 1
-            # Agrupa en dos tandas, las iniciales y las finales
-            spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
-            listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
+            # indices_referencias = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='sw']) - 1
+            # # Agrupa en dos tandas, las iniciales y las finales
+            # spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
+            # listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
 
-            contain_values = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
-            st.dataframe(contain_values)
+            datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
+            ref_inicial       = datos_referencias['Peak Number'].iloc[0]
+            ref_final         = datos_referencias['Peak Number'].iloc[1]
+            
+            # st.dataframe(contain_values)
 
-            st.dataframe(datos_AA)
+            # st.dataframe(datos_AA)
 
-            st.text(listado_refs)
-            st.text(listado_refs[0])
-            st.text(listado_refs[1])
+            # st.text(listado_refs)
+            # st.text(listado_refs[0])
+            # st.text(listado_refs[1])
             
             
 
 
-            ref_inicial        = listado_refs[0][-1] + 1
-            ref_final          = listado_refs[1][0]
+            # ref_inicial        = listado_refs[0][-1] + 1
+            # ref_final          = listado_refs[1][0]
             
             # Encuentra la salinidad de cada muestra
             datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
