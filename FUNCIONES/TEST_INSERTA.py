@@ -46,28 +46,48 @@ email_contacto    = 'prueba@ieo.csic.es'
 df_datos_importacion  = pandas.read_excel(archivo_datos) 
 
 
-# # Recupera el identificador del programa de muestreo
-# id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+# Recupera el identificador del programa de muestreo
+id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# # Encuentra la estación asociada a cada registro
-# datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(df_datos_importacion,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+# Encuentra la estación asociada a cada registro
+datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(df_datos_importacion,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# # Encuentra las salidas al mar correspondientes  
-# nombre_entrada = programa_seleccionado
-# datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_entrada,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+# Encuentra las salidas al mar correspondientes  
+nombre_entrada = programa_seleccionado
+datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_entrada,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
  
-# # Encuentra el identificador asociado a cada registro
-# datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-     
+
+
+# Recupera la tabla con los registros de los muestreos
+con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+conn_psql        = create_engine(con_engine)
+tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
+tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
+tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn_psql)
+conn_psql.dispose() 
+
+
+#listado_salidas  = datos_corregidos['id_salida'].unique()
+
+#df_datos_salidas = tabla_muestreos[tabla_muestreos['salida_mar'].isin(listado_salidas)]
+import time
+st = time.time()
+
+# Encuentra el identificador asociado a cada registro
+datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+ 
+et = time.time()    
         
 # with open(archivo_guardar, 'wb') as handle:
 #     pickle.dump(datos_corregidos, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-with open(archivo_guardar, 'rb') as handle:
-    datos_corregidos = pickle.load(handle)
+# with open(archivo_guardar, 'rb') as handle:
+#     datos_corregidos = pickle.load(handle)
+
 
 FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
 
+dt = time.time()
 
         
 # texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'

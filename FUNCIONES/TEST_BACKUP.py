@@ -39,29 +39,29 @@ itipo_informacion = 2 # 1-nuevo muestreo 2-dato nuevo (analisis laboratorio)  3-
 email_contacto    = 'prueba@ieo.csic.es'
 
 
-'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/BACKUPS/TEST.dump'
-
-import os
-os.system("pg_dump --dbname=postgresql://postgres:m0nt34lt0@193.146.155.99:5432/COAC > C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/BACKUPS/TEST.dump" )
 
 ###### PROCESADO ########
 
 
-#df_datos_importacion  = pandas.read_excel(archivo_datos) 
+df_datos_importacion  = pandas.read_excel(archivo_datos) 
 
 
-# # Recupera el identificador del programa de muestreo
-# id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+# Recupera el identificador del programa de muestreo
+id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# # Encuentra la estación asociada a cada registro
-# datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(df_datos_importacion,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+# Encuentra la estación asociada a cada registro
+datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(df_datos_importacion,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# # Encuentra las salidas al mar correspondientes  
-# nombre_entrada = programa_seleccionado
-# datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_entrada,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+# Encuentra las salidas al mar correspondientes  
+nombre_entrada = programa_seleccionado
+datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_entrada,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
  
-# # Encuentra el identificador asociado a cada registro
-# datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+# Encuentra el identificador asociado a cada registro
+datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+     
+        
+     
+        
      
         
 # with open(archivo_guardar, 'wb') as handle:
