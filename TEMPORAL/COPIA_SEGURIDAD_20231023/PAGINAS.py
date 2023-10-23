@@ -1995,22 +1995,14 @@ def entrada_datos_excel():
     contrasena       = st.secrets["postgres"].password
     puerto           = st.secrets["postgres"].port
     
-    # Función para cargar en caché los datos a utilizar
-    @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
-    def carga_datos_entrada_datos():
-        conn             = init_connection()
-        df_programas     = psql.read_sql('SELECT * FROM programas', conn)
-        tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-        tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
-        tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn)
-        tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-        conn.close()   
-        
-        return df_programas,tabla_muestreos,tabla_estaciones,tabla_variables,tabla_salidas,tabla_muestreos
+    # Recupera la informacion de la cache 
+    #df_programas,variables_bd = carga_datos_entrada_datos_excel()
+    conn                      = init_connection()
+    df_programas              = psql.read_sql('SELECT * FROM programas', conn)
+    variables_bd              = psql.read_sql('SELECT * FROM variables_procesado', conn)
+    conn.close()   
     
-    df_programas,tabla_muestreos,tabla_estaciones,tabla_variables,tabla_salidas,tabla_muestreos = carga_datos_entrada_datos()
-
+    
        
     
     # Despliega menús de selección de la variable, salida y la estación a controlar                
@@ -2071,7 +2063,7 @@ def entrada_datos_excel():
         df_datos_importacion  = pandas.read_excel(archivo_datos) 
         
         # Identifica las variables que contiene el archivo
-        df_variables = tabla_variables[tabla_variables['tipo']=='variable_muestreo']
+        df_variables = variables_bd[variables_bd['tipo']=='variable_muestreo']
         
         
         variables_archivo    = df_datos_importacion.columns.tolist()
@@ -2117,14 +2109,14 @@ def entrada_datos_excel():
                 
         with st.spinner('Asignando la estación y salida al mar de cada medida'):
             # Encuentra la estación asociada a cada registro
-            datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
             # Encuentra las salidas al mar correspondientes  
-            datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_entrada,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_entrada,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
      
         # Encuentra el identificador asociado a cada registro
         with st.spinner('Asignando el registro correspondiente a cada medida'):
-            datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
 
             
         # Añade datos físicos
@@ -2132,7 +2124,7 @@ def entrada_datos_excel():
                             
             with st.spinner('Añadiendo datos discretos'):
                 
-                FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables)
+                FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
                 
         texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
         st.success(texto_exito)

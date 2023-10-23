@@ -125,10 +125,13 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 ######## FUNCION PARA ENCONTRAR LA ESTACIÓN ASOCIADA A CADA REGISTRO  ########
 ##############################################################################
 
-def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos):
+def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto):
 
-
-
+    # Consulta las estaciones disponibles en la base de datos    
+    con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    conn_psql        = create_engine(con_engine)
+    tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql) 
+    tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
         
     
     # Cambia nombres a minusculas para comparar 
@@ -225,19 +228,20 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             # Añade columna con el identiicador del programa
             exporta_registros['programa'] = numpy.zeros(exporta_registros.shape[0],dtype=int)
             exporta_registros['programa'] = id_programa
-            # corrige el indice del dataframe 
+            # corrije el indice del dataframe 
             exporta_registros.set_index('id_estacion',drop=True,append=False,inplace=True)
-        
-            # Establece conexion con la base de datos   
-            con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-            conn_psql        = create_engine(con_engine)
         
             # Inserta el dataframe resultante en la base de datos 
             exporta_registros.to_sql('estaciones', conn_psql,if_exists='append')
     
-            # Cierra la conexión con la base de datos
-            conn_psql.dispose() 
+        # elimina la informacion cargada y que no se vaya a exportar, para liberar memoria
+        del(estaciones_muestreadas,estaciones_programa,tabla_estaciones)
         
+        conn_psql.dispose() # Cierra la conexión con la base de datos
+    
+#    # Cambia el nombre de la columna "estacion" por "nombre_estacion"
+#    datos = datos.rename(columns={"estacion":"nombre_estacion"})
+    
     return datos  
 
 
@@ -704,7 +708,78 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     cursor.close()
     conn.close()
 
- 
+                    
+    # # Recupera la tabla con los registros de muestreos físicos
+    # con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    # conn_psql          = create_engine(con_engine)
+    # tabla_variables    = psql.read_sql('SELECT * FROM variables_procesado', conn_psql) 
+    # instruccion_sql    = 'SELECT * FROM ' + tabla_destino
+    # tabla_registros    = psql.read_sql(instruccion_sql, conn_psql)
+    # conn_psql.dispose()
+        
+    # # Lee las variables de cada tipo a utilizar en el control de calidad
+    # df_variables = tabla_variables[tabla_variables['tipo']=='variable_muestreo']
+    # variables_bd = df_variables['nombre']    
+  
+    # # Busca qué variables están incluidas en los datos a importar
+    # listado_variables_datos   = datos_insercion.columns.tolist()
+    # listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
+    # listado_adicional         = [puntero] + listado_variables_comunes
+            
+    # # # Si no existe ningún registro en la base de datos, introducir todos los datos disponibles
+    # if tabla_registros.shape[0] == 0:
+        
+    #     datos_insercion = datos_insercion[listado_adicional]
+        
+    #     datos_insercion.set_index(puntero,drop=True,append=False,inplace=True)
+    #     datos_insercion.to_sql(tabla_destino, conn_psql,if_exists='append')
+               
+        
+    # # En caso contrario, comprobar qué parte de la información está en la base de datos
+    # else: 
+            
+         
+    #     for idato in range(datos_insercion.shape[0]): # Dataframe con la interseccion de los datos nuevos y los disponibles en la base de datos, a partir de la variable muestreo
+                             
+    #         df_temp  = tabla_registros[(tabla_registros[puntero]==datos_insercion[puntero].iloc[idato])] 
+            
+    #         if df_temp.shape[0]>0:  # Muestreo ya incluido en la base de datos
+            
+    #             muestreo = df_temp[puntero].iloc[0]
+                                
+    #             for ivariable in range(len(listado_variables_comunes)): # Reemplazar las variables disponibles en el muestreo correspondiente
+                        
+    #                 #tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]][datos_insercion[puntero]==int(muestreo)]
+    #                 tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]].iloc[idato]
+
+    #         else: # Nuevo muestreo
+                       
+    #             df_add = datos_insercion[datos_insercion[puntero]==datos_insercion[puntero].iloc[idato]] # Genero un dataframe con cada línea de datos a añadir
+  
+    #             df_add = df_add[listado_adicional] # Recorto para que tenga sólo las variables a añadir
+            
+    #             tabla_registros = pandas.concat([tabla_registros, df_add]) # Combino ambos dataframes
+                   
+    #     tabla_registros.set_index(puntero,drop=True,append=False,inplace=True)
+        
+        
+    #     # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+    #     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    #     cursor = conn.cursor()
+    #     instruccion_sql = "TRUNCATE " + tabla_destino + ";"
+    #     cursor.execute(instruccion_sql)
+    #     conn.commit()
+    #     cursor.close()
+    #     conn.close() 
+        
+    #     # Inserta el dataframe resultante en la base de datos 
+    #     tabla_registros.to_sql(tabla_destino, conn_psql,if_exists='append')
+  
+
+    # conn_psql.dispose() # Cierra la conexión con la base de datos 
+
+
+
 
 
 
