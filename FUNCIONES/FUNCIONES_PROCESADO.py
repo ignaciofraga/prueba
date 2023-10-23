@@ -137,15 +137,9 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     # Cambia nombres a minusculas para comparar 
     tabla_estaciones['nombre_estacion'] = tabla_estaciones['nombre_estacion'].apply(lambda x:x.lower())
     
-    # Cambia los nombres a minusculas
-    datos['estacion'] = datos['estacion'].astype(str)
-    datos['estacion'] = datos['estacion'].apply(lambda x:x.lower())
-    
     # Columna para punteros de estaciones
     datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
 
-
-    
     # Comprueba si los datos tienen un identificador de muestreo. En ese caso, ya tenemos la estacion identificada.
     variables_datos    = datos.columns.tolist()
     if 'nombre_muestreo' in variables_datos and datos['nombre_muestreo'].isnull().values.any() == False:
@@ -154,7 +148,11 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             datos['id_estacion_temp'].iloc[idato] = tabla_muestreos['estacion'][tabla_muestreos['nombre_muestreo']==datos['nombre_muestreo'].iloc[idato]]
     
     # En caso contrario, hay que buscar la estación asociada
-    else:    
+    else: 
+        
+        # Cambia los nombres a minusculas
+        datos['estacion'] = datos['estacion'].astype(str)
+        datos['estacion'] = datos['estacion'].apply(lambda x:x.lower())
         
         # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
         estaciones_programa            = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
