@@ -126,10 +126,6 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 ##############################################################################
 
 def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos):
-
-
-
-        
     
     # Cambia nombres a minusculas para comparar 
     tabla_estaciones['nombre_estacion'] = tabla_estaciones['nombre_estacion'].apply(lambda x:x.lower())
@@ -248,15 +244,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
 ###### FUNCION PARA ENCONTRAR LA SALIDA AL MAR ASOCIADA A CADA REGISTRO  ######
 ###############################################################################
 
-def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto):
-
-    # Recupera la tabla con los registros de muestreos físicos
-    con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    conn_psql        = create_engine(con_engine)
-    tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
-    tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn_psql)
-    tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
-    conn_psql.dispose()
+def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos):
 
     datos['id_salida']  = numpy.zeros(datos.shape[0],dtype=int)
     
@@ -473,17 +461,9 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
 ######## FUNCION PARA ENCONTRAR EL IDENTIFICADOR DE CADA REGISTRO  ########
 ###########################################################################
 
-def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto):
+def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables):
     
 
-    # Recupera la tabla con los registros de los muestreos
-    con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    conn_psql        = create_engine(con_engine)
-    tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
-    tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
-    tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn_psql)
-    conn_psql.dispose() 
-    
     # Genera un sub-set sólo con los registros de la base de datos correspondientes a las salidas a evaluar
     # El objetivo es agilizar la comparación
     listado_salidas  = datos['id_salida'].unique()
@@ -498,12 +478,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     
     # si no hay ningun valor en la tabla de registro, meter directamente todos los datos registrados
     if tabla_muestreos.shape[0] == 0:
-    
-        # Mantén sólo las columnas que interesan
-        
-        
-        #variables_bd  = [x for x in tabla_variables['parametros_muestreo'] if str(x) != 'None']
-        
+            
         # Busca qué variables están incluidas en los datos a importar
         listado_variables_comunes = list(set(listado_variables_datos).intersection(df_variables['nombre']))
         listado_adicional         = ['id_estacion_temp','id_salida'] + listado_variables_comunes
@@ -538,9 +513,12 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             datos['muestreo'].iloc[idato]                 = idato + 1
             
             
-        # Inserta en base de datos        
+        # Inserta en base de datos
+        con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+        conn_psql        = create_engine(con_engine)        
         exporta_registros.set_index('muestreo',drop=True,append=False,inplace=True)
-        exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append') 
+        exporta_registros.to_sql('muestreos_discretos', conn_psql,if_exists='append')
+        conn_psql.dispose() 
     
     # En caso contrario hay que ver registro a registro, si ya está incluido en la base de datos
     else:
@@ -642,7 +620,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 ######## FUNCION PARA INSERTAR DATOS DISCRETOS EN LA BASE DE DATOS  ########
 ############################################################################
 
-def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,contrasena,puerto):
+def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables):
   
     if tipo_datos     == 'discreto':
         tabla_destino = 'datos_discretos'
@@ -651,14 +629,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     elif tipo_datos   == 'perfil':
         tabla_destino = 'datos_perfiles'
         puntero       = 'perfil'            
-
-
-    # Recupera la tabla con las variables disponibles
-    con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    conn_psql          = create_engine(con_engine)
-    tabla_variables    = psql.read_sql('SELECT * FROM variables_procesado', conn_psql) 
-    conn_psql.dispose()
-        
+       
     # Lee las variables de cada tipo a utilizar en el control de calidad
     df_variables = tabla_variables[tabla_variables['tipo']=='variable_muestreo']
     variables_bd = df_variables['nombre']    
