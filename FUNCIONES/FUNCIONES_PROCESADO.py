@@ -548,12 +548,12 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                         df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (df_datos_salidas['hora_muestreo']==datos['hora_muestreo'].iloc[idato]) & (df_datos_salidas['presion_ctd']== datos['presion_ctd'].iloc[idato])]
                             
                     else:
-                        df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (df_datos_salidas['presion_ctd']== datos['presion_ctd'].iloc[idato])]
+                        df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato].date()) & (df_datos_salidas['presion_ctd']== datos['presion_ctd'].iloc[idato])]
                 
                         st.text(datos['fecha_muestreo'].iloc[idato])
                         st.text(df_datos_salidas['fecha_muestreo'].iloc[0])
-                        st.text(type(datos['fecha_muestreo'].iloc[idato]))
-                        st.text(type(df_datos_salidas['fecha_muestreo'].iloc[0]))
+                        # st.text(type(datos['fecha_muestreo'].iloc[idato]))
+                        # st.text(type(df_datos_salidas['fecha_muestreo'].iloc[0]))
                 
                 else:
                     if 'hora_muestreo' in listado_variables_datos and datos['hora_muestreo'].iloc[idato] is not None:          

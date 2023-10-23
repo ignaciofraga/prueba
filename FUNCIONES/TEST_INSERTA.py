@@ -54,6 +54,8 @@ tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
 conn.dispose() 
 
 
+
+
 df_datos_importacion  = pandas.read_excel(archivo_datos) 
 
 # control de calidad
