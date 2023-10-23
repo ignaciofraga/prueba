@@ -533,7 +533,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         
         import streamlit as st
         st.dataframe(df_datos_salidas['nombre_muestreo'])
-        st.dataframe(datos['nombre_muestreo'])
+        st.dataframe(datos)
         
         for idato in range(datos.shape[0]):
             
