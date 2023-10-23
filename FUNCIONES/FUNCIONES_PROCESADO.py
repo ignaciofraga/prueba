@@ -464,6 +464,8 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
 def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables):
     
 
+    con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+
     # Genera un sub-set sólo con los registros de la base de datos correspondientes a las salidas a evaluar
     # El objetivo es agilizar la comparación
     listado_salidas  = datos['id_salida'].unique()
