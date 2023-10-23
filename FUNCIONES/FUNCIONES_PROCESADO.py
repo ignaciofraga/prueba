@@ -535,7 +535,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             
             if 'nombre_muestreo' in listado_variables_datos and datos['nombre_muestreo'].iloc[idato] is not None: 
                 
-                df_temp = df_datos_salidas[(df_datos_salidas['nombre_muestreo']==datos['nombre_muestreo'].iloc[idato])]
+                df_temp = df_datos_salidas[(df_datos_salidas['nombre_muestreo']==str(datos['nombre_muestreo'].iloc[idato]))]
+                
                 
             else:
                 
