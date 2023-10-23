@@ -531,10 +531,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
         cursor = conn.cursor()
         
-        import streamlit as st
-        st.dataframe(df_datos_salidas['nombre_muestreo'])
-        st.dataframe(datos)
-        
+
+        import streamlit as st        
+
         for idato in range(datos.shape[0]):
             
             if 'nombre_muestreo' in listado_variables_datos and datos['nombre_muestreo'].iloc[idato] is not None: 
@@ -547,6 +546,11 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 if 'botella' in listado_variables_datos and datos['botella'].iloc[idato] is not None:        
                     if 'hora_muestreo' in listado_variables_datos and datos['hora_muestreo'].iloc[idato] is not None:          
                         df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (df_datos_salidas['hora_muestreo']==datos['hora_muestreo'].iloc[idato]) & (df_datos_salidas['presion_ctd']== datos['presion_ctd'].iloc[idato])]
+                        
+                        st.text(datos['fecha_muestreo'].iloc[idato])
+                        st.text(df_datos_salidas['fecha_muestreo'].iloc[0])
+                        st.text(type(datos['fecha_muestreo'].iloc[idato]))
+                        st.text(type(df_datos_salidas['fecha_muestreo'].iloc[0]))
     
                     else:
                         df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato]) & (df_datos_salidas['presion_ctd']== datos['presion_ctd'].iloc[idato])]
