@@ -86,8 +86,8 @@ for ianho in range(len(listado_años)):
     
     # Introduce los datos en la base de datos
     print('Introduciendo los datos en la base de datos')
-    FUNCIONES_PROCESADO.inserta_datos(datos_anual,'discreto_fisica',direccion_host,base_datos,usuario,contrasena,puerto)
-    FUNCIONES_PROCESADO.inserta_datos(datos_anual,'discreto_bgq',direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_PROCESADO.inserta_datos(datos_anual,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
+
 
  
 

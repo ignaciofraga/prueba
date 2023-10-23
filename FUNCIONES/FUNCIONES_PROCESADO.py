@@ -247,6 +247,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
     conn_psql        = create_engine(con_engine)
     tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
     tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn_psql)
+    tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
     conn_psql.dispose()
 
     datos['id_salida']  = numpy.zeros(datos.shape[0],dtype=int)
@@ -258,148 +259,33 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
         id_ultima_salida_bd = 0
     iconta_nueva_salida     = 1
     
-    # listado con los nombres de meses
-    meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']
-           
-    # Extrae el mes y año de cada salida al mar
-    datos['mes'] = numpy.zeros(datos.shape[0])
-    datos['año'] = numpy.zeros(datos.shape[0])
-    for idato in range(datos.shape[0]):
-        datos['mes'].iloc[idato] =  datos['fecha_muestreo'].iloc[idato].month    
-        datos['año'].iloc[idato] =  datos['fecha_muestreo'].iloc[idato].year 
+    # Comprueba si los datos tienen un identificador de muestreo. En ese caso, ya tenemos la salida identificada.
+    variables_datos    = datos.columns.tolist()
+    if 'nombre_muestreo' in variables_datos and datos['nombre_muestreo'].isnull().values.any() == False:
+
+        for idato in range(datos.shape[0]):
+            datos['id_salida'].iloc[idato] = tabla_muestreos['salida_mar'][tabla_muestreos['nombre_muestreo']==datos['nombre_muestreo'].iloc[idato]]
     
-    if tipo_salida == 'PUNTUAL' and id_programa == 6: # Muestra puntual de un programa que no es estructural
+    # En caso contrario, hay que buscar la salida asociada entre las disponibles 
+    else:
     
-        dias_salida_mar = datos['fecha_muestreo'].unique()
+        # listado con los nombres de meses
+        meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']
+               
+        # Extrae el mes y año de cada salida al mar
+        datos['mes'] = numpy.zeros(datos.shape[0])
+        datos['año'] = numpy.zeros(datos.shape[0])
+        for idato in range(datos.shape[0]):
+            datos['mes'].iloc[idato] =  datos['fecha_muestreo'].iloc[idato].month    
+            datos['año'].iloc[idato] =  datos['fecha_muestreo'].iloc[idato].year 
         
-        for idia in range(len(dias_salida_mar)):    
-      
-            df_temporal = tabla_salidas[(tabla_salidas['fecha_salida']==dias_salida_mar[idia]) & (tabla_salidas['programa']==id_programa)]
-    
-            # Salida ya incluida en la base de datos. Recuperar identificador
-            if df_temporal.shape[0]>0:
-                id_salida = df_temporal['id_salida'].iloc[0]
-                
-            # Salida no incluida. Añadirla a la base de datos.
-            else:
+        if tipo_salida == 'PUNTUAL' and id_programa == 6: # Muestra puntual de un programa que no es estructural
+        
+            dias_salida_mar = datos['fecha_muestreo'].unique()
             
-                id_salida           = id_ultima_salida_bd + iconta_nueva_salida
-                iconta_nueva_salida = iconta_nueva_salida + 1
-            
-                # Encuentra las estaciones muestreadas
-                subset_salida                        = datos[datos['fecha_muestreo']==dias_salida_mar[idia]]
-                identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
-                estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
-                for iestacion in range(len(estaciones_muestreadas)):
-                    estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
-                json_estaciones        = json.dumps(estaciones_muestreadas)
-                   
-                # Define nombre
-                nombre_salida = nombre_programa + ' ' + str(dias_salida_mar[idia])
+            for idia in range(len(dias_salida_mar)):    
           
-                # Inserta en la base de datos
-                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                cursor = conn.cursor()                      
-                instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''        
-                cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,dias_salida_mar[idia],dias_salida_mar[idia],json_estaciones))
-                conn.commit()
-                cursor.close()
-                conn.close()
-                
-            # Asigna el id de la salida al dataframe
-            datos['id_salida'][datos['fecha_muestreo']==dias_salida_mar[idia]] = id_salida
-        
-        
-        
-        
-
-
-    if tipo_salida == 'ANUAL':
-
-        
-        # Añade una columna a las salidas con el año
-        tabla_salidas['año_salida']= numpy.zeros(tabla_salidas.shape[0])
-        for idato in range(tabla_salidas.shape[0]):
-            tabla_salidas['año_salida'].iloc[idato] =  tabla_salidas['fecha_salida'].iloc[idato].year    
-            
-
-        anhos_salida_mar = datos['año'].unique()
-        
-        for ianho in range(len(anhos_salida_mar)):    
- 
-            subset_anual     = datos[datos['año']==anhos_salida_mar[ianho]] 
-            
-            df_temporal = tabla_salidas[(tabla_salidas['año_salida']==anhos_salida_mar[ianho]) & (tabla_salidas['programa']==id_programa)]
-    
-            # Salida ya incluida en la base de datos. Recuperar identificador
-            if df_temporal.shape[0]>0:
-                id_salida = df_temporal['id_salida'].iloc[0]
-                
-            # Salida no incluida. Añadirla a la base de datos.
-            else:
-                
-                # Busca las fechas de salida y llegada
-                fechas_anuales   = subset_anual['fecha_muestreo'].unique()
-                fecha_salida     = min(fechas_anuales)
-                fecha_llegada    = max(fechas_anuales)  
-            
-                id_salida           = id_ultima_salida_bd + iconta_nueva_salida
-                iconta_nueva_salida = iconta_nueva_salida + 1
-            
-                # Encuentra las estaciones muestreadas
-                subset_salida                        = datos[datos['año']==anhos_salida_mar[ianho]]
-                identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
-                estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
-                for iestacion in range(len(estaciones_muestreadas)):
-                    estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
-                json_estaciones        = json.dumps(estaciones_muestreadas)
-                   
-                # Define nombre
-                nombre_salida = nombre_programa + ' ' + str(int(anhos_salida_mar[ianho]))
-          
-                # Inserta en la base de datos
-                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                cursor = conn.cursor()                      
-                instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''        
-                cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,fecha_salida,fecha_llegada,json_estaciones))
-                conn.commit()
-                cursor.close()
-                conn.close()
-                
-            # Asigna el id de la salida al dataframe
-            datos['id_salida'][datos['año']==anhos_salida_mar[ianho]] = id_salida
-    
-            
-    if tipo_salida == 'MENSUAL' or tipo_salida == 'SEMANAL' : # Programas radiales
-
-        anhos_salida_mar = datos['año'].unique()
-        
-        for ianho in range(len(anhos_salida_mar)):    
- 
-            subset_anual     = datos[datos['año']==anhos_salida_mar[ianho]] 
-            
-            if id_programa == 3: # PROGRAMA RADIALES CORUÑA. busco las salidas por fechas únicas (salidas de 1 día)
-            
-                fechas_salidas_mar = subset_anual['fecha_muestreo'].unique()
-                fechas_partida     = fechas_salidas_mar
-                fechas_regreso     = fechas_salidas_mar
-            
-            if id_programa == 4: # PROGRAMA RADIALES CANTABRICO. busco las salidas por meses únicos (salidas de más de 1 día, no vale criterio anterior)
-            
-                meses_salida_mar = subset_anual['mes'].unique()        
-                fechas_partida   = []
-                fechas_regreso   = []
-                for imes in range(len(meses_salida_mar)):            
-                    subset_mensual    = subset_anual[subset_anual['mes']==meses_salida_mar[imes]]
-                    fechas_partida    = fechas_partida + [min(subset_mensual['fecha_muestreo'])]
-                    fechas_regreso    = fechas_regreso + [max(subset_mensual['fecha_muestreo'])]       
-        
-            for isalida in range(len(fechas_partida)):            
-    
-                #df_temporal = tabla_salidas[tabla_salidas['fecha_salida']==fechas_partida[isalida]]
-                df_temporal = tabla_salidas[(tabla_salidas['fecha_salida']==fechas_partida[isalida]) & (tabla_salidas['programa']==id_programa)]
+                df_temporal = tabla_salidas[(tabla_salidas['fecha_salida']==dias_salida_mar[idia]) & (tabla_salidas['programa']==id_programa)]
         
                 # Salida ya incluida en la base de datos. Recuperar identificador
                 if df_temporal.shape[0]>0:
@@ -412,12 +298,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                     iconta_nueva_salida = iconta_nueva_salida + 1
                 
                     # Encuentra las estaciones muestreadas
-                    #subset_salida                        = datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]
-                    
-                    subset_salida = datos[(datos['fecha_muestreo']>=fechas_partida[isalida]) & (datos['fecha_muestreo']<=fechas_regreso[isalida])]
-                    
-                    
-                    
+                    subset_salida                        = datos[datos['fecha_muestreo']==dias_salida_mar[idia]]
                     identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
                     estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
                     for iestacion in range(len(estaciones_muestreadas)):
@@ -425,26 +306,156 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                     json_estaciones        = json.dumps(estaciones_muestreadas)
                        
                     # Define nombre
-                    if tipo_salida == 'MENSUAL':
-                        nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_partida[isalida].month-1]) + ' ' +  str(fechas_partida[isalida].year)
-                    if tipo_salida == 'SEMANAL':   
-                        nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_partida[isalida].month-1]) + ' ' +  str(fechas_partida[isalida].year) + ' SEMANA ' + str(round(fechas_partida[isalida].day/7)+1)
+                    nombre_salida = nombre_programa + ' ' + str(dias_salida_mar[idia])
+              
                     # Inserta en la base de datos
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()                      
                     instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
                     VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''        
-                    cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_partida[isalida],fechas_regreso[isalida],json_estaciones))
+                    cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,dias_salida_mar[idia],dias_salida_mar[idia],json_estaciones))
                     conn.commit()
                     cursor.close()
                     conn.close()
                     
                 # Asigna el id de la salida al dataframe
-                if id_programa == 3:
-                    datos['id_salida'][datos['fecha_muestreo']==fechas_salidas_mar[isalida]] = id_salida
-                if id_programa == 4:                
-                    #datos['id_salida'][(datos['año']==anhos_salida_mar[ianho]) & (datos['mes']==fechas_partida[isalida].month)] = id_salida
-                    datos['id_salida'][(datos['fecha_muestreo']>=fechas_partida[isalida]) & (datos['fecha_muestreo']<=fechas_regreso[isalida])]  = id_salida
+                datos['id_salida'][datos['fecha_muestreo']==dias_salida_mar[idia]] = id_salida
+            
+            
+            
+            
+    
+    
+        if tipo_salida == 'ANUAL':
+    
+            
+            # Añade una columna a las salidas con el año
+            tabla_salidas['año_salida']= numpy.zeros(tabla_salidas.shape[0])
+            for idato in range(tabla_salidas.shape[0]):
+                tabla_salidas['año_salida'].iloc[idato] =  tabla_salidas['fecha_salida'].iloc[idato].year    
+                
+    
+            anhos_salida_mar = datos['año'].unique()
+            
+            for ianho in range(len(anhos_salida_mar)):    
+     
+                subset_anual     = datos[datos['año']==anhos_salida_mar[ianho]] 
+                
+                df_temporal = tabla_salidas[(tabla_salidas['año_salida']==anhos_salida_mar[ianho]) & (tabla_salidas['programa']==id_programa)]
+        
+                # Salida ya incluida en la base de datos. Recuperar identificador
+                if df_temporal.shape[0]>0:
+                    id_salida = df_temporal['id_salida'].iloc[0]
+                    
+                # Salida no incluida. Añadirla a la base de datos.
+                else:
+                    
+                    # Busca las fechas de salida y llegada
+                    fechas_anuales   = subset_anual['fecha_muestreo'].unique()
+                    fecha_salida     = min(fechas_anuales)
+                    fecha_llegada    = max(fechas_anuales)  
+                
+                    id_salida           = id_ultima_salida_bd + iconta_nueva_salida
+                    iconta_nueva_salida = iconta_nueva_salida + 1
+                
+                    # Encuentra las estaciones muestreadas
+                    subset_salida                        = datos[datos['año']==anhos_salida_mar[ianho]]
+                    identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
+                    estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
+                    for iestacion in range(len(estaciones_muestreadas)):
+                        estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
+                    json_estaciones        = json.dumps(estaciones_muestreadas)
+                       
+                    # Define nombre
+                    nombre_salida = nombre_programa + ' ' + str(int(anhos_salida_mar[ianho]))
+              
+                    # Inserta en la base de datos
+                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                    cursor = conn.cursor()                      
+                    instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''        
+                    cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,fecha_salida,fecha_llegada,json_estaciones))
+                    conn.commit()
+                    cursor.close()
+                    conn.close()
+                    
+                # Asigna el id de la salida al dataframe
+                datos['id_salida'][datos['año']==anhos_salida_mar[ianho]] = id_salida
+        
+                
+        if tipo_salida == 'MENSUAL' or tipo_salida == 'SEMANAL' : # Programas radiales
+    
+            anhos_salida_mar = datos['año'].unique()
+            
+            for ianho in range(len(anhos_salida_mar)):    
+     
+                subset_anual     = datos[datos['año']==anhos_salida_mar[ianho]] 
+                
+                if id_programa == 3: # PROGRAMA RADIALES CORUÑA. busco las salidas por fechas únicas (salidas de 1 día)
+                
+                    fechas_salidas_mar = subset_anual['fecha_muestreo'].unique()
+                    fechas_partida     = fechas_salidas_mar
+                    fechas_regreso     = fechas_salidas_mar
+                
+                if id_programa == 4: # PROGRAMA RADIALES CANTABRICO. busco las salidas por meses únicos (salidas de más de 1 día, no vale criterio anterior)
+                
+                    meses_salida_mar = subset_anual['mes'].unique()        
+                    fechas_partida   = []
+                    fechas_regreso   = []
+                    for imes in range(len(meses_salida_mar)):            
+                        subset_mensual    = subset_anual[subset_anual['mes']==meses_salida_mar[imes]]
+                        fechas_partida    = fechas_partida + [min(subset_mensual['fecha_muestreo'])]
+                        fechas_regreso    = fechas_regreso + [max(subset_mensual['fecha_muestreo'])]       
+            
+                for isalida in range(len(fechas_partida)):            
+        
+                    #df_temporal = tabla_salidas[tabla_salidas['fecha_salida']==fechas_partida[isalida]]
+                    df_temporal = tabla_salidas[(tabla_salidas['fecha_salida']==fechas_partida[isalida]) & (tabla_salidas['programa']==id_programa)]
+            
+                    # Salida ya incluida en la base de datos. Recuperar identificador
+                    if df_temporal.shape[0]>0:
+                        id_salida = df_temporal['id_salida'].iloc[0]
+                        
+                    # Salida no incluida. Añadirla a la base de datos.
+                    else:
+                    
+                        id_salida           = id_ultima_salida_bd + iconta_nueva_salida
+                        iconta_nueva_salida = iconta_nueva_salida + 1
+                    
+                        # Encuentra las estaciones muestreadas
+                        #subset_salida                        = datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]
+                        
+                        subset_salida = datos[(datos['fecha_muestreo']>=fechas_partida[isalida]) & (datos['fecha_muestreo']<=fechas_regreso[isalida])]
+                        
+                        
+                        
+                        identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
+                        estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
+                        for iestacion in range(len(estaciones_muestreadas)):
+                            estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
+                        json_estaciones        = json.dumps(estaciones_muestreadas)
+                           
+                        # Define nombre
+                        if tipo_salida == 'MENSUAL':
+                            nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_partida[isalida].month-1]) + ' ' +  str(fechas_partida[isalida].year)
+                        if tipo_salida == 'SEMANAL':   
+                            nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_partida[isalida].month-1]) + ' ' +  str(fechas_partida[isalida].year) + ' SEMANA ' + str(round(fechas_partida[isalida].day/7)+1)
+                        # Inserta en la base de datos
+                        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                        cursor = conn.cursor()                      
+                        instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''        
+                        cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_partida[isalida],fechas_regreso[isalida],json_estaciones))
+                        conn.commit()
+                        cursor.close()
+                        conn.close()
+                        
+                    # Asigna el id de la salida al dataframe
+                    if id_programa == 3:
+                        datos['id_salida'][datos['fecha_muestreo']==fechas_salidas_mar[isalida]] = id_salida
+                    if id_programa == 4:                
+                        #datos['id_salida'][(datos['año']==anhos_salida_mar[ianho]) & (datos['mes']==fechas_partida[isalida].month)] = id_salida
+                        datos['id_salida'][(datos['fecha_muestreo']>=fechas_partida[isalida]) & (datos['fecha_muestreo']<=fechas_regreso[isalida])]  = id_salida
     return datos
 
 
@@ -632,74 +643,128 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     elif tipo_datos   == 'perfil':
         tabla_destino = 'datos_perfiles'
         puntero       = 'perfil'            
-                    
-    # Recupera la tabla con los registros de muestreos físicos
+
+
+    # Recupera la tabla con las variables disponibles
     con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql          = create_engine(con_engine)
     tabla_variables    = psql.read_sql('SELECT * FROM variables_procesado', conn_psql) 
-    instruccion_sql    = 'SELECT * FROM ' + tabla_destino
-    tabla_registros    = psql.read_sql(instruccion_sql, conn_psql)
     conn_psql.dispose()
         
     # Lee las variables de cada tipo a utilizar en el control de calidad
     df_variables = tabla_variables[tabla_variables['tipo']=='variable_muestreo']
     variables_bd = df_variables['nombre']    
-  
+      
     # Busca qué variables están incluidas en los datos a importar
     listado_variables_datos   = datos_insercion.columns.tolist()
     listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
     listado_adicional         = [puntero] + listado_variables_comunes
+    
+    
+    # Genera la intrucción de escritura
+    str_var = ','.join(listado_adicional)
+    str_com = ','.join(listado_variables_comunes)
+    listado_exc = ['EXCLUDED.' + s for s in listado_variables_comunes]
+    str_exc = ','.join(listado_exc)
+    listado_str = ['%s']*len(listado_adicional)
+    str_car = ','.join(listado_str)
+    
+    instruccion_sql = 'INSERT INTO ' + tabla_destino + '(' + str_var + ') VALUES (' + str_car + ') ON CONFLICT (' + puntero + ') DO UPDATE SET (' + str_com + ') = ROW(' + str_exc +');'
+      
+    # Genera un dataframe sólo con las variables a insertar y el puntero
+    datos_variables = datos_insercion[listado_adicional]
+    
+    # Convierte todos los datos a formato nativo de python
+    df_formateado  = pandas.DataFrame(index=range(datos_variables.shape[0]),columns=listado_adicional)
+    for idato in range(df_formateado.shape[0]):
+        for ivar in range(df_formateado.shape[1]):
+            try:
+                df_formateado.iloc[idato].iloc[ivar] = (datos_variables.iloc[idato].iloc[ivar]).item()
+            except:
+                pass
+    
+    # Conecta con la base de datos
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor() 
+    
+    for idato in range(df_formateado.shape[0]): # Dataframe con la interseccion de los datos nuevos y los disponibles en la base de datos, a partir de la variable muestreo
+                 
+        # Inserta los datos
+        cursor.execute(instruccion_sql,(df_formateado.iloc[idato]))
+        conn.commit()       
+    
+    cursor.close()
+    conn.close()
+
+                    
+    # # Recupera la tabla con los registros de muestreos físicos
+    # con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    # conn_psql          = create_engine(con_engine)
+    # tabla_variables    = psql.read_sql('SELECT * FROM variables_procesado', conn_psql) 
+    # instruccion_sql    = 'SELECT * FROM ' + tabla_destino
+    # tabla_registros    = psql.read_sql(instruccion_sql, conn_psql)
+    # conn_psql.dispose()
+        
+    # # Lee las variables de cada tipo a utilizar en el control de calidad
+    # df_variables = tabla_variables[tabla_variables['tipo']=='variable_muestreo']
+    # variables_bd = df_variables['nombre']    
+  
+    # # Busca qué variables están incluidas en los datos a importar
+    # listado_variables_datos   = datos_insercion.columns.tolist()
+    # listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
+    # listado_adicional         = [puntero] + listado_variables_comunes
             
-    # # Si no existe ningún registro en la base de datos, introducir todos los datos disponibles
-    if tabla_registros.shape[0] == 0:
+    # # # Si no existe ningún registro en la base de datos, introducir todos los datos disponibles
+    # if tabla_registros.shape[0] == 0:
         
-        datos_insercion = datos_insercion[listado_adicional]
+    #     datos_insercion = datos_insercion[listado_adicional]
         
-        datos_insercion.set_index(puntero,drop=True,append=False,inplace=True)
-        datos_insercion.to_sql(tabla_destino, conn_psql,if_exists='append')
+    #     datos_insercion.set_index(puntero,drop=True,append=False,inplace=True)
+    #     datos_insercion.to_sql(tabla_destino, conn_psql,if_exists='append')
                
         
-    # En caso contrario, comprobar qué parte de la información está en la base de datos
-    else: 
+    # # En caso contrario, comprobar qué parte de la información está en la base de datos
+    # else: 
             
-        for idato in range(datos_insercion.shape[0]): # Dataframe con la interseccion de los datos nuevos y los disponibles en la base de datos, a partir de la variable muestreo
          
-            df_temp  = tabla_registros[(tabla_registros[puntero]==datos_insercion[puntero].iloc[idato])] 
+    #     for idato in range(datos_insercion.shape[0]): # Dataframe con la interseccion de los datos nuevos y los disponibles en la base de datos, a partir de la variable muestreo
+                             
+    #         df_temp  = tabla_registros[(tabla_registros[puntero]==datos_insercion[puntero].iloc[idato])] 
             
-            if df_temp.shape[0]>0:  # Muestreo ya incluido en la base de datos
+    #         if df_temp.shape[0]>0:  # Muestreo ya incluido en la base de datos
             
-                muestreo = df_temp[puntero].iloc[0]
+    #             muestreo = df_temp[puntero].iloc[0]
                                 
-                for ivariable in range(len(listado_variables_comunes)): # Reemplazar las variables disponibles en el muestreo correspondiente
+    #             for ivariable in range(len(listado_variables_comunes)): # Reemplazar las variables disponibles en el muestreo correspondiente
                         
-                    #tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]][datos_insercion[puntero]==int(muestreo)]
-                    tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]].iloc[idato]
+    #                 #tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]][datos_insercion[puntero]==int(muestreo)]
+    #                 tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]].iloc[idato]
 
-            else: # Nuevo muestreo
+    #         else: # Nuevo muestreo
                        
-                df_add = datos_insercion[datos_insercion[puntero]==datos_insercion[puntero].iloc[idato]] # Genero un dataframe con cada línea de datos a añadir
+    #             df_add = datos_insercion[datos_insercion[puntero]==datos_insercion[puntero].iloc[idato]] # Genero un dataframe con cada línea de datos a añadir
   
-                df_add = df_add[listado_adicional] # Recorto para que tenga sólo las variables a añadir
+    #             df_add = df_add[listado_adicional] # Recorto para que tenga sólo las variables a añadir
             
-                tabla_registros = pandas.concat([tabla_registros, df_add]) # Combino ambos dataframes
+    #             tabla_registros = pandas.concat([tabla_registros, df_add]) # Combino ambos dataframes
                    
-        tabla_registros.set_index(puntero,drop=True,append=False,inplace=True)
+    #     tabla_registros.set_index(puntero,drop=True,append=False,inplace=True)
         
         
-        # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
-        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        cursor = conn.cursor()
-        instruccion_sql = "TRUNCATE " + tabla_destino + ";"
-        cursor.execute(instruccion_sql)
-        conn.commit()
-        cursor.close()
-        conn.close() 
+    #     # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+    #     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    #     cursor = conn.cursor()
+    #     instruccion_sql = "TRUNCATE " + tabla_destino + ";"
+    #     cursor.execute(instruccion_sql)
+    #     conn.commit()
+    #     cursor.close()
+    #     conn.close() 
         
-        # Inserta el dataframe resultante en la base de datos 
-        tabla_registros.to_sql(tabla_destino, conn_psql,if_exists='append')
+    #     # Inserta el dataframe resultante en la base de datos 
+    #     tabla_registros.to_sql(tabla_destino, conn_psql,if_exists='append')
   
 
-    conn_psql.dispose() # Cierra la conexión con la base de datos 
+    # conn_psql.dispose() # Cierra la conexión con la base de datos 
 
 
 

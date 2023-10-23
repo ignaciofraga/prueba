@@ -45,42 +45,43 @@ from os import listdir
 from os.path import isfile, join
 listado_archivos = [f for f in listdir(directorio_datos) if isfile(join(directorio_datos, f))]
 
-#for iarchivo in range(len(listado_archivos)):
+for iarchivo in range(len(listado_archivos)):
 #for iarchivo in range(1):
 
-iarchivo = 11   
-
-nombre_archivo = directorio_datos + '/' + listado_archivos[iarchivo] 
-   
-print('Procesando la informacion correspondiente al año ',nombre_archivo[-9:-5])
-
-print('Leyendo los datos contenidos en el archivo excel')
-datos_radprof  = FUNCIONES_LECTURA.lectura_datos_radprof(nombre_archivo)
-datos_radprof['prof_referencia'] = None
+    nombre_archivo = directorio_datos + '/' + listado_archivos[iarchivo] 
+       
+    print('Procesando la informacion correspondiente al año ',nombre_archivo[-9:-5])
     
-# Realiza un control de calidad primario a los datos importados   
-print('Realizando control de calidad')
-datos_radprof_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radprof)  
+    print('Leyendo los datos contenidos en el archivo excel')
+    datos_radprof  = FUNCIONES_LECTURA.lectura_datos_radprof(nombre_archivo)
+    datos_radprof['prof_referencia'] = None
+        
+    # Realiza un control de calidad primario a los datos importados   
+    print('Realizando control de calidad')
+    datos_radprof_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radprof)  
+    
+    # Recupera el identificador del programa de muestreo
+    id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    # Encuentra la estación asociada a cada registro
+    print('Asignando la estación correspondiente a cada medida')
+    datos_radprof_corregido = FUNCIONES_PROCESADO.evalua_estaciones(datos_radprof_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    # Asigna el identificador de salida al mar correspondiente
+    tipo_salida = 'ANUAL'
+    datos_radprof_corregido = FUNCIONES_PROCESADO.evalua_salidas(datos_radprof_corregido,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    
+    # Encuentra el identificador asociado a cada registro
+    print('Asignando el registro correspondiente a cada medida')
+    datos_radprof_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radprof_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    # # # # # Introduce los datos en la base de datos
+    print('Introduciendo los datos en la base de datos')
+    FUNCIONES_PROCESADO.inserta_datos(datos_radprof_corregido,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
 
-# Recupera el identificador del programa de muestreo
-id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
-
-# Encuentra la estación asociada a cada registro
-print('Asignando la estación correspondiente a cada medida')
-datos_radprof_corregido = FUNCIONES_PROCESADO.evalua_estaciones(datos_radprof_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-
-# Asigna el identificador de salida al mar correspondiente
-tipo_salida = 'ANUAL'
-datos_radprof_corregido = FUNCIONES_PROCESADO.evalua_salidas(datos_radprof_corregido,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
 
 
-# Encuentra el identificador asociado a cada registro
-print('Asignando el registro correspondiente a cada medida')
-datos_radprof_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radprof_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-
-# # # # # Introduce los datos en la base de datos
-print('Introduciendo los datos en la base de datos')
-FUNCIONES_PROCESADO.inserta_datos(datos_radprof_corregido,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
 
 
  

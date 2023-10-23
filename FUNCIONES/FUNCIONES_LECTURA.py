@@ -329,18 +329,18 @@ def lectura_datos_radprof(nombre_archivo):
         
     # Calcula la columna de NO3 a partir de la suma NO3+NO2
     datos_radprof['nitrato']    =  datos_radprof['NO3+NO2 umol/Kg'] - datos_radprof['NO2 umol/kg']
-    datos_radprof['nitrato_qf'] =  datos_radprof['Flag_TON'] 
+    datos_radprof['nitrato_qf'] =  1 #datos_radprof['Flag_TON'] 
        
 
     # Renombra las columnas para mantener una denominación homogénea
-    datos_radprof = datos_radprof.rename(columns={"Sta":"nombre_estacion","Niskin":"botella","Cast":'num_cast',
+    datos_radprof = datos_radprof.rename(columns={"Sta":"estacion","Niskin":"botella","Cast":'num_cast',
                                                   "Lat":"latitud","Lon":"longitud","CTDPRS":"presion_ctd","CTDtemp":"temperatura_ctd","SALCTD":"salinidad_ctd",
                                                   "SiO2 umol/Kg":"silicato","Flag_SiO2":"silicato_qf",
                                                   "NO2 umol/kg":"nitrito","Flag_NO2":"nitrito_qf","PO4 umol/Kg":"fosfato","Flag_PO4":"fosfato_qf","ID":"id_externo"
                                                   })
 
     # Mantén solo las columnas que interesan
-    datos_radprof_recorte = datos_radprof[['nombre_estacion','botella','fecha_muestreo','hora_muestreo','latitud','longitud','presion_ctd','num_cast','temperatura_ctd','salinidad_ctd',
+    datos_radprof_recorte = datos_radprof[['estacion','botella','fecha_muestreo','hora_muestreo','latitud','longitud','presion_ctd','num_cast','temperatura_ctd','salinidad_ctd',
                                             'nitrato','nitrato_qf','nitrito','nitrito_qf','silicato','silicato_qf','fosfato','fosfato_qf','id_externo']]
     
 

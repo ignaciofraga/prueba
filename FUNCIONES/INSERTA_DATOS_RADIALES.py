@@ -34,6 +34,7 @@ programa_muestreo = 'RADIAL CORUÑA'
 # INSERTA_DATOS_RADIALES_HISTORICO.inserta_radiales_historico(nombre_archivo,base_datos,usuario,contrasena,puerto,direccion_host,programa_muestreo)
 
 
+
 # # # RADIALES 2013-2020
 # directorio_datos           = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES'
 # # Listado de archivos disponibles
@@ -85,7 +86,7 @@ programa_muestreo = 'RADIAL CORUÑA'
 
 # # DATOS DEL 21-23
 # # # Parámetros
-# anhos = [2023]
+# anhos = [2021]
 # ruta_archivos = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/MENSUALES/Procesados'
 # import INSERTA_DATOS_PERFILES
 # for ianho in range(len(anhos)):
@@ -102,21 +103,52 @@ nombre_archivo    = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATO
 datos_radiales = pandas.read_excel(nombre_archivo)
 datos_radiales_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radiales)  
 
-datos_radiales_corregido['nitrato']    = datos_radiales_corregido['ton'] - datos_radiales_corregido['nitrito']
-datos_radiales_corregido['nitrato_qf'] = 9
-for idato in range(datos_radiales_corregido.shape[0]):
-    if datos_radiales_corregido['ton_qf'].iloc[idato] == 2 and datos_radiales_corregido['nitrito_qf'].iloc[idato]:
-       datos_radiales_corregido['nitrato_qf'].iloc[idato] = 2 
+import psycopg2
+import pandas.io.sql as psql
+from sqlalchemy import create_engine
+import numpy
+datos = datos_radiales_corregido
+# Recupera la tabla con los registros de muestreos físicos
+con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+conn_psql        = create_engine(con_engine)
+tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql)
+tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn_psql)
+tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
+conn_psql.dispose()
 
-# Recupera el identificador del programa de muestreo
-id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+datos['id_salida']  = numpy.zeros(datos.shape[0],dtype=int)
 
-# Encuentra el identificador asociado a cada registro
-print('Asignando el registro correspondiente a cada medida')
-datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+# Contadores e identificadores 
+if tabla_salidas['id_salida'].shape[0]>0:
+    id_ultima_salida_bd = max(tabla_salidas['id_salida'])
+else:
+    id_ultima_salida_bd = 0
+iconta_nueva_salida     = 1
+
+# Comprueba si los datos tienen un identificador de muestreo. En ese caso, ya tenemos la salida identificada.
+variables_datos    = datos.columns.tolist()
+if 'nombre_muestreo' in variables_datos and datos['nombre_muestreo'].isnull().values.any() == False:
+    print('sd')
+    for idato in range(datos.shape[0]):
+        datos['id_salida'].iloc[idato] = tabla_muestreos['salida_mar'][tabla_muestreos['nombre_muestreo']==datos['nombre_muestreo'].iloc[idato]]
+
+
+
+# datos_radiales_corregido['nitrato']    = datos_radiales_corregido['ton'] - datos_radiales_corregido['nitrito']
+# datos_radiales_corregido['nitrato_qf'] = 9
+# for idato in range(datos_radiales_corregido.shape[0]):
+#     if datos_radiales_corregido['ton_qf'].iloc[idato] == 2 and datos_radiales_corregido['nitrito_qf'].iloc[idato]:
+#         datos_radiales_corregido['nitrato_qf'].iloc[idato] = 2 
+
+# # Recupera el identificador del programa de muestreo
+# id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+
+# # Encuentra el identificador asociado a cada registro
+# print('Asignando el registro correspondiente a cada medida')
+# datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
-print('Introduciendo los datos en la base de datos')
-FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
+# print('Introduciendo los datos en la base de datos')
+# FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
 
   
 

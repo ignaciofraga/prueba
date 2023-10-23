@@ -2071,11 +2071,12 @@ def entrada_datos_excel():
 
                                 
         # Corrige el formato de las fechas
-        for idato in range(df_datos_importacion.shape[0]):
-            df_datos_importacion['fecha_muestreo'].iloc[idato] = (df_datos_importacion['fecha_muestreo'].iloc[idato]).date()           
-            if df_datos_importacion['fecha_muestreo'].iloc[idato]:
-                if 'hora_muestreo' in variables_archivo and isinstance(df_datos_importacion['hora_muestreo'].iloc[idato], str):
-                    df_datos_importacion['hora_muestreo'].iloc[idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'].iloc[idato], '%H:%M:%S').time()
+        if 'fecha_muestreo' in variables_discretas:
+            for idato in range(df_datos_importacion.shape[0]):
+                df_datos_importacion['fecha_muestreo'].iloc[idato] = (df_datos_importacion['fecha_muestreo'].iloc[idato]).date()           
+                if df_datos_importacion['fecha_muestreo'].iloc[idato]:
+                    if 'hora_muestreo' in variables_archivo and isinstance(df_datos_importacion['hora_muestreo'].iloc[idato], str):
+                        df_datos_importacion['hora_muestreo'].iloc[idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'].iloc[idato], '%H:%M:%S').time()
 
         # Cambia el nombre del identificador 
         try:

@@ -177,7 +177,7 @@ def inserta_radiales_historico(nombre_archivo,base_datos,usuario,contrasena,puer
             datos_radiales['estacion'].iloc[idato]  = '3C'         
     
     
-    
+    #return datos_radiales    
     
     # Recupera el identificador del programa de muestreo
     id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
