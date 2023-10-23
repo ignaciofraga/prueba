@@ -531,6 +531,10 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
         cursor = conn.cursor()
         
+        import streamlit as st
+        st.dataframe(df_datos_salidas['nombre_muestreo'])
+        st.dataframe(datos['nombre_muestreo'])
+        
         for idato in range(datos.shape[0]):
             
             if 'nombre_muestreo' in listado_variables_datos and datos['nombre_muestreo'].iloc[idato] is not None: 
