@@ -131,7 +131,9 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql        = create_engine(con_engine)
     tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn_psql) 
+    tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn_psql)
         
+    
     # Cambia nombres a minusculas para comparar 
     tabla_estaciones['nombre_estacion'] = tabla_estaciones['nombre_estacion'].apply(lambda x:x.lower())
     
@@ -141,91 +143,103 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     
     # Columna para punteros de estaciones
     datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
-    
-    # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
-    estaciones_programa            = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
-    indices_dataframe              = numpy.arange(0,estaciones_programa.shape[0],1,dtype=int)    
-    estaciones_programa['id_temp'] = indices_dataframe
-    estaciones_programa.set_index('id_temp',drop=True,append=False,inplace=True)
-    
-    listado_variables = datos.columns.tolist()
-    if 'latitud' not in listado_variables:
-        datos['latitud'] = [None]*datos.shape[0]
-    if 'longitud' not in listado_variables:
-        datos['longitud'] = [None]*datos.shape[0]   
-        
-    # Genera un dataframe con las estaciones incluidas en el muestreo
-    estaciones_muestreadas                      = datos['estacion'].unique()
-    estaciones_muestreadas                      = pandas.DataFrame(data=estaciones_muestreadas,columns=['nombre_estacion'])  
-    estaciones_muestreadas['id_estacion']       = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-    estaciones_muestreadas['io_nueva_estacion'] = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-    estaciones_muestreadas['latitud_estacion']  = [None]*estaciones_muestreadas.shape[0]
-    estaciones_muestreadas['longitud_estacion'] = [None]*estaciones_muestreadas.shape[0]
 
 
-    # Contadores e identificadores 
-    if len(tabla_estaciones['id_estacion'])>0:
-        id_ultima_estacion_bd = max(tabla_estaciones['id_estacion'])
-    else:
-        id_ultima_estacion_bd = 0
+    
+    # Comprueba si los datos tienen un identificador de muestreo. En ese caso, ya tenemos la estacion identificada.
+    variables_datos    = datos.columns.tolist()
+    if 'nombre_muestreo' in variables_datos and datos['nombre_muestreo'].isnull().values.any() == False:
+
+        for idato in range(datos.shape[0]):
+            datos['id_estacion_temp'].iloc[idato] = tabla_muestreos['estacion'][tabla_muestreos['nombre_muestreo']==datos['nombre_muestreo'].iloc[idato]]
+    
+    # En caso contrario, hay que buscar la estación asociada
+    else:    
         
-    iconta_nueva_estacion     = 1
-    
-    # Encuentra el identificador asociado a cada estacion en la base de datos
-    for iestacion in range(estaciones_muestreadas.shape[0]):
+        # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
+        estaciones_programa            = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
+        indices_dataframe              = numpy.arange(0,estaciones_programa.shape[0],1,dtype=int)    
+        estaciones_programa['id_temp'] = indices_dataframe
+        estaciones_programa.set_index('id_temp',drop=True,append=False,inplace=True)
         
-        df_temporal = estaciones_programa[estaciones_programa['nombre_estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]
-    
-        #print(df_temporal)
-    
-        # Estacion ya incluida en la base de datos. Recuperar identificador
-        if df_temporal.shape[0]>0:
-            estaciones_muestreadas['id_estacion'][iestacion]       = df_temporal['id_estacion'].iloc[0]
+        listado_variables = datos.columns.tolist()
+        if 'latitud' not in listado_variables:
+            datos['latitud'] = [None]*datos.shape[0]
+        if 'longitud' not in listado_variables:
+            datos['longitud'] = [None]*datos.shape[0]   
             
-            # Asigna lat/lon a la medida si ésta no la tenía
-            if 'latitud' not in listado_variables:
-                datos['latitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['latitud_estacion'].iloc[0] 
-            if 'longitud' not in listado_variables:
-                datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['longitud_estacion'].iloc[0] 
-            
-             
-        # Nueva estación, asignar orden creciente de identificador
+        # Genera un dataframe con las estaciones incluidas en el muestreo
+        estaciones_muestreadas                      = datos['estacion'].unique()
+        estaciones_muestreadas                      = pandas.DataFrame(data=estaciones_muestreadas,columns=['nombre_estacion'])  
+        estaciones_muestreadas['id_estacion']       = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
+        estaciones_muestreadas['io_nueva_estacion'] = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
+        estaciones_muestreadas['latitud_estacion']  = [None]*estaciones_muestreadas.shape[0]
+        estaciones_muestreadas['longitud_estacion'] = [None]*estaciones_muestreadas.shape[0]
+    
+    
+        # Contadores e identificadores 
+        if len(tabla_estaciones['id_estacion'])>0:
+            id_ultima_estacion_bd = max(tabla_estaciones['id_estacion'])
         else:
-            estaciones_muestreadas['id_estacion'][iestacion]       = id_ultima_estacion_bd + iconta_nueva_estacion
-            estaciones_muestreadas['io_nueva_estacion'][iestacion] = 1           
-            iconta_nueva_estacion                                 = iconta_nueva_estacion + 1
-  
-            # Determina la lat/lon de la estacion a partir de los valores de los registros asociados
-            if 'latitud' in listado_variables:
-                estaciones_muestreadas['latitud_estacion'][iestacion]  = (datos['latitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
-            if 'longitud' in listado_variables:
-                estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
-          
-        # Asigna el identificador de estación a los datos importados
-        datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]=estaciones_muestreadas['id_estacion'][iestacion]
+            id_ultima_estacion_bd = 0
             
-
-
-    # Añade en la base de datos las nuevas estaciones    
-    if numpy.count_nonzero(estaciones_muestreadas['io_nueva_estacion']) > 0:
+        iconta_nueva_estacion     = 1
+        
+        # Encuentra el identificador asociado a cada estacion en la base de datos
+        for iestacion in range(estaciones_muestreadas.shape[0]):
+            
+            df_temporal = estaciones_programa[estaciones_programa['nombre_estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]
+        
+            #print(df_temporal)
+        
+            # Estacion ya incluida en la base de datos. Recuperar identificador
+            if df_temporal.shape[0]>0:
+                estaciones_muestreadas['id_estacion'][iestacion]       = df_temporal['id_estacion'].iloc[0]
+                
+                # Asigna lat/lon a la medida si ésta no la tenía
+                if 'latitud' not in listado_variables:
+                    datos['latitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['latitud_estacion'].iloc[0] 
+                if 'longitud' not in listado_variables:
+                    datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['longitud_estacion'].iloc[0] 
+                
+                 
+            # Nueva estación, asignar orden creciente de identificador
+            else:
+                estaciones_muestreadas['id_estacion'][iestacion]       = id_ultima_estacion_bd + iconta_nueva_estacion
+                estaciones_muestreadas['io_nueva_estacion'][iestacion] = 1           
+                iconta_nueva_estacion                                 = iconta_nueva_estacion + 1
+      
+                # Determina la lat/lon de la estacion a partir de los valores de los registros asociados
+                if 'latitud' in listado_variables:
+                    estaciones_muestreadas['latitud_estacion'][iestacion]  = (datos['latitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
+                if 'longitud' in listado_variables:
+                    estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
+              
+            # Asigna el identificador de estación a los datos importados
+            datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]=estaciones_muestreadas['id_estacion'][iestacion]
+                
     
-        # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
-        nuevos_muestreos  = estaciones_muestreadas[estaciones_muestreadas['io_nueva_estacion']==1]
-        # Mantén sólo las columnas que interesan
-        exporta_registros = nuevos_muestreos[['id_estacion','nombre_estacion','latitud_estacion','longitud_estacion']]
-        # Añade columna con el identiicador del programa
-        exporta_registros['programa'] = numpy.zeros(exporta_registros.shape[0],dtype=int)
-        exporta_registros['programa'] = id_programa
-        # corrije el indice del dataframe 
-        exporta_registros.set_index('id_estacion',drop=True,append=False,inplace=True)
     
-        # Inserta el dataframe resultante en la base de datos 
-        exporta_registros.to_sql('estaciones', conn_psql,if_exists='append')
-
-    # elimina la informacion cargada y que no se vaya a exportar, para liberar memoria
-    del(estaciones_muestreadas,estaciones_programa,tabla_estaciones)
+        # Añade en la base de datos las nuevas estaciones    
+        if numpy.count_nonzero(estaciones_muestreadas['io_nueva_estacion']) > 0:
+        
+            # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
+            nuevos_muestreos  = estaciones_muestreadas[estaciones_muestreadas['io_nueva_estacion']==1]
+            # Mantén sólo las columnas que interesan
+            exporta_registros = nuevos_muestreos[['id_estacion','nombre_estacion','latitud_estacion','longitud_estacion']]
+            # Añade columna con el identiicador del programa
+            exporta_registros['programa'] = numpy.zeros(exporta_registros.shape[0],dtype=int)
+            exporta_registros['programa'] = id_programa
+            # corrije el indice del dataframe 
+            exporta_registros.set_index('id_estacion',drop=True,append=False,inplace=True)
+        
+            # Inserta el dataframe resultante en la base de datos 
+            exporta_registros.to_sql('estaciones', conn_psql,if_exists='append')
     
-    conn_psql.dispose() # Cierra la conexión con la base de datos
+        # elimina la informacion cargada y que no se vaya a exportar, para liberar memoria
+        del(estaciones_muestreadas,estaciones_programa,tabla_estaciones)
+        
+        conn_psql.dispose() # Cierra la conexión con la base de datos
     
 #    # Cambia el nombre de la columna "estacion" por "nombre_estacion"
 #    datos = datos.rename(columns={"estacion":"nombre_estacion"})
