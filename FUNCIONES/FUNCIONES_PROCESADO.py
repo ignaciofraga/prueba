@@ -27,9 +27,9 @@ def control_calidad(datos):
  
     textos_aviso = [] 
       
-    # Cambia valores no válidos por None
-    datos = datos.replace({numpy.nan:None})
-    datos = datos.replace(-999, None) 
+    # # Cambia valores no válidos por None
+    # datos = datos.replace({numpy.nan:None})
+    # datos = datos.replace(-999, None) 
     
     listado_variables_datos   = datos.columns.tolist()
            
@@ -494,21 +494,21 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         # # añade el nombre del muestreo
         exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
         for idato in range(exporta_registros.shape[0]):    
-            nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == datos['id_estacion_temp'].iloc[idato]]['nombre_estacion'].iloc[0]
+            nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == exporta_registros['id_estacion_temp'].iloc[idato]]['nombre_estacion'].iloc[0]
             
-            nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'].iloc[idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
-            if 'num_cast' in listado_variables_datos and datos['num_cast'].iloc[idato] is not None:
-                nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'].iloc[idato]))
+            nombre_muestreo     = abreviatura_programa + '_' + exporta_registros['fecha_muestreo'].iloc[idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
+            if 'num_cast' in listado_variables_datos and exporta_registros['num_cast'].iloc[idato] is not None:
+                nombre_muestreo = nombre_muestreo + '_C' + str(round(exporta_registros['num_cast'].iloc[idato]))
             else:
                 nombre_muestreo = nombre_muestreo + '_C1' 
                 
-            if 'botella' in listado_variables_datos and datos['botella'].iloc[idato] is not None:
-                nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'].iloc[idato])) 
+            if 'botella' in listado_variables_datos and exporta_registros['botella'].iloc[idato] is not None:
+                nombre_muestreo = nombre_muestreo + '_B' + str(round(exporta_registros['botella'].iloc[idato])) 
             else:
-                if 'prof_referencia' in listado_variables_datos and datos['prof_referencia'].iloc[idato] is not None: 
-                    nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['prof_referencia'].iloc[idato]))
+                if 'prof_referencia' in listado_variables_datos and exporta_registros['prof_referencia'].iloc[idato] is not None: 
+                    nombre_muestreo = nombre_muestreo + '_P' + str(round(exporta_registros['prof_referencia'].iloc[idato]))
                 else:
-                    nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'].iloc[idato])) 
+                    nombre_muestreo = nombre_muestreo + '_P' + str(round(exporta_registros['presion_ctd'].iloc[idato])) 
                 
             exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
 
@@ -541,18 +541,33 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 
             else:
                 
+                # condicional para evitar errores por tipo de dato en la fecha y hora
+                if isinstance(datos['fecha_muestreo'].iloc[idato], datetime.date):
+                    fecha_comparacion = datos['fecha_muestreo'].iloc[idato]
+                else:
+                    fecha_comparacion = datos['fecha_muestreo'].iloc[idato].date()  
+                    
+                if 'hora_muestreo' in listado_variables_datos and datos['hora_muestreo'].iloc[idato] is not None:
+                    if isinstance(datos['hora_muestreo'].iloc[idato], datetime.time):
+                        hora_comparacion = datos['hora_muestreo'].iloc[idato]
+                    else:
+                        hora_comparacion = datos['hora_muestreo'].iloc[idato].time()                        
+                
                 if 'botella' in listado_variables_datos and datos['botella'].iloc[idato] is not None:        
-                    if 'hora_muestreo' in listado_variables_datos and datos['hora_muestreo'].iloc[idato] is not None:          
-                        df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato].date()) & (df_datos_salidas['hora_muestreo']==datos['hora_muestreo'].iloc[idato].time()) & (df_datos_salidas['presion_ctd']== datos['presion_ctd'].iloc[idato])]
+                    if 'hora_muestreo' in listado_variables_datos and datos['hora_muestreo'].iloc[idato] is not None:  
+                        if 'num_cast' in listado_variables_datos and datos['num_cast'].iloc[idato] is not None: 
+                            df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato])  & (df_datos_salidas['num_cast']==datos['num_cast'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['hora_muestreo']==hora_comparacion)]
+                        else:
+                            df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['hora_muestreo']==hora_comparacion)]
                             
                     else:
-                        df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato].date()) & (df_datos_salidas['presion_ctd']== datos['presion_ctd'].iloc[idato])]
+                        df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion)]
                                 
                 else:
                     if 'hora_muestreo' in listado_variables_datos and datos['hora_muestreo'].iloc[idato] is not None:          
-                        df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato].date()) & (df_datos_salidas['hora_muestreo']==datos['hora_muestreo'].iloc[idato].time()) & (df_datos_salidas['presion_ctd']== datos['presion_ctd'].iloc[idato])]   
+                        df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['hora_muestreo']==hora_comparacion) & (df_datos_salidas['presion_ctd']== datos['presion_ctd'].iloc[idato])]   
                     else:
-                        df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==datos['fecha_muestreo'].iloc[idato].date()) & (df_datos_salidas['presion_ctd']== datos['presion_ctd'].iloc[idato])]
+                        df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['presion_ctd']== datos['presion_ctd'].iloc[idato])]
                 
             if df_temp.shape[0]> 0:
                 datos['muestreo'].iloc[idato]          = df_temp['muestreo'].iloc[0]    
@@ -594,21 +609,21 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             # Añade el nombre del muestreo
             exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
             for idato in range(exporta_registros.shape[0]):    
-                nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == datos['id_estacion_temp'].iloc[idato]]['nombre_estacion'].iloc[0]
+                nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == exporta_registros['estacion'].iloc[idato]]['nombre_estacion'].iloc[0]
               
-                nombre_muestreo     = abreviatura_programa + '_' + datos['fecha_muestreo'].iloc[idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
-                if 'num_cast' in listado_variables_datos and datos['num_cast'].iloc[idato] is not None:
-                    nombre_muestreo = nombre_muestreo + '_C' + str(round(datos['num_cast'].iloc[idato]))
+                nombre_muestreo     = abreviatura_programa + '_' + exporta_registros['fecha_muestreo'].iloc[idato].strftime("%Y%m%d") + '_E' + str(nombre_estacion)
+                if 'num_cast' in listado_variables_datos and exporta_registros['num_cast'].iloc[idato] is not None:
+                    nombre_muestreo = nombre_muestreo + '_C' + str(round(exporta_registros['num_cast'].iloc[idato]))
                 else:
                     nombre_muestreo = nombre_muestreo + '_C1'
                 
-                if 'botella' in listado_variables_datos and datos['botella'].iloc[idato] is not None:
-                    nombre_muestreo = nombre_muestreo + '_B' + str(round(datos['botella'].iloc[idato])) 
+                if 'botella' in listado_variables_datos and exporta_registros['botella'].iloc[idato] is not None:
+                    nombre_muestreo = nombre_muestreo + '_B' + str(round(exporta_registros['botella'].iloc[idato])) 
                 else:
-                    if 'prof_referencia' in listado_variables_datos and datos['prof_referencia'].iloc[idato] is not None: 
-                        nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['prof_referencia'].iloc[idato]))
+                    if 'prof_referencia' in listado_variables_datos and exporta_registros['prof_referencia'].iloc[idato] is not None: 
+                        nombre_muestreo = nombre_muestreo + '_P' + str(round(exporta_registros['prof_referencia'].iloc[idato]))
                     else:
-                        nombre_muestreo = nombre_muestreo + '_P' + str(round(datos['presion_ctd'].iloc[idato])) 
+                        nombre_muestreo = nombre_muestreo + '_P' + str(round(exporta_registros['presion_ctd'].iloc[idato])) 
                  
                 exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
         
@@ -625,15 +640,19 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 ######## FUNCION PARA INSERTAR DATOS DISCRETOS EN LA BASE DE DATOS  ########
 ############################################################################
 
-def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables):
+def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_registros,tabla_muestreos):
   
-    if tipo_datos     == 'discreto':
-        tabla_destino = 'datos_discretos'
-        puntero       = 'muestreo'
+    # Establece los parámetros de la conexion con la base de datos
+    con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+   
+    # Define tabla y puntero en funcion del tipo de dato 
+    if tipo_datos   == 'discreto':
+        tabla_datos = 'datos_discretos'
+        puntero     = 'muestreo'
     
-    elif tipo_datos   == 'perfil':
-        tabla_destino = 'datos_perfiles'
-        puntero       = 'perfil'            
+    elif tipo_datos == 'perfil':
+        tabla_datos = 'datos_perfiles'
+        puntero     = 'perfil'            
        
     # Lee las variables de cada tipo a utilizar en el control de calidad
     df_variables = tabla_variables[tabla_variables['tipo']=='variable_muestreo']
@@ -643,42 +662,147 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     listado_variables_datos   = datos_insercion.columns.tolist()
     listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
     listado_adicional         = [puntero] + listado_variables_comunes
+
+    # Genera una tabla con los datos disponibles de las salidas a insertar (para agilizar la comparación entre datos nuevos y disponibles)
+    listado_salidas            = datos_insercion['id_salida'].unique()
+    df_muestreos_seleccionados = tabla_muestreos[tabla_muestreos['salida_mar'].isin(listado_salidas)]
+    tabla_datos_previos        = pandas.merge(tabla_registros, df_muestreos_seleccionados, on="muestreo")
+            
+    # Si la tabla en la que se cargan los datos no contiene ningún registro, introducir todos los datos disponibles
+    if tabla_datos_previos.shape[0] == 0:
+        
+        datos_insercion = datos_insercion[listado_adicional]
+        
+        datos_insercion.set_index(puntero,drop=True,append=False,inplace=True)
+        conn_psql          = create_engine(con_engine)
+        datos_insercion.to_sql(tabla_datos, conn_psql,if_exists='append')
+        conn_psql.dispose()       
+        
+        texto_insercion = 'Datos insertados correctamente'
+        
+    # En caso contrario, buscar si los datos a añadir corresponden a muestreos que ya estan en la base de datos para incorporar solo la nueva informacion y no perder la disponible 
+    else: 
+                    
+        for idato in range(datos_insercion.shape[0]): # Dataframe con la interseccion de los datos nuevos y los disponibles en la base de datos, a partir de la variable muestreo
+                             
+            df_temp  = tabla_datos_previos[(tabla_datos_previos[puntero]==datos_insercion[puntero].iloc[idato])] 
+            
+            if df_temp.shape[0]>0:  # Muestreo ya incluido en la base de datos
+            
+                muestreo = df_temp[puntero].iloc[0]
+                                
+                for ivariable in range(len(listado_variables_comunes)): # Reemplazar las variables disponibles en el muestreo correspondiente
+                        
+                    tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]].iloc[idato]
+
+            else: # Nuevo muestreo
+                       
+                df_add = datos_insercion[datos_insercion[puntero]==datos_insercion[puntero].iloc[idato]] # Genero un dataframe con cada línea de datos a añadir
+  
+                df_add = df_add[listado_adicional] # Recorto para que tenga sólo las variables a añadir
+            
+                tabla_registros = pandas.concat([tabla_registros, df_add]) # Combino ambos dataframes
+                   
+        tabla_registros.set_index(puntero,drop=True,append=False,inplace=True)
+                
+        ##### INSERCION DE DATOS ######
+        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        cursor = conn.cursor()
+        
+        # Copia temporal de la tabla con los datos a importar, para no perder los datos si hay un fallo en la carga.
+        tabla_temporal = tabla_datos + '_temporal'
+        
+        instruccion_sql = "DROP TABLE IF EXISTS " + tabla_temporal + ";"
+        cursor.execute(instruccion_sql)
+        conn.commit()
+
+        instruccion_sql = "CREATE TABLE " + tabla_temporal + "  AS TABLE " + tabla_datos + ";"        
+        cursor.execute(instruccion_sql)
+        conn.commit()
+                
+        cursor.close()
+        conn.close() 
+
+        try:
+        
+            # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()
+            instruccion_sql = "TRUNCATE " + tabla_datos + ";"
+            cursor.execute(instruccion_sql)
+            conn.commit()
+            cursor.close()
+            conn.close() 
+       
+            # Inserta el dataframe con los datos anteriores y nuevos en la base de datos 
+            conn_psql          = create_engine(con_engine)
+            tabla_registros.to_sql(tabla_datos, conn_psql,if_exists='append')
+            conn_psql.dispose() 
+            
+            # Texto con el resultado de la insercion
+            texto_insercion = 'Datos insertados correctamente'
+            
+        except:
+            
+            # En caso de fallo, vuelve a copiar la información de la tabla temporal a la original, para no perder informacion
+            instruccion_sql = "INSERT INTO " + tabla_datos + " SELECT * FROM "  + tabla_temporal +";"
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()
+            cursor.execute(instruccion_sql)
+            conn.commit()
+            cursor.close()
+            conn.close() 
+            
+            texto_insercion = 'Error en la carga de datos.'
+            
+    return texto_insercion
+  
+
+    
+
+
+####################○
+
     
     
-    # Genera la intrucción de escritura
-    str_var = ','.join(listado_adicional)
-    str_com = ','.join(listado_variables_comunes)
-    listado_exc = ['EXCLUDED.' + s for s in listado_variables_comunes]
-    str_exc = ','.join(listado_exc)
-    listado_str = ['%s']*len(listado_adicional)
-    str_car = ','.join(listado_str)
+    # # Genera la intrucción de escritura
+    # str_var = ','.join(listado_adicional)
+    # str_com = ','.join(listado_variables_comunes)
+    # listado_exc = ['EXCLUDED.' + s for s in listado_variables_comunes]
+    # str_exc = ','.join(listado_exc)
+    # listado_str = ['%s']*len(listado_adicional)
+    # str_car = ','.join(listado_str)
     
-    instruccion_sql = 'INSERT INTO ' + tabla_destino + '(' + str_var + ') VALUES (' + str_car + ') ON CONFLICT (' + puntero + ') DO UPDATE SET (' + str_com + ') = ROW(' + str_exc +');'
+    # instruccion_sql = 'INSERT INTO ' + tabla_destino + '(' + str_var + ') VALUES (' + str_car + ') ON CONFLICT (' + puntero + ') DO UPDATE SET (' + str_com + ') = ROW(' + str_exc +');'
       
-    # Genera un dataframe sólo con las variables a insertar y el puntero
-    datos_variables = datos_insercion[listado_adicional]
+    # # Genera un dataframe sólo con las variables a insertar y el puntero
+    # datos_variables = datos_insercion[listado_adicional]
     
-    # Convierte todos los datos a formato nativo de python
-    df_formateado  = pandas.DataFrame(index=range(datos_variables.shape[0]),columns=listado_adicional)
-    for idato in range(df_formateado.shape[0]):
-        for ivar in range(df_formateado.shape[1]):
-            try:
-                df_formateado.iloc[idato].iloc[ivar] = (datos_variables.iloc[idato].iloc[ivar]).item()
-            except:
-                pass
+    # # # Convierte todos los datos a formato nativo de python
+    # df_formateado  = pandas.DataFrame(index=range(datos_variables.shape[0]),columns=listado_adicional)
+    # df_formateado  = df_formateado.replace(numpy.nan, None)
+    # for idato in range(df_formateado.shape[0]):
+    #     for ivar in range(df_formateado.shape[1]):
+    #         try:
+    #             df_formateado.iloc[idato].iloc[ivar] = (datos_variables.iloc[idato].iloc[ivar]).item()
+    #         except:
+    #             pass
     
-    # Conecta con la base de datos
-    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    cursor = conn.cursor() 
+    # #df_formateado = datos_variables
+
+    # # Conecta con la base de datos
+    # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    # cursor = conn.cursor() 
     
-    for idato in range(df_formateado.shape[0]): # Dataframe con la interseccion de los datos nuevos y los disponibles en la base de datos, a partir de la variable muestreo
+    # for idato in range(df_formateado.shape[0]): # Dataframe con la interseccion de los datos nuevos y los disponibles en la base de datos, a partir de la variable muestreo
                  
-        # Inserta los datos
-        cursor.execute(instruccion_sql,(df_formateado.iloc[idato]))
-        conn.commit()       
+    #     # Inserta los datos
+    #     print(df_formateado.iloc[idato])
+    #     cursor.execute(instruccion_sql,(df_formateado.iloc[idato]))
+    #     conn.commit()       
     
-    cursor.close()
-    conn.close()
+    # cursor.close()
+    # conn.close()
 
  
 
@@ -1330,12 +1454,12 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
     datos_corregidos = pandas.DataFrame(columns=variables_run)    
 
     # En runs con nitrato y nitrito calcular las concentraciones teniendo en cuenta el rendimiento
-    if 'ton' in variables_run and 'nitrito' in variables_run:
+    if 'nitrogeno_inorganico_total' in variables_run and 'nitrito' in variables_run:
     
         # Rendimiento de la columna del 100%, asignar directamente las concentraciones
         if rendimiento_columna == 100:
-            datos_entrada['nitrato_rendimiento'] = datos_entrada['ton'] - datos_entrada['nitrito'] 
-            datos_entrada['ton_rendimiento']     = datos_entrada['ton']       
+            datos_entrada['nitrato_rendimiento'] = datos_entrada['nitrogeno_inorganico_total'] - datos_entrada['nitrito'] 
+            datos_entrada['nitrogeno_inorganico_total_rendimiento']     = datos_entrada['nitrogeno_inorganico_total']       
         
         # Rendimiento menor al 100%, buscar los calibrantes y componer la concentración
         else:
@@ -1345,11 +1469,11 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
                    
             # Corrige las concentraciones a partir de los rendimientos de la columna reductora
             datos_entrada['nitrato_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
-            datos_entrada['ton_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
-            factor = ((datos_entrada['ton'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])/(datos_entrada['ton'].iloc[indices_calibracion[-1]] + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])
+            datos_entrada['nitrogeno_inorganico_total_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
+            factor = ((datos_entrada['nitrogeno_inorganico_total'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])/(datos_entrada['nitrogeno_inorganico_total'].iloc[indices_calibracion[-1]] + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])
             for idato in range(datos_entrada.shape[0]):
-                datos_entrada['nitrato_rendimiento'].iloc[idato] = (datos_entrada['ton'].iloc[idato]*factor - datos_entrada['nitrito'].iloc[idato])/(rendimiento_columna/100) 
-                datos_entrada['ton_rendimiento'].iloc[idato] = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['nitrito'].iloc[idato]
+                datos_entrada['nitrato_rendimiento'].iloc[idato] = (datos_entrada['nitrogeno_inorganico_total'].iloc[idato]*factor - datos_entrada['nitrito'].iloc[idato])/(rendimiento_columna/100) 
+                datos_entrada['nitrogeno_inorganico_total_rendimiento'].iloc[idato] = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['nitrito'].iloc[idato]
             
             
     # Asocia la temperatura de laboratorio a todas las muestras
@@ -1375,9 +1499,9 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
     densidades = seawater.eos80.dens0(datos_entrada['salinidad'], datos_entrada['temp.lab'])
     datos_entrada['DENSIDAD'] = densidades/1000  
                     
-    if 'ton' in variables_run:
-        datos_entrada['ton_CONC'] = datos_entrada['ton_rendimiento']/datos_entrada['DENSIDAD']  
-    if 'ton' in variables_run and 'nitrito' in variables_run:
+    if 'nitrogeno_inorganico_total' in variables_run:
+        datos_entrada['nitrogeno_inorganico_total_CONC'] = datos_entrada['nitrogeno_inorganico_total_rendimiento']/datos_entrada['DENSIDAD']  
+    if 'nitrogeno_inorganico_total' in variables_run and 'nitrito' in variables_run:
         datos_entrada['nitrato_CONC'] = datos_entrada['nitrato_rendimiento']/datos_entrada['DENSIDAD']  
     if 'nitrito' in variables_run:
         datos_entrada['nitrito_CONC'] = datos_entrada['nitrito']/datos_entrada['DENSIDAD']  
@@ -1478,7 +1602,7 @@ def procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_
                     
     if id_estacion == 2: #E3A
         listado_equiv_ctd = [1,3,5,7,9,11]
-        listado_equiv_real = [13,131,132,133,134,135]
+        listado_equiv_real = [1,3,5,7,9,11]
         for ibotella in range(datos_botellas.shape[0]):
             for iequiv in range(len(listado_equiv_ctd)):
                 if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
@@ -1486,7 +1610,7 @@ def procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_
 
     if id_estacion == 3: #E3C
         listado_equiv_ctd = [1,3,5,7,9,11]
-        listado_equiv_real = [14,141,142,143,144,145]
+        listado_equiv_real = [1,3,5,7,9,11]
         for ibotella in range(datos_botellas.shape[0]):
             for iequiv in range(len(listado_equiv_ctd)):
                 if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
@@ -1494,7 +1618,7 @@ def procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_
                     
     if id_estacion == 4: #E3B
         listado_equiv_ctd = [1,3,5,7,9,11]
-        listado_equiv_real = [15,151,152,153,154,155]
+        listado_equiv_real = [1,3,5,7,9,11]
         for ibotella in range(datos_botellas.shape[0]):
             for iequiv in range(len(listado_equiv_ctd)):
                 if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
@@ -1517,10 +1641,10 @@ def procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_
   
     # Asigna lat/lon de la estación si esa información no etá incluia en el .btl
     for imuestreo in range(datos_botellas.shape[0]):
-        if datos_botellas['latitud'].iloc[imuestreo] is None:
-            datos_botellas['latitud'].iloc[imuestreo] = tabla_estaciones_programa['latitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
-        if datos_botellas['longitud'].iloc[imuestreo] is None:
-            datos_botellas['longitud'].iloc[imuestreo] = tabla_estaciones_programa['longitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
+        if datos_botellas['latitud_muestreo'].iloc[imuestreo] is None:
+            datos_botellas['latitud_muestreo'].iloc[imuestreo] = tabla_estaciones_programa['latitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
+        if datos_botellas['longitud_muestreo'].iloc[imuestreo] is None:
+            datos_botellas['longitud_muestreo'].iloc[imuestreo] = tabla_estaciones_programa['longitud_estacion'][tabla_estaciones_programa['id_estacion']==id_estacion].iloc[0]
             
     # Asigna identificadores de salida al mar y estación
     datos_botellas['id_estacion_temp'] = datos_botellas['estacion']
@@ -1567,11 +1691,11 @@ def procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,
     conn.close() 
     
     df_perfiles['perfil'] = int(id_perfil)
-                                
-    inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    df_botella = None    
+                            
+    #inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto)
    
-        
-        
     if nombre_estacion == '2' and abreviatura_programa == 'RADCOR' :  # Estacion 2 del programa radiales, añadir muestreo correspondiente a la botella en superficie
 
           # Genera dataframe con el muestreo de la estacion 2
@@ -1585,8 +1709,8 @@ def procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,
             df_botella = df_temp
 
           # Asigna los datos correspondientes
-          df_botella['latitud']                = datos_muestreo_perfil['lat_muestreo'].iloc[0]
-          df_botella['longitud']               = datos_muestreo_perfil['lon_muestreo'].iloc[0]
+          df_botella['latitud_muestreo']                = datos_muestreo_perfil['lat_muestreo'].iloc[0]
+          df_botella['longitud_muestreo']               = datos_muestreo_perfil['lon_muestreo'].iloc[0]
           df_botella['prof_referencia']        = 0
           df_botella['fecha_muestreo']         = datos_muestreo_perfil['fecha_muestreo'].iloc[0]
          
@@ -1615,7 +1739,8 @@ def procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,
           df_botella['fluorescencia_ctd_qf']   = 2
           df_botella['par_ctd_qf']             = 2
     
-  
-          df_botella                           = evalua_registros(df_botella,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
  
-          inserta_datos(df_botella,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
+    
+    return df_botella,df_perfiles      
+ 
+    #inserta_datos(df_botella,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)

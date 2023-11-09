@@ -659,9 +659,9 @@ def consulta_botellas():
                              
                 
         with col2:
-            io_nitrogeno_total     = st.checkbox('TON', value=False)
+            io_nitrogeno_total     = st.checkbox('Nitrogeno inorgánico total', value=False)
             if io_nitrogeno_total:
-                listado_variables = listado_variables + ['ton'] + ['ton_qf']
+                listado_variables = listado_variables + ['nitrogeno_inorganico_total'] + ['nitrogeno_inorganico_total_qf']
                 
             io_nitrato   = st.checkbox('Nitrato', value=False)
             if io_nitrato:
@@ -688,29 +688,29 @@ def consulta_botellas():
                                 
                                
         with col3:
-            io_inorg_tcarb           = st.checkbox('Carbono inorganico total', value=False)
+            io_inorg_tcarb           = st.checkbox('Carbono inorgánico total', value=False)
             if io_inorg_tcarb:
-                listado_variables = listado_variables + ['tcarbn'] + ['tcarbn_qf']
+                listado_variables = listado_variables + ['carbono_inorganico_total'] + ['carbono_inorganico_total_qf']
                 
-            io_org_tcarb           = st.checkbox('NPOC', value=False)
+            io_org_tcarb           = st.checkbox('Carbono orgánico total', value=False)
             if io_org_tcarb:
-                listado_variables = listado_variables + ['toc'] + ['toc_qf']
+                listado_variables = listado_variables + ['carbono_organico_total'] + ['carbono_organico_total_qf']
                 
-            io_tn           = st.checkbox('TDN', value=False)
+            io_tn           = st.checkbox('Nitrógeno total', value=False)
             if io_tn:
-                listado_variables = listado_variables + ['tdn'] + ['tdn_qf']
+                listado_variables = listado_variables + ['nitrogeno_total'] + ['nitrogeno_total_qf']
                 
-            io_doc           = st.checkbox('DOC', value=False)
+            io_doc           = st.checkbox('Carbono orgánico disuelto', value=False)
             if io_doc:
-                 listado_variables = listado_variables + ['doc'] + ['doc_qf']
+                 listado_variables = listado_variables + ['carbono_organico_disuelto'] + ['carbono_organico_disuelto_qf']
                  
-            io_doc           = st.checkbox('COP', value=False)
+            io_doc           = st.checkbox('Carbono orgánico particulado', value=False)
             if io_doc:
-                listado_variables = listado_variables + ['cop'] 
+                listado_variables = listado_variables + ['carbono_organico_particulado'] 
 
-            io_cdom           = st.checkbox('NOP', value=False)
+            io_cdom           = st.checkbox('Nitrógeno orgánico particulado', value=False)
             if io_cdom:
-               listado_variables = listado_variables + ['nop'] 
+               listado_variables = listado_variables + ['nitrogeno_organico_particulado'] 
 
             io_cdom           = st.checkbox('CDOM', value=False)
             if io_cdom:

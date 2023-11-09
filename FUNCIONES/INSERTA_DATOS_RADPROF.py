@@ -17,6 +17,8 @@ import FUNCIONES_AUXILIARES
 import pandas
 pandas.options.mode.chained_assignment = None
 import datetime
+from sqlalchemy import create_engine
+import pandas.io.sql as psql
 
 
 # Parámetros de la base de datos
@@ -45,8 +47,21 @@ from os import listdir
 from os.path import isfile, join
 listado_archivos = [f for f in listdir(directorio_datos) if isfile(join(directorio_datos, f))]
 
+
 for iarchivo in range(len(listado_archivos)):
 #for iarchivo in range(1):
+    
+    
+    # Carga informacion común a todas las salidas
+    con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+    conn             = create_engine(con_engine)
+    tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+    tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn)
+    tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+    tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+    tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
+    conn.dispose() 
 
     nombre_archivo = directorio_datos + '/' + listado_archivos[iarchivo] 
        
@@ -65,20 +80,20 @@ for iarchivo in range(len(listado_archivos)):
     
     # Encuentra la estación asociada a cada registro
     print('Asignando la estación correspondiente a cada medida')
-    datos_radprof_corregido = FUNCIONES_PROCESADO.evalua_estaciones(datos_radprof_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+    datos_radprof_corregido = FUNCIONES_PROCESADO.evalua_estaciones(datos_radprof_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
     
     # Asigna el identificador de salida al mar correspondiente
     tipo_salida = 'ANUAL'
-    datos_radprof_corregido = FUNCIONES_PROCESADO.evalua_salidas(datos_radprof_corregido,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+    datos_radprof_corregido = FUNCIONES_PROCESADO.evalua_salidas(datos_radprof_corregido,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
     
     
     # Encuentra el identificador asociado a cada registro
     print('Asignando el registro correspondiente a cada medida')
-    datos_radprof_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radprof_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-    
+    datos_radprof_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radprof_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
+        
     # # # # # Introduce los datos en la base de datos
     print('Introduciendo los datos en la base de datos')
-    FUNCIONES_PROCESADO.inserta_datos(datos_radprof_corregido,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
+    FUNCIONES_PROCESADO.inserta_datos(datos_radprof_corregido,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
 
 
 

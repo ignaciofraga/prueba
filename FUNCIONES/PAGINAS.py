@@ -1428,8 +1428,10 @@ def entrada_archivos_roseta():
                         # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
                         datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
-                        FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
+                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
 
+                        if texto_insercion:
+                            st.success(texto_insercion)   
                         
                     else:
                     
@@ -1590,8 +1592,8 @@ def procesado_nutrientes():
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
  
     # Define los vectores con las variables a procesar
-    variables_procesado    = ['TON','Nitrato','Nitrito','Silicato','Fosfato']    
-    variables_procesado_bd = ['ton','nitrato','nitrito','silicato','fosfato']
+    variables_procesado    = ['Nitrogeno inorganico total','Nitrato','Nitrito','Silicato','Fosfato']    
+    variables_procesado_bd = ['nitrogeno_inorganico_total','nitrato','nitrito','silicato','fosfato']
     variables_unidades     = ['\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg']
     
     
@@ -1604,7 +1606,7 @@ def procesado_nutrientes():
         
         st.subheader('Procesado de datos de nutrientes')
         
-        canales_autoanalizador = ['ton','nitrito','silicato','fosfato']
+        canales_autoanalizador = ['nitrogeno_inorganico_total','nitrito','silicato','fosfato']
         
         # Selecciona campaña y año (para evitar problemas con id duplicados en años distintos)              
         col1, col2 = st.columns(2,gap="small")
@@ -1719,12 +1721,12 @@ def procesado_nutrientes():
                 datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
                                             
                 # Calcula el NO3 como diferencia entre el TON y el NO2 (sólo si se han procesado estos dos canales)
-                if 'ton' in variables_run and 'nitrito' in variables_run:
-                    datos_corregidos['nitrato'] = datos_corregidos['ton'] - datos_corregidos['nitrito']
+                if 'nitrogeno_inorganico_total' in variables_run and 'nitrito' in variables_run:
+                    datos_corregidos['nitrato'] = datos_corregidos['nitrogeno_inorganico_total'] - datos_corregidos['nitrito']
                     datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
                     
                     # vuelvo a calcular el TON como NO3+NO2, por si hubiese corregido valores nulos
-                    datos_corregidos['ton'] = datos_corregidos['nitrato'] + datos_corregidos['nitrito']
+                    datos_corregidos['nitrogeno_inorganico_total'] = datos_corregidos['nitrato'] + datos_corregidos['nitrito']
                     
                     # añade nitrato a variables procesadas (para redondear decimales y añadir qf)
                     variables_run = variables_run + ['nitrato']
@@ -1739,14 +1741,7 @@ def procesado_nutrientes():
                 st.success(texto_exito)
                 
                 
-                # Añade información de la base de datos (muestreo, biogeoquimica y fisica)
-                # datos_corregidos = pandas.merge(datos_corregidos, df_muestreos, on="id_externo") # Esta unión elimina los registros que NO son muestras
-                
-                # variables_elimina       = variables_procesado_bd + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado']
-                # df_datos_biogeoquimicos = df_datos_discretos.drop(columns=variables_elimina) # Para eliminar las columnas previas con datos de nutrientes
 
-                # datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="muestreo",how='left')
-                                
                 variables_elimina       = variables_procesado_bd + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado']
                 df_datos_biogeoquimicos = df_datos_disponibles.drop(columns=variables_elimina)
                 datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="id_externo",how='left')
@@ -1772,12 +1767,13 @@ def procesado_nutrientes():
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
                 if io_add_data is True:
                                         
-                    FUNCIONES_PROCESADO.inserta_datos(datos_exporta,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
-                    #FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
+                    texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_exporta,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
                     
-                    
-                    texto_exito = 'Información introducida correctamente en la base de datos'
-                    st.success(texto_exito)
+                    if texto_insercion:
+                        st.success(texto_exito)
+                    else:
+                        texto_exito = 'Información introducida correctamente en la base de datos'
+                        st.success(texto_exito)
 
                 # Añade nombre de la estacion
                 df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
@@ -2132,10 +2128,17 @@ def entrada_datos_excel():
                             
             with st.spinner('Añadiendo datos discretos'):
                 
-                FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables)
+                texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables)
                 
-        texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
-        st.success(texto_exito)
+                if texto_insercion:
+                    st.success(texto_insercion)    
+                else:
+                    texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
+                    st.success(texto_exito)
+                    
+        else:
+            texto = 'El archivo ' + archivo_datos.name + ' no contiene informacion de variables muestreadas'
+            st.success(texto)
         
 
 
@@ -2184,8 +2187,8 @@ def referencias_nutrientes():
         
         col1, col2, col3= st.columns(3,gap="small")
         with col1:
-            salinidad = st.number_input('Salinidad (PSU):',value=float(35))
-            ton       = st.number_input('Nitrógeno total (µmol/L):',value=float(15))
+            salinidad                   = st.number_input('Salinidad (PSU):',value=float(35))
+            nitrogeno_inorganico_total  = st.number_input('Nitrógeno total (µmol/L):',value=float(15))
 
             
         with col2:
@@ -2205,19 +2208,19 @@ def referencias_nutrientes():
         if io_envio: 
             
             # Comprueba valores
-            if len(nombre_muestras) == 0 or salinidad is None or ton is None or nitrito is None or silicato is None or fosfato is None:
-                texto_error = 'IMPORTANTE. Los campos de nombre, TON, nitrito, silicato y fosfato no pueden ser nulos' 
+            if len(nombre_muestras) == 0 or salinidad is None or nitrogeno_inorganico_total is None or nitrito is None or silicato is None or fosfato is None:
+                texto_error = 'IMPORTANTE. Los campos de nombre, Nitrogeno inorganico total, nitrito, silicato y fosfato no pueden ser nulos' 
                 st.warning(texto_error, icon="⚠️")
                 
             else:
             
                 with st.spinner('Añadiendo RMN a la base de datos'):
                 
-                    instruccion_sql = 'INSERT INTO ' + nombre_tabla + ' (nombre_rmn,salinidad,ton,nitrito,silicato,fosfato,observaciones) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad,ton,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.ton,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato,EXCLUDED.observaciones);'
+                    instruccion_sql = 'INSERT INTO ' + nombre_tabla + ' (nombre_rmn,salinidad,nitrogeno_inorganico_total,nitrito,silicato,fosfato,observaciones) VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_rmn) DO UPDATE SET (salinidad,nitrogeno_inorganico_total,nitrito,silicato,fosfato,observaciones) = ROW(EXCLUDED.salinidad,EXCLUDED.nitrogeno_inorganico_total,EXCLUDED.nitrito,EXCLUDED.silicato,EXCLUDED.fosfato,EXCLUDED.observaciones);'
                         
                     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                     cursor = conn.cursor()
-                    cursor.execute(instruccion_sql,(nombre_muestras,salinidad,ton,nitrito,silicato,fosfato,observaciones))
+                    cursor.execute(instruccion_sql,(nombre_muestras,salinidad,nitrogeno_inorganico_total,nitrito,silicato,fosfato,observaciones))
                     conn.commit()                 
                     cursor.close()
                     conn.close()

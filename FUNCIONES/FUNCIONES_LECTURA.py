@@ -105,32 +105,40 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
     datos_radiales['ph_qf']     = numpy.zeros(datos_radiales.shape[0],dtype=int)
     datos_radiales['ph_metodo'] = numpy.zeros(datos_radiales.shape[0],dtype=int)
 
-    for idato in range(datos_radiales.shape[0]):
-        if datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato] != 9 and  datos_radiales['PHTS25P0_PUR_FLAG_W'][idato] == 9:
-            datos_radiales['ph'][idato]        =  datos_radiales['PHTS25P0_UNPUR'][idato]
-            datos_radiales['ph_qf'][idato]     = datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato]
-            datos_radiales['ph_metodo'][idato] = 1
-        elif datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato] == 9 and  datos_radiales['PHTS25P0_PUR_FLAG_W'][idato] != 9:
-            datos_radiales['ph'][idato]        =  datos_radiales['PHTS25P0_PUR'][idato]
-            datos_radiales['ph_qf'][idato]     = datos_radiales['PHTS25P0_PUR_FLAG_W'][idato]
-            datos_radiales['ph_metodo'][idato] = 2
-        else: 
-            datos_radiales['ph'][idato]        =  None
-            datos_radiales['ph_qf'][idato]     = 9
-            datos_radiales['ph_metodo'][idato] = None
-            
-              
-    for idato in range(datos_radiales.shape[0]):
-        if datos_radiales['ph'][idato] is None:
-            datos_radiales['ph_metodo'][idato] = None
+    try:
+
+        for idato in range(datos_radiales.shape[0]):
+            if datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato] != 9 and  datos_radiales['PHTS25P0_PUR_FLAG_W'][idato] == 9:
+                datos_radiales['ph'][idato]        =  datos_radiales['PHTS25P0_UNPUR'][idato]
+                datos_radiales['ph_qf'][idato]     = datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato]
+                datos_radiales['ph_metodo'][idato] = 1
+            elif datos_radiales['PHTS25P0_UNPUR_FLAG_W'][idato] == 9 and  datos_radiales['PHTS25P0_PUR_FLAG_W'][idato] != 9:
+                datos_radiales['ph'][idato]        =  datos_radiales['PHTS25P0_PUR'][idato]
+                datos_radiales['ph_qf'][idato]     = datos_radiales['PHTS25P0_PUR_FLAG_W'][idato]
+                datos_radiales['ph_metodo'][idato] = 2
+            else: 
+                datos_radiales['ph'][idato]        =  None
+                datos_radiales['ph_qf'][idato]     = 9
+                datos_radiales['ph_metodo'][idato] = None
+                
+                  
+        for idato in range(datos_radiales.shape[0]):
+            if datos_radiales['ph'][idato] is None:
+                datos_radiales['ph_metodo'][idato] = None
     
-        
+    except:
+        pass
+    
+    
     # Asigna el valor del cast. Si es un texto no asigna valor
     datos_radiales['num_cast'] = numpy.ones(datos_radiales.shape[0],dtype=int)
 #    datos_radiales['num_cast'] = [None]*datos_radiales.shape[0]
-        
-    datos_radiales = datos_radiales.drop(columns=['CTDOXY_CAL','CTDOXY_CAL_FLAG_W','CTDFLOUR_SCUFA', 'CTDFLUOR_AFL','CTDFLUOR_SP','CTDFLOUR_SCUFA_FLAG_W','CTDFLUOR_AFL_FLAG_W','CTDFLUOR_SP_FLAG_W','PHTS25P0_UNPUR','PHTS25P0_UNPUR_FLAG_W','PHTS25P0_PUR','PHTS25P0_PUR_FLAG_W'])
-    datos_radiales = datos_radiales.drop(columns=['configuracion_perfilador','configuracion_superficie'])
+
+
+
+    #listado_variables_elimina
+    #datos_radiales = datos_radiales.drop(columns=['CTDOXY_CAL','CTDOXY_CAL_FLAG_W','CTDFLOUR_SCUFA', 'CTDFLUOR_AFL','CTDFLUOR_SP','CTDFLOUR_SCUFA_FLAG_W','CTDFLUOR_AFL_FLAG_W','CTDFLUOR_SP_FLAG_W','PHTS25P0_UNPUR','PHTS25P0_UNPUR_FLAG_W','PHTS25P0_PUR','PHTS25P0_PUR_FLAG_W'])
+    #datos_radiales = datos_radiales.drop(columns=['configuracion_perfilador','configuracion_superficie'])
 
      
     # Renombra las columnas para mantener un mismo esquema de nombres   
@@ -140,17 +148,17 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
                                                     "CTDOXY":"oxigeno_ctd","CTDOXY_FLAG_W":"oxigeno_ctd_qf","CTDPAR":"par_ctd","CTDPAR_FLAG_W":"par_ctd_qf",
                                                     "CTDTURB":"turbidez_ctd","CTDTURB_FLAG_W":"turbidez_ctd_qf","OXYGEN":"oxigeno_wk","OXYGEN_FLAG_W":"oxigeno_wk_qf",
                                                     "SILCAT":"silicato","SILCAT_FLAG_W":"silicato_qf","NITRAT":"nitrato","NITRAT_FLAG_W":"nitrato_qf","NITRIT":"nitrito","NITRIT_FLAG_W":"nitrito_qf",
-                                                    "PHSPHT":"fosfato","PHSPHT_FLAG_W":"fosfato_qf","TCARBN":"tcarbn","TCARBN_FLAG_W":"tcarbn_qf","ALKALI":"alcalinidad","ALKALI_FLAG_W":"alcalinidad_qf",                                                   
+                                                    "PHSPHT":"fosfato","PHSPHT_FLAG_W":"fosfato_qf","TCARBN":"carbono_inorganico_total","TCARBN_FLAG_W":"carbono_inorganico_total_qf","ALKALI":"alcalinidad","ALKALI_FLAG_W":"alcalinidad_qf",                                                   
                                                     "R_CLOR":"r_clor","R_CLOR_FLAG_W":"r_clor_qf","R_PER":"r_per","R_PER_FLAG_W":"r_per_qf","CO3_TMP":"co3_temp"
                                                     })    
     
     # Ojo con esto, cuando una de las medidas está mal, estropea
-    datos_radiales['ton']    = [None]*datos_radiales.shape[0]
-    datos_radiales['ton_qf'] = 9
+    datos_radiales['nitrogeno_inorganico_total']    = [None]*datos_radiales.shape[0]
+    datos_radiales['nitrogeno_inorganico_total_qf'] = 9
     for idato in range(datos_radiales.shape[0]):
        if datos_radiales['nitrato_qf'][idato] == 2 and datos_radiales['nitrito_qf'][idato] == 2:
-           datos_radiales['ton'][idato]    = datos_radiales['nitrato'][idato] + datos_radiales['nitrito'][idato]
-           datos_radiales['ton_qf'][idato] = 2
+           datos_radiales['nitrogeno_inorganico_total'][idato]    = datos_radiales['nitrato'][idato] + datos_radiales['nitrito'][idato]
+           datos_radiales['nitrogeno_inorganico_total_qf'][idato] = 2
     
     # Añade una columan con el QF de la temperatura, igual al de la salinidad
     datos_radiales['temperatura_ctd_qf'] = datos_radiales['salinidad_ctd_qf'] 
@@ -158,12 +166,18 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
     # Añade una columan con la hora, aunque sea nula
     datos_radiales['hora_muestreo'] = None
     
-   
+  
+    # # Modifica el numero de la estacion a un entero
+    try:
+        datos_radiales['estacion'] = datos_radiales['estacion'].astype(int)
+    except:
+        pass
+  
+  
  
     # Añade una columna con la profundidad de referencia
     datos_radiales['prof_referencia'] = numpy.zeros(datos_radiales.shape[0],dtype=int)
     for idato in range(datos_radiales.shape[0]):
-        
         # Define las profundidades de referencia en cada estación
         if str(datos_radiales['estacion'][idato]) == '2': #Estación 2
             profundidades_referencia = numpy.asarray([0,5,10,20,30,40,70])
@@ -176,13 +190,162 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
         idx = (numpy.abs(profundidades_referencia - datos_radiales['presion_ctd'][idato])).argmin()
         datos_radiales['prof_referencia'][idato] =  profundidades_referencia[idx]
 
-        
+#     # Añade una columna con el nombre del muestreo
+#     datos_radiales['prof_referencia'] = numpy.zeros(datos_radiales.shape[0],dtype=int)
+#     for idato in range(datos_radiales.shape[0]):
+#         # Define las profundidades de referencia en cada estación
+#         if str(int(datos_radiales['estacion'][idato])) == '2': #Estación 2
+             
+
+# RADCOR_20210113_E2_C1_B7
     
     
     return datos_radiales
  
     
+############################################################################
+######## FUNCION PARA LEER DATOS HISTORICOS DE LA  CAMPAÑA RADIALES  #######
+############################################################################ 
+def lectura_radiales_historicos(nombre_archivo):
+    
+    # Importa el .xlsx
+    datos_radiales = pandas.read_excel(nombre_archivo, 'datos',na_values='#N/A')
+    
+    # # Elimina la primera fila, con unidades de las distintas variables
+    # datos_radiales = datos_radiales.iloc[1: , :]
+    
+    # Convierte las fechas de DATE a formato correcto
+    datos_radiales['Fecha'] =  pandas.to_datetime(datos_radiales['Fecha'], format='%Y%m%d').dt.date
+      
+    # Define una columna índice
+    indices_dataframe         = numpy.arange(0,datos_radiales.shape[0],1,dtype=int)
+    datos_radiales['id_temp'] = indices_dataframe
+    datos_radiales.set_index('id_temp',drop=True,append=False,inplace=True)
+    
+    # Cambia los nan por None
+    datos_radiales = datos_radiales.replace(numpy.nan, None)
+    
+    # Corrige las concentraciones para pasarlas de mmol/m3 (o umol/l) a umol/kg
+    
+    # Calculo de densidades
+    datos_radiales['densidad'] = numpy.ones(datos_radiales.shape[0])
+    for idato in range(datos_radiales.shape[0]):
+        if datos_radiales['sigmat'].iloc[idato] is not None:
+            datos_radiales['densidad'].iloc[idato]  =  1 + datos_radiales['sigmat'].iloc[idato]/1000
+    
+    datos_radiales = datos_radiales.rename(columns={"Fecha": "fecha_muestreo", "Prof":"presion_ctd", "t":"temperatura_ctd","S":"salinidad_ctd","E":"par_ctd", 
+                                                    "O2 umol/kg":"oxigeno_wk","Cla":"clorofila_a","ID_estacion":"estacion","Clb":"clorofila_b","Clc":"clorofila_c","PP":"prod_primaria","COP":"carbono_organico_particulado",'NOP':'nitrogeno_organico_particulado'})
+    
+    
+    # correccion
+    datos_radiales['nitrogeno_inorganico_total']      = [None]*datos_radiales.shape[0]
+    datos_radiales['nitrato']  = [None]*datos_radiales.shape[0]
+    datos_radiales['nitrito']  = [None]*datos_radiales.shape[0]
+    datos_radiales['amonio']   = [None]*datos_radiales.shape[0]
+    datos_radiales['fosfato']  = [None]*datos_radiales.shape[0]
+    datos_radiales['silicato'] = [None]*datos_radiales.shape[0]
+    
+        
+    datos_radiales['nitrogeno_inorganico_total_qf']      = int(2)
+    datos_radiales['nitrato_qf']  = int(2)
+    datos_radiales['nitrito_qf']  = int(2)
+    datos_radiales['amonio_qf']   = int(2)
+    datos_radiales['fosfato_qf']  = int(2)
+    datos_radiales['silicato_qf'] = int(2)
+    
+    datos_radiales['botella']       = [None]*datos_radiales.shape[0]
+    datos_radiales['hora_muestreo'] = [None]*datos_radiales.shape[0]
+    datos_radiales['prof_referencia'] = [None]*datos_radiales.shape[0]
+    datos_radiales['num_cast']        = [None]*datos_radiales.shape[0]
+    
+    datos_radiales['salinidad_ctd_qf']   = int(2)
+    datos_radiales['temperatura_ctd_qf'] = int(2)
+    datos_radiales['par_ctd_qf']         = int(2)
+    
+    datos_radiales['oxigeno_wk_qf']      = int(2)
+    datos_radiales['clorofila_a_qf']     = int(2)
+    datos_radiales['clorofila_b_qf']     = int(2)
+    datos_radiales['clorofila_c_qf']     = int(2)
+    
+    for idato in range(datos_radiales.shape[0]):
+        if datos_radiales['NO3'].iloc[idato] is not None:
+            datos_radiales['nitrato'].iloc[idato]  = datos_radiales['NO3'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+        else:
+            datos_radiales['nitrato_qf'].iloc[idato] = int(9)
+              
+        if datos_radiales['NO2'].iloc[idato] is not None:
+            datos_radiales['nitrito'].iloc[idato]  = datos_radiales['NO2'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+        else:
+            datos_radiales['nitrito_qf'].iloc[idato]  = int(9)       
+        
+        if datos_radiales['NH4'].iloc[idato] is not None:
+            datos_radiales['amonio'].iloc[idato]  = datos_radiales['NH4'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+        else:
+            datos_radiales['amonio_qf'].iloc[idato]  = int(9) 
+        
+        if datos_radiales['PO4'].iloc[idato] is not None:
+            datos_radiales['fosfato'].iloc[idato]  = datos_radiales['PO4'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+        else:
+            datos_radiales['fosfato_qf'].iloc[idato]  = int(9) 
+            
+        if datos_radiales['SiO2'].iloc[idato] is not None:
+            datos_radiales['silicato'].iloc[idato]  = datos_radiales['SiO2'].iloc[idato]/datos_radiales['densidad'].iloc[idato]  
+        else:
+            datos_radiales['silicato_qf'].iloc[idato]  = int(9)   
+            
+            
+        # QF
+        if datos_radiales['NO3flag'].iloc[idato] is not None:
+            datos_radiales['nitrato_qf'].iloc[idato]  = datos_radiales['NO3flag'].iloc[idato]  
+        if datos_radiales['NO2flag'].iloc[idato] is not None:
+            datos_radiales['nitrito_qf'].iloc[idato]  = datos_radiales['NO2flag'].iloc[idato]  
+        if datos_radiales['NH4flag'].iloc[idato] is not None:
+            datos_radiales['amonio_qf'].iloc[idato]  = datos_radiales['NH4flag'].iloc[idato]
+        if datos_radiales['PO4flag'].iloc[idato] is not None:
+            datos_radiales['fosfato_qf'].iloc[idato]  = datos_radiales['PO4flag'].iloc[idato]          
+        if datos_radiales['SiO2flag'].iloc[idato] is not None:
+            datos_radiales['silicato_qf'].iloc[idato]  = datos_radiales['SiO2flag'].iloc[idato]           
+    
+        # calculo del TON 
+        if datos_radiales['nitrato'].iloc[idato] is not None and datos_radiales['nitrito'].iloc[idato] is not None:
+            datos_radiales['nitrogeno_inorganico_total'].iloc[idato]  = datos_radiales['nitrato'].iloc[idato] + datos_radiales['nitrito'].iloc[idato]
+            if datos_radiales['amonio'].iloc[idato] is not None:
+                datos_radiales['nitrogeno_inorganico_total'].iloc[idato] = datos_radiales['nitrogeno_inorganico_total'].iloc[idato] + datos_radiales['amonio'].iloc[idato]
+        else:
+            datos_radiales['nitrogeno_inorganico_total_qf'].iloc[idato] = int(9) 
+        
+        # Reviso los QF
+        if datos_radiales['salinidad_ctd'].iloc[idato] is None:
+            datos_radiales['salinidad_ctd_qf'].iloc[idato] = int(9) 
+        if datos_radiales['temperatura_ctd'].iloc[idato] is None:
+            datos_radiales['temperatura_ctd_qf'].iloc[idato] = int(9) 
+        if datos_radiales['par_ctd'].iloc[idato] is None:
+            datos_radiales['par_ctd_qf'].iloc[idato] = int(9) 
+        if datos_radiales['oxigeno_wk'].iloc[idato] is None:
+            datos_radiales['oxigeno_wk_qf'].iloc[idato] = int(9) 
+        if datos_radiales['clorofila_a'].iloc[idato] is None:
+            datos_radiales['clorofila_a_qf'].iloc[idato] = int(9) 
+        if datos_radiales['clorofila_b'].iloc[idato] is None:
+            datos_radiales['clorofila_b_qf'].iloc[idato] = int(9) 
+        if datos_radiales['clorofila_c'].iloc[idato] is None:
+            datos_radiales['clorofila_c_qf'].iloc[idato] = int(9)          
+            
+        # aprovecho para cambiar el nombre de la estación
+        if datos_radiales['estacion'].iloc[idato] == 'E2CO':
+            datos_radiales['estacion'].iloc[idato]  = '2'    
+        if datos_radiales['estacion'].iloc[idato] == 'E4CO':
+            datos_radiales['estacion'].iloc[idato]  = '4'    
+        if datos_radiales['estacion'].iloc[idato] == 'E3CO':
+            datos_radiales['estacion'].iloc[idato]  = '3' 
+        if datos_radiales['estacion'].iloc[idato] == 'E3ACO':
+            datos_radiales['estacion'].iloc[idato]  = '3A' 
+        if datos_radiales['estacion'].iloc[idato] == 'E3BCO':
+            datos_radiales['estacion'].iloc[idato]  = '3B' 
+        if datos_radiales['estacion'].iloc[idato] == 'E3CCO':
+            datos_radiales['estacion'].iloc[idato]  = '3C'    
  
+    
+    return datos_radiales 
     
 ############################################################################
 ######## FUNCION PARA LEER DATOS CON EL FORMATO DE CAMPAÑA PELACUS  ########
@@ -196,12 +359,12 @@ def lectura_datos_pelacus(nombre_archivo):
     # Define una columna índice
     indices_dataframe         = numpy.arange(0,datos_pelacus.shape[0],1,dtype=int)
     datos_pelacus['id_temp'] = indices_dataframe
-    datos_pelacus.set_index('id_temp',drop=True,append=False,inplace=True)
+    datos_pelacus.set_index('id_temp',drop=True,append=False,inplace=True)  
     
     # Convierte las fechas de DATE a formato correcto
     datos_pelacus['fecha'] =  pandas.to_datetime(datos_pelacus['fecha'], format='%d%m%Y').dt.date
              
-    datos_pelacus['ton_qf']    = 9
+    datos_pelacus['nitrogeno_inorganico_total_qf']    = 9
     datos_pelacus['cast_temp'] = [None]*datos_pelacus.shape[0]
     for idato in range(datos_pelacus.shape[0]):
         if isinstance(datos_pelacus['cast'].iloc[idato], str) and datos_pelacus['cast'].iloc[idato][0:5] == 'PEL03':
@@ -219,38 +382,40 @@ def lectura_datos_pelacus(nombre_archivo):
             
         if math.isnan(datos_pelacus['NO3T_flag'].iloc[idato]):
             if not math.isnan(datos_pelacus['NO3'].iloc[idato]):
-                datos_pelacus['NO3T_flag'].iloc[idato] = 1
+                datos_pelacus['NO3T_flag'].iloc[idato] = int(1)
         if math.isnan(datos_pelacus['NO3'].iloc[idato]):
-            datos_pelacus['NO3T_flag'].iloc[idato] = 9
+            datos_pelacus['NO3T_flag'].iloc[idato] = int(9)
                 
         if math.isnan(datos_pelacus['NO2_flag'].iloc[idato]):
             if not math.isnan(datos_pelacus['NO2'].iloc[idato]):
-                datos_pelacus['NO2_flag'].iloc[idato] = 1
+                datos_pelacus['NO2_flag'].iloc[idato] = int(1)
         if math.isnan(datos_pelacus['NO2'].iloc[idato]):
-            datos_pelacus['NO2_flag'].iloc[idato] = 9
+            datos_pelacus['NO2_flag'].iloc[idato] = int(9)
     
         if math.isnan(datos_pelacus['NH4_flag'].iloc[idato]):
             if not math.isnan(datos_pelacus['NH4'].iloc[idato]):
-                datos_pelacus['NH4_flag'].iloc[idato] = 1
+                datos_pelacus['NH4_flag'].iloc[idato] = int(1)
         if math.isnan(datos_pelacus['NH4'].iloc[idato]):
-            datos_pelacus['NH4_flag'].iloc[idato] = 9
+            datos_pelacus['NH4_flag'].iloc[idato] = int(9)
     
         if math.isnan(datos_pelacus['PO4_flag'].iloc[idato]):
             if not math.isnan(datos_pelacus['PO4'].iloc[idato]):
-                datos_pelacus['PO4_flag'].iloc[idato] = 1
+                datos_pelacus['PO4_flag'].iloc[idato] = int(1)
         if math.isnan(datos_pelacus['PO4'].iloc[idato]):
-            datos_pelacus['PO4_flag'].iloc[idato] = 9
+            datos_pelacus['PO4_flag'].iloc[idato] = int(9)
     
         if math.isnan(datos_pelacus['SiO2_flag'].iloc[idato]):
             if not math.isnan(datos_pelacus['SiO2'].iloc[idato]):
-                datos_pelacus['SiO2_flag'].iloc[idato] = 1
+                datos_pelacus['SiO2_flag'].iloc[idato] = int(1)
         if math.isnan(datos_pelacus['SiO2'].iloc[idato]):
-            datos_pelacus['SiO2_flag'].iloc[idato] = 9
+            datos_pelacus['SiO2_flag'].iloc[idato] = int(9)
             
         if not isinstance(datos_pelacus['cast'].iloc[idato], str) and math.isnan(datos_pelacus['cast'].iloc[idato]) is True:    
             datos_pelacus['cast'].iloc[idato] = 1
 
     datos_pelacus['presion_ctd'] = numpy.zeros(datos_pelacus.shape[0])
+    datos_pelacus['Prof_real']   = datos_pelacus['Prof_real'].replace({numpy.nan:None})
+    datos_pelacus['Prof_teor.']  = datos_pelacus['Prof_teor.'].replace({numpy.nan:None})
     for idato in range(datos_pelacus.shape[0]):
         if datos_pelacus['Prof_real'][idato] is not None:
             datos_pelacus['presion_ctd'][idato] = datos_pelacus['Prof_real'][idato]
@@ -296,7 +461,8 @@ def lectura_datos_pelacus(nombre_archivo):
 
     datos_pelacus['botella'] = None
     
-
+    #datos_pelacus['estacion'] = datos_pelacus['estacion'].astype(int)
+    
 
     return datos_pelacus
 
@@ -319,13 +485,15 @@ def lectura_datos_radprof(nombre_archivo):
     datos_radprof['id_temp'] = indices_dataframe
     datos_radprof.set_index('id_temp',drop=True,append=False,inplace=True)
        
+    
+    
     # Cambia, en el dataframe, una única columna de fecha/hora por dos columnas: una de fecha y otra de hora
     datos_radprof['fecha_muestreo'] = [None]*datos_radprof.shape[0]
     datos_radprof['hora_muestreo']  = [None]*datos_radprof.shape[0]
     for idato in range(datos_radprof.shape[0]):
         datos_radprof['fecha_muestreo'][idato] = (datos_radprof['Date'][idato]).date()
         datos_radprof['hora_muestreo'][idato]  = (datos_radprof['Date'][idato]).time()
-        datos_radprof['st'][idato]             = str(datos_radprof['st'][idato])
+        datos_radprof['Sta'][idato]             = str(datos_radprof['Sta'][idato])
         
     # Calcula la columna de NO3 a partir de la suma NO3+NO2
     datos_radprof['nitrato']    =  datos_radprof['NO3+NO2 umol/Kg'] - datos_radprof['NO2 umol/kg']
@@ -370,8 +538,38 @@ def lectura_datos_radprof(nombre_archivo):
 
 
 ############################################################################
-######## FUNCION PARA LEER DATOS CON EL FORMATO DE CAMPAÑA RADPROF  ########
+######## FUNCION PARA LEER DATOS CON EL FORMATO DE CAMPAÑA RADCAN  ########
 ############################################################################ 
+    
+def lectura_datos_radcan(nombre_archivo):
+  
+    # Importa el .xlsx
+   
+    datos_radcan = pandas.read_excel(nombre_archivo, 'datos',dtype={'hora_muestreo': datetime.time})
+    for idato in range(datos_radcan.shape[0]):
+        datos_radcan['fecha_muestreo'][idato] = (datos_radcan['fecha_muestreo'][idato]).date()
+    
+    datos_radcan = datos_radcan.replace(numpy.nan, None)
+    # datos_radcan['hora_muestreo'] = datos_radcan['hora_muestreo'].replace(numpy.nan, None)
+    # datos_radcan['num_cast']      = datos_radcan['num_cast'].replace(numpy.nan, None)
+    # datos_radcan['botella']       = datos_radcan['botella'].replace(numpy.nan, None)
+    
+    # Corrige valores de nutrientes <0 
+    datos_radcan['nitrogeno_inorganico_total'][datos_radcan['nitrogeno_inorganico_total']<0]=0
+    datos_radcan['nitrito'][datos_radcan['nitrito']<0]=0
+    datos_radcan['fosfato'][datos_radcan['fosfato']<0]=0
+    datos_radcan['silicato'][datos_radcan['silicato']<0]=0
+    
+ 
+
+    return datos_radcan
+
+
+
+
+######################################################
+######## FUNCION PARA LEER DATOS DE PERFILES  ########
+###################################################### 
     
 def lectura_archivo_perfiles(datos_archivo):
 
@@ -837,8 +1035,8 @@ def lectura_btl(nombre_archivo,datos_archivo):
             datos_botellas['turbidez_ctd_qf']      = int(1)
                      
         # Añade informacion de lat/lon y fecha para que no elimine el registro durante el control de calidad
-        datos_botellas['latitud']                  = lat_muestreo  
-        datos_botellas['longitud']                 = lon_muestreo 
+        datos_botellas['latitud_muestreo']         = lat_muestreo  
+        datos_botellas['longitud_muestreo']        = lon_muestreo 
         datos_botellas['fecha_muestreo']           = fecha_muestreo_archivo
         datos_botellas['num_cast']                 = cast_muestreo
         
