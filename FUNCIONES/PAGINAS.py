@@ -1910,12 +1910,11 @@ def entrada_datos_laboratorio():
         df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
         df_programas            = psql.read_sql('SELECT * FROM programas', conn)
         df_indices_calidad      = psql.read_sql('SELECT * FROM indices_calidad', conn)
-        df_metodo_ph            = psql.read_sql('SELECT * FROM metodo_ph', conn)
         conn.close()
-        return df_muestreos,df_datos_discretos,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph
+        return df_muestreos,df_datos_discretos,df_salidas,df_estaciones,df_programas,df_indices_calidad
         
 
-    df_muestreos,df_datos_discretos,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph = carga_datos_entrada_laboratorio()
+    df_muestreos,df_datos_discretos,df_salidas,df_estaciones,df_programas,df_indices_calidad = carga_datos_entrada_laboratorio()
 
     # Mantén sólo las salidas de radiales
     id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
@@ -1941,7 +1940,7 @@ def entrada_datos_laboratorio():
     # Añade nuevos datos obtenidos en laboratorio
     if tipo_accion == acciones[0]:
         
-        FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_procesado,variables_procesado_bd,variables_unidades,df_referencia,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph)
+        FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_procesado,variables_procesado_bd,variables_unidades,df_referencia,df_salidas,df_estaciones,df_programas,df_indices_calidad)
 
     
     # Realiza control de calidad
@@ -1973,6 +1972,16 @@ def entrada_datos_laboratorio():
 
             texto_aviso = 'La base de datos no contiene información de ' + variable_seleccionada + ' correspondientes a la salida ' + salida_seleccionada 
             st.warning(texto_aviso)
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
  
 # ###############################################################################
 # ################## PÁGINA DE ENTRADA DE ESTADILLOS #################
