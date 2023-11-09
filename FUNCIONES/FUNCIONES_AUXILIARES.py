@@ -686,6 +686,7 @@ def consulta_botellas():
             if io_silicato or io_fosfato or io_amonio or io_nitrito or io_nitrato or io_nitrogeno_total:
                 listado_variables = listado_variables + ['cc_nutrientes'] 
                                 
+                
                                
         with col3:
             io_inorg_tcarb           = st.checkbox('Carbono inorgánico total', value=False)
