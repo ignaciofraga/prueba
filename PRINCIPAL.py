@@ -44,7 +44,8 @@ if FUNCIONES_AUXILIARES.log_in() is True:
                         "PROCESOS EN CURSO": PAGINAS.actualiza_procesos, 
                         "CONSULTA DATOS":PAGINAS.consulta_datos,
                         "REFERENCIAS NUTRIENTES":PAGINAS.referencias_nutrientes,                        
-                        "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes,                        
+                        "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes,
+                        "ENTRADA DATOS DE LABORATORIO":PAGINAS.entrada_datos_laboratorio,                           
                         "ENTRADA DATOS":PAGINAS.entrada_datos_excel
                         }
 
