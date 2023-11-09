@@ -682,22 +682,18 @@ def consulta_botellas():
             io_silicato   = st.checkbox('Silicato', value=False)
             if io_silicato:
                   listado_variables = listado_variables + ['silicato'] + ['silicato_qf'] 
-                  
-            if io_silicato or io_fosfato or io_amonio or io_nitrito or io_nitrato or io_nitrogeno_total:
-                listado_variables = listado_variables + ['cc_nutrientes'] 
-                                
-                
+                                    
                                
         with col3:
             io_inorg_tcarb           = st.checkbox('Carbono inorgánico total', value=False)
             if io_inorg_tcarb:
                 listado_variables = listado_variables + ['carbono_inorganico_total'] + ['carbono_inorganico_total_qf']
                 
-            io_org_tcarb           = st.checkbox('Carbono orgánico total', value=False)
+            io_org_tcarb           = st.checkbox('Carbono orgánico total (TOC)', value=False)
             if io_org_tcarb:
                 listado_variables = listado_variables + ['carbono_organico_total'] + ['carbono_organico_total_qf']
                 
-            io_tn           = st.checkbox('Nitrógeno total', value=False)
+            io_tn           = st.checkbox('Nitrógeno total (TDN)', value=False)
             if io_tn:
                 listado_variables = listado_variables + ['nitrogeno_total'] + ['nitrogeno_total_qf']
                 

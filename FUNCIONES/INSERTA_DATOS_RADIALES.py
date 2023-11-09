@@ -107,7 +107,7 @@ conn.dispose()
 directorio_datos           = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES'
 listado_archivos = [f for f in listdir(directorio_datos) if isfile(join(directorio_datos, f))]
 
-#listado_archivos = ['RADIAL_BTL_COR_2021.xlsx']
+#listado_archivos = ['RADIAL_BTL_COR_2020.xlsx']
 
 
 for iarchivo in range(len(listado_archivos)):

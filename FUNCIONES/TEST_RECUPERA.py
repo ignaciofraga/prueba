@@ -37,9 +37,9 @@ email_contacto    = 'prueba@ieo.csic.es'
 
 fecha_actualizacion = datetime.date.today()
 
-anho_consulta = 2023
-programa_seleccionado = 'RADPROF'
-tipo_salida           = 'ANUAL'
+anho_consulta = 2020
+programa_seleccionado = 'RADIAL CORUÑA'
+tipo_salida           = 'MENSUAL'
 ###### PROCESADO ########
 
 

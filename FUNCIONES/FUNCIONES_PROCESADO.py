@@ -27,9 +27,9 @@ def control_calidad(datos):
  
     textos_aviso = [] 
       
-    # # Cambia valores no válidos por None
-    # datos = datos.replace({numpy.nan:None})
-    # datos = datos.replace(-999, None) 
+    # Cambia valores no válidos por None
+    datos = datos.replace({numpy.nan:None})
+    datos = datos.replace(-999, None) 
     
     listado_variables_datos   = datos.columns.tolist()
            
