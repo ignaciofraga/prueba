@@ -261,7 +261,7 @@ def menu_seleccion_reducido(datos_procesados,variables_procesado,variables_proce
 ##################### FUNCION PARA INSERTAR DATOS DISCRETOS  ##################
 ############################################################################### 
 
-def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_procesado,variables_procesado_bd,variables_unidades,df_referencia,df_salidas,df_estaciones,df_programas,df_indices_calidad,df_metodo_ph):
+def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_procesado,variables_procesado_bd,variables_unidades,df_referencia,df_salidas,df_estaciones,df_programas,df_indices_calidad):
 
     # Recupera los datos de conexión
     direccion_host   = st.secrets["postgres"].host
@@ -308,14 +308,7 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
 
     with st.form("Formulario", clear_on_submit=False):
 
-        # Si los datos a introducir son de pH, especificar si la medida es con reactivo purificado o no purificado            
-        if variable_seleccionada == 'ph':
-       
-            listado_metodos   = df_metodo_ph['descripcion_metodo_ph'].tolist()                
-            tipo_analisis     = st.radio('Selecciona el tipo de análisis realizado',listado_metodos,horizontal=True,key = 5*df_seleccion.shape[0],index = 0)
-            id_tipo_analisis  = df_metodo_ph['id_metodo'][df_metodo_ph['descripcion_metodo_ph']==tipo_analisis].iloc[0] 
-            
-
+ 
         listado_estados        = list(df_indices_calidad['descripcion']) 
         listado_estados_indice = list(df_indices_calidad['indice']) 
         indice_qf_seleccionado = numpy.zeros(df_seleccion.shape[0],dtype=int)
@@ -387,22 +380,12 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
                 # Introducir los valores en la base de datos
                 conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                 cursor = conn.cursor()  
-       
-                # Diferente instrucción si es pH (hay que especificar el tipo de medida)
-                if variable_seleccionada == 'ph': 
-                    instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s, ph_metodo = %s WHERE muestreo = %s;'
-                    for idato in range(df_seleccion.shape[0]):
-        
-                        cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(id_tipo_analisis),int(df_seleccion['muestreo'].iloc[idato])))
-                        conn.commit()             
-                        
-                else:
-                    instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
+                instruccion_sql = "UPDATE datos_discretos SET " + variable_seleccionada + ' = %s, ' + variable_seleccionada +  '_qf = %s WHERE muestreo = %s;'
 
-                    for idato in range(df_seleccion.shape[0]):
-        
-                        cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(df_seleccion['muestreo'].iloc[idato])))
-                        conn.commit() 
+                for idato in range(df_seleccion.shape[0]):
+    
+                    cursor.execute(instruccion_sql, (df_seleccion[variable_seleccionada].iloc[idato],int(df_seleccion[variable_seleccionada_cc].iloc[idato]),int(df_seleccion['muestreo'].iloc[idato])))
+                    conn.commit() 
     
                 cursor.close()
                 conn.close()   
