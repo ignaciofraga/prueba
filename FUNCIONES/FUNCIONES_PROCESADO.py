@@ -666,7 +666,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     # Genera una tabla con los datos disponibles de las salidas a insertar (para agilizar la comparación entre datos nuevos y disponibles)
     listado_salidas            = datos_insercion['id_salida'].unique()
     df_muestreos_seleccionados = tabla_muestreos[tabla_muestreos['salida_mar'].isin(listado_salidas)]
-    tabla_datos_previos        = pandas.merge(tabla_registros, df_muestreos_seleccionados, on="muestreo")
+    tabla_datos_previos        = pandas.merge(tabla_registros, df_muestreos_seleccionados, on=puntero)
             
     # Si la tabla en la que se cargan los datos no contiene ningún registro, introducir todos los datos disponibles
     if tabla_datos_previos.shape[0] == 0:
@@ -1690,7 +1690,8 @@ def procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,
     cursor.close()
     conn.close() 
     
-    df_perfiles['perfil'] = int(id_perfil)
+    df_perfiles['perfil']    = int(id_perfil)
+    df_perfiles['id_salida'] = int(id_salida)
     
     df_botella = None    
                             
@@ -1724,7 +1725,7 @@ def procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,
          
           df_botella['id_estacion_temp']       = int(id_estacion) 
           df_botella['id_salida']              = id_salida 
-          df_botella['nombre_muestreo']        = abreviatura_programa + '_' + (datos_muestreo_perfil['fecha_muestreo'].iloc[0]).strftime("%Y%m%d") + '_E2_P0' 
+          #df_botella['nombre_muestreo']        = abreviatura_programa + '_' + (datos_muestreo_perfil['fecha_muestreo'].iloc[0]).strftime("%Y%m%d") + '_E2_P0' 
          
           df_botella['programa']               = id_programa    
           df_botella['num_cast']               = datos_muestreo_perfil['cast_muestreo'].iloc[0]
