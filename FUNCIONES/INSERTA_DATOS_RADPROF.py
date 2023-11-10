@@ -47,6 +47,7 @@ from os import listdir
 from os.path import isfile, join
 listado_archivos = [f for f in listdir(directorio_datos) if isfile(join(directorio_datos, f))]
 
+listado_archivos = ['RADPROF_2023.xlsx']
 
 for iarchivo in range(len(listado_archivos)):
 #for iarchivo in range(1):

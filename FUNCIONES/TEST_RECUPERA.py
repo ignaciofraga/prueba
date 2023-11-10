@@ -39,8 +39,8 @@ fecha_actualizacion = datetime.date.today()
 
 anho_consulta = 2023
 
-programa_seleccionado = 'RADIAL CORUÑA'
-tipo_salida           = 'MENSUAL'
+programa_seleccionado = 'RADPROF'
+tipo_salida           = 'ANUAL'
 ###### PROCESADO ########
 
 

@@ -547,37 +547,36 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 else:
                     fecha_comparacion = datos['fecha_muestreo'].iloc[idato].date()  
                     
-                if 'hora_muestreo' in listado_variables_datos and datos['hora_muestreo'].iloc[idato] is not None:
-                    if isinstance(datos['hora_muestreo'].iloc[idato], datetime.time):
-                        hora_comparacion = datos['hora_muestreo'].iloc[idato]
-                    else:
-                        hora_comparacion = datos['hora_muestreo'].iloc[idato].time()                        
-                
+                                     
                 if 'botella' in listado_variables_datos and datos['botella'].iloc[idato] is not None:        
-                    if 'hora_muestreo' in listado_variables_datos and datos['hora_muestreo'].iloc[idato] is not None:  
-                        if 'num_cast' in listado_variables_datos and datos['num_cast'].iloc[idato] is not None: 
-                            df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato])  & (df_datos_salidas['num_cast']==datos['num_cast'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['hora_muestreo']==hora_comparacion)]
-                        else:
-                            df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['hora_muestreo']==hora_comparacion)]
-                            
+
+                    if 'num_cast' in listado_variables_datos and datos['num_cast'].iloc[idato] is not None: 
+                        df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato])  & (df_datos_salidas['num_cast']==datos['num_cast'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion)]
                     else:
                         df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['botella']==datos['botella'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion)]
-                                
+                             
                 else:
-                    if 'hora_muestreo' in listado_variables_datos and datos['hora_muestreo'].iloc[idato] is not None:          
-                        df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['hora_muestreo']==hora_comparacion) & (df_datos_salidas['presion_ctd']== datos['presion_ctd'].iloc[idato])]   
-                    else:
-                        df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['presion_ctd']== datos['presion_ctd'].iloc[idato])]
+
+                    df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (int(df_datos_salidas['presion_ctd'])== int(datos['presion_ctd'].iloc[idato]))]
                 
+            # Bucle para insertar identificadores de muestreos (vial nutrientes/TOC)
             if df_temp.shape[0]> 0:
                 datos['muestreo'].iloc[idato]          = df_temp['muestreo'].iloc[0]    
                 datos['io_nuevo_muestreo'].iloc[idato] = 0
                 
-                if 'id_externo' in listado_variables_datos and datos['id_externo'].iloc[idato] is not None:
-                    # Inserta en la base de datos
-                      
+                if 'id_externo' in listado_variables_datos and datos['id_externo'].iloc[idato] is not None:                     
                     instruccion_sql = 'UPDATE muestreos_discretos SET id_externo =%s WHERE muestreo = %s;'
                     cursor.execute(instruccion_sql, (datos['id_externo'].iloc[idato],int(datos['muestreo'].iloc[idato])))
+                    conn.commit()
+                    
+                if 'tubo_nutrientes' in listado_variables_datos and datos['tubo_nutrientes'].iloc[idato] is not None:
+                    instruccion_sql = 'UPDATE muestreos_discretos SET tubo_nutrientes =%s WHERE muestreo = %s;'
+                    cursor.execute(instruccion_sql, (datos['tubo_nutrientes'].iloc[idato],int(datos['muestreo'].iloc[idato])))
+                    conn.commit()
+                    
+                if 'vial_toc' in listado_variables_datos and datos['vial_toc'].iloc[idato] is not None:                     
+                    instruccion_sql = 'UPDATE muestreos_discretos SET vial_toc =%s WHERE muestreo = %s;'
+                    cursor.execute(instruccion_sql, (int(datos['vial_toc'].iloc[idato]),int(datos['muestreo'].iloc[idato])))
                     conn.commit()
                                 
             else:
