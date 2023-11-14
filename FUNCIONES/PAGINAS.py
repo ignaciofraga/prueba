@@ -2085,12 +2085,18 @@ def entrada_datos_excel():
 
         st.dataframe(df_datos_importacion)                        
         # Corrige el formato de las fechas
+        # if 'fecha_muestreo' in variables_discretas:
+        #     for idato in range(df_datos_importacion.shape[0]):
+        #         df_datos_importacion['fecha_muestreo'].iloc[idato] = (df_datos_importacion['fecha_muestreo'].iloc[idato]).date()           
+        #         if df_datos_importacion['fecha_muestreo'].iloc[idato]:
+        #             if 'hora_muestreo' in variables_archivo and isinstance(df_datos_importacion['hora_muestreo'].iloc[idato], str):
+        #                 df_datos_importacion['hora_muestreo'].iloc[idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'].iloc[idato], '%H:%M:%S').time()
         if 'fecha_muestreo' in variables_discretas:
-            for idato in range(df_datos_importacion.shape[0]):
-                df_datos_importacion['fecha_muestreo'].iloc[idato] = (df_datos_importacion['fecha_muestreo'].iloc[idato]).date()           
-                if df_datos_importacion['fecha_muestreo'].iloc[idato]:
-                    if 'hora_muestreo' in variables_archivo and isinstance(df_datos_importacion['hora_muestreo'].iloc[idato], str):
-                        df_datos_importacion['hora_muestreo'].iloc[idato] = datetime.datetime.strptime(df_datos_importacion['hora_muestreo'].iloc[idato], '%H:%M:%S').time()
+            df_datos_importacion['fecha_muestreo'] =  pandas.to_datetime(df_datos_importacion['fecha_muestreo'], format='%d%m%Y').dt.date
+        if 'hora_muestreo' in variables_archivo:
+            df_datos_importacion['hora_muestreo'] =  pandas.to_datetime(df_datos_importacion['hora_muestreo'], format='%H:%M').dt.time
+
+
 
         st.dataframe(df_datos_importacion)
 
