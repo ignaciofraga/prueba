@@ -37,10 +37,10 @@ email_contacto    = 'prueba@ieo.csic.es'
 
 fecha_actualizacion = datetime.date.today()
 
-anho_consulta = 2023
+anho_consulta = 2022
 
-programa_seleccionado = 'RADPROF'
-tipo_salida           = 'ANUAL'
+programa_seleccionado = 'RADIAL CANTABRICO'
+tipo_salida           = 'MENSUAL'
 ###### PROCESADO ########
 
 
