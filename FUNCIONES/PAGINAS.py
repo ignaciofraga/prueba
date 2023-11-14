@@ -2010,11 +2010,12 @@ def entrada_datos_excel():
         tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn)
         tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+        tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
         conn.close()   
         
-        return df_programas,tabla_muestreos,tabla_estaciones,tabla_variables,tabla_salidas,tabla_muestreos
+        return df_programas,tabla_muestreos,tabla_estaciones,tabla_variables,tabla_salidas,tabla_muestreos,tabla_datos
     
-    df_programas,tabla_muestreos,tabla_estaciones,tabla_variables,tabla_salidas,tabla_muestreos = carga_datos_entrada_datos()
+    df_programas,tabla_muestreos,tabla_estaciones,tabla_variables,tabla_salidas,tabla_muestreos,tabla_datos = carga_datos_entrada_datos()
 
        
     
@@ -2137,7 +2138,7 @@ def entrada_datos_excel():
                             
             with st.spinner('Añadiendo datos discretos'):
                 
-                texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables)
+                texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
                 
                 if texto_insercion:
                     st.success(texto_insercion)    
