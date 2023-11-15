@@ -1687,7 +1687,7 @@ def procesado_nutrientes():
             # listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
 
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_alto)]
-            ref_inicial       = datos_referencias['Peak Number'].iloc[0]
+            ref_inicial       = datos_referencias['Peak Number'].iloc[0] + 1
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
             ref_final         = datos_referencias['Peak Number'].iloc[1] - 1
             
