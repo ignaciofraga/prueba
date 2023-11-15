@@ -1766,9 +1766,9 @@ def procesado_nutrientes():
                 
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
                 if io_add_data is True:
-                                        
-                    texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_exporta,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
-
+                                       
+                    with st.spinner('Insertando datos en la base de datos'):
+                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_exporta,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
                     st.success(texto_insercion)
 
                 # Añade nombre de la estacion
