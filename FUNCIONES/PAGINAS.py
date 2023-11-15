@@ -1567,8 +1567,9 @@ def procesado_nutrientes():
         df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
         df_rmns_bajos             = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
         df_rmns_altos             = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
+        df_variables              = psql.read_sql('SELECT * FROM variables_procesado', conn)
         conn.close()
-        return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos
+        return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos,df_variables
         
 
 
@@ -1581,7 +1582,7 @@ def procesado_nutrientes():
     puerto           = st.secrets["postgres"].port
     
    
-    df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos = carga_datos_procesado_nutrientes()
+    df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos,df_variables = carga_datos_procesado_nutrientes()
 
     # Combina la información de muestreos y salidas en un único dataframe 
     df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
@@ -1767,8 +1768,9 @@ def procesado_nutrientes():
                 # Añade los datos a la base de datos si se seleccionó esta opción                        
                 if io_add_data is True:
                                         
-                    texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_exporta,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
-                    
+                    texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_exporta,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
+
+
                     if texto_insercion:
                         st.success(texto_exito)
                     else:
