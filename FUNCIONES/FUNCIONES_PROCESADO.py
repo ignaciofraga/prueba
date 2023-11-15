@@ -663,9 +663,12 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     listado_adicional         = [puntero] + listado_variables_comunes
 
     # Genera una tabla con los datos disponibles de las salidas a insertar (para agilizar la comparación entre datos nuevos y disponibles)
-    listado_salidas            = datos_insercion['id_salida'].unique()
-    df_muestreos_seleccionados = tabla_muestreos[tabla_muestreos['salida_mar'].isin(listado_salidas)]
-    tabla_datos_previos        = pandas.merge(tabla_registros, df_muestreos_seleccionados, on=puntero)
+    if 'id_salida' in listado_variables_datos:
+        listado_salidas            = datos_insercion['id_salida'].unique()
+        df_muestreos_seleccionados = tabla_muestreos[tabla_muestreos['salida_mar'].isin(listado_salidas)]
+        tabla_datos_previos        = pandas.merge(tabla_registros, df_muestreos_seleccionados, on=puntero)
+    else:
+        tabla_datos_previos        = pandas.merge(tabla_registros, tabla_muestreos, on=puntero)
             
     # Si la tabla en la que se cargan los datos no contiene ningún registro, introducir todos los datos disponibles
     if tabla_datos_previos.shape[0] == 0:
