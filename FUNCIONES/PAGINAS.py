@@ -1770,6 +1770,7 @@ def procesado_nutrientes():
                                         
                     texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_exporta,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
 
+                    st.text(texto_insercion)
                     if texto_insercion:
                         st.success(texto_exito)
                     else:
