@@ -1694,6 +1694,8 @@ def procesado_nutrientes():
             st.text(ref_inicial)
             st.text(ref_final)
             
+            st.dataframe(datos_AA)
+            
             # Encuentra la salinidad de cada muestra
             datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
             datos_AA['io_procesado']  = None
