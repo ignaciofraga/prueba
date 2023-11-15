@@ -1691,6 +1691,8 @@ def procesado_nutrientes():
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
             ref_final         = datos_referencias['Peak Number'].iloc[1] - 1
             
+            st.text(ref_inicial)
+            st.text(ref_final)
             
             # Encuentra la salinidad de cada muestra
             datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
@@ -1770,12 +1772,7 @@ def procesado_nutrientes():
                                         
                     texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_exporta,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
 
-                    st.text(texto_insercion)
-                    if texto_insercion:
-                        st.success(texto_exito)
-                    else:
-                        texto_exito = 'Información introducida correctamente en la base de datos'
-                        st.success(texto_exito)
+                    st.success(texto_insercion)
 
                 # Añade nombre de la estacion
                 df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
