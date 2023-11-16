@@ -2292,6 +2292,7 @@ def entrada_toc():
         
         programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']))
         indice_programa           = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0]
+        abreviatura_programa      = df_programas['abreviatura'][df_programas['nombre_programa']==programa_seleccionado].iloc[0]
 
     with col2:
         
@@ -2333,9 +2334,12 @@ def entrada_toc():
     if archivo_datos is not None and io_envio is True:
     
          datos_muestras = FUNCIONES_PROCESADO.procesado_toc(archivo_datos,direccion_host,base_datos,usuario,contrasena,puerto)
+         datos_muestras['salida_mar'] = indice_salida
         
          datos_muestras = FUNCIONES_PROCESADO.evalua_estaciones(datos_muestras,indice_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
 
+         datos_muestras = FUNCIONES_PROCESADO.evalua_registros(datos_muestras,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
+   
         
          muestreos_salida = tabla_muestreos[tabla_muestreos['salida_mar']==indice_salida]
         
