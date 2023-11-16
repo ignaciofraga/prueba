@@ -2256,6 +2256,13 @@ def referencias_nutrientes():
 
 def entrada_toc():
          
+    # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port
+    
   
     # Función para cargar en caché los datos a utilizar
     @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
@@ -2277,38 +2284,57 @@ def entrada_toc():
                
   
     
-    # Despliega menús de selección de la variable, salida y la estación a controlar                
-    col1, col2, col3, col4 = st.columns(4,gap="small")
-    with col1: 
-        
-        programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']))
-        indice_programa           = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0]
+ 
+  
+    with st.form("Formulario", clear_on_submit=False):
+ 
+        # Despliega menús de selección del programa, tipo de salida y año de la información a procesar                 
+        col1, col2, col3 = st.columns(3,gap="small")
+        with col1: 
+            
+            programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']))
+            indice_programa           = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0]
 
-    with col2:
-        
-        df_salidas_prog_sel       = tabla_salidas[tabla_salidas['programa']==indice_programa]
-        tipos_salidas             = df_salidas_prog_sel['tipo_salida'].unique()
-        tipo_salida_seleccionada  = st.selectbox('Tipo',(tipos_salidas))
-        
+        with col2:
+            
+            df_salidas_prog_sel       = tabla_salidas[tabla_salidas['programa']==indice_programa]
+            tipos_salidas             = df_salidas_prog_sel['tipo_salida'].unique()
+            tipo_salida_seleccionada  = st.selectbox('Tipo',(tipos_salidas))
+            
 
-    with col3:
-        
-        df_salidas_prog_tipo_sel        = df_salidas_prog_sel[df_salidas_prog_sel['tipo_salida']==tipo_salida_seleccionada]
-        df_salidas_prog_tipo_sel['año'] = None
-        for idato in range(df_salidas_prog_tipo_sel.shape[0]):
-            df_salidas_prog_tipo_sel['año'].iloc[idato] = df_salidas_prog_tipo_sel['fecha_salida'].iloc[idato].year
-        df_salidas_prog_tipo_sel  = df_salidas_prog_tipo_sel.sort_values('año',ascending=False)
-        anhos_salidas             = df_salidas_prog_tipo_sel['año'].unique()
-        anho_seleccionado         = st.selectbox('Año',(anhos_salidas))
-        
-
-        
-    with col4:
-        
+        with col3:
+            
+            df_salidas_prog_tipo_sel        = df_salidas_prog_sel[df_salidas_prog_sel['tipo_salida']==tipo_salida_seleccionada]
+            df_salidas_prog_tipo_sel['año'] = None
+            for idato in range(df_salidas_prog_tipo_sel.shape[0]):
+                df_salidas_prog_tipo_sel['año'].iloc[idato] = df_salidas_prog_tipo_sel['fecha_salida'].iloc[idato].year
+            df_salidas_prog_tipo_sel  = df_salidas_prog_tipo_sel.sort_values('año',ascending=False)
+            anhos_salidas             = df_salidas_prog_tipo_sel['año'].unique()
+            anho_seleccionado         = st.selectbox('Año',(anhos_salidas))
+            
+        # Selecciona la salida a procesar
         df_salidas_prog_tipo_anho_sel = df_salidas_prog_tipo_sel[df_salidas_prog_tipo_sel['año']==anho_seleccionado]
         df_salidas_prog_tipo_anho_sel = df_salidas_prog_tipo_anho_sel.sort_values('fecha_salida',ascending=False)
         salida_seleccionada           = st.selectbox('Salida',(df_salidas_prog_tipo_anho_sel['nombre_salida']))
         indice_salida                 = df_salidas_prog_tipo_anho_sel['id_salida'][df_salidas_prog_tipo_anho_sel['nombre_salida']==salida_seleccionada].iloc[0]
         
+
+                    
+        archivo_datos       = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
+        
+        iq_elegido = st.radio("Indice de calidad asignado a los datos subidos",('Bueno', 'No evaluado'),horizontal=True)
+        if iq_elegido == 'Bueno':
+            iq_asignado = 2
+        if iq_elegido == 'No evaluado':
+            iq_asignado = 1
+    
+  
+        io_envio            = st.form_submit_button("Procesar el archivo subido")
+      
+    if archivo_datos is not None and io_envio is True:
+    
+         datos_muestras = FUNCIONES_PROCESADO.procesado_toc(archivo_datos,direccion_host,base_datos,usuario,contrasena,puerto)
+        
+         st.dataframe(datos_muestras)
         
     st.text(indice_salida)
