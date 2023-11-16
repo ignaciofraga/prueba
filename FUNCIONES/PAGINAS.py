@@ -2295,7 +2295,7 @@ def entrada_toc():
         
         df_salidas_prog_tipo_sel        = df_salidas_prog_sel[df_salidas_prog_sel['tipo_salida']==tipo_salida_seleccionada]
         df_salidas_prog_tipo_sel['año'] = None
-        for idato in range(df_salidas_prog_tipo_sel.iloc[0]):
+        for idato in range(df_salidas_prog_tipo_sel.shape[0]):
             df_salidas_prog_tipo_sel['año'].iloc[idato] = df_salidas_prog_tipo_sel['fecha_salida'].iloc[idato].year
         anhos_salidas             = df_salidas_prog_tipo_sel['año'].unique()
         anho_seleccionado         = st.selectbox('Año',(anhos_salidas))
