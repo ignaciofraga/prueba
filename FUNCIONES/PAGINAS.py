@@ -2333,12 +2333,13 @@ def entrada_toc():
       
     if archivo_datos is not None and io_envio is True:
     
-         datos_muestras = FUNCIONES_PROCESADO.procesado_toc(archivo_datos,direccion_host,base_datos,usuario,contrasena,puerto)
-         datos_muestras['id_salida'] = indice_salida
+         datos_muestras,datos_analisis = FUNCIONES_LECTURA.lectura_toc(archivo_datos,direccion_host,base_datos,usuario,contrasena,puerto)
+         datos_muestras['id_salida']   = indice_salida
         
-         datos_muestras = FUNCIONES_PROCESADO.evalua_estaciones(datos_muestras,indice_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
+         datos_muestras                = FUNCIONES_PROCESADO.evalua_estaciones(datos_muestras,indice_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
 
-         #datos_muestras = FUNCIONES_PROCESADO.evalua_registros(datos_muestras,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
+         muestreos_salida              = tabla_muestreos[tabla_muestreos['salida_mar']==indice_salida]
+         datos_muestras,texto_error    = FUNCIONES_PROCESADO.procesado_toc(datos_muestras,datos_analisis,muestreos_salida,direccion_host,base_datos,usuario,contrasena,puerto)
    
         
          muestreos_salida = tabla_muestreos[tabla_muestreos['salida_mar']==indice_salida]

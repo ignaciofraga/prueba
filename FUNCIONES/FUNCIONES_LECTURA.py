@@ -1048,7 +1048,52 @@ def lectura_btl(nombre_archivo,datos_archivo):
 
 
 
+# ################################################################
+# ########### FUNCION PARA PROCESAR ARCHIVOS DEL TOC/TN ##########
+# ################################################################    
 
+def lectura_toc(archivo_toc):
+
+    # Lectura del archivo con los resultados del TOC
+    datos_archivo              = pandas.read_excel(archivo_toc,skiprows=25)            
+    
+    # Mantén un recorte con las variables que interesan
+    datos_toc = datos_archivo[['estacion','botella','muestra','conc C','conc N']]
+    
+    # Subset con los datos correspondientes a muestras
+    datos_muestras = datos_toc[datos_toc[['estacion','botella']].notna().all(axis=1)]
+    
+    datos_muestras         = datos_muestras.rename(columns={"conc C":'carbono_organico_total','conc N':"nitrogeno_total"})
+       
+    # Metadatos
+    datos_archivo_completo = pandas.read_excel(archivo_toc) 
+    
+    for idato in range(datos_archivo.shape[0]):
+        if 'lcw' in str(datos_archivo['muestra'].iloc[idato]).lower():
+            lcw_c = datos_archivo['conc C'].iloc[idato]
+            lcw_n = datos_archivo['conc N'].iloc[idato]
+        if 'dsr' in str(datos_archivo['muestra'].iloc[idato]).lower():
+            dsr_c = datos_archivo['conc C'].iloc[idato]
+            dsr_n = datos_archivo['conc N'].iloc[idato]
+        
+    data = {
+    'pte_carbono': [datos_archivo_completo.iloc[5].iloc[19]],
+    'r2_carbono':  [datos_archivo_completo.iloc[7].iloc[19]],
+    'area_blanco_carbono': [datos_archivo_completo.iloc[3].iloc[20]],
+    'conc_blanco_carbono': [datos_archivo_completo.iloc[3].iloc[21]],
+    'pte_nitrogeno': [datos_archivo_completo.iloc[14].iloc[19]],
+    'r2_nitrogeno':  [datos_archivo_completo.iloc[16].iloc[19]],
+    'area_blanco_nitrogeno': [datos_archivo_completo.iloc[12].iloc[20]],
+    'conc_blanco_nitrogeno': [datos_archivo_completo.iloc[12].iloc[21]],
+    'lcw_c': [lcw_c],
+    'lcw_n': [lcw_n],
+    'dsr_c': [dsr_c],
+    'dsr_n': [dsr_n],    
+    'fecha_analisis': [datos_archivo_completo.iloc[4].iloc[6].date()]}
+
+    datos_analisis = pandas.DataFrame(data)
+
+    return  datos_muestras,datos_analisis   
 
 
   
