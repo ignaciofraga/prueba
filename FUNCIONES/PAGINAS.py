@@ -2334,6 +2334,9 @@ def entrada_toc():
     
          datos_muestras = FUNCIONES_PROCESADO.procesado_toc(archivo_datos,direccion_host,base_datos,usuario,contrasena,puerto)
         
+         datos_muestras = FUNCIONES_PROCESADO.evalua_estaciones(datos_muestras,indice_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
+
+        
          muestreos_salida = tabla_muestreos[tabla_muestreos['salida_mar']==indice_salida]
         
          st.dataframe(datos_muestras)
