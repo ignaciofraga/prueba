@@ -2320,6 +2320,9 @@ def entrada_toc():
     
 
     with st.form("Formulario", clear_on_submit=False):                    
+        
+        fecha_seleccionada  = st.date_input("Selecciona fecha de consulta",datetime.date.today())
+        
         archivo_datos       = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
         
         iq_elegido = st.radio("Indice de calidad asignado a los datos subidos",('Bueno', 'No evaluado'),horizontal=True)
