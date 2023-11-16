@@ -2338,7 +2338,7 @@ def entrada_toc():
         
          datos_muestras = FUNCIONES_PROCESADO.evalua_estaciones(datos_muestras,indice_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
 
-         datos_muestras = FUNCIONES_PROCESADO.evalua_registros(datos_muestras,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
+         #datos_muestras = FUNCIONES_PROCESADO.evalua_registros(datos_muestras,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
    
         
          muestreos_salida = tabla_muestreos[tabla_muestreos['salida_mar']==indice_salida]
