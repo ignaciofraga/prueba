@@ -2306,10 +2306,7 @@ def entrada_toc():
         
         df_salidas_prog_tipo_anho_sel = df_salidas_prog_tipo_sel[df_salidas_prog_tipo_sel['año']==anho_seleccionado]
         df_salidas_prog_tipo_anho_sel = df_salidas_prog_tipo_anho_sel.sort_values('fecha_salida',ascending=False)
-        listado_salidas               = df_salidas_prog_tipo_anho_sel['salida_mar'].unique()
- 
-        df_salidas_prog_tipo_anho_sel = df_salidas_prog_tipo_anho_sel.sort_values('fecha_salida',ascending=False)
-        salida_seleccionada           = st.selectbox('Salida',(listado_salidas))
+        salida_seleccionada           = st.selectbox('Salida',(df_salidas_prog_tipo_anho_sel['nombre_salida']))
         indice_salida                 = df_salidas_prog_tipo_anho_sel['id_salida'][df_salidas_prog_tipo_anho_sel['nombre_salida']==salida_seleccionada].iloc[0]
         
         
