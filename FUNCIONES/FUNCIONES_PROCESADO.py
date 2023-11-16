@@ -1802,3 +1802,5 @@ def procesado_toc(archivo_toc,direccion_host,base_datos,usuario,contrasena,puert
     conn.commit() 
     cursor.close()
     conn.close()
+    
+    return datos_muestras
