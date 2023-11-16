@@ -2371,3 +2371,6 @@ def entrada_toc():
         conn                  = init_connection()
         tabla_parametros_toc  = psql.read_sql('SELECT * FROM parametros_analisis_toc', conn)
         conn.close()   
+        
+        
+        st.line_chart(tabla_parametros_toc, x="fecha_analisis", y="pte_carbono")
