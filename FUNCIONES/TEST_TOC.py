@@ -97,21 +97,73 @@ datos_muestras = datos_toc[datos_toc[['estacion','botella']].notna().all(axis=1)
 datos_muestras         = datos_muestras.rename(columns={"conc C":'carbono_organico_total','conc N':"nitrogeno_total"})
    
 
-str_salida = programa_muestreo + ' ' + str(anho_salida)
-id_salida  = tabla_salidas['id_salida'][tabla_salidas['nombre_salida']==str_salida].iloc[0]
+# str_salida = programa_muestreo + ' ' + str(anho_salida)
+# id_salida  = tabla_salidas['id_salida'][tabla_salidas['nombre_salida']==str_salida].iloc[0]
 
-datos_muestras['salida_mar'] = id_salida
+# datos_muestras['salida_mar'] = id_salida
 
-# Encuentra el identificador asociado a cada registro
-print('Asignando el registro correspondiente a cada medida')
-datos_estadillo = FUNCIONES_PROCESADO.evalua_registros(datos_muestras,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
+# # Encuentra el identificador asociado a cada registro
+# print('Asignando el registro correspondiente a cada medida')
+# datos_estadillo = FUNCIONES_PROCESADO.evalua_registros(datos_muestras,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
    
 
-# Introduce los datos en la base de datos
-print('Introduciendo los datos en la base de datos')
-texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_muestras,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
+# # Introduce los datos en la base de datos
+# print('Introduciendo los datos en la base de datos')
+# texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_muestras,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
 
 
+# Metadatos
+archivo_toc            = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/PRUEBA_WEB/PRUEBA_ESTADILLO.xlsx'
+datos_archivo_completo = pandas.read_excel(archivo_toc) 
+
+pte_carbono            = datos_archivo_completo.iloc[5].iloc[19]
+r2_carbono             = datos_archivo_completo.iloc[7].iloc[19]
+area_blanco_carbono    = datos_archivo_completo.iloc[3].iloc[20]
+conc_blanco_carbono    = datos_archivo_completo.iloc[3].iloc[21]
+
+pte_nitrogeno            = datos_archivo_completo.iloc[14].iloc[19]
+r2_nitrogeno             = datos_archivo_completo.iloc[16].iloc[19]
+area_blanco_nitrogeno    = datos_archivo_completo.iloc[12].iloc[20]
+conc_blanco_nitrogeno    = datos_archivo_completo.iloc[12].iloc[21]
+
+for idato in range(datos_archivo.shape[0]):
+    if 'lcw' in str(datos_archivo['muestra'].iloc[idato]).lower():
+        lcw_c = datos_archivo['conc C'].iloc[idato]
+        lcw_n = datos_archivo['conc N'].iloc[idato]
+    if 'dsr' in str(datos_archivo['muestra'].iloc[idato]).lower():
+        dsr_c = datos_archivo['conc C'].iloc[idato]
+        dsr_n = datos_archivo['conc N'].iloc[idato]
+
+fecha_analisis = datos_archivo_completo.iloc[4].iloc[6].date()
+
+
+# Insercion en la pagina correspondiente
+instruccion_sql = '''INSERT INTO parametros_analisis_toc (fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n)
+VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (fecha_analisis) DO UPDATE SET (pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n) = ROW(EXCLUDED.pte_carbono,EXCLUDED.r2_carbono,EXCLUDED.area_blanco_carbono,EXCLUDED.conc_blanco_carbono,EXCLUDED.pte_nitrogeno,EXCLUDED.r2_nitrogeno,EXCLUDED.area_blanco_nitrogeno,EXCLUDED.conc_blanco_nitrogeno,EXCLUDED.lcw_c,EXCLUDED.lcw_n,EXCLUDED.dsr_c,EXCLUDED.dsr_n);''' 
+
+conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+cursor = conn.cursor()    
+cursor.execute(instruccion_sql,(fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n))
+conn.commit() 
+cursor.close()
+conn.close()
+
+
+    # # Genera la intrucción de escritura
+    # str_var = ','.join(listado_adicional)
+    # str_com = ','.join(listado_variables_comunes)
+    # listado_exc = ['EXCLUDED.' + s for s in listado_variables_comunes]
+    # str_exc = ','.join(listado_exc)
+    # listado_str = ['%s']*len(listado_adicional)
+    # str_car = ','.join(listado_str)
+    
+    # instruccion_sql = 'INSERT INTO ' + tabla_destino + '(' + str_var + ') VALUES (' + str_car + ') ON CONFLICT (' + puntero + ') DO UPDATE SET (' + str_com + ') = ROW(' + str_exc +');'
+      
+
+
+
+    #fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n
+    # instruccion_sql = 'INSERT INTO ' + tabla_destino + '(' + str_var + ') VALUES (' + str_car + ') ON CONFLICT (' + puntero + ') DO UPDATE SET (' + str_com + ') = ROW(' + str_exc +');'
 
 
 
