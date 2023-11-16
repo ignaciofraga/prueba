@@ -2333,7 +2333,7 @@ def entrada_toc():
       
     if archivo_datos is not None and io_envio is True:
     
-         datos_muestras,datos_analisis = FUNCIONES_LECTURA.lectura_toc(archivo_datos,direccion_host,base_datos,usuario,contrasena,puerto)
+         datos_muestras,datos_analisis = FUNCIONES_LECTURA.lectura_toc(archivo_datos)
          datos_muestras['id_salida']   = indice_salida
         
          datos_muestras                = FUNCIONES_PROCESADO.evalua_estaciones(datos_muestras,indice_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
