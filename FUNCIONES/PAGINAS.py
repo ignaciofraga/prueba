@@ -2250,6 +2250,67 @@ def referencias_nutrientes():
 
      
         
-     
+# ###############################################################################
+# #### PÁGINA DE ENTRADA DE ARCHIVOS UTILIZADOS EN EL PROCESADO DEL TOC/TN ######
+# ###############################################################################  
+
+def entrada_toc():
+         
+  
+    # Función para cargar en caché los datos a utilizar
+    @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
+    def carga_datos_entrada_datos():
+        conn             = init_connection()
+        df_programas     = psql.read_sql('SELECT * FROM programas', conn)
+        tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+        tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+        tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn)
+        tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+        tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
+        conn.close()   
         
-     
+        return df_programas,tabla_muestreos,tabla_estaciones,tabla_variables,tabla_salidas,tabla_muestreos,tabla_datos
+    
+    df_programas,tabla_muestreos,tabla_estaciones,tabla_variables,tabla_salidas,tabla_muestreos,tabla_datos = carga_datos_entrada_datos()
+
+               
+  
+    
+    # Despliega menús de selección de la variable, salida y la estación a controlar                
+    col1, col2, col3, col4 = st.columns(4,gap="small")
+    with col1: 
+        
+        programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']))
+        indice_programa           = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0]
+
+    with col2:
+        
+        df_salidas_prog_sel       = tabla_salidas[tabla_salidas['programa']==indice_programa]
+        tipos_salidas             = df_salidas_prog_sel['tipo_salida'].unique()
+        tipo_salida_seleccionada  = st.selectbox('Tipo',(tipos_salidas))
+        
+
+    with col3:
+        
+        df_salidas_prog_tipo_sel        = df_salidas_prog_sel[df_salidas_prog_sel['tipo_salida']==tipo_salida_seleccionada]
+        df_salidas_prog_tipo_sel['año'] = None
+        for idato in range(df_salidas_prog_tipo_sel.iloc[0]):
+            df_salidas_prog_tipo_sel['año'].iloc[idato] = df_salidas_prog_tipo_sel['fecha_salida'].iloc[idato].year
+        anhos_salidas             = df_salidas_prog_tipo_sel['año'].unique()
+        anho_seleccionado         = st.selectbox('Año',(anhos_salidas))
+        
+
+        
+    with col4:
+        
+        df_salidas_prog_tipo_anho_sel = df_salidas_prog_tipo_sel[df_salidas_prog_tipo_sel['año']==anho_seleccionado]
+        df_salidas_prog_tipo_anho_sel = df_salidas_prog_tipo_anho_sel.sort_values('fecha_salida',ascending=False)
+        listado_salidas               = df_salidas_prog_tipo_anho_sel['salida_mar'].unique()
+ 
+        df_salidas_prog_tipo_anho_sel = df_salidas_prog_tipo_anho_sel.sort_values('fecha_salida',ascending=False)
+        salida_seleccionada           = st.selectbox('Salida',(listado_salidas))
+        indice_salida                 = df_salidas_prog_tipo_anho_sel['id_salida'][df_salidas_prog_tipo_anho_sel['nombre_salida']==salida_seleccionada].iloc[0]
+        
+        
+    st.text(indice_salida)
