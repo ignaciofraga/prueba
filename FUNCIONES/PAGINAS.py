@@ -2005,7 +2005,6 @@ def entrada_datos_excel():
         tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
         tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn)
         tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
         tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
         conn.close()   
         
@@ -2273,7 +2272,6 @@ def entrada_toc():
         tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
         tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn)
         tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
         tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
         conn.close()   
         
@@ -2320,9 +2318,7 @@ def entrada_toc():
     
 
     with st.form("Formulario", clear_on_submit=False):                    
-        
-        fecha_seleccionada  = st.date_input("Selecciona fecha de consulta",datetime.date.today())
-        
+                
         archivo_datos       = st.file_uploader("Arrastra o selecciona el archivo con los datos a importar", accept_multiple_files=False)
         
         iq_elegido = st.radio("Indice de calidad asignado a los datos subidos",('Bueno', 'No evaluado'),horizontal=True)
@@ -2338,6 +2334,8 @@ def entrada_toc():
     
          datos_muestras = FUNCIONES_PROCESADO.procesado_toc(archivo_datos,direccion_host,base_datos,usuario,contrasena,puerto)
         
-         st.dataframe(datos_muestras)
+         muestreos_salida = tabla_muestreos[tabla_muestreos['salida_mar']==indice_salida]
         
-    st.text(indice_salida)
+         st.dataframe(datos_muestras)
+         st.dataframe(muestreos_salida)
+        

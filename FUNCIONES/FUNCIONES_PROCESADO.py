@@ -1766,6 +1766,9 @@ def procesado_toc(archivo_toc,direccion_host,base_datos,usuario,contrasena,puert
     
     datos_muestras         = datos_muestras.rename(columns={"conc C":'carbono_organico_total','conc N':"nitrogeno_total"})
        
+    # Comprueba que los numeros de vial coinciden con los de los estadillos
+    
+    
     
 
     # Metadatos
