@@ -2341,7 +2341,11 @@ def entrada_toc():
          muestreos_salida              = tabla_muestreos[tabla_muestreos['salida_mar']==indice_salida]
          datos_muestras,texto_error    = FUNCIONES_PROCESADO.procesado_toc(datos_muestras,datos_analisis,muestreos_salida,direccion_host,base_datos,usuario,contrasena,puerto)
    
-        
+         if texto_error:
+            
+            st.warning(texto_error, icon="⚠️")    
+   
+    
          muestreos_salida = tabla_muestreos[tabla_muestreos['salida_mar']==indice_salida]
         
          st.dataframe(datos_muestras)
