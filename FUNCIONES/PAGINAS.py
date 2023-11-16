@@ -2333,21 +2333,28 @@ def entrada_toc():
       
     if archivo_datos is not None and io_envio is True:
     
+         # Lectura del archivo
          datos_muestras,datos_analisis = FUNCIONES_LECTURA.lectura_toc(archivo_datos)
          datos_muestras['id_salida']   = indice_salida
         
+         # Identifica estaciones
          datos_muestras                = FUNCIONES_PROCESADO.evalua_estaciones(datos_muestras,indice_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
 
+         # Recupera el numero de muestreo de cada muestra 
          muestreos_salida              = tabla_muestreos[tabla_muestreos['salida_mar']==indice_salida]
          datos_muestras,texto_error    = FUNCIONES_PROCESADO.procesado_toc(datos_muestras,datos_analisis,muestreos_salida,direccion_host,base_datos,usuario,contrasena,puerto)
+   
+         # Asigna las banderas de calidad
+         datos_muestras['carbono_organico_total_qf'] = iq_asignado
+         datos_muestras['nitrogeno_total_qf']        = iq_asignado         
    
          if texto_error:
             
             st.warning(texto_error, icon="⚠️")    
    
-    
-         muestreos_salida = tabla_muestreos[tabla_muestreos['salida_mar']==indice_salida]
-        
-         st.dataframe(datos_muestras)
-         st.dataframe(muestreos_salida)
-        
+         else:
+             texto_estado = 'Añadiendo datos a la base de datos'
+             with st.spinner(texto_estado):
+                 texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_muestras,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
+
+                 st.success(texto_insercion)   
