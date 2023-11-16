@@ -2347,10 +2347,7 @@ def entrada_toc():
              # Recupera el numero de muestreo de cada muestra 
              muestreos_salida              = tabla_muestreos[tabla_muestreos['salida_mar']==indice_salida]
              datos_muestras,texto_error    = FUNCIONES_PROCESADO.procesado_toc(datos_muestras,datos_analisis,muestreos_salida,direccion_host,base_datos,usuario,contrasena,puerto)
-       
-             st.dataframe(datos_muestras)
-             st.dataframe(muestreos_salida)
-       
+              
              # Asigna las banderas de calidad
              datos_muestras['carbono_organico_total_qf'] = iq_asignado
              datos_muestras['nitrogeno_total_qf']        = iq_asignado         
@@ -2376,4 +2373,4 @@ def entrada_toc():
         conn.close()   
         
         
-        st.line_chart(tabla_parametros_toc, x="fecha_analisis", y="pte_carbono")
+        st.scatter_chart(tabla_parametros_toc, x="fecha_analisis", y="pte_carbono")
