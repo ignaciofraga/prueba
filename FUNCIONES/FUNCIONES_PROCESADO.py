@@ -143,6 +143,11 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     # En caso contrario, hay que buscar la estación asociada
     else: 
         
+        try:
+            datos["estacion"] = pandas.to_numeric(datos["estacion"], downcast="integer")
+        except:
+            pass
+
         # Cambia los nombres a minusculas
         datos['estacion'] = datos['estacion'].astype(str)
         datos['estacion'] = datos['estacion'].apply(lambda x:x.lower())
