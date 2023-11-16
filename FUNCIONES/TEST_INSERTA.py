@@ -40,7 +40,7 @@ conn.dispose()
 
 # Rutas de los archivos a importar  
 #archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx' 
-archivo_datos                ='D:/DATOS/Desktop/Nacho/TRABAJO/IEO/03-DESARROLLOS/NUTRIENTES/PROCESADO/RADCAN/2022/estadillo_RCAN2022_prof_test.xlsx'
+archivo_datos                ='C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/RADCAN/2022/estadillo_RCAN2022_cost.xlsx'
 
 # Importa el .xlsx
 df_datos_importacion = pandas.read_excel(archivo_datos,index_col=None)
@@ -55,32 +55,32 @@ df_datos_importacion['hora_muestreo'] =  pandas.to_datetime(df_datos_importacion
 # Realiza un control de calidad primario a los datos importados   
 datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
 
-# # Recupera el identificador del programa de muestreo
-# id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+# Recupera el identificador del programa de muestreo
+id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
         
 
 
-# # Encuentra la estación asociada a cada registro
-# print('Asignando la estación correspondiente a cada medida')
-# datos_estadillo = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
+# Encuentra la estación asociada a cada registro
+print('Asignando la estación correspondiente a cada medida')
+datos_estadillo = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
 
-# # Encuentra las salidas al mar correspondientes 
-# datos_estadillo = FUNCIONES_PROCESADO.evalua_salidas(datos_estadillo,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
+# Encuentra las salidas al mar correspondientes 
+datos_estadillo = FUNCIONES_PROCESADO.evalua_salidas(datos_estadillo,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
 
-# import time
-# t_init = time.time()
+import time
+t_init = time.time()
  
-# # Encuentra el identificador asociado a cada registro
-# print('Asignando el registro correspondiente a cada medida')
-# datos_estadillo = FUNCIONES_PROCESADO.evalua_registros(datos_estadillo,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
+# Encuentra el identificador asociado a cada registro
+print('Asignando el registro correspondiente a cada medida')
+datos_estadillo = FUNCIONES_PROCESADO.evalua_registros(datos_estadillo,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
    
-# t_end = time.time()
+t_end = time.time()
 
-# dt1 = t_end - t_init
+dt1 = t_end - t_init
 
-# # Introduce los datos en la base de datos
-# print('Introduciendo los datos en la base de datos')
-# texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_estadillo,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
+# Introduce los datos en la base de datos
+print('Introduciendo los datos en la base de datos')
+texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_estadillo,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
 
 
 

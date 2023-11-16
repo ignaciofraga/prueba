@@ -709,7 +709,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
                 df_add = df_add[listado_adicional] # Recorto para que tenga sólo las variables a añadir
             
                 tabla_registros = pandas.concat([tabla_registros, df_add]) # Combino ambos dataframes
-                   
+                                 
         tabla_registros.set_index(puntero,drop=True,append=False,inplace=True)
                 
         ##### INSERCION DE DATOS ######
