@@ -1776,9 +1776,6 @@ def procesado_toc(datos_muestras,datos_analisis,tabla_muestreos,direccion_host,b
         else:
             datos_muestras['muestreo'].iloc[idato] = df_temp['muestreo'].iloc[0]
             
-    import streamlit as st
-    st.dataframe(datos_analisis)
-
     # Inserta los datos del analisis 
     instruccion_sql = '''INSERT INTO parametros_analisis_toc (fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n)
     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (fecha_analisis) DO UPDATE SET (pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n) = ROW(EXCLUDED.pte_carbono,EXCLUDED.r2_carbono,EXCLUDED.area_blanco_carbono,EXCLUDED.conc_blanco_carbono,EXCLUDED.pte_nitrogeno,EXCLUDED.r2_nitrogeno,EXCLUDED.area_blanco_nitrogeno,EXCLUDED.conc_blanco_nitrogeno,EXCLUDED.lcw_c,EXCLUDED.lcw_n,EXCLUDED.dsr_c,EXCLUDED.dsr_n);''' 
