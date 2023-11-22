@@ -1085,6 +1085,7 @@ def lectura_toc(archivo_toc):
     
     import streamlit as st
     st.dataframe(data)
+    st.dataframe(datos_archivo)
     
     for idato in range(datos_archivo.shape[0]):
         if 'lcw' in str(datos_archivo['muestra'].iloc[idato]).lower():
