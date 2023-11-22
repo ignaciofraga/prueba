@@ -1771,7 +1771,7 @@ def procesado_toc(datos_muestras,datos_analisis,tabla_muestreos,direccion_host,b
         if datos_muestras['muestra'].iloc[idato] is not None:        
             df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos_muestras['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['botella']==datos_muestras['botella'].iloc[idato]) & (tabla_muestreos['vial_toc']==datos_muestras['muestra'].iloc[idato])]
         else:
-            df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos_muestras['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['botella']==datos_muestras['botella'].iloc[idato])]
+            df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos_muestras['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['botella']==int(datos_muestras['botella'].iloc[idato]))]
 
         st.text(idato)
         st.text(datos_muestras['botella'].iloc[idato])
