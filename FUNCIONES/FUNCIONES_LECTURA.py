@@ -1083,6 +1083,9 @@ def lectura_toc(archivo_toc):
     'dsr_n': [None],    
     'fecha_analisis': [datos_archivo_completo.iloc[4].iloc[6].date()]}
     
+    import streamlit as st
+    st.dataframe(data)
+    
     for idato in range(datos_archivo.shape[0]):
         if 'lcw' in str(datos_archivo['muestra'].iloc[idato]).lower():
             data['lcw_c'].iloc[0] = datos_archivo['conc C'].iloc[idato]
