@@ -1068,6 +1068,19 @@ def lectura_toc(archivo_toc):
     # Metadatos
     datos_archivo_completo = pandas.read_excel(archivo_toc) 
 
+    lcw_c = None
+    lcw_n = None
+    dsr_c = None
+    dsr_n = None
+    for idato in range(datos_archivo.shape[0]):
+        if 'lcw' in str(datos_archivo['muestra'].iloc[idato]).lower():
+            lcw_c = datos_archivo['conc C'].iloc[idato]
+            lcw_n = datos_archivo['conc N'].iloc[idato] 
+        
+        if 'dsr' in str(datos_archivo['muestra'].iloc[idato]).lower():
+            dsr_c = datos_archivo['conc C'].iloc[idato]
+            dsr_n = datos_archivo['conc N'].iloc[idato]   
+
     data = {
     'pte_carbono': [datos_archivo_completo.iloc[5].iloc[19]],
     'r2_carbono':  [datos_archivo_completo.iloc[7].iloc[19]],
@@ -1077,24 +1090,22 @@ def lectura_toc(archivo_toc):
     'r2_nitrogeno':  [datos_archivo_completo.iloc[16].iloc[19]],
     'area_blanco_nitrogeno': [datos_archivo_completo.iloc[12].iloc[20]],
     'conc_blanco_nitrogeno': [datos_archivo_completo.iloc[12].iloc[21]],
-    'lcw_c': [None],
-    'lcw_n': [None],
-    'dsr_c': [None],
-    'dsr_n': [None],    
+    'lcw_c': [lcw_c],
+    'lcw_n': [lcw_n],
+    'dsr_c': [dsr_c],
+    'dsr_n': [dsr_n],    
     'fecha_analisis': [datos_archivo_completo.iloc[4].iloc[6].date()]}
     
-    import streamlit as st
-    st.dataframe(data)
-    st.dataframe(datos_archivo)
+
     
-    for idato in range(datos_archivo.shape[0]):
-        if 'lcw' in str(datos_archivo['muestra'].iloc[idato]).lower():
-            data['lcw_c'].iloc[0] = datos_archivo['conc C'].iloc[idato]
-            data['lcw_n'].iloc[0] = datos_archivo['conc N'].iloc[idato] 
+    # for idato in range(datos_archivo.shape[0]):
+    #     if 'lcw' in str(datos_archivo['muestra'].iloc[idato]).lower():
+    #         data['lcw_c'].iloc[0] = datos_archivo['conc C'].iloc[idato]
+    #         data['lcw_n'].iloc[0] = datos_archivo['conc N'].iloc[idato] 
         
-        if 'dsr' in str(datos_archivo['muestra'].iloc[idato]).lower():
-            data['dsr_c'].iloc[0] = datos_archivo['conc C'].iloc[idato]
-            data['dsr_n'].iloc[0] = datos_archivo['conc N'].iloc[idato]              
+    #     if 'dsr' in str(datos_archivo['muestra'].iloc[idato]).lower():
+    #         data['dsr_c'].iloc[0] = datos_archivo['conc C'].iloc[idato]
+    #         data['dsr_n'].iloc[0] = datos_archivo['conc N'].iloc[idato]              
 
 
     datos_analisis = pandas.DataFrame(data)
