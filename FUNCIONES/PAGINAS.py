@@ -2372,6 +2372,8 @@ def entrada_toc():
         tabla_parametros_toc  = psql.read_sql('SELECT * FROM parametros_analisis_toc', conn)
         conn.close()   
         
+        st.dataframe(tabla_parametros_toc)
+        
         st.markdown('Evolucion pendientes de calibración del **carbono**') 
 
         fig = plt.figure(figsize=(24/2.54, 16/2.54))
