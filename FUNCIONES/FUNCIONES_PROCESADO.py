@@ -1776,6 +1776,7 @@ def procesado_toc(datos_muestras,datos_analisis,tabla_muestreos,direccion_host,b
         st.text(idato)
         st.text(datos_muestras['botella'].iloc[idato])
         st.text(datos_muestras['id_estacion_temp'].iloc[idato])
+        st.dataframe(df_temp)
 
         if df_temp.shape[0] == 0:
             texto_error = 'Uno o varios de los viales no corresponden a muestras incluidas en la base de datos'
