@@ -83,7 +83,7 @@ id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(prog
 
 
 
-archivo_toc   = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/PRUEBA_WEB/PRUEBA_ESTADILLO.xlsx'
+archivo_toc            = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/2022/20231005_TOC_TN_RADPROF22_04.xlsx'
 
 # Lectura del archivo con los resultados del TOC
 datos_archivo              = pandas.read_excel(archivo_toc,skiprows=25)            
@@ -113,7 +113,7 @@ datos_muestras         = datos_muestras.rename(columns={"conc C":'carbono_organi
 
 
 # Metadatos
-archivo_toc            = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/PRUEBA_WEB/PRUEBA_ESTADILLO.xlsx'
+archivo_toc            = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/2022/20231005_TOC_TN_RADPROF22_04.xlsx'
 datos_archivo_completo = pandas.read_excel(archivo_toc) 
 
 pte_carbono            = datos_archivo_completo.iloc[5].iloc[19]
@@ -137,16 +137,16 @@ for idato in range(datos_archivo.shape[0]):
 fecha_analisis = datos_archivo_completo.iloc[4].iloc[6].date()
 
 
-# Insercion en la pagina correspondiente
-instruccion_sql = '''INSERT INTO parametros_analisis_toc (fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n)
-VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (fecha_analisis) DO UPDATE SET (pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n) = ROW(EXCLUDED.pte_carbono,EXCLUDED.r2_carbono,EXCLUDED.area_blanco_carbono,EXCLUDED.conc_blanco_carbono,EXCLUDED.pte_nitrogeno,EXCLUDED.r2_nitrogeno,EXCLUDED.area_blanco_nitrogeno,EXCLUDED.conc_blanco_nitrogeno,EXCLUDED.lcw_c,EXCLUDED.lcw_n,EXCLUDED.dsr_c,EXCLUDED.dsr_n);''' 
+# # Insercion en la pagina correspondiente
+# instruccion_sql = '''INSERT INTO parametros_analisis_toc (fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n)
+# VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (fecha_analisis) DO UPDATE SET (pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n) = ROW(EXCLUDED.pte_carbono,EXCLUDED.r2_carbono,EXCLUDED.area_blanco_carbono,EXCLUDED.conc_blanco_carbono,EXCLUDED.pte_nitrogeno,EXCLUDED.r2_nitrogeno,EXCLUDED.area_blanco_nitrogeno,EXCLUDED.conc_blanco_nitrogeno,EXCLUDED.lcw_c,EXCLUDED.lcw_n,EXCLUDED.dsr_c,EXCLUDED.dsr_n);''' 
 
-conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-cursor = conn.cursor()    
-cursor.execute(instruccion_sql,(fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n))
-conn.commit() 
-cursor.close()
-conn.close()
+# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# cursor = conn.cursor()    
+# cursor.execute(instruccion_sql,(fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n))
+# conn.commit() 
+# cursor.close()
+# conn.close()
 
 
     # # Genera la intrucción de escritura
