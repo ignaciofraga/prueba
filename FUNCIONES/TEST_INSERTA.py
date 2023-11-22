@@ -40,7 +40,7 @@ conn.dispose()
 
 # Rutas de los archivos a importar  
 #archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx' 
-archivo_datos                ='C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/2023/RADPROF2023_BTL_POM_Cla_FORMATO.xlsx'
+archivo_datos                ='C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/2022/estadillo_listado muestras.xlsx'
 
 # Importa el .xlsx
 df_datos_importacion = pandas.read_excel(archivo_datos,index_col=None)
@@ -49,8 +49,8 @@ df_datos_importacion = pandas.read_excel(archivo_datos,index_col=None)
 # Realiza un control de calidad primario a los datos importados   
 datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
 
-# Convierte las fechas de DATE a formato correcto
-datos_corregidos['fecha_muestreo'] =  pandas.to_datetime(datos_corregidos['fecha_muestreo'], format='%d%m%Y').dt.date
+# # Convierte las fechas de DATE a formato correcto
+# datos_corregidos['fecha_muestreo'] =  pandas.to_datetime(datos_corregidos['fecha_muestreo'], format='%d%m%Y').dt.date
 
 
 # Recupera el identificador del programa de muestreo
@@ -76,9 +76,9 @@ t_end = time.time()
 
 dt1 = t_end - t_init
 
-# Introduce los datos en la base de datos
-print('Introduciendo los datos en la base de datos')
-texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_estadillo,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
+# # Introduce los datos en la base de datos
+# print('Introduciendo los datos en la base de datos')
+# texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_estadillo,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
 
 
 

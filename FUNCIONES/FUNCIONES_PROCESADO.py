@@ -1763,8 +1763,6 @@ def procesado_toc(datos_muestras,datos_analisis,tabla_muestreos,direccion_host,b
     datos_muestras['muestreo'] = None    
     texto_error = None
     
-    import streamlit as st
-
     # Recupera el identificador de cada muestreo
     for idato in range(datos_muestras.shape[0]):
         
@@ -1772,11 +1770,6 @@ def procesado_toc(datos_muestras,datos_analisis,tabla_muestreos,direccion_host,b
             df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos_muestras['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['botella']==datos_muestras['botella'].iloc[idato]) & (tabla_muestreos['vial_toc']==datos_muestras['muestra'].iloc[idato])]
         else:
             df_temp = tabla_muestreos[(tabla_muestreos['estacion']==datos_muestras['id_estacion_temp'].iloc[idato]) & (tabla_muestreos['botella']==int(datos_muestras['botella'].iloc[idato]))]
-
-        st.text(idato)
-        st.text(datos_muestras['botella'].iloc[idato])
-        st.text(datos_muestras['id_estacion_temp'].iloc[idato])
-        st.dataframe(df_temp)
 
         if df_temp.shape[0] == 0:
             texto_error = 'Uno o varios de los viales no corresponden a muestras incluidas en la base de datos'
