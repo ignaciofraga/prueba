@@ -2375,8 +2375,8 @@ def entrada_toc():
         fig = plt.figure(figsize=(20/2.54, 18/2.54))
         ax = fig.add_subplot(111)
         
-        plt.plot(tabla_parametros_toc['fecha_analisis'],tabla_parametros_toc['pte_carbono'],'.r' )
-        
+        plt.plot(tabla_parametros_toc['fecha_analisis'],tabla_parametros_toc['pte_carbono'],color='blue',linestyle='dashed', marker='o', markerfacecolor='blue', markersize=12 )
+
         ax.set(xlabel='Fecha')
         ax.set(ylabel='Pendiente C')           
          
