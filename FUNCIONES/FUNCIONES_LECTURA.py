@@ -1085,11 +1085,12 @@ def lectura_toc(archivo_toc):
     
     for idato in range(datos_archivo.shape[0]):
         if 'lcw' in str(datos_archivo['muestra'].iloc[idato]).lower():
-            data = {'lcw_c': [datos_archivo['conc C'].iloc[idato]],
-            'lcw_n': [datos_archivo['conc N'].iloc[idato]]}      
+            data['lcw_c'].iloc[0] = datos_archivo['conc C'].iloc[idato]
+            data['lcw_n'].iloc[0] = datos_archivo['conc N'].iloc[idato] 
+        
         if 'dsr' in str(datos_archivo['muestra'].iloc[idato]).lower():
-            data = {'dsr_c': [datos_archivo['conc C'].iloc[idato]],
-            'dsr_n': [datos_archivo['conc N'].iloc[idato]]}              
+            data['dsr_c'].iloc[0] = datos_archivo['conc C'].iloc[idato]
+            data['dsr_n'].iloc[0] = datos_archivo['conc N'].iloc[idato]              
 
 
     datos_analisis = pandas.DataFrame(data)
