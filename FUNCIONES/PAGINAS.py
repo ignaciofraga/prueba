@@ -2343,11 +2343,14 @@ def entrada_toc():
             
              # Identifica estaciones
              datos_muestras                = FUNCIONES_PROCESADO.evalua_estaciones(datos_muestras,indice_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
-    
-             st.dataframe(datos_muestras)
-    
+        
              # Recupera el numero de muestreo de cada muestra 
              muestreos_salida              = tabla_muestreos[tabla_muestreos['salida_mar']==indice_salida]
+             
+             st.dataframe(datos_muestras)
+             st.dataframe(datos_analisis)
+             st.dataframe(muestreos_salida)
+             
              datos_muestras,texto_error    = FUNCIONES_PROCESADO.procesado_toc(datos_muestras,datos_analisis,muestreos_salida,direccion_host,base_datos,usuario,contrasena,puerto)
               
              # Asigna las banderas de calidad
