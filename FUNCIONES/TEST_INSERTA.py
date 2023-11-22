@@ -24,8 +24,8 @@ puerto         = '5432'
 direccion_host = '193.146.155.99'
 
 # Parámetros
-programa_muestreo = 'RADIAL CANTABRICO'
-tipo_salida       = 'MENSUAL'
+programa_muestreo = 'RADPROF'
+tipo_salida       = 'ANUAL'
 
 
 con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
@@ -40,20 +40,18 @@ conn.dispose()
 
 # Rutas de los archivos a importar  
 #archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx' 
-archivo_datos                ='C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/RADCAN/2022/estadillo_RCAN2022_cost.xlsx'
+archivo_datos                ='C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/2023/RADPROF2023_BTL_POM_Cla_FORMATO.xlsx'
 
 # Importa el .xlsx
 df_datos_importacion = pandas.read_excel(archivo_datos,index_col=None)
 
 
-# Convierte las fechas de DATE a formato correcto
-df_datos_importacion['fecha_muestreo'] =  pandas.to_datetime(df_datos_importacion['fecha_muestreo'], format='%d%m%Y').dt.date
-df_datos_importacion['hora_muestreo'] =  pandas.to_datetime(df_datos_importacion['hora_muestreo'], format='%H:%M').dt.time
-
-
-
 # Realiza un control de calidad primario a los datos importados   
 datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
+
+# Convierte las fechas de DATE a formato correcto
+datos_corregidos['fecha_muestreo'] =  pandas.to_datetime(datos_corregidos['fecha_muestreo'], format='%d%m%Y').dt.date
+
 
 # Recupera el identificador del programa de muestreo
 id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)

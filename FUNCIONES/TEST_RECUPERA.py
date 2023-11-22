@@ -23,24 +23,9 @@ puerto         = '5432'
 direccion_host = '193.146.155.99'
 
 # Parámetros
-
-id_config_sup     = 1
-id_config_per     = 1
-
-# Rutas de los archivos a importar  
-#archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx' 
-archivo_datos                ='C:/Users/ifraga/Desktop/03-DESARROLLOS/NUTRIENTES/PROCESADO/PRUEBAS STREAMLIT/BTL_RCAN17prof_TEST.xlsx'
-
-# Tipo de información a introducir
-itipo_informacion = 2 # 1-nuevo muestreo 2-dato nuevo (analisis laboratorio)  3-dato re-analizado (control calidad)   
-email_contacto    = 'prueba@ieo.csic.es'
-
-fecha_actualizacion = datetime.date.today()
-
-anho_consulta = 2022
-
-programa_seleccionado = 'RADIAL CANTABRICO'
-tipo_salida           = 'MENSUAL'
+anho_consulta = 2023
+programa_seleccionado = 'RADPROF'
+tipo_salida           = 'ANUAL'
 ###### PROCESADO ########
 
 
@@ -76,32 +61,4 @@ df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(listad
 df_muestreos_seleccionados = df_muestreos_seleccionados.sort_values(by=['muestreo'])
 
 df_datos = pandas.merge(df_muestreos_seleccionados, df_datos_discretos, on="muestreo")
-
-# conn   = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-# cursor = conn.cursor()  
-
-# for idato in range(df_muestreos_seleccionados.shape[0]):
-    
-#     for icompara in range(idato+1,df_muestreos_seleccionados.shape[0]):
-                
-#         if df_muestreos_seleccionados['nombre_muestreo'].iloc[idato] == df_muestreos_seleccionados['nombre_muestreo'].iloc[icompara]:
-            
-#             print(df_muestreos_seleccionados['nombre_muestreo'].iloc[idato],df_muestreos_seleccionados['muestreo'].iloc[idato],df_muestreos_seleccionados['nombre_muestreo'].iloc[icompara],df_muestreos_seleccionados['muestreo'].iloc[icompara])
-    
-#             instruccion_sql = "DELETE FROM muestreos_discretos WHERE muestreo=" + str(int(df_muestreos_seleccionados['muestreo'].iloc[icompara])) + ";" 
-        
-#             cursor.execute(instruccion_sql)#,int(df_muestreos_seleccionados['muestreo'].iloc[icompara]))
-#             conn.commit()  
-
-# cursor.close()
-# conn.close()                          
-
-
-#DELETE FROM Customers WHERE CustomerName='Alfreds Futterkiste';
-
-
-
-
-#df_datos = pandas.merge(df_muestreos_seleccionados, df_datos_discretos, on="muestreo")
-
 

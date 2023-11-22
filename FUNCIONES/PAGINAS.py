@@ -2372,5 +2372,18 @@ def entrada_toc():
         tabla_parametros_toc  = psql.read_sql('SELECT * FROM parametros_analisis_toc', conn)
         conn.close()   
         
+        fig = plt.figure(figsize=(20/2.54, 18/2.54))
+        ax = fig.add_subplot(111)
         
-        st.scatter_chart(tabla_parametros_toc, x="fecha_analisis", y="pte_carbono")
+        plt.plot(tabla_parametros_toc['fecha_analisis'],tabla_parametros_toc['pte_carbono'],'.r' )
+        
+        ax.set(xlabel='Fecha')
+        ax.set(ylabel='Pendiente C')           
+         
+        buf = BytesIO()
+        fig.savefig(buf, format="png")
+        st.image(buf) 
+        
+        # st.pyplot(fig=None, clear_figure=None, use_container_width=True, **kwargs)
+        
+        # st.scatter_chart(tabla_parametros_toc, x="fecha_analisis", y="pte_carbono")
