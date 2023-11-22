@@ -2372,17 +2372,11 @@ def entrada_toc():
         tabla_parametros_toc  = psql.read_sql('SELECT * FROM parametros_analisis_toc', conn)
         conn.close()   
         
-        col1, col2 = st.columns(2,gap="small")
-        with col1:
-            st.markdown('Evolucion pendientes de calibración del **carbono**') 
-        with col2:
-            color_C = st.color_picker('Color', '#408EB9',label_visibility="visible")
-        
-        
-        
-        fig = plt.figure(figsize=(20/2.54, 18/2.54))
+        st.markdown('Evolucion pendientes de calibración del **carbono**') 
+
+        fig = plt.figure(figsize=(24/2.54, 16/2.54))
         ax = fig.add_subplot(111)
-        plt.plot(tabla_parametros_toc['fecha_analisis'],tabla_parametros_toc['pte_carbono'],color=color_C,linestyle='dashed', marker='o', markerfacecolor=color_C, markersize=10)
+        plt.plot(tabla_parametros_toc['fecha_analisis'],tabla_parametros_toc['pte_carbono'],color='#408EB9',linestyle='dashed', marker='o', markerfacecolor='#408EB9', markersize=10)
         ax.set(xlabel='Fecha')
         ax.set(ylabel='Pendiente C')           
         buf = BytesIO()
@@ -2391,11 +2385,11 @@ def entrada_toc():
         
         st.markdown('Evolucion pendientes de calibración del **nitrógeno**')
         
-        fig = plt.figure(figsize=(20/2.54, 18/2.54))
+        fig = plt.figure(figsize=(24/2.54, 16/2.54))
         ax = fig.add_subplot(111)
-        plt.plot(tabla_parametros_toc['fecha_analisis'],tabla_parametros_toc['pte_nitrogeno'],color='green',linestyle='dashed', marker='o', markerfacecolor='green', markersize=12 )
+        plt.plot(tabla_parametros_toc['fecha_analisis'],tabla_parametros_toc['pte_nitrogeno'],color='#66A25F',linestyle='dashed', marker='o', markerfacecolor='#66A25F', markersize=10 )
         ax.set(xlabel='Fecha')
-        ax.set(ylabel='Pendiente C')           
+        ax.set(ylabel='Pendiente N')           
         buf = BytesIO()
         fig.savefig(buf, format="png")
         st.image(buf) 
