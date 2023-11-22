@@ -1076,7 +1076,11 @@ def lectura_toc(archivo_toc):
     'pte_nitrogeno': [datos_archivo_completo.iloc[14].iloc[19]],
     'r2_nitrogeno':  [datos_archivo_completo.iloc[16].iloc[19]],
     'area_blanco_nitrogeno': [datos_archivo_completo.iloc[12].iloc[20]],
-    'conc_blanco_nitrogeno': [datos_archivo_completo.iloc[12].iloc[21]],    
+    'conc_blanco_nitrogeno': [datos_archivo_completo.iloc[12].iloc[21]],
+    'lcw_c': [None],
+    'lcw_n': [None],
+    'dsr_c': [None],
+    'dsr_n': [None],    
     'fecha_analisis': [datos_archivo_completo.iloc[4].iloc[6].date()]}
     
     for idato in range(datos_archivo.shape[0]):
