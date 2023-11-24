@@ -1422,38 +1422,40 @@ def entrada_archivos_roseta():
                       
                         datos_botellas = FUNCIONES_PROCESADO.procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_salida,tabla_estaciones_programa)
                       
-                        # Aplica control de calidad
-                        datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
+                        st.dataframe(datos_botellas)  
+                      
+                    #     # Aplica control de calidad
+                    #     datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
            
-                        # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-                        datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
+                    #     # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+                    #     datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
              
-                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
+                    #     texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
 
-                        if texto_insercion:
-                            st.success(texto_insercion)   
+                    #     if texto_insercion:
+                    #         st.success(texto_insercion)   
                         
-                    else:
+                    # else:
                     
-                        texto_error = 'La fecha del archivo ' + archivo_btl.name + ' no coindice con la fecha seleccionada '
-                        st.warning(texto_error, icon="⚠️")  
+                    #     texto_error = 'La fecha del archivo ' + archivo_btl.name + ' no coindice con la fecha seleccionada '
+                    #     st.warning(texto_error, icon="⚠️")  
                         
                         
                         
-                    ### DATOS DE PERFIL
+                    # ### DATOS DE PERFIL
                     
-                    for archivo_cnv in listado_archivos_cnv:
+                    # for archivo_cnv in listado_archivos_cnv:
                     
-                        nombre_archivo_cnv    = archivo_cnv.name
-                        nombre_archivo_cnv    = nombre_archivo_cnv.replace('.cnv','.btl')
+                    #     nombre_archivo_cnv    = archivo_cnv.name
+                    #     nombre_archivo_cnv    = nombre_archivo_cnv.replace('.cnv','.btl')
                                            
-                        if nombre_archivo_cnv == nombre_archivo_btl:
+                    #     if nombre_archivo_cnv == nombre_archivo_btl:
                                                                                     
-                            datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
+                    #         datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
                                           
-                            datos_perfil,df_perfiles,datos_muestreo_perfil = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
+                    #         datos_perfil,df_perfiles,datos_muestreo_perfil = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
                                                              
-                            FUNCIONES_PROCESADO.procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,id_programa,abreviatura_programa,nombre_estacion,id_estacion,direccion_host,base_datos,usuario,contrasena,puerto)
+                    #         FUNCIONES_PROCESADO.procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,id_programa,abreviatura_programa,nombre_estacion,id_estacion,direccion_host,base_datos,usuario,contrasena,puerto)
                                     
 
                 texto_exito = 'Estación ' + nombre_estacion + ' procesada correctamente. Información subida a la base de datos'

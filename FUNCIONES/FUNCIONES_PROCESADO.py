@@ -1596,55 +1596,69 @@ def procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_
     else:
         datos_botellas['prof_referencia'] = [None]*datos_botellas.shape[0]
 
-    
-  
-    # Cambia los nombre de las botellas.        
-    if id_estacion == 1: #E2
-        listado_equiv_ctd = [1,3,5,7,9,11]
-        listado_equiv_real = [1,2,3,4,5,6]
-        for ibotella in range(datos_botellas.shape[0]):
-            for iequiv in range(len(listado_equiv_ctd)):
-                if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                    datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
-                    
-    if id_estacion == 2: #E3A
-        listado_equiv_ctd = [1,3,5,7,9,11]
-        listado_equiv_real = [1,3,5,7,9,11]
-        for ibotella in range(datos_botellas.shape[0]):
-            for iequiv in range(len(listado_equiv_ctd)):
-                if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                    datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
-
-    if id_estacion == 3: #E3C
-        listado_equiv_ctd = [1,3,5,7,9,11]
-        listado_equiv_real = [1,3,5,7,9,11]
-        for ibotella in range(datos_botellas.shape[0]):
-            for iequiv in range(len(listado_equiv_ctd)):
-                if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                    datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
-                    
-    if id_estacion == 4: #E3B
-        listado_equiv_ctd = [1,3,5,7,9,11]
-        listado_equiv_real = [1,3,5,7,9,11]
-        for ibotella in range(datos_botellas.shape[0]):
-            for iequiv in range(len(listado_equiv_ctd)):
-                if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                    datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]                                            
+    # En el caso de un muestreo de la estacion 4, elimina la botella 11 (es un duplicado de la 9)  
+    if id_estacion == 5: #E4
+        datos_botellas = datos_botellas.drop(datos_botellas[datos_botellas.botella == 11].index)
+     
+    # Cambia los nombre de las botellas.
+    listado_equiv_ctd = [1,3,5,7,9,11]
+    listado_equiv_real = [1,2,3,4,5,6]
+    for ibotella in range(datos_botellas.shape[0]):
+        for iequiv in range(len(listado_equiv_ctd)):
+            if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+                datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
                 
 
-    if id_estacion == 5: #E4
-        
-        datos_botellas['botella_temp'] = datos_botellas['botella']
-        datos_botellas = datos_botellas.drop(datos_botellas[datos_botellas.botella_temp == 11].index)
-        
-        listado_equiv_ctd = [1,3,5,7,9,11]
-        listado_equiv_real = [8,9,10,11,12,None]
-        for ibotella in range(datos_botellas.shape[0]):
-            for iequiv in range(len(listado_equiv_ctd)):
-                if datos_botellas['botella_temp'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
-                    datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+
+
+  
+    # # Cambia los nombre de las botellas.        
+    # if id_estacion == 1: #E2
+    #     listado_equiv_ctd = [1,3,5,7,9,11]
+    #     listado_equiv_real = [1,2,3,4,5,6]
+    #     for ibotella in range(datos_botellas.shape[0]):
+    #         for iequiv in range(len(listado_equiv_ctd)):
+    #             if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+    #                 datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
                     
-        datos_botellas = datos_botellas.drop(columns=['botella_temp'])  
+    # if id_estacion == 2: #E3A
+    #     listado_equiv_ctd = [1,3,5,7,9,11]
+    #     listado_equiv_real = [1,3,5,7,9,11]
+    #     for ibotella in range(datos_botellas.shape[0]):
+    #         for iequiv in range(len(listado_equiv_ctd)):
+    #             if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+    #                 datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+
+    # if id_estacion == 3: #E3C
+    #     listado_equiv_ctd = [1,3,5,7,9,11]
+    #     listado_equiv_real = [1,3,5,7,9,11]
+    #     for ibotella in range(datos_botellas.shape[0]):
+    #         for iequiv in range(len(listado_equiv_ctd)):
+    #             if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+    #                 datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+                    
+    # if id_estacion == 4: #E3B
+    #     listado_equiv_ctd = [1,3,5,7,9,11]
+    #     listado_equiv_real = [1,3,5,7,9,11]
+    #     for ibotella in range(datos_botellas.shape[0]):
+    #         for iequiv in range(len(listado_equiv_ctd)):
+    #             if datos_botellas['botella'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+    #                 datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]                                            
+                
+
+    # if id_estacion == 5: #E4
+        
+    #     datos_botellas['botella_temp'] = datos_botellas['botella']
+    #     datos_botellas = datos_botellas.drop(datos_botellas[datos_botellas.botella_temp == 11].index)
+        
+    #     listado_equiv_ctd = [1,3,5,7,9,11]
+    #     listado_equiv_real = [8,9,10,11,12,None]
+    #     for ibotella in range(datos_botellas.shape[0]):
+    #         for iequiv in range(len(listado_equiv_ctd)):
+    #             if datos_botellas['botella_temp'].iloc[ibotella] == listado_equiv_ctd[iequiv]:
+    #                 datos_botellas['botella'].iloc[ibotella] = listado_equiv_real[iequiv]
+                    
+    #     datos_botellas = datos_botellas.drop(columns=['botella_temp'])  
   
     # Asigna lat/lon de la estación si esa información no etá incluia en el .btl
     for imuestreo in range(datos_botellas.shape[0]):
