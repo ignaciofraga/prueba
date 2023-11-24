@@ -1424,6 +1424,7 @@ def entrada_archivos_roseta():
                       
                         st.dataframe(datos_botellas)  
                       
+                        
                     #     # Aplica control de calidad
                     #     datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
            
