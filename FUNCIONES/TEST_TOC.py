@@ -20,20 +20,22 @@ from sqlalchemy import create_engine
 import FUNCIONES_PROCESADO
 import numpy
 import psycopg2
+from os import listdir
+from os.path import isfile, join
 
-programa_muestreo = 'RADPROF'
-tipo_salida       = 'ANUAL'
-anho_salida       = 2023
+# programa_muestreo = 'RADPROF'
+# tipo_salida       = 'ANUAL'
+# anho_salida       = 2023
 
-# Carga de informacion previa
-con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-conn             = create_engine(con_engine)
-tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
-tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
-tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn)
-conn.dispose() 
+# # Carga de informacion previa
+# con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+# conn             = create_engine(con_engine)
+# tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+# tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+# tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
+# tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+# tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn)
+# conn.dispose() 
 
 
 # archivo_estadillo_toc   = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/2023/Estadillo_TOC_RADPROF2023.xlsx'
@@ -56,7 +58,7 @@ conn.dispose()
 # # # conn.close()
 
 # Recupera el identificador del programa de muestreo
-id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+#id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
 
 # # Encuentra la estación asociada a cada registro
 # print('Asignando la estación correspondiente a cada medida')
@@ -76,6 +78,65 @@ id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(prog
 
 
 
+directorio_datos           = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/INSTRUMENTACION/TOC/Procesado/ESTADILLOS ANTIGUOS'
+
+listado_archivos = [f for f in listdir(directorio_datos) if isfile(join(directorio_datos, f))]
+
+for iarchivo in range(len(listado_archivos)):
+
+   
+    archivo_toc            = directorio_datos + '/' + listado_archivos[iarchivo]    
+
+    # Lectura del archivo con los resultados del TOC
+    datos_archivo              = pandas.read_excel(archivo_toc,skiprows=27)            
+    
+    # Mantén un recorte con las variables que interesan
+    datos_toc = datos_archivo[['muestra','conc.','conc..1']]
+
+    # Subset con los datos correspondientes a muestras
+    datos_muestras = datos_toc[datos_toc[['muestra']].notna().all(axis=1)]
+    
+    # Metadatos
+    datos_archivo_completo = pandas.read_excel(archivo_toc) 
+    
+    pte_carbono            = datos_archivo_completo.iloc[5].iloc[17]
+    r2_carbono             = datos_archivo_completo.iloc[7].iloc[17]
+    area_blanco_carbono    = datos_archivo_completo.iloc[3].iloc[18]
+    conc_blanco_carbono    = datos_archivo_completo.iloc[3].iloc[19]
+    
+    pte_nitrogeno            = datos_archivo_completo.iloc[14].iloc[17]
+    r2_nitrogeno             = datos_archivo_completo.iloc[16].iloc[17]
+    area_blanco_nitrogeno    = datos_archivo_completo.iloc[12].iloc[18]
+    conc_blanco_nitrogeno    = datos_archivo_completo.iloc[12].iloc[19]
+    
+    lcw_c = None
+    lcw_n = None
+    dsr_c = None
+    dsr_n = None
+    
+    for idato in range(datos_archivo.shape[0]):
+        if 'lcw' in str(datos_archivo['muestra'].iloc[idato]).lower():
+            lcw_c = datos_archivo['conc.'].iloc[idato]
+            lcw_n = datos_archivo['conc..1'].iloc[idato]
+        if 'dsr' in str(datos_archivo['muestra'].iloc[idato]).lower():
+            dsr_c = datos_archivo['conc.'].iloc[idato]
+            dsr_n = datos_archivo['conc..1'].iloc[idato]
+    
+    fecha_analisis = datos_archivo_completo.iloc[4].iloc[4].date()
+    
+ 
+    print('Archivo ',listado_archivos[iarchivo], 'pte C',pte_carbono, 'lwc ',lcw_c)
+    
+    # Insercion en la pagina correspondiente
+    instruccion_sql = '''INSERT INTO parametros_analisis_toc (fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n)
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (fecha_analisis) DO UPDATE SET (pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n) = ROW(EXCLUDED.pte_carbono,EXCLUDED.r2_carbono,EXCLUDED.area_blanco_carbono,EXCLUDED.conc_blanco_carbono,EXCLUDED.pte_nitrogeno,EXCLUDED.r2_nitrogeno,EXCLUDED.area_blanco_nitrogeno,EXCLUDED.conc_blanco_nitrogeno,EXCLUDED.lcw_c,EXCLUDED.lcw_n,EXCLUDED.dsr_c,EXCLUDED.dsr_n);''' 
+    
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor()    
+    cursor.execute(instruccion_sql,(fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n))
+    conn.commit() 
+    cursor.close()
+    conn.close()
 
 
 
@@ -83,18 +144,18 @@ id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(prog
 
 
 
-archivo_toc            = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/2022/20231005_TOC_TN_RADPROF22_04.xlsx'
+# archivo_toc            = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/2022/20231005_TOC_TN_RADPROF22_04.xlsx'
 
-# Lectura del archivo con los resultados del TOC
-datos_archivo              = pandas.read_excel(archivo_toc,skiprows=25)            
+# # Lectura del archivo con los resultados del TOC
+# datos_archivo              = pandas.read_excel(archivo_toc,skiprows=25)            
 
-# Mantén un recorte con las variables que interesan
-datos_toc = datos_archivo[['estacion','botella','muestra','conc C','conc N']]
+# # Mantén un recorte con las variables que interesan
+# datos_toc = datos_archivo[['estacion','botella','muestra','conc C','conc N']]
 
-# Subset con los datos correspondientes a muestras
-datos_muestras = datos_toc[datos_toc[['estacion','botella']].notna().all(axis=1)]
+# # Subset con los datos correspondientes a muestras
+# datos_muestras = datos_toc[datos_toc[['estacion','botella']].notna().all(axis=1)]
 
-datos_muestras         = datos_muestras.rename(columns={"conc C":'carbono_organico_total','conc N':"nitrogeno_total"})
+# datos_muestras         = datos_muestras.rename(columns={"conc C":'carbono_organico_total','conc N':"nitrogeno_total"})
    
 
 # str_salida = programa_muestreo + ' ' + str(anho_salida)
@@ -112,41 +173,41 @@ datos_muestras         = datos_muestras.rename(columns={"conc C":'carbono_organi
 # texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_muestras,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
 
 
-# Metadatos
-archivo_toc            = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/2022/20231005_TOC_TN_RADPROF22_04.xlsx'
-datos_archivo_completo = pandas.read_excel(archivo_toc) 
+# # Metadatos
+# archivo_toc            = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/2022/20231005_TOC_TN_RADPROF22_04.xlsx'
+# datos_archivo_completo = pandas.read_excel(archivo_toc) 
 
-pte_carbono            = datos_archivo_completo.iloc[5].iloc[19]
-r2_carbono             = datos_archivo_completo.iloc[7].iloc[19]
-area_blanco_carbono    = datos_archivo_completo.iloc[3].iloc[20]
-conc_blanco_carbono    = datos_archivo_completo.iloc[3].iloc[21]
+# pte_carbono            = datos_archivo_completo.iloc[5].iloc[19]
+# r2_carbono             = datos_archivo_completo.iloc[7].iloc[19]
+# area_blanco_carbono    = datos_archivo_completo.iloc[3].iloc[20]
+# conc_blanco_carbono    = datos_archivo_completo.iloc[3].iloc[21]
 
-pte_nitrogeno            = datos_archivo_completo.iloc[14].iloc[19]
-r2_nitrogeno             = datos_archivo_completo.iloc[16].iloc[19]
-area_blanco_nitrogeno    = datos_archivo_completo.iloc[12].iloc[20]
-conc_blanco_nitrogeno    = datos_archivo_completo.iloc[12].iloc[21]
+# pte_nitrogeno            = datos_archivo_completo.iloc[14].iloc[19]
+# r2_nitrogeno             = datos_archivo_completo.iloc[16].iloc[19]
+# area_blanco_nitrogeno    = datos_archivo_completo.iloc[12].iloc[20]
+# conc_blanco_nitrogeno    = datos_archivo_completo.iloc[12].iloc[21]
 
-for idato in range(datos_archivo.shape[0]):
-    if 'lcw' in str(datos_archivo['muestra'].iloc[idato]).lower():
-        lcw_c = datos_archivo['conc C'].iloc[idato]
-        lcw_n = datos_archivo['conc N'].iloc[idato]
-    if 'dsr' in str(datos_archivo['muestra'].iloc[idato]).lower():
-        dsr_c = datos_archivo['conc C'].iloc[idato]
-        dsr_n = datos_archivo['conc N'].iloc[idato]
+# for idato in range(datos_archivo.shape[0]):
+#     if 'lcw' in str(datos_archivo['muestra'].iloc[idato]).lower():
+#         lcw_c = datos_archivo['conc C'].iloc[idato]
+#         lcw_n = datos_archivo['conc N'].iloc[idato]
+#     if 'dsr' in str(datos_archivo['muestra'].iloc[idato]).lower():
+#         dsr_c = datos_archivo['conc C'].iloc[idato]
+#         dsr_n = datos_archivo['conc N'].iloc[idato]
 
-fecha_analisis = datos_archivo_completo.iloc[4].iloc[6].date()
+# fecha_analisis = datos_archivo_completo.iloc[4].iloc[6].date()
 
 
-# # Insercion en la pagina correspondiente
-# instruccion_sql = '''INSERT INTO parametros_analisis_toc (fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n)
-# VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (fecha_analisis) DO UPDATE SET (pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n) = ROW(EXCLUDED.pte_carbono,EXCLUDED.r2_carbono,EXCLUDED.area_blanco_carbono,EXCLUDED.conc_blanco_carbono,EXCLUDED.pte_nitrogeno,EXCLUDED.r2_nitrogeno,EXCLUDED.area_blanco_nitrogeno,EXCLUDED.conc_blanco_nitrogeno,EXCLUDED.lcw_c,EXCLUDED.lcw_n,EXCLUDED.dsr_c,EXCLUDED.dsr_n);''' 
+# # # Insercion en la pagina correspondiente
+# # instruccion_sql = '''INSERT INTO parametros_analisis_toc (fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n)
+# # VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (fecha_analisis) DO UPDATE SET (pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n) = ROW(EXCLUDED.pte_carbono,EXCLUDED.r2_carbono,EXCLUDED.area_blanco_carbono,EXCLUDED.conc_blanco_carbono,EXCLUDED.pte_nitrogeno,EXCLUDED.r2_nitrogeno,EXCLUDED.area_blanco_nitrogeno,EXCLUDED.conc_blanco_nitrogeno,EXCLUDED.lcw_c,EXCLUDED.lcw_n,EXCLUDED.dsr_c,EXCLUDED.dsr_n);''' 
 
-# conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-# cursor = conn.cursor()    
-# cursor.execute(instruccion_sql,(fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n))
-# conn.commit() 
-# cursor.close()
-# conn.close()
+# # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+# # cursor = conn.cursor()    
+# # cursor.execute(instruccion_sql,(fecha_analisis,pte_carbono,r2_carbono,area_blanco_carbono,conc_blanco_carbono,pte_nitrogeno,r2_nitrogeno,area_blanco_nitrogeno,conc_blanco_nitrogeno,lcw_c,lcw_n,dsr_c,dsr_n))
+# # conn.commit() 
+# # cursor.close()
+# # conn.close()
 
 
     # # Genera la intrucción de escritura

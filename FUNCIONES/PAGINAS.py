@@ -1311,8 +1311,11 @@ def entrada_archivos_roseta():
         df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
         df_programas              = psql.read_sql('SELECT * FROM programas', conn)
         df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
+        tabla_variables           = psql.read_sql('SELECT * FROM variables_procesado', conn)
+        tabla_datos_perfiles      = psql.read_sql('SELECT * FROM datos_perfiles', conn)
+        tabla_muestreo_perfiles   = psql.read_sql('SELECT * FROM perfiles_verticales', conn)
         conn.close()
-        return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad
+        return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles
         
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
@@ -1334,7 +1337,7 @@ def entrada_archivos_roseta():
         st.subheader('Entrada de datos procedentes de botellas y perfiles') 
     
         # Recupera tablas con informacion utilizada en el procesado
-        df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad = carga_datos_entrada_archivo_roseta()
+        df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,tabla_variables,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles = carga_datos_entrada_archivo_roseta()
         
         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
 
@@ -1425,43 +1428,55 @@ def entrada_archivos_roseta():
                         st.dataframe(datos_botellas)  
                       
                         
-                    #     # Aplica control de calidad
-                    #     datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
+                        # Aplica control de calidad
+                        datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
            
-                    #     # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-                    #     datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto)
-             
-                    #     texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto)
-
-                    #     if texto_insercion:
-                    #         st.success(texto_insercion)   
+                        # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+                        datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
+                                
+                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,df_datos_discretos,df_muestreos)
+                        if texto_insercion:
+                            st.success(texto_insercion)   
                         
-                    # else:
+                    else:
                     
-                    #     texto_error = 'La fecha del archivo ' + archivo_btl.name + ' no coindice con la fecha seleccionada '
-                    #     st.warning(texto_error, icon="⚠️")  
-                        
-                        
-                        
-                    # ### DATOS DE PERFIL
-                    
-                    # for archivo_cnv in listado_archivos_cnv:
-                    
-                    #     nombre_archivo_cnv    = archivo_cnv.name
-                    #     nombre_archivo_cnv    = nombre_archivo_cnv.replace('.cnv','.btl')
-                                           
-                    #     if nombre_archivo_cnv == nombre_archivo_btl:
-                                                                                    
-                    #         datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
-                                          
-                    #         datos_perfil,df_perfiles,datos_muestreo_perfil = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
-                                                             
-                    #         FUNCIONES_PROCESADO.procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,id_programa,abreviatura_programa,nombre_estacion,id_estacion,direccion_host,base_datos,usuario,contrasena,puerto)
-                                    
+                        texto_error = 'La fecha del archivo ' + archivo_btl.name + ' no coindice con la fecha seleccionada '
+                        st.warning(texto_error, icon="⚠️")  
 
                 texto_exito = 'Estación ' + nombre_estacion + ' procesada correctamente. Información subida a la base de datos'
                 st.success(texto_exito)                            
              
+                        
+                      
+                        
+            ### DATOS DE PERFILES
+            
+            for archivo_cnv in listado_archivos_cnv:
+                              
+                texto_estado = 'Procesando la información del perfil ' + archivo_cnv
+                with st.spinner(texto_estado):
+                                                                            
+                    datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
+                                  
+                    datos_perfil,df_perfiles,datos_muestreo_perfil = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
+                                                     
+                    df_botellas,df_perfiles = FUNCIONES_PROCESADO.procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,id_programa,abreviatura_programa,nombre_estacion,id_estacion,direccion_host,base_datos,usuario,contrasena,puerto)
+                
+                    if df_botellas is not None:     
+                        
+                        conn                      = init_connection()
+                        tabla_datos_discretos = psql.read_sql('SELECT * FROM datos_discretos', conn)
+                        conn.close()
+                        
+                        df_botellas = FUNCIONES_PROCESADO.evalua_registros(df_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
+                               
+                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_discretos,df_muestreos)
+        
+                    texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles)
+           
+                    st.success(texto_insercion)      
+
+
 
             
 
@@ -2376,6 +2391,8 @@ def entrada_toc():
         tabla_parametros_toc  = psql.read_sql('SELECT * FROM parametros_analisis_toc', conn)
         conn.close()   
                 
+        tabla_parametros_toc = tabla_parametros_toc.sort_values('fecha_analisis')
+        
         st.markdown('Evolucion pendientes de calibración del **carbono**') 
 
         fig = plt.figure(figsize=(24/2.54, 16/2.54))
