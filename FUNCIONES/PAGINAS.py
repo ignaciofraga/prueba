@@ -2405,7 +2405,7 @@ def entrada_toc():
         st.image(buf) 
         
         
-        st.line_chart(tabla_parametros_toc, x="fecha_analisis", y="pte_carbono", color="#408EB9")
+        st.line_chart(tabla_parametros_toc, x="fecha_analisis", y="pte_carbono")
         
         st.markdown('Evolucion pendientes de calibración del **nitrógeno**')
         
