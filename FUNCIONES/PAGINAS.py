@@ -2404,6 +2404,9 @@ def entrada_toc():
         fig.savefig(buf, format="png")
         st.image(buf) 
         
+        
+        st.line_chart(tabla_parametros_toc, x="fecha_analisis", y="pte_carbono", color="#408EB9")
+        
         st.markdown('Evolucion pendientes de calibración del **nitrógeno**')
         
         fig = plt.figure(figsize=(24/2.54, 16/2.54))
