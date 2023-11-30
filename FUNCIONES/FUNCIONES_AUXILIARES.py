@@ -862,14 +862,15 @@ def consulta_botellas():
         if io_whp and 'id_externo' in listado_cols:
             df_exporta  = df_exporta.drop(columns=['id_externo'])
         
-        st.dataframe(df_exporta)
-
         # Elimina las filas sin datos de las variables-filtro
         if len(filtros_aplicados) > 0:
             for ivariable_filtro in range(len(filtros_aplicados)):
                 df_exporta = df_exporta[df_exporta[filtros_aplicados[ivariable_filtro]].notna()]
         
-        st.dataframe(df_exporta)        
+            indices_dataframe     = numpy.arange(0,df_exporta.shape[0],1,dtype=int)
+            df_exporta['id_temp'] = indices_dataframe
+            df_exporta.set_index('id_temp',drop=True,append=False,inplace=True)
+                
  
         # Elimina las columnas sin datos        
         listado_variables_inicial = list(df_exporta.columns) 
