@@ -2371,6 +2371,8 @@ def entrada_toc():
              datos_muestras['carbono_organico_total_qf'] = iq_asignado
              datos_muestras['nitrogeno_total_qf']        = iq_asignado         
        
+             st.dataframe(datos_muestras) 
+       
              if texto_error:
                 
                 st.warning(texto_error, icon="⚠️")    
