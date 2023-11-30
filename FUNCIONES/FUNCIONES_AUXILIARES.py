@@ -582,7 +582,8 @@ def consulta_botellas():
     
     ### SELECCION DE VARIABLES
   
-    listado_variables =['muestreo']  
+    listado_variables =['muestreo'] 
+    listado_variables_filtrado = []
   
     # Selecciona las variables a exportar
     with st.expander("Variables físicas",expanded=True):
@@ -595,18 +596,22 @@ def consulta_botellas():
             io_temperatura   = st.checkbox('Temperatura(CTD)', value=False)
             if io_temperatura:
                 listado_variables = listado_variables + ['temperatura_ctd'] + ['temperatura_ctd_qf']
+                listado_variables_filtrado = listado_variables_filtrado + ['temperatura_ctd']
         with col2:
             io_salinidad     = st.checkbox('Salinidad(CTD)', value=False)
             if io_salinidad:
                 listado_variables = listado_variables + ['salinidad_ctd'] + ['salinidad_ctd_qf']
+                listado_variables_filtrado = listado_variables_filtrado + ['salinidad_ctd']
         with col3:
             io_par           = st.checkbox('PAR(CTD)', value=False)
             if io_par:
                 listado_variables = listado_variables + ['par_ctd'] + ['par_ctd_qf']
+                listado_variables_filtrado = listado_variables_filtrado + ['par_ctd']
         with col4:
             io_turbidez      = st.checkbox('Turbidez(CTD)', value=False)
             if io_turbidez:
                 listado_variables = listado_variables + ['turbidez_ctd'] + ['turbidez_ctd_qf']
+                listado_variables_filtrado = listado_variables_filtrado + ['turbidez_ctd']                
                 
     # Recorta el dataframe de datos físicos con las variables seleccionadas
     df_datos_fisicos_seleccion = df_datos_discretos.loc[:, listado_variables]
@@ -623,14 +628,17 @@ def consulta_botellas():
             io_fluorescencia   = st.checkbox('Fluorescencia(CTD)', value=False)
             if io_fluorescencia:
                 listado_variables = listado_variables + ['fluorescencia_ctd'] + ['fluorescencia_ctd_qf']
+                listado_variables_filtrado = listado_variables_filtrado + ['fluorescencia_ctd']   
  
             io_oxigeno_ctd   = st.checkbox('Oxígeno(CTD)', value=False)
             if io_oxigeno_ctd:
                 listado_variables = listado_variables + ['oxigeno_ctd'] + ['oxigeno_ctd_qf']
+                listado_variables_filtrado = listado_variables_filtrado + ['oxigeno_ctd'] 
 
             io_oxigeno_wk   = st.checkbox('Oxígeno(Winkler)', value=False)
             if io_oxigeno_wk:
-                listado_variables = listado_variables + ['oxigeno_wk'] + ['oxigeno_wk_qf']  
+                listado_variables = listado_variables + ['oxigeno_wk'] + ['oxigeno_wk_qf'] 
+                listado_variables_filtrado = listado_variables_filtrado + ['oxigeno_wk'] 
                 
             io_ph      = st.checkbox('pH', value=False)
             if io_ph:
@@ -638,63 +646,77 @@ def consulta_botellas():
 
             io_alcalinidad           = st.checkbox('Alcalinidad', value=False)
             if io_alcalinidad:
-                 listado_variables = listado_variables + ['alcalinidad'] + ['alcalinidad_qf']  
+                 listado_variables = listado_variables + ['alcalinidad'] + ['alcalinidad_qf']
+                 listado_variables_filtrado = listado_variables_filtrado + ['alcalinidad'] 
                              
                 
         with col2:
             io_nitrogeno_total     = st.checkbox('Nitrogeno inorgánico total', value=False)
             if io_nitrogeno_total:
                 listado_variables = listado_variables + ['nitrogeno_inorganico_total'] + ['nitrogeno_inorganico_total_qf']
+                listado_variables_filtrado = listado_variables_filtrado + ['nitrogeno_inorganico_total'] 
                 
             io_nitrato   = st.checkbox('Nitrato', value=False)
             if io_nitrato:
                 listado_variables = listado_variables + ['nitrato'] + ['nitrato_qf']
+                listado_variables_filtrado = listado_variables_filtrado + ['nitrato'] 
   
             io_nitrito   = st.checkbox('Nitrito', value=False)
             if io_nitrito:
                  listado_variables = listado_variables + ['nitrito'] + ['nitrito_qf']
+                 listado_variables_filtrado = listado_variables_filtrado + ['nitrito'] 
 
             io_amonio   = st.checkbox('Amonio', value=False)
             if io_amonio:
-                 listado_variables = listado_variables + ['amonio'] + ['amonio_qf']                 
+                 listado_variables = listado_variables + ['amonio'] + ['amonio_qf']
+                 listado_variables_filtrado = listado_variables_filtrado + ['amonio']                  
                 
             io_fosfato   = st.checkbox('Fosfato', value=False)
             if io_fosfato:
-                  listado_variables = listado_variables + ['fosfato'] + ['fosfato_qf']                 
+                  listado_variables = listado_variables + ['fosfato'] + ['fosfato_qf']
+                  listado_variables_filtrado = listado_variables_filtrado + ['fosfato'] 
    
             io_silicato   = st.checkbox('Silicato', value=False)
             if io_silicato:
-                  listado_variables = listado_variables + ['silicato'] + ['silicato_qf'] 
+                  listado_variables = listado_variables + ['silicato'] + ['silicato_qf']
+                  listado_variables_filtrado = listado_variables_filtrado + ['silicato']
                                     
                                
         with col3:
             io_inorg_tcarb           = st.checkbox('Carbono inorgánico total', value=False)
             if io_inorg_tcarb:
                 listado_variables = listado_variables + ['carbono_inorganico_total'] + ['carbono_inorganico_total_qf']
+                listado_variables_filtrado = listado_variables_filtrado + ['carbono_inorganico_total']
                 
             io_org_tcarb           = st.checkbox('Carbono orgánico total (TOC)', value=False)
             if io_org_tcarb:
                 listado_variables = listado_variables + ['carbono_organico_total'] + ['carbono_organico_total_qf']
+                listado_variables_filtrado = listado_variables_filtrado + ['carbono_organico_total']
                 
             io_tn           = st.checkbox('Nitrógeno total (TDN)', value=False)
             if io_tn:
                 listado_variables = listado_variables + ['nitrogeno_total'] + ['nitrogeno_total_qf']
+                listado_variables_filtrado = listado_variables_filtrado + ['nitrogeno_total']
                 
             io_doc           = st.checkbox('Carbono orgánico disuelto', value=False)
             if io_doc:
                  listado_variables = listado_variables + ['carbono_organico_disuelto'] + ['carbono_organico_disuelto_qf']
+                 listado_variables_filtrado = listado_variables_filtrado + ['carbono_organico_disuelto']
                  
             io_doc           = st.checkbox('Carbono orgánico particulado', value=False)
             if io_doc:
-                listado_variables = listado_variables + ['carbono_organico_particulado'] 
+                listado_variables = listado_variables + ['carbono_organico_particulado']
+                listado_variables_filtrado = listado_variables_filtrado + ['carbono_organico_particulado']
 
             io_cdom           = st.checkbox('Nitrógeno orgánico particulado', value=False)
             if io_cdom:
-               listado_variables = listado_variables + ['nitrogeno_organico_particulado'] 
+               listado_variables = listado_variables + ['nitrogeno_organico_particulado']
+               listado_variables_filtrado = listado_variables_filtrado + ['nitrogeno_organico_particulado']
 
             io_cdom           = st.checkbox('CDOM', value=False)
             if io_cdom:
-                listado_variables = listado_variables + ['cdom'] + ['cdom_qf']            
+                listado_variables = listado_variables + ['cdom'] + ['cdom_qf']
+                listado_variables_filtrado = listado_variables_filtrado + ['cdom']
                 
  
                  
@@ -703,18 +725,22 @@ def consulta_botellas():
            io_pp             = st.checkbox('Producción primaria', value=False)
            if io_pp:
                listado_variables = listado_variables + ['prod_primaria'] 
+               listado_variables_filtrado = listado_variables_filtrado + ['prod_primaria']
                
            io_clorofila_a         = st.checkbox('Clorofila (a)', value=False)
            if io_clorofila_a:
-                 listado_variables = listado_variables + ['clorofila_a'] + ['clorofila_a_qf']                 
+                 listado_variables = listado_variables + ['clorofila_a'] + ['clorofila_a_qf']
+                 listado_variables_filtrado = listado_variables_filtrado + ['clorofila_a']                 
   
            io_clorofila_b         = st.checkbox('Clorofila (b)', value=False)
            if io_clorofila_b:
-                 listado_variables = listado_variables + ['clorofila_b'] + ['clorofila_b_qf']                   
+                 listado_variables = listado_variables + ['clorofila_b'] + ['clorofila_b_qf']
+                 listado_variables_filtrado = listado_variables_filtrado + ['clorofila_b']                   
   
            io_clorofila_c         = st.checkbox('Clorofila (c)', value=False)
            if io_clorofila_c:
-                 listado_variables = listado_variables + ['clorofila_c'] + ['clorofila_c_qf']            
+                 listado_variables = listado_variables + ['clorofila_c'] + ['clorofila_c_qf']
+                 listado_variables_filtrado = listado_variables_filtrado + ['clorofila_c']
                
            io_parametros_nutrientes = st.checkbox('Parametros análisis nutrientes', value=False)
            if io_parametros_nutrientes:
@@ -747,6 +773,13 @@ def consulta_botellas():
        if io_qc2:
            io_whp = True
                    
+
+    with st.expander("Filtro",expanded=True):
+   
+       st.write("Selecciona el filtro")    
+   
+       # Selecciona el filtro 
+       listado_variables    = st.multiselect('Filtro ',(listado_variables_filtrado))   
 
                        
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
