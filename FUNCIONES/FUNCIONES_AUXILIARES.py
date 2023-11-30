@@ -830,8 +830,9 @@ def consulta_botellas():
             df_exporta  = df_exporta.drop(columns=['id_externo'])
         
         #Ordena los valores por estacion/botella
+        st.dataframe(df_exporta)
         df_exporta = df_exporta.sort_values(['nombre_estacion', 'botella', 'presion_ctd'], ascending=[True, True,True], inplace=True)
-        
+        st.dataframe(df_exporta)        
         ## Ordena los valores por fechas
         #df_exporta = df_exporta.sort_values('fecha_muestreo')
         
