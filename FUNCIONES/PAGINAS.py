@@ -2384,6 +2384,8 @@ def entrada_toc():
     
                      st.success(texto_insercion)   
 
+                 st.cache_data.clear()
+
 
     # Añade nuevos datos obtenidos en laboratorio
     if tipo_accion == acciones[1]:
