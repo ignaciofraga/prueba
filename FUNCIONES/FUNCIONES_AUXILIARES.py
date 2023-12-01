@@ -862,7 +862,7 @@ def consulta_botellas():
             listado_variables_promedio.remove('fecha_muestreo')
         if 'hora_muestreo' in listado_variables_promedio:
             listado_variables_promedio.remove('hora_muestreo')
-        listado_variables_promedio.remove('nombre_estacion')
+        listado_variables_promedio.remove('nombre_estacion','nombre_muestreo')
         
         
         listado_estaciones = df_exporta['nombre_estacion'].unique()
