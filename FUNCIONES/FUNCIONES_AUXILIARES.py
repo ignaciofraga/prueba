@@ -881,11 +881,14 @@ def consulta_botellas():
             
                     datos_prof = df_cast[df_cast['prof_promedio']==profs_unicas[iprof_unica]] 
                     
+                    st.dataframe(datos_prof)
+                    
                     if datos_prof.shape[0]>1:
                     
                         #promedios = datos_prof.mean(axis=0)
                         
                         promedios = datos_prof[listado_variables_promedio].mean()
+                        
                         
                         df_promedio = pandas.DataFrame([promedios])
                         
