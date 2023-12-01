@@ -845,6 +845,7 @@ def consulta_botellas():
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
     
 
+
 ########################################
 
         df_exporta['prof_promedio'] = None
