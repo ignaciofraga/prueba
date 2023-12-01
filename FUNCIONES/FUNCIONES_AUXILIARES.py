@@ -845,6 +845,71 @@ def consulta_botellas():
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
     
 
+########################################
+
+        df_exporta['prof_promedio'] = None
+        
+        df_exporta['prof_promedio'] = round(df_exporta['presion_ctd']/5)*5
+        
+        
+        listado_variables = df_exporta.columns.values.tolist()
+        
+        df_acc = pandas.DataFrame(columns=listado_variables)
+        
+        listado_variables_promedio = df_exporta.columns.values.tolist() 
+        if 'fecha_muestreo' in listado_variables_promedio:
+            listado_variables_promedio.remove('fecha_muestreo')
+        if 'hora_muestreo' in listado_variables_promedio:
+            listado_variables_promedio.remove('hora_muestreo')
+        
+        
+        listado_estaciones = df_exporta['estacion'].unique()
+        
+        for iestacion in range(len(listado_estaciones)):
+            
+            df_estacion   = df_exporta[df_exporta['estacion']==listado_estaciones[iestacion]]
+        
+            listado_casts = df_estacion['num_cast'].unique()
+            
+            for icast in range(len(listado_casts)):    
+        
+                df_cast      = df_estacion[df_estacion['num_cast']==listado_casts[icast]]
+               
+                profs_unicas = df_cast['prof_referencia'].unique()
+                
+                for iprof_unica in range(len(profs_unicas)):
+            
+                    datos_prof = df_cast[df_cast['prof_referencia']==profs_unicas[iprof_unica]] 
+                    
+                    if datos_prof.shape[0]>1:
+                    
+                        #promedios = datos_prof.mean(axis=0)
+                        
+                        promedios = datos_prof[listado_variables_promedio].mean()
+                        
+                        df_promedio = pandas.DataFrame([promedios])
+                        
+                        df_promedio['fecha_muestreo'] = datos_prof['fecha_muestreo'].iloc[0]
+                        df_promedio['promediado']     = 1
+                    
+                        df_acc = pandas.concat([df_acc, df_promedio])
+                    
+                    else:
+                
+                        df_acc = pandas.concat([df_acc, datos_prof])
+
+        df_exporta = df_acc
+
+
+
+#########################################
+
+        
+    
+
+
+
+
     
         # Mueve los identificadores de muestreo al final del dataframe
         listado_cols = df_exporta.columns.tolist()
