@@ -862,6 +862,7 @@ def consulta_botellas():
             listado_variables_promedio.remove('fecha_muestreo')
         if 'hora_muestreo' in listado_variables_promedio:
             listado_variables_promedio.remove('hora_muestreo')
+        listado_variables_promedio.remove('nombre_estacion')
         
         
         listado_estaciones = df_exporta['nombre_estacion'].unique()
@@ -888,13 +889,15 @@ def consulta_botellas():
                     
                         #promedios = datos_prof.mean(axis=0)
                         
+                        
+                        
                         promedios = datos_prof[listado_variables_promedio].mean()
                         
                         
                         df_promedio = pandas.DataFrame([promedios])
                         
                         df_promedio['fecha_muestreo'] = datos_prof['fecha_muestreo'].iloc[0]
-                        df_promedio['promediado']     = 1
+
                     
                         df_acc = pandas.concat([df_acc, df_promedio])
                     
