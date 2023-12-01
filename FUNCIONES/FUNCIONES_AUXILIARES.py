@@ -863,11 +863,11 @@ def consulta_botellas():
             listado_variables_promedio.remove('hora_muestreo')
         
         
-        listado_estaciones = df_exporta['estacion'].unique()
+        listado_estaciones = df_exporta['nombre_estacion'].unique()
         
         for iestacion in range(len(listado_estaciones)):
             
-            df_estacion   = df_exporta[df_exporta['estacion']==listado_estaciones[iestacion]]
+            df_estacion   = df_exporta[df_exporta['nombre_estacion']==listado_estaciones[iestacion]]
         
             listado_casts = df_estacion['num_cast'].unique()
             
