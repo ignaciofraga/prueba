@@ -875,11 +875,11 @@ def consulta_botellas():
         
                 df_cast      = df_estacion[df_estacion['num_cast']==listado_casts[icast]]
                
-                profs_unicas = df_cast['prof_referencia'].unique()
+                profs_unicas = df_cast['prof_promedio'].unique()
                 
                 for iprof_unica in range(len(profs_unicas)):
             
-                    datos_prof = df_cast[df_cast['prof_referencia']==profs_unicas[iprof_unica]] 
+                    datos_prof = df_cast[df_cast['prof_promedio']==profs_unicas[iprof_unica]] 
                     
                     if datos_prof.shape[0]>1:
                     
