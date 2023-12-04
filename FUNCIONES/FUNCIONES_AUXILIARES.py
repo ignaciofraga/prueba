@@ -914,7 +914,7 @@ def consulta_botellas():
                 
                         datos_prof = df_cast[df_cast['prof_referencia']==profs_unicas[iprof_unica]] 
                              
-                        st.dataframe(datos_prof)
+                        #st.dataframe(datos_prof)
                         
                         # Si hay varias profundidades muestreadas, promedia los registros
                         if datos_prof.shape[0]>1:

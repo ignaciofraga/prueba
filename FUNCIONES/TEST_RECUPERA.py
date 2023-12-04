@@ -23,8 +23,8 @@ puerto         = '5432'
 direccion_host = '193.146.155.99'
 
 # Parámetros
-anho_consulta = 2018
-programa_seleccionado = 'PELACUS'
+anho_consulta = 2022
+programa_seleccionado = 'RADPROF'
 tipo_salida           = 'ANUAL'
 ###### PROCESADO ########
 
