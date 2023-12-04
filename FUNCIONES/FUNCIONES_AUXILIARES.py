@@ -856,6 +856,8 @@ def consulta_botellas():
         # Elimina las columnas que no interesan
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
     
+        st.dataframe(df_exporta)
+    
 
         ###
         # Promedia los registros por profundidades similares si se seleccionó esa opción
