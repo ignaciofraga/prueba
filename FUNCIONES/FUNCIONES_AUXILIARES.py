@@ -791,8 +791,7 @@ def consulta_botellas():
        with col2:
            prof_promedio = st.number_input('Diferencia profundidad promedio:',value=1.5)
    
-       # Selecciona el filtro 
-       filtros_aplicados    = st.multiselect('Filtro ',(listado_variables_filtrado))
+
 
                        
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
