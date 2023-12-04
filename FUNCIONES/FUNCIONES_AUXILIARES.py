@@ -914,7 +914,7 @@ def consulta_botellas():
 
         
         #### Mueve los identificadores de muestreo al final del dataframe ###
-        listado_orden_inverso = ['botella','presion_CTD','hora_muestreo','fecha_muestreo','latitud_muestreo','longitud_muestreo','nombre_estacion']
+        listado_orden_inverso = ['botella','presion_ctd','hora_muestreo','fecha_muestreo','latitud_muestreo','longitud_muestreo','nombre_estacion']
         for ivariable in range(len(listado_orden_inverso)):
             columna_auxiliar = df_exporta.pop(listado_orden_inverso[ivariable]) 
             df_exporta.insert(0, listado_orden_inverso[ivariable], columna_auxiliar) 
