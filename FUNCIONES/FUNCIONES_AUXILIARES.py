@@ -924,7 +924,7 @@ def consulta_botellas():
         listado_variables_final = ['nombre_muestreo','id_externo']
         for ivariable in range(len(listado_variables_final)):
             columna_auxiliar = df_exporta.pop(listado_variables_final[ivariable]) 
-            df_exporta.insert(-1, listado_variables_final[ivariable], columna_auxiliar) 
+            df_exporta.insert(df_exporta.shape[1], listado_variables_final[ivariable], columna_auxiliar) 
         
  
         # listado_cols = df_exporta.columns.tolist()
