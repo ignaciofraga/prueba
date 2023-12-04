@@ -856,9 +856,6 @@ def consulta_botellas():
         # Elimina las columnas que no interesan
         df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
     
-        st.dataframe(df_exporta)
-    
-
         ###
         # Promedia los registros por profundidades similares si se seleccionó esa opción
         if io_promedio:
@@ -916,9 +913,7 @@ def consulta_botellas():
                     for iprof_unica in range(len(profs_unicas)):
                 
                         datos_prof = df_cast[df_cast['prof_referencia']==profs_unicas[iprof_unica]] 
-                        
-                        st.dataframe(datos_prof)
-                        
+                                                
                         # Si hay varias profundidades muestreadas, promedia los registros
                         if datos_prof.shape[0]>1:
                         
