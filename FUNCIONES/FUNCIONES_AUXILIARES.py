@@ -770,37 +770,37 @@ def consulta_botellas():
     
     
                            
-        # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
-        
-        if len(listado_salidas) > 0:  
-      
-            identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
-            for idato in range(len(listado_salidas)):
-                identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
-                
-            # Elimina las columnas que no interesan en los dataframes a utilizar
-            df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
-            df_datos_discretos          = df_datos_discretos[listado_variables]
+    # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
     
-            # conserva los datos de las salidas seleccionadas
-            df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
-      
-            # Recupera los muestreos correspondientes a las salidas seleccionadas
-            df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(identificadores_salidas)]
-            df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"id_muestreo": "muestreo"})
-    
-            # Asocia las coordenadas y nombre de estación de cada muestreo
-            df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
-            df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
+    if len(listado_salidas) > 0:  
+  
+        identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
+        for idato in range(len(listado_salidas)):
+            identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
             
-            # Asocia las propiedades muestreadas de cada muestreo
-            df_temp = pandas.merge(df_muestreos_seleccionados, df_datos_discretos, on="muestreo")
-            if df_temp.shape[0]!=0:
-                df_muestreos_seleccionados = df_temp
-                
-                
-                
-            st.dataframe(df_muestreos_seleccionados)
+        # Elimina las columnas que no interesan en los dataframes a utilizar
+        df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
+        df_datos_discretos          = df_datos_discretos[listado_variables]
+
+        # conserva los datos de las salidas seleccionadas
+        df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
+  
+        # Recupera los muestreos correspondientes a las salidas seleccionadas
+        df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(identificadores_salidas)]
+        df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"id_muestreo": "muestreo"})
+
+        # Asocia las coordenadas y nombre de estación de cada muestreo
+        df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
+        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
+        
+        # Asocia las propiedades muestreadas de cada muestreo
+        df_temp = pandas.merge(df_muestreos_seleccionados, df_datos_discretos, on="muestreo")
+        if df_temp.shape[0]!=0:
+            df_muestreos_seleccionados = df_temp
+            
+            
+            
+        st.dataframe(df_muestreos_seleccionados)
             
             # # Asocia las propiedades físicas de cada muestreo
             # #df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos_seleccion, on="muestreo")
