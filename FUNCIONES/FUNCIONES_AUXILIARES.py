@@ -913,12 +913,20 @@ def consulta_botellas():
         df_exporta.set_index('id_temp',drop=True,append=False,inplace=True)
 
         
-        #### Mueve los identificadores de muestreo al final del dataframe ###
-        listado_orden_inverso = ['botella','presion_ctd','hora_muestreo','fecha_muestreo','latitud_muestreo','longitud_muestreo','nombre_estacion']
-        for ivariable in range(len(listado_orden_inverso)):
-            columna_auxiliar = df_exporta.pop(listado_orden_inverso[ivariable]) 
-            df_exporta.insert(0, listado_orden_inverso[ivariable], columna_auxiliar) 
+        #### Ordena las variables ###
+        # Listado con las variables que se quieren mostrar al inicio del dataframe, EN ORDEN INVERSO
+        listado_variables_inicio = ['botella','presion_ctd','hora_muestreo','fecha_muestreo','latitud_muestreo','longitud_muestreo','nombre_estacion']
+        for ivariable in range(len(listado_variables_inicio)):
+            columna_auxiliar = df_exporta.pop(listado_variables_inicio[ivariable]) 
+            df_exporta.insert(0, listado_variables_inicio[ivariable], columna_auxiliar) 
+
+        #Listado con las variables que se quieren mostrar al final del dataframe, EN ORDEN INVERSO    
+        listado_variables_final = ['nombre_muestreo','id_externo']
+        for ivariable in range(len(listado_variables_final)):
+            columna_auxiliar = df_exporta.pop(listado_variables_final[ivariable]) 
+            df_exporta.insert(-1, listado_variables_final[ivariable], columna_auxiliar) 
         
+ 
         # listado_cols = df_exporta.columns.tolist()
         # listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))        
         # listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
