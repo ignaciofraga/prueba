@@ -914,6 +914,8 @@ def consulta_botellas():
         listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
         
         
+        ##### Ordena los valores por estacion/botella #####
+        df_exporta = df_exporta.sort_values('nombre_estacion') 
         
         ##### Modifica el nombre de las variables #####
         listado_nombres_ref     = variables_bd['nombre'].tolist()
@@ -955,8 +957,7 @@ def consulta_botellas():
                 df_exporta['DATE'].iloc[idato] = df_exporta['DATE'].iloc[idato].strftime('%Y%m%d')
             
       
-        ##### Ordena los valores por estacion/botella #####
-        df_exporta = df_exporta.sort_values('nombre_estacion')   
+  
   
             
         ##################################
