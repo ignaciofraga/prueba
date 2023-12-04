@@ -719,49 +719,49 @@ def consulta_botellas():
                io_factores_correccion_nutrientes = st.checkbox('Factores de corrección nutrientes', value=False)           
                            
         # Botón de envío para confirmar selección
-        submit = st.form_submit_button("Confirmar variables")
+        st.form_submit_button("Confirmar variables")
       
-        if submit == True:
-                                                 
-            listado_sin_qf = [ x for x in listado_variables if "_qf" not in x ]
-            
-            with st.expander("Formatos de salida",expanded=True):
-           
-               st.write("Selecciona el formato de salida de datos")    
-           
-               # Selecciona mostrar o no datos malos y dudosos
-               col1, col2, col3 = st.columns(3,gap="small")
-               with col1:
-                   io_whp   = st.checkbox('Formato WHP', value=False)
-                       
-               with col2:
-                   io_uds     = st.checkbox('Incluir unidades en cabeceras', value=False)
-        
-               with col3:
-                   io_qc2     = st.checkbox('Exportar para análisis QC2', value=False)    
-        
-               # si se selecciona exportar para QC2 forzar a formato WHP
-               if io_qc2:
-                   io_whp = True
-                           
-        
-            with st.expander("Filtrado datos exportados",expanded=True):
-           
-               st.write("Exportar sólo los registros con información de las variables seleccionadas")    
-           
-               # Selecciona el filtro 
-               filtros_aplicados    = st.multiselect('Variable(s) ',(listado_sin_qf))  
+
+                                         
+    listado_sin_qf = [ x for x in listado_variables if "_qf" not in x ]
+    
+    with st.expander("Formatos de salida",expanded=True):
+   
+       st.write("Selecciona el formato de salida de datos")    
+   
+       # Selecciona mostrar o no datos malos y dudosos
+       col1, col2, col3 = st.columns(3,gap="small")
+       with col1:
+           io_whp   = st.checkbox('Formato WHP', value=False)
                
-               # Activar/desactivar promediado
-               st.write("Promediar registros correspondientes a una misma profundidad de muestreo") 
+       with col2:
+           io_uds     = st.checkbox('Incluir unidades en cabeceras', value=False)
+
+       with col3:
+           io_qc2     = st.checkbox('Exportar para análisis QC2', value=False)    
+
+       # si se selecciona exportar para QC2 forzar a formato WHP
+       if io_qc2:
+           io_whp = True
+                   
+
+    with st.expander("Filtrado datos exportados",expanded=True):
+   
+       st.write("Exportar sólo los registros con información de las variables seleccionadas")    
+   
+       # Selecciona el filtro 
+       filtros_aplicados    = st.multiselect('Variable(s) ',(listado_sin_qf))  
+       
+       # Activar/desactivar promediado
+       st.write("Promediar registros correspondientes a una misma profundidad de muestreo") 
+       
+       col1, col2 = st.columns(2,gap="small")
+       with col1:
+           io_promedio   = st.checkbox('Promediar registros', value=False)
                
-               col1, col2 = st.columns(2,gap="small")
-               with col1:
-                   io_promedio   = st.checkbox('Promediar registros', value=False)
-                       
-               with col2:
-                   prof_promedio = st.number_input('Diferencia profundidad promedio:',value=1.5)
-           
+       with col2:
+           prof_promedio = st.number_input('Diferencia profundidad promedio:',value=1.5)
+   
 
 
                            
