@@ -581,533 +581,515 @@ def consulta_botellas():
     listado_salidas                 = st.multiselect('Muestreo',(df_salidas_seleccion['nombre_salida']))   
     
     ### SELECCION DE VARIABLES
- 
-    listado_variables =['muestreo'] 
-    listado_variables_filtrado = []
-  
-    # Selecciona las variables a exportar
-    with st.expander("Variables físicas",expanded=True):
+    with st.form("Formulario seleccion"): 
+        listado_variables =['muestreo'] 
+      
+        # Selecciona las variables a exportar
+        with st.expander("Variables físicas",expanded=True):
+        
+            st.write("Selecciona las variables físicas a exportar")    
+        
+            # Selecciona mostrar o no datos malos y dudosos
+            col1, col2, col3, col4 = st.columns(4,gap="small")
+            with col1:
+                io_temperatura   = st.checkbox('Temperatura(CTD)', value=False)
+                if io_temperatura:
+                    listado_variables = listado_variables + ['temperatura_ctd'] + ['temperatura_ctd_qf']
     
-        st.write("Selecciona las variables físicas a exportar")    
+            with col2:
+                io_salinidad     = st.checkbox('Salinidad(CTD)', value=False)
+                if io_salinidad:
+                    listado_variables = listado_variables + ['salinidad_ctd'] + ['salinidad_ctd_qf']
     
-        # Selecciona mostrar o no datos malos y dudosos
-        col1, col2, col3, col4 = st.columns(4,gap="small")
-        with col1:
-            io_temperatura   = st.checkbox('Temperatura(CTD)', value=False)
-            if io_temperatura:
-                listado_variables = listado_variables + ['temperatura_ctd'] + ['temperatura_ctd_qf']
-                listado_variables_filtrado = listado_variables_filtrado + ['temperatura_ctd']
-        with col2:
-            io_salinidad     = st.checkbox('Salinidad(CTD)', value=False)
-            if io_salinidad:
-                listado_variables = listado_variables + ['salinidad_ctd'] + ['salinidad_ctd_qf']
-                listado_variables_filtrado = listado_variables_filtrado + ['salinidad_ctd']
-        with col3:
-            io_par           = st.checkbox('PAR(CTD)', value=False)
-            if io_par:
-                listado_variables = listado_variables + ['par_ctd'] + ['par_ctd_qf']
-                listado_variables_filtrado = listado_variables_filtrado + ['par_ctd']
-        with col4:
-            io_turbidez      = st.checkbox('Turbidez(CTD)', value=False)
-            if io_turbidez:
-                listado_variables = listado_variables + ['turbidez_ctd'] + ['turbidez_ctd_qf']
-                listado_variables_filtrado = listado_variables_filtrado + ['turbidez_ctd']                
-                
-    # Recorta el dataframe de datos físicos con las variables seleccionadas
-    df_datos_fisicos_seleccion = df_datos_discretos.loc[:, listado_variables]
+            with col3:
+                io_par           = st.checkbox('PAR(CTD)', value=False)
+                if io_par:
+                    listado_variables = listado_variables + ['par_ctd'] + ['par_ctd_qf']
+    
+            with col4:
+                io_turbidez      = st.checkbox('Turbidez(CTD)', value=False)
+                if io_turbidez:
+                    listado_variables = listado_variables + ['turbidez_ctd'] + ['turbidez_ctd_qf']
                     
-    listado_variables =['muestreo']
-                
-    with st.expander("Variables biogeoquímicas",expanded=True):
+                    
+        with st.expander("Variables biogeoquímicas",expanded=True):
+        
+            st.write("Selecciona las variables biogeoquímicas a exportar")    
+        
+            # Selecciona mostrar o no datos malos y dudosos
+            col1, col2, col3, col4 = st.columns(4,gap="small")
+            with col1:
+                io_fluorescencia   = st.checkbox('Fluorescencia(CTD)', value=False)
+                if io_fluorescencia:
+                    listado_variables = listado_variables + ['fluorescencia_ctd'] + ['fluorescencia_ctd_qf']
+     
+                io_oxigeno_ctd   = st.checkbox('Oxígeno(CTD)', value=False)
+                if io_oxigeno_ctd:
+                    listado_variables = listado_variables + ['oxigeno_ctd'] + ['oxigeno_ctd_qf']
     
-        st.write("Selecciona las variables biogeoquímicas a exportar")    
+                io_oxigeno_wk   = st.checkbox('Oxígeno(Winkler)', value=False)
+                if io_oxigeno_wk:
+                    listado_variables = listado_variables + ['oxigeno_wk'] + ['oxigeno_wk_qf'] 
+                    
+                io_ph      = st.checkbox('pH', value=False)
+                if io_ph:
+                    listado_variables = listado_variables + ['ph'] + ['ph_qf'] + ['ph_metodo']               
     
-        # Selecciona mostrar o no datos malos y dudosos
-        col1, col2, col3, col4 = st.columns(4,gap="small")
-        with col1:
-            io_fluorescencia   = st.checkbox('Fluorescencia(CTD)', value=False)
-            if io_fluorescencia:
-                listado_variables = listado_variables + ['fluorescencia_ctd'] + ['fluorescencia_ctd_qf']
-                listado_variables_filtrado = listado_variables_filtrado + ['fluorescencia_ctd']   
- 
-            io_oxigeno_ctd   = st.checkbox('Oxígeno(CTD)', value=False)
-            if io_oxigeno_ctd:
-                listado_variables = listado_variables + ['oxigeno_ctd'] + ['oxigeno_ctd_qf']
-                listado_variables_filtrado = listado_variables_filtrado + ['oxigeno_ctd'] 
-
-            io_oxigeno_wk   = st.checkbox('Oxígeno(Winkler)', value=False)
-            if io_oxigeno_wk:
-                listado_variables = listado_variables + ['oxigeno_wk'] + ['oxigeno_wk_qf'] 
-                listado_variables_filtrado = listado_variables_filtrado + ['oxigeno_wk'] 
-                
-            io_ph      = st.checkbox('pH', value=False)
-            if io_ph:
-                listado_variables = listado_variables + ['ph'] + ['ph_qf'] + ['ph_metodo']               
-
-            io_alcalinidad           = st.checkbox('Alcalinidad', value=False)
-            if io_alcalinidad:
-                 listado_variables = listado_variables + ['alcalinidad'] + ['alcalinidad_qf']
-                 listado_variables_filtrado = listado_variables_filtrado + ['alcalinidad'] 
-                             
-                
-        with col2:
-            io_nitrogeno_total     = st.checkbox('Nitrogeno inorgánico total', value=False)
-            if io_nitrogeno_total:
-                listado_variables = listado_variables + ['nitrogeno_inorganico_total'] + ['nitrogeno_inorganico_total_qf']
-                listado_variables_filtrado = listado_variables_filtrado + ['nitrogeno_inorganico_total'] 
-                
-            io_nitrato   = st.checkbox('Nitrato', value=False)
-            if io_nitrato:
-                listado_variables = listado_variables + ['nitrato'] + ['nitrato_qf']
-                listado_variables_filtrado = listado_variables_filtrado + ['nitrato'] 
-  
-            io_nitrito   = st.checkbox('Nitrito', value=False)
-            if io_nitrito:
-                 listado_variables = listado_variables + ['nitrito'] + ['nitrito_qf']
-                 listado_variables_filtrado = listado_variables_filtrado + ['nitrito'] 
-
-            io_amonio   = st.checkbox('Amonio', value=False)
-            if io_amonio:
-                 listado_variables = listado_variables + ['amonio'] + ['amonio_qf']
-                 listado_variables_filtrado = listado_variables_filtrado + ['amonio']                  
-                
-            io_fosfato   = st.checkbox('Fosfato', value=False)
-            if io_fosfato:
-                  listado_variables = listado_variables + ['fosfato'] + ['fosfato_qf']
-                  listado_variables_filtrado = listado_variables_filtrado + ['fosfato'] 
-   
-            io_silicato   = st.checkbox('Silicato', value=False)
-            if io_silicato:
-                  listado_variables = listado_variables + ['silicato'] + ['silicato_qf']
-                  listado_variables_filtrado = listado_variables_filtrado + ['silicato']
-                                    
-                               
-        with col3:
-            io_inorg_tcarb           = st.checkbox('Carbono inorgánico total', value=False)
-            if io_inorg_tcarb:
-                listado_variables = listado_variables + ['carbono_inorganico_total'] + ['carbono_inorganico_total_qf']
-                listado_variables_filtrado = listado_variables_filtrado + ['carbono_inorganico_total']
-                
-            io_org_tcarb           = st.checkbox('Carbono orgánico total (TOC)', value=False)
-            if io_org_tcarb:
-                listado_variables = listado_variables + ['carbono_organico_total'] + ['carbono_organico_total_qf']
-                listado_variables_filtrado = listado_variables_filtrado + ['carbono_organico_total']
-                
-            io_tn           = st.checkbox('Nitrógeno total (TDN)', value=False)
-            if io_tn:
-                listado_variables = listado_variables + ['nitrogeno_total'] + ['nitrogeno_total_qf']
-                listado_variables_filtrado = listado_variables_filtrado + ['nitrogeno_total']
-                
-            io_doc           = st.checkbox('Carbono orgánico disuelto', value=False)
-            if io_doc:
-                 listado_variables = listado_variables + ['carbono_organico_disuelto'] + ['carbono_organico_disuelto_qf']
-                 listado_variables_filtrado = listado_variables_filtrado + ['carbono_organico_disuelto']
-                 
-            io_doc           = st.checkbox('Carbono orgánico particulado', value=False)
-            if io_doc:
-                listado_variables = listado_variables + ['carbono_organico_particulado']
-                listado_variables_filtrado = listado_variables_filtrado + ['carbono_organico_particulado']
-
-            io_cdom           = st.checkbox('Nitrógeno orgánico particulado', value=False)
-            if io_cdom:
-               listado_variables = listado_variables + ['nitrogeno_organico_particulado']
-               listado_variables_filtrado = listado_variables_filtrado + ['nitrogeno_organico_particulado']
-
-            io_cdom           = st.checkbox('CDOM', value=False)
-            if io_cdom:
-                listado_variables = listado_variables + ['cdom'] + ['cdom_qf']
-                listado_variables_filtrado = listado_variables_filtrado + ['cdom']
-                
- 
-                 
-                 
-        with col4:
-           io_pp             = st.checkbox('Producción primaria', value=False)
-           if io_pp:
-               listado_variables = listado_variables + ['prod_primaria'] 
-               listado_variables_filtrado = listado_variables_filtrado + ['prod_primaria']
-               
-           io_clorofila_a         = st.checkbox('Clorofila (a)', value=False)
-           if io_clorofila_a:
-                 listado_variables = listado_variables + ['clorofila_a'] + ['clorofila_a_qf']
-                 listado_variables_filtrado = listado_variables_filtrado + ['clorofila_a']                 
-  
-           io_clorofila_b         = st.checkbox('Clorofila (b)', value=False)
-           if io_clorofila_b:
-                 listado_variables = listado_variables + ['clorofila_b'] + ['clorofila_b_qf']
-                 listado_variables_filtrado = listado_variables_filtrado + ['clorofila_b']                   
-  
-           io_clorofila_c         = st.checkbox('Clorofila (c)', value=False)
-           if io_clorofila_c:
-                 listado_variables = listado_variables + ['clorofila_c'] + ['clorofila_c_qf']
-                 listado_variables_filtrado = listado_variables_filtrado + ['clorofila_c']
-               
-           io_parametros_nutrientes = st.checkbox('Parametros análisis nutrientes', value=False)
-           if io_parametros_nutrientes:
-               listado_variables = listado_variables + ['rmn_alto_procesado']  + ['rmn_bajo_procesado']  + ['temp_lab_procesado'] + ['rto_columna_procesado']  + ['tubo_nutrientes']  
-                
-           io_factores_correccion_nutrientes = st.checkbox('Factores de corrección nutrientes', value=False)           
-                
-    listado_variables_bgq = listado_variables
+                io_alcalinidad           = st.checkbox('Alcalinidad', value=False)
+                if io_alcalinidad:
+                     listado_variables = listado_variables + ['alcalinidad'] + ['alcalinidad_qf']
+                                 
+                    
+            with col2:
+                io_nitrogeno_total     = st.checkbox('Nitrogeno inorgánico total', value=False)
+                if io_nitrogeno_total:
+                    listado_variables = listado_variables + ['nitrogeno_inorganico_total'] + ['nitrogeno_inorganico_total_qf']
+                    
+                io_nitrato   = st.checkbox('Nitrato', value=False)
+                if io_nitrato:
+                    listado_variables = listado_variables + ['nitrato'] + ['nitrato_qf']
+      
+                io_nitrito   = st.checkbox('Nitrito', value=False)
+                if io_nitrito:
+                     listado_variables = listado_variables + ['nitrito'] + ['nitrito_qf']
     
-    # Recorta el dataframe de datos biogeoquimicos con las variables seleccionadas
-    df_datos_biogeoquimicos_seleccion = df_datos_discretos.loc[:, listado_variables]
-
-
-    with st.expander("Formatos de salida",expanded=True):
-   
-       st.write("Selecciona el formato de salida de datos")    
-   
-       # Selecciona mostrar o no datos malos y dudosos
-       col1, col2, col3 = st.columns(3,gap="small")
-       with col1:
-           io_whp   = st.checkbox('Formato WHP', value=False)
-               
-       with col2:
-           io_uds     = st.checkbox('Incluir unidades en cabeceras', value=False)
-
-       with col3:
-           io_qc2     = st.checkbox('Exportar para análisis QC2', value=False)    
-
-       # si se selecciona exportar para QC2 forzar a formato WHP
-       if io_qc2:
-           io_whp = True
+                io_amonio   = st.checkbox('Amonio', value=False)
+                if io_amonio:
+                     listado_variables = listado_variables + ['amonio'] + ['amonio_qf']              
+                    
+                io_fosfato   = st.checkbox('Fosfato', value=False)
+                if io_fosfato:
+                      listado_variables = listado_variables + ['fosfato'] + ['fosfato_qf']
+       
+                io_silicato   = st.checkbox('Silicato', value=False)
+                if io_silicato:
+                      listado_variables = listado_variables + ['silicato'] + ['silicato_qf']
+                                                                      
+            with col3:
+                io_inorg_tcarb           = st.checkbox('Carbono inorgánico total', value=False)
+                if io_inorg_tcarb:
+                    listado_variables = listado_variables + ['carbono_inorganico_total'] + ['carbono_inorganico_total_qf']
+                    
+                io_org_tcarb           = st.checkbox('Carbono orgánico total (TOC)', value=False)
+                if io_org_tcarb:
+                    listado_variables = listado_variables + ['carbono_organico_total'] + ['carbono_organico_total_qf']
+                    
+                io_tn           = st.checkbox('Nitrógeno total (TDN)', value=False)
+                if io_tn:
+                    listado_variables = listado_variables + ['nitrogeno_total'] + ['nitrogeno_total_qf']
+                    
+                io_doc           = st.checkbox('Carbono orgánico disuelto', value=False)
+                if io_doc:
+                     listado_variables = listado_variables + ['carbono_organico_disuelto'] + ['carbono_organico_disuelto_qf']
+                     
+                io_doc           = st.checkbox('Carbono orgánico particulado', value=False)
+                if io_doc:
+                    listado_variables = listado_variables + ['carbono_organico_particulado']
+    
+                io_cdom           = st.checkbox('Nitrógeno orgánico particulado', value=False)
+                if io_cdom:
+                   listado_variables = listado_variables + ['nitrogeno_organico_particulado']
+    
+                io_cdom           = st.checkbox('CDOM', value=False)
+                if io_cdom:
+                    listado_variables = listado_variables + ['cdom'] + ['cdom_qf']               
+     
+                     
+            with col4:
+               io_pp             = st.checkbox('Producción primaria', value=False)
+               if io_pp:
+                   listado_variables = listado_variables + ['prod_primaria'] 
                    
-
-    with st.expander("Filtro",expanded=True):
-   
-       st.write("Exportar sólo los registros con información de las variables seleccionadas")    
-   
-       # Selecciona el filtro 
-       filtros_aplicados    = st.multiselect('Filtro ',(listado_variables_filtrado))  
-       
-       # Activar/desactivar promediado
-       st.write("Promediar registros correspondientes a una misma profundidad de muestreo") 
-       
-       col1, col2 = st.columns(2,gap="small")
-       with col1:
-           io_promedio   = st.checkbox('Promediar registros', value=False)
-               
-       with col2:
-           prof_promedio = st.number_input('Diferencia profundidad promedio:',value=1.5)
-   
-
-
+               io_clorofila_a         = st.checkbox('Clorofila (a)', value=False)
+               if io_clorofila_a:
+                     listado_variables = listado_variables + ['clorofila_a'] + ['clorofila_a_qf']               
+      
+               io_clorofila_b         = st.checkbox('Clorofila (b)', value=False)
+               if io_clorofila_b:
+                     listado_variables = listado_variables + ['clorofila_b'] + ['clorofila_b_qf']             
+      
+               io_clorofila_c         = st.checkbox('Clorofila (c)', value=False)
+               if io_clorofila_c:
+                     listado_variables = listado_variables + ['clorofila_c'] + ['clorofila_c_qf']
+                   
+               io_parametros_nutrientes = st.checkbox('Parametros análisis nutrientes', value=False)
+               if io_parametros_nutrientes:
+                   listado_variables = listado_variables + ['rmn_alto_procesado']  + ['rmn_bajo_procesado']  + ['temp_lab_procesado'] + ['rto_columna_procesado']  + ['tubo_nutrientes']  
+                    
+               io_factores_correccion_nutrientes = st.checkbox('Factores de corrección nutrientes', value=False)           
+                
+    with st.form("Formulario seleccion"):               
+        # Botón de envío para confirmar selección
+        submit = st.form_submit_button("Confirmar variables")
+  
+        if submit == True:
+                      
+        
                        
-    # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
-    
-    if len(listado_salidas) > 0:  
-  
-        identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
-        for idato in range(len(listado_salidas)):
-            identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
+                        
+                       
+            listado_sin_qf = [ x for x in listado_variables if "_qf" not in x ]
             
-        # Elimina las columnas que no interesan en los dataframes a utilizar
-        #df_salidas_seleccion        = df_salidas_seleccion.drop(df_salidas_seleccion.columns.difference(['id_salida']), 1, inplace=True)
-        df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
-
-        # conserva los datos de las salidas seleccionadas
-        df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
-  
-        # Recupera los muestreos correspondientes a las salidas seleccionadas
-        df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(identificadores_salidas)]
-        df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"id_muestreo": "muestreo"})
-
-        # Asocia las coordenadas y nombre de estación de cada muestreo
-        df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
-        df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
+            
+            with st.expander("Formatos de salida",expanded=True):
+           
+               st.write("Selecciona el formato de salida de datos")    
+           
+               # Selecciona mostrar o no datos malos y dudosos
+               col1, col2, col3 = st.columns(3,gap="small")
+               with col1:
+                   io_whp   = st.checkbox('Formato WHP', value=False)
+                       
+               with col2:
+                   io_uds     = st.checkbox('Incluir unidades en cabeceras', value=False)
         
-        # Asocia las propiedades físicas de cada muestreo
-        #df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos_seleccion, on="muestreo")
-        df_temp = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos_seleccion, on="muestreo")
-        if df_temp.shape[0]!=0:
-            df_muestreos_seleccionados = df_temp
+               with col3:
+                   io_qc2     = st.checkbox('Exportar para análisis QC2', value=False)    
+        
+               # si se selecciona exportar para QC2 forzar a formato WHP
+               if io_qc2:
+                   io_whp = True
+                           
+        
+            with st.expander("Filtrado datos exportados",expanded=True):
+           
+               st.write("Exportar sólo los registros con información de las variables seleccionadas")    
+           
+               # Selecciona el filtro 
+               filtros_aplicados    = st.multiselect('Variable(s) ',(listado_sin_qf))  
+               
+               # Activar/desactivar promediado
+               st.write("Promediar registros correspondientes a una misma profundidad de muestreo") 
+               
+               col1, col2 = st.columns(2,gap="small")
+               with col1:
+                   io_promedio   = st.checkbox('Promediar registros', value=False)
+                       
+               with col2:
+                   prof_promedio = st.number_input('Diferencia profundidad promedio:',value=1.5)
+           
         
         
-        # Asocia las propiedades biogeoquimicas de cada muestreo
-        #df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
-        df_temp  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
-        if df_temp.shape[0]!=0:
-            df_muestreos_seleccionados = df_temp
+                               
+            # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
             
-        # Si se quieren recuperar los parámetros de muestreo de nutrientes, componer el nombre de los rmns utilizados
-        if io_parametros_nutrientes:
-            df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"rmn_alto_procesado": "rmn_alto_procesado_temp","rmn_bajo_procesado": "rmn_bajo_procesado_temp"})
-            df_muestreos_seleccionados['rmn_alto_procesado'] = [None]*df_muestreos_seleccionados.shape[0]
-            df_muestreos_seleccionados['rmn_bajo_procesado'] = [None]*df_muestreos_seleccionados.shape[0]
-            for idato in range(df_muestreos_seleccionados.shape[0]):
-                if df_muestreos_seleccionados['rmn_alto_procesado_temp'].iloc[idato] is not None and df_muestreos_seleccionados['rmn_bajo_procesado_temp'].iloc[idato] is not None:
-                    df_muestreos_seleccionados['rmn_alto_procesado'].iloc[idato] = df_rmn_altos['nombre_rmn'][df_rmn_altos['id_rmn']==int(df_muestreos_seleccionados['rmn_alto_procesado_temp'].iloc[idato])]
-                    df_muestreos_seleccionados['rmn_bajo_procesado'].iloc[idato] = df_rmn_bajos['nombre_rmn'][df_rmn_bajos['id_rmn']==int(df_muestreos_seleccionados['rmn_bajo_procesado_temp'].iloc[idato])]
-
-    
-        # Si se quieren recuperar los factores de corrección de los nutrientes
-        if io_factores_correccion_nutrientes:
-            df_muestreos_seleccionados = recupera_factores_nutrientes(df_muestreos_seleccionados)
-            
-        if io_whp :
-            dt_temporal                 = df_salidas_seleccion[['id_salida','expocode']]
-            dt_temporal                 = dt_temporal.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas
-            df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, dt_temporal, on="salida_mar")
-            df_muestreos_seleccionados  = df_muestreos_seleccionados.rename(columns={"expocode": "EXPOCODE"})
-
-
-            
-        # Elimina las columnas que no interesan
-        df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
-    
-        ###
-        # Promedia los registros por profundidades similares si se seleccionó esa opción
-        if io_promedio:
-    
-            # Genera una variable temporal
-            df_exporta['prof_referencia'] = None
-            df_exporta['prof_referencia'] = round(df_exporta['presion_ctd']/prof_promedio)*prof_promedio
-            
-            # Genera un dataframe vacío con las variables seleccionadas para su exportación
-            listado_variables = df_exporta.columns.values.tolist()
-            df_promediado = pandas.DataFrame(columns=listado_variables)
-            
-            # Define una lista con las variables de las que se hará el promediado, las que se utilizará el valor común y las que se conertirán el listas e varios valores
-            listado_variables_datos = df_exporta.columns.values.tolist()
-
-            listado_variables_unificadas =[]
-            if 'fecha_muestreo' in listado_variables_datos:
-                listado_variables_unificadas = listado_variables_unificadas + ['fecha_muestreo']
-            if 'hora_muestreo' in listado_variables_datos:
-                listado_variables_unificadas = listado_variables_unificadas + ['hora_muestreo']
-            listado_variables_unificadas = listado_variables_unificadas + ['nombre_estacion']
-            
-            listado_variables_listadas = []
-            if 'tubo_nutrientes' in listado_variables_datos:
-                listado_variables_listadas = listado_variables_listadas + ['tubo_nutrientes']                
-            listado_variables_listadas = listado_variables_listadas + ['nombre_muestreo','id_externo']             
-            
-            listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas
-            listado_variables_promedio  = [x for x in listado_variables_datos if x not in listado_variables_excluidas]
-            
-            
-            
-            # Redondea las profundidades a partir del umbral definido como dato de entrada
-            df_exporta['prof_referencia'] = None
-            df_exporta['prof_referencia'] = round(df_exporta['presion_ctd']/prof_promedio)*prof_promedio            
-            
-            # Busca las estaciones incluidas en los datos a exportar
-            listado_estaciones = df_exporta['nombre_estacion'].unique()
-            
-            # Itera en cada estación
-            for iestacion in range(len(listado_estaciones)):
-                
-                df_estacion   = df_exporta[df_exporta['nombre_estacion']==listado_estaciones[iestacion]]
-            
-                listado_casts = df_estacion['num_cast'].unique()
-                
-                # Selecciona primero por casts
-                for icast in range(len(listado_casts)):    
-            
-                    df_cast      = df_estacion[df_estacion['num_cast']==listado_casts[icast]]
-                   
-                    profs_unicas = df_cast['prof_referencia'].unique()
+            if len(listado_salidas) > 0:  
+          
+                identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
+                for idato in range(len(listado_salidas)):
+                    identificadores_salidas[idato] = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==listado_salidas[idato]].iloc[0]
                     
-                    # Selecciona por profundidades
-                    for iprof_unica in range(len(profs_unicas)):
+                # Elimina las columnas que no interesan en los dataframes a utilizar
+                df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
+                df_datos_discretos          = df_datos_discretos[listado_variables]
+        
+                # conserva los datos de las salidas seleccionadas
+                df_salidas_seleccion = df_salidas_seleccion[df_salidas_seleccion['id_salida'].isin(identificadores_salidas)]
+          
+                # Recupera los muestreos correspondientes a las salidas seleccionadas
+                df_muestreos_seleccionados = df_muestreos[df_muestreos['salida_mar'].isin(identificadores_salidas)]
+                df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"id_muestreo": "muestreo"})
+        
+                # Asocia las coordenadas y nombre de estación de cada muestreo
+                df_estaciones               = df_estaciones.rename(columns={"id_estacion": "estacion"}) # Para igualar los nombres de columnas                                               
+                df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_estaciones, on="estacion")
                 
-                        datos_prof = df_cast[df_cast['prof_referencia']==profs_unicas[iprof_unica]] 
-                             
-                        #st.dataframe(datos_prof)
+                # Asocia las propiedades muestreadas de cada muestreo
+                df_temp = pandas.merge(df_muestreos_seleccionados, df_datos_discretos, on="muestreo")
+                if df_temp.shape[0]!=0:
+                    df_muestreos_seleccionados = df_temp
+                    
+                    
+                
+                # # Asocia las propiedades físicas de cada muestreo
+                # #df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos_seleccion, on="muestreo")
+                # df_temp = pandas.merge(df_muestreos_seleccionados, df_datos_fisicos_seleccion, on="muestreo")
+                # if df_temp.shape[0]!=0:
+                #     df_muestreos_seleccionados = df_temp
+                
+                
+                # # Asocia las propiedades biogeoquimicas de cada muestreo
+                # #df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
+                # df_temp  = pandas.merge(df_muestreos_seleccionados, df_datos_biogeoquimicos_seleccion, on="muestreo")
+                # if df_temp.shape[0]!=0:
+                #     df_muestreos_seleccionados = df_temp
+                    
+                # Si se quieren recuperar los parámetros de muestreo de nutrientes, componer el nombre de los rmns utilizados
+                if io_parametros_nutrientes:
+                    df_muestreos_seleccionados = df_muestreos_seleccionados.rename(columns={"rmn_alto_procesado": "rmn_alto_procesado_temp","rmn_bajo_procesado": "rmn_bajo_procesado_temp"})
+                    df_muestreos_seleccionados['rmn_alto_procesado'] = [None]*df_muestreos_seleccionados.shape[0]
+                    df_muestreos_seleccionados['rmn_bajo_procesado'] = [None]*df_muestreos_seleccionados.shape[0]
+                    for idato in range(df_muestreos_seleccionados.shape[0]):
+                        if df_muestreos_seleccionados['rmn_alto_procesado_temp'].iloc[idato] is not None and df_muestreos_seleccionados['rmn_bajo_procesado_temp'].iloc[idato] is not None:
+                            df_muestreos_seleccionados['rmn_alto_procesado'].iloc[idato] = df_rmn_altos['nombre_rmn'][df_rmn_altos['id_rmn']==int(df_muestreos_seleccionados['rmn_alto_procesado_temp'].iloc[idato])]
+                            df_muestreos_seleccionados['rmn_bajo_procesado'].iloc[idato] = df_rmn_bajos['nombre_rmn'][df_rmn_bajos['id_rmn']==int(df_muestreos_seleccionados['rmn_bajo_procesado_temp'].iloc[idato])]
+        
+            
+                # Si se quieren recuperar los factores de corrección de los nutrientes
+                if io_factores_correccion_nutrientes:
+                    df_muestreos_seleccionados = recupera_factores_nutrientes(df_muestreos_seleccionados)
+                    
+                if io_whp :
+                    dt_temporal                 = df_salidas_seleccion[['id_salida','expocode']]
+                    dt_temporal                 = dt_temporal.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas
+                    df_muestreos_seleccionados  = pandas.merge(df_muestreos_seleccionados, dt_temporal, on="salida_mar")
+                    df_muestreos_seleccionados  = df_muestreos_seleccionados.rename(columns={"expocode": "EXPOCODE"})
+        
+        
+                    
+                # Elimina las columnas que no interesan
+                df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
+            
+                ###
+                # Promedia los registros por profundidades similares si se seleccionó esa opción
+                if io_promedio:
+            
+                    # Genera una variable temporal
+                    df_exporta['prof_referencia'] = None
+                    df_exporta['prof_referencia'] = round(df_exporta['presion_ctd']/prof_promedio)*prof_promedio
+                    
+                    # Genera un dataframe vacío con las variables seleccionadas para su exportación
+                    listado_variables = df_exporta.columns.values.tolist()
+                    df_promediado = pandas.DataFrame(columns=listado_variables)
+                    
+                    # Define una lista con las variables de las que se hará el promediado, las que se utilizará el valor común y las que se conertirán el listas e varios valores
+                    listado_variables_datos = df_exporta.columns.values.tolist()
+        
+                    listado_variables_unificadas =[]
+                    if 'fecha_muestreo' in listado_variables_datos:
+                        listado_variables_unificadas = listado_variables_unificadas + ['fecha_muestreo']
+                    if 'hora_muestreo' in listado_variables_datos:
+                        listado_variables_unificadas = listado_variables_unificadas + ['hora_muestreo']
+                    listado_variables_unificadas = listado_variables_unificadas + ['nombre_estacion']
+                    
+                    listado_variables_listadas = []
+                    if 'tubo_nutrientes' in listado_variables_datos:
+                        listado_variables_listadas = listado_variables_listadas + ['tubo_nutrientes']                
+                    listado_variables_listadas = listado_variables_listadas + ['nombre_muestreo','id_externo']             
+                    
+                    listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas
+                    listado_variables_promedio  = [x for x in listado_variables_datos if x not in listado_variables_excluidas]
+                    
+                    
+                    
+                    # Redondea las profundidades a partir del umbral definido como dato de entrada
+                    df_exporta['prof_referencia'] = None
+                    df_exporta['prof_referencia'] = round(df_exporta['presion_ctd']/prof_promedio)*prof_promedio            
+                    
+                    # Busca las estaciones incluidas en los datos a exportar
+                    listado_estaciones = df_exporta['nombre_estacion'].unique()
+                    
+                    # Itera en cada estación
+                    for iestacion in range(len(listado_estaciones)):
                         
-                        # Si hay varias profundidades muestreadas, promedia los registros
-                        if datos_prof.shape[0]>1:
+                        df_estacion   = df_exporta[df_exporta['nombre_estacion']==listado_estaciones[iestacion]]
+                    
+                        listado_casts = df_estacion['num_cast'].unique()
                         
-                            promedios = datos_prof[listado_variables_promedio].mean()
+                        # Selecciona primero por casts
+                        for icast in range(len(listado_casts)):    
+                    
+                            df_cast      = df_estacion[df_estacion['num_cast']==listado_casts[icast]]
+                           
+                            profs_unicas = df_cast['prof_referencia'].unique()
+                            
+                            # Selecciona por profundidades
+                            for iprof_unica in range(len(profs_unicas)):
+                        
+                                datos_prof = df_cast[df_cast['prof_referencia']==profs_unicas[iprof_unica]] 
+                                                             
+                                # Si hay varias profundidades muestreadas, promedia los registros
+                                if datos_prof.shape[0]>1:
                                 
-                            df_promedio = pandas.DataFrame([promedios])
+                                    promedios = datos_prof[listado_variables_promedio].mean()
+                                        
+                                    df_promedio = pandas.DataFrame([promedios])
+                                    
+                                    # Añade los valores de las variables unificadas
+                                    for ivariable_unificada in range(len(listado_variables_unificadas)):
+                                    
+                                        df_promedio[listado_variables_unificadas[ivariable_unificada]] = datos_prof[listado_variables_unificadas[ivariable_unificada]].iloc[0]
+            
+                                    # Añade los valores de las variables listadas
+            
+                                    df_promediado = pandas.concat([df_promediado, df_promedio])
+                                
+                                # Si solo hay una profundidad muestreada no hacer nada 
+                                else:
                             
-                            # Añade los valores de las variables unificadas
-                            for ivariable_unificada in range(len(listado_variables_unificadas)):
-                            
-                                df_promedio[listado_variables_unificadas[ivariable_unificada]] = datos_prof[listado_variables_unificadas[ivariable_unificada]].iloc[0]
-    
-                            # Añade los valores de las variables listadas
-    
-                            df_promediado = pandas.concat([df_promediado, df_promedio])
+                                    df_promediado = pandas.concat([df_promediado, datos_prof])
+            
+                    df_exporta = df_promediado
+                ###            
+        
+        
+        
+                
+            
+        
+        
+        
+        
+            
+                # Mueve los identificadores de muestreo al final del dataframe
+                listado_cols = df_exporta.columns.tolist()
+                listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))     
+                listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))    
+                listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
+                listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
+                listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
+                
+                if io_whp and 'EXPOCODE' in listado_cols:
+                    listado_cols.insert(0, listado_cols.pop(listado_cols.index('EXPOCODE')))
+                df_exporta = df_exporta[listado_cols]
+                
+                # Elimina la columna id_externo si se exporta la información en formato WHP
+                if io_whp and 'id_externo' in listado_cols:
+                    df_exporta  = df_exporta.drop(columns=['id_externo'])
+                
+                # Elimina las filas sin datos de las variables-filtro
+                if len(filtros_aplicados) > 0:
+                    for ivariable_filtro in range(len(filtros_aplicados)):
+                        df_exporta = df_exporta[df_exporta[filtros_aplicados[ivariable_filtro]].notna()]
+                
+                    indices_dataframe     = numpy.arange(0,df_exporta.shape[0],1,dtype=int)
+                    df_exporta['id_temp'] = indices_dataframe
+                    df_exporta.set_index('id_temp',drop=True,append=False,inplace=True)
                         
-                        # Si solo hay una profundidad muestreada no hacer nada 
-                        else:
+         
+                # Elimina las columnas sin datos        
+                listado_variables_inicial = list(df_exporta.columns) 
+                nan_value = float("NaN")
+                df_exporta.replace("", nan_value, inplace=True)
+                df_exporta.dropna(how='all', axis=1, inplace=True)
+                # Elimina también las columnas de QF de las variables sin datos
+                listado_variables_final = list(df_exporta.columns)
+                #variables_eliminadas    = list(set(listado_variables_final).difference(listado_variables_inicial))
+                variables_eliminadas = numpy.setdiff1d(listado_variables_inicial,listado_variables_final)
+                if len(variables_eliminadas) > 0:
+                    for ivar_eliminada in range(len(variables_eliminadas)):
+                        var_eliminada_qf = variables_eliminadas[ivar_eliminada] + '_qf'
+                        try:
+                            df_exporta       = df_exporta.drop(var_eliminada_qf, axis=1)
+                        except:
+                            pass
+                        
                     
-                            df_promediado = pandas.concat([df_promediado, datos_prof])
-    
-            df_exporta = df_promediado
-        ###            
-
-
-
+                # Comprueba que los datos disponen de expocode y elimina los registros sin datos (si se exporta para QC2)
+                if io_qc2:
+                    if 'EXPOCODE' in df_exporta.columns:
         
-    
-
-
-
-
-    
-        # Mueve los identificadores de muestreo al final del dataframe
-        listado_cols = df_exporta.columns.tolist()
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))     
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))    
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
+                        listado_real_variables_bgq = list(set(listado_variables).intersection(list(df_exporta.columns)))            
+                        df_exporta = df_exporta.dropna(axis='index',how='any',subset=listado_real_variables_bgq)
         
-        if io_whp and 'EXPOCODE' in listado_cols:
-            listado_cols.insert(0, listado_cols.pop(listado_cols.index('EXPOCODE')))
-        df_exporta = df_exporta[listado_cols]
+                        if  df_exporta.shape[0] == 0:
+                            texto_aviso = "No hay datos almacenados de la salida y variables seleccionadas"
+                            st.warning(texto_aviso, icon="⚠️")
         
-        # Elimina la columna id_externo si se exporta la información en formato WHP
-        if io_whp and 'id_externo' in listado_cols:
-            df_exporta  = df_exporta.drop(columns=['id_externo'])
-        
-        # Elimina las filas sin datos de las variables-filtro
-        if len(filtros_aplicados) > 0:
-            for ivariable_filtro in range(len(filtros_aplicados)):
-                df_exporta = df_exporta[df_exporta[filtros_aplicados[ivariable_filtro]].notna()]
-        
-            indices_dataframe     = numpy.arange(0,df_exporta.shape[0],1,dtype=int)
-            df_exporta['id_temp'] = indices_dataframe
-            df_exporta.set_index('id_temp',drop=True,append=False,inplace=True)
-                
- 
-        # Elimina las columnas sin datos        
-        listado_variables_inicial = list(df_exporta.columns) 
-        nan_value = float("NaN")
-        df_exporta.replace("", nan_value, inplace=True)
-        df_exporta.dropna(how='all', axis=1, inplace=True)
-        # Elimina también las columnas de QF de las variables sin datos
-        listado_variables_final = list(df_exporta.columns)
-        #variables_eliminadas    = list(set(listado_variables_final).difference(listado_variables_inicial))
-        variables_eliminadas = numpy.setdiff1d(listado_variables_inicial,listado_variables_final)
-        if len(variables_eliminadas) > 0:
-            for ivar_eliminada in range(len(variables_eliminadas)):
-                var_eliminada_qf = variables_eliminadas[ivar_eliminada] + '_qf'
-                try:
-                    df_exporta       = df_exporta.drop(var_eliminada_qf, axis=1)
-                except:
-                    pass
-                
-            
-        # Comprueba que los datos disponen de expocode y elimina los registros sin datos (si se exporta para QC2)
-        if io_qc2:
-            if 'EXPOCODE' in df_exporta.columns:
-
-                listado_real_variables_bgq = list(set(listado_variables_bgq).intersection(list(df_exporta.columns)))            
-                df_exporta = df_exporta.dropna(axis='index',how='any',subset=listado_real_variables_bgq)
-
-                if  df_exporta.shape[0] == 0:
-                    texto_aviso = "No hay datos almacenados de la salida y variables seleccionadas"
-                    st.warning(texto_aviso, icon="⚠️")
-
-            else:
-                
-                texto_aviso = "La salida seleccionada no dispone de EXPOCODE. No se podrá utilizar el código para el QC2"
-                st.warning(texto_aviso, icon="⚠️")    
-                st.stop()
-
-        
-        # Añade unidades al nombre de cada variable (opcional) y cambia a nombre WHP (también opcional)
-        #df_variables = variables_bd[variables_bd['tipo']=='variable_muestreo']
-        df_variables = variables_bd
-        
-        listado_variables_bd     = df_variables['nombre'].tolist()
-        listado_unidades         = df_variables['unidades'].tolist() 
-                              
-        if io_whp:
-            listado_nombres = df_variables['nombre_WHP'].tolist()
-        else:
-            listado_nombres = df_variables['nombre'].tolist()
-        
-        listado_variables_df = df_exporta.columns.tolist()
-        for ivariable_df in range(len(listado_variables_df)):
-            for ivariable_bd in range(len(listado_variables_bd)):
-                
-                if listado_variables_df[ivariable_df] == listado_variables_bd[ivariable_bd]:
-                                   
-                    if io_uds is True and listado_unidades[ivariable_bd] is not None:    
-            
-                        nombre_uds = listado_nombres[ivariable_bd] + '(' + listado_unidades[ivariable_bd] + ')'
-                
                     else:
                         
-                        nombre_uds = listado_nombres[ivariable_bd]
-                        
-                    if nombre_uds :
-                    
-                        df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})        
-            
-
-        # Ajusta el formato de la fecha si se exporta en WHP
-        if io_whp:
-            for idato in range(df_exporta.shape[0]):
-                df_exporta['DATE'].iloc[idato] = df_exporta['DATE'].iloc[idato].strftime('%Y%m%d')
-            
-            
-        #Ordena los valores por estacion/botella
-        # st.dataframe(df_exporta)
-        # df_exporta = df_exporta.sort_values(['nombre_estacion', 'botella', 'presion_ctd'], ascending=[True, True,True], inplace=True)
-        # st.dataframe(df_exporta)        
-        # Ordena los valores por fechas
-        df_exporta = df_exporta.sort_values('fecha_muestreo')   
-  
-            
-        ## Botón para exportar los resultados
+                        texto_aviso = "La salida seleccionada no dispone de EXPOCODE. No se podrá utilizar el código para el QC2"
+                        st.warning(texto_aviso, icon="⚠️")    
+                        st.stop()
         
-        if io_qc2:
-            listado_expocodes = df_exporta['EXPOCODE'].unique()
-            if len(listado_expocodes) == 1:
-                nombre_archivo = listado_expocodes[0] + '.csv'
-            else:
-                texto_aviso = "Los datos seleccionados corresponden a más de un EXPOCODE. No se podrá utilizar el código para el QC2"
-                st.warning(texto_aviso, icon="⚠️")
-                nombre_archivo = 'DATOS_BOTELLAS.csv'
                 
-            tipo_mime      = "text/csv"
-            datos_exporta  = df_exporta.to_csv(index=False).encode('utf-8')
+                # Añade unidades al nombre de cada variable (opcional) y cambia a nombre WHP (también opcional)
+                #df_variables = variables_bd[variables_bd['tipo']=='variable_muestreo']
+                df_variables = variables_bd
+                
+                listado_variables_bd     = df_variables['nombre'].tolist()
+                listado_unidades         = df_variables['unidades'].tolist() 
+                                      
+                if io_whp:
+                    listado_nombres = df_variables['nombre_WHP'].tolist()
+                else:
+                    listado_nombres = df_variables['nombre'].tolist()
+                
+                listado_variables_df = df_exporta.columns.tolist()
+                for ivariable_df in range(len(listado_variables_df)):
+                    for ivariable_bd in range(len(listado_variables_bd)):
+                        
+                        if listado_variables_df[ivariable_df] == listado_variables_bd[ivariable_bd]:
+                                           
+                            if io_uds is True and listado_unidades[ivariable_bd] is not None:    
+                    
+                                nombre_uds = listado_nombres[ivariable_bd] + '(' + listado_unidades[ivariable_bd] + ')'
+                        
+                            else:
+                                
+                                nombre_uds = listado_nombres[ivariable_bd]
+                                
+                            if nombre_uds :
+                            
+                                df_exporta = df_exporta.rename(columns={listado_variables_df[ivariable_df]: nombre_uds})        
+                    
+        
+                # Ajusta el formato de la fecha si se exporta en WHP
+                if io_whp:
+                    for idato in range(df_exporta.shape[0]):
+                        df_exporta['DATE'].iloc[idato] = df_exporta['DATE'].iloc[idato].strftime('%Y%m%d')
+                    
+                    
+                #Ordena los valores por estacion/botella
+                # st.dataframe(df_exporta)
+                # df_exporta = df_exporta.sort_values(['nombre_estacion', 'botella', 'presion_ctd'], ascending=[True, True,True], inplace=True)
+                # st.dataframe(df_exporta)        
+                # Ordena los valores por fechas
+                df_exporta = df_exporta.sort_values('fecha_muestreo')   
+          
+                    
+                ## Botón para exportar los resultados
+                
+                if io_qc2:
+                    listado_expocodes = df_exporta['EXPOCODE'].unique()
+                    if len(listado_expocodes) == 1:
+                        nombre_archivo = listado_expocodes[0] + '.csv'
+                    else:
+                        texto_aviso = "Los datos seleccionados corresponden a más de un EXPOCODE. No se podrá utilizar el código para el QC2"
+                        st.warning(texto_aviso, icon="⚠️")
+                        nombre_archivo = 'DATOS_BOTELLAS.csv'
+                        
+                    tipo_mime      = "text/csv"
+                    datos_exporta  = df_exporta.to_csv(index=False).encode('utf-8')
+                    
+                else:
+                
+                    nombre_archivo = 'DATOS_BOTELLAS.xlsx'
+                    tipo_mime      = "application/vnd.ms-excel"
             
-        else:
+                    output = BytesIO()
+                    writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                    df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
+                    writer.close()
+                    datos_exporta = output.getvalue()
+            
+            
+            
+            
+                st.download_button(
+                    label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
+                    data=datos_exporta,
+                    file_name=nombre_archivo,
+                    help= 'Descarga un archivo con los datos solicitados',
+                    mime=tipo_mime
+                )
         
-            nombre_archivo = 'DATOS_BOTELLAS.xlsx'
-            tipo_mime      = "application/vnd.ms-excel"
-    
-            output = BytesIO()
-            writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-            df_exporta.to_excel(writer, index=False, sheet_name='DATOS')
-            writer.close()
-            datos_exporta = output.getvalue()
-    
-    
-    
-    
-        st.download_button(
-            label="DESCARGA LOS DATOS DISPONIBLES DE LOS MUESTREOS SELECCIONADOS",
-            data=datos_exporta,
-            file_name=nombre_archivo,
-            help= 'Descarga un archivo con los datos solicitados',
-            mime=tipo_mime
-        )
-
-  
-    
-
-        archivo_metadatos     = 'DATOS/Metadatos y control de calidad.pdf'
-        with open(archivo_metadatos, "rb") as pdf_file:
-            PDFbyte = pdf_file.read()
+          
+            
         
-        st.download_button(label="DESCARGA METADATOS",
-                            data=PDFbyte,
-                            file_name="METADATOS.pdf",
-                            help= 'Descarga un archivo .pdf con información de los datos y el control de calidad realizado',
-                            mime='application/octet-stream')
-    
-
-
-    
+                archivo_metadatos     = 'DATOS/Metadatos y control de calidad.pdf'
+                with open(archivo_metadatos, "rb") as pdf_file:
+                    PDFbyte = pdf_file.read()
+                
+                st.download_button(label="DESCARGA METADATOS",
+                                    data=PDFbyte,
+                                    file_name="METADATOS.pdf",
+                                    help= 'Descarga un archivo .pdf con información de los datos y el control de calidad realizado',
+                                    mime='application/octet-stream')
+            
+        
+        
+            
     
     
     
