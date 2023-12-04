@@ -582,7 +582,7 @@ def consulta_botellas():
     
     ### SELECCION DE VARIABLES
     with st.form("Formulario seleccion"): 
-        listado_variables =['muestreo'] 
+        listado_variables =[] 
       
         # Selecciona las variables a exportar
         with st.expander("Variables físicas",expanded=True):
@@ -792,6 +792,7 @@ def consulta_botellas():
             
         # Elimina las columnas que no interesan en los dataframes a utilizar
         df_salidas_seleccion        = df_salidas_seleccion.drop(columns=['nombre_salida','programa','nombre_programa','tipo_salida','fecha_salida','hora_salida','fecha_retorno','hora_retorno','buque','estaciones','participantes_comisionados','participantes_no_comisionados','observaciones','año'])
+        listado_variables           = ['muestreo'] + listado_variables
         df_datos_discretos          = df_datos_discretos[listado_variables]
 
         # conserva los datos de las salidas seleccionadas
