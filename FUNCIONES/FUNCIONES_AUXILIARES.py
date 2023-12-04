@@ -717,8 +717,7 @@ def consulta_botellas():
                    listado_variables = listado_variables + ['rmn_alto_procesado']  + ['rmn_bajo_procesado']  + ['temp_lab_procesado'] + ['rto_columna_procesado']  + ['tubo_nutrientes']  
                     
                io_factores_correccion_nutrientes = st.checkbox('Factores de corrección nutrientes', value=False)           
-                
-    with st.form("Formulario seleccion"):               
+                           
         # Botón de envío para confirmar selección
         submit = st.form_submit_button("Confirmar variables")
   
