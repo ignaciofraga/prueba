@@ -744,8 +744,30 @@ def consulta_botellas():
    
        st.write("Exportar sólo los registros con información de las variables seleccionadas")    
    
-       # Selecciona el filtro 
-       filtros_aplicados    = st.multiselect('Variable(s) ',(listado_sin_qf))  
+       ### Selecciona el filtro 
+       # Genera un listado con los nombres de las variables seleccionadas en formato para exportar
+       listado_sin_qf_exp            = []
+       listado_variables_nombre_exp  = variables_bd['nombre_COAC'].tolist()
+       listado_variables_nombre_orig = variables_bd['nombre'].tolist()
+       for ivar in range(len(listado_sin_qf)):
+           indice_temp = listado_variables_nombre_orig.index(listado_sin_qf[ivar])
+           listado_sin_qf_exp = listado_sin_qf_exp + [listado_variables_nombre_exp[indice_temp]]
+        
+       # Selecciona las variables 
+       filtros_aplicados_exp    = st.multiselect('Variable(s) ',(listado_sin_qf_exp))    
+       
+       # Devuelve las variables seleccionadas en los nombres utilizados en el procesado
+       filtros_aplicados = []
+       if len(filtros_aplicados_exp)>0:
+           for ivar in range(len(filtros_aplicados_exp)):
+               indice_temp = listado_variables_nombre_exp.index(filtros_aplicados_exp[ivar])
+               filtros_aplicados = filtros_aplicados + [listado_variables_nombre_orig[indice_temp]]           
+       
+       #filtros_aplicados    = st.multiselect('Variable(s) ',(listado_sin_qf))  
+       
+ 
+       
+       
        
        # Activar/desactivar promediado
        st.write("Promediar registros correspondientes a una misma profundidad de muestreo") 
@@ -850,15 +872,13 @@ def consulta_botellas():
             # Itera en cada estación
             for iestacion in range(len(listado_estaciones)):
                 
-                df_estacion   = df_exporta[df_exporta['nombre_estacion']==listado_estaciones[iestacion]]
-            
+                df_estacion   = df_exporta[df_exporta['nombre_estacion']==listado_estaciones[iestacion]]            
                 listado_casts = df_estacion['num_cast'].unique()
                 
                 # Selecciona primero por casts
                 for icast in range(len(listado_casts)):    
             
-                    df_cast      = df_estacion[df_estacion['num_cast']==listado_casts[icast]]
-                   
+                    df_cast      = df_estacion[df_estacion['num_cast']==listado_casts[icast]]                   
                     profs_unicas = df_cast['prof_referencia'].unique()
                     
                     # Selecciona por profundidades
@@ -869,8 +889,7 @@ def consulta_botellas():
                         # Si hay varias profundidades muestreadas, promedia los registros
                         if datos_prof.shape[0]>1:
                         
-                            promedios = datos_prof[listado_variables_promedio].mean()
-                                
+                            promedios   = datos_prof[listado_variables_promedio].mean()                                
                             df_promedio = pandas.DataFrame([promedios])
                             
                             # Añade los valores de las variables unificadas
@@ -879,7 +898,6 @@ def consulta_botellas():
                                 df_promedio[listado_variables_unificadas[ivariable_unificada]] = datos_prof[listado_variables_unificadas[ivariable_unificada]].iloc[0]
     
                             # Añade los valores de las variables listadas
-    
                             df_promediado = pandas.concat([df_promediado, df_promedio])
                         
                         # Si solo hay una profundidad muestreada no hacer nada 
@@ -926,12 +944,7 @@ def consulta_botellas():
             columna_auxiliar = df_exporta.pop(listado_variables_final[ivariable]) 
             df_exporta.insert(df_exporta.shape[1], listado_variables_final[ivariable], columna_auxiliar) 
         
- 
-        # listado_cols = df_exporta.columns.tolist()
-        # listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))        
-        # listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
-        # listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
-        # listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
+
         
         
         ##### Modifica el nombre de las variables #####
@@ -944,7 +957,7 @@ def consulta_botellas():
                 if listado_nombres_exporta[ivar] is None:
                     listado_nombres_exporta[ivar] = listado_nombres_ref[ivar]
         
-        # Nombres en formato propio (configurable)
+        # Nombres en formato propio (configurable en la base de datos)
         else:
             listado_nombres_exporta = variables_bd['nombre_COAC'].tolist()
     
