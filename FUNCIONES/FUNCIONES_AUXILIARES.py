@@ -945,7 +945,7 @@ def consulta_botellas():
             listado_unidades        = variables_bd['unidades'].tolist()
             listado_variables_datos = df_exporta.columns.tolist()
             for ivariable in range(len(listado_nombres_exporta)):
-                if listado_nombres_exporta[ivariable] in listado_variables_datos:
+                if listado_nombres_exporta[ivariable] in listado_variables_datos and listado_unidades[ivariable] is not None:
                     nombre_sust = listado_nombres_exporta[ivariable] + '(' + listado_unidades[ivariable] + ')'
                     df_exporta  = df_exporta.rename(columns={listado_nombres_exporta[ivariable]: nombre_sust}) 
     
