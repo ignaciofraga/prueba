@@ -906,7 +906,16 @@ def consulta_botellas():
         # AJUSTE DE FORMATOS DE LOS DATOS A EXPORTAR #
         ##############################################
         
-        # Modifica el nombre de las variables 
+        #### Mueve los identificadores de muestreo al final del dataframe ###
+        listado_cols = df_exporta.columns.tolist()
+        listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))        
+        listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
+        listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
+        listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
+        
+        
+        
+        ##### Modifica el nombre de las variables #####
         listado_nombres_ref     = variables_bd['nombre'].tolist()
         
         # Nombres en formato WHP. En aquellas variables que no tienen nombre en ese formato, utilizar el de la base de datos
@@ -929,10 +938,7 @@ def consulta_botellas():
     
     
 
-
-
-
-        # Añade las unidades de la variable en el cabecero si se selecciona esta opción
+        ##### Añade las unidades de la variable en el cabecero si se selecciona esta opción #####
         if io_uds:
             listado_unidades        = variables_bd['unidades'].tolist()
             listado_variables_datos = df_exporta.columns.tolist()
@@ -942,32 +948,21 @@ def consulta_botellas():
                     df_exporta  = df_exporta.rename(columns={listado_nombres_exporta[ivariable]: nombre_sust}) 
     
     
-    
-    
-
-    
-        # Mueve los identificadores de muestreo al final del dataframe
-        listado_cols = df_exporta.columns.tolist()
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))        
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
-        
-
-      
-        # Ajusta el formato de la fecha si se exporta en WHP
+       
+        ##### Ajusta el formato de la fecha si se exporta en WHP #####
         if io_whp:
             for idato in range(df_exporta.shape[0]):
                 df_exporta['DATE'].iloc[idato] = df_exporta['DATE'].iloc[idato].strftime('%Y%m%d')
             
       
-            
-      
-        #Ordena los valores por estacion/botella
+        ##### Ordena los valores por estacion/botella #####
         df_exporta = df_exporta.sort_values('nombre_estacion')   
   
             
-        ## Botón para exportar los resultados
+        ##################################
+        # BOTON PARA EXPORTAR RESULTADOS #
+        ##################################  
+    
         nombre_archivo = 'DATOS_BOTELLAS.xlsx'
         tipo_mime      = "application/vnd.ms-excel"
         output = BytesIO()
@@ -985,7 +980,9 @@ def consulta_botellas():
         )
 
   
-    
+        #################################
+        # BOTON PARA EXPORTAR METADATOS #
+        #################################     
 
         archivo_metadatos     = 'DATOS/Metadatos y control de calidad.pdf'
         with open(archivo_metadatos, "rb") as pdf_file:
