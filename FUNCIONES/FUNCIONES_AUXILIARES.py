@@ -1094,6 +1094,7 @@ def consulta_botellas():
         )
 
   
+    
 
         archivo_metadatos     = 'DATOS/Metadatos y control de calidad.pdf'
         with open(archivo_metadatos, "rb") as pdf_file:
