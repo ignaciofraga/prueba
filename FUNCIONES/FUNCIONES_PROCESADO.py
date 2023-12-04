@@ -510,8 +510,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             if 'botella' in listado_variables_datos and exporta_registros['botella'].iloc[idato] is not None:
                 nombre_muestreo = nombre_muestreo + '_B' + str(round(exporta_registros['botella'].iloc[idato])) 
             else:
-                if 'prof_referencia' in listado_variables_datos and exporta_registros['prof_referencia'].iloc[idato] is not None: 
-                    nombre_muestreo = nombre_muestreo + '_P' + str(round(exporta_registros['prof_referencia'].iloc[idato]))
+                if 'prof_teorica' in listado_variables_datos and exporta_registros['prof_teorica'].iloc[idato] is not None: 
+                    nombre_muestreo = nombre_muestreo + '_P' + str(round(exporta_registros['prof_teorica'].iloc[idato]))
                 else:
                     nombre_muestreo = nombre_muestreo + '_P' + str(round(exporta_registros['presion_ctd'].iloc[idato])) 
                 
@@ -624,8 +624,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 if 'botella' in listado_variables_datos and exporta_registros['botella'].iloc[idato] is not None:
                     nombre_muestreo = nombre_muestreo + '_B' + str(round(exporta_registros['botella'].iloc[idato])) 
                 else:
-                    if 'prof_referencia' in listado_variables_datos and exporta_registros['prof_referencia'].iloc[idato] is not None: 
-                        nombre_muestreo = nombre_muestreo + '_P' + str(round(exporta_registros['prof_referencia'].iloc[idato]))
+                    if 'prof_teorica' in listado_variables_datos and exporta_registros['prof_teorica'].iloc[idato] is not None: 
+                        nombre_muestreo = nombre_muestreo + '_P' + str(round(exporta_registros['prof_teorica'].iloc[idato]))
                     else:
                         nombre_muestreo = nombre_muestreo + '_P' + str(round(exporta_registros['presion_ctd'].iloc[idato])) 
                  
@@ -1588,13 +1588,13 @@ def procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_
     profundidades_referencia = tabla_estaciones_programa['profundidades_referencia'][tabla_estaciones_programa['nombre_estacion']==nombre_estacion].iloc[0]
     # Añade una columna con la profundidad de referencia
     if profundidades_referencia is not None:
-        datos_botellas['prof_referencia'] = numpy.zeros(datos_botellas.shape[0],dtype=int)
+        datos_botellas['prof_teorica'] = numpy.zeros(datos_botellas.shape[0],dtype=int)
         for idato in range(datos_botellas.shape[0]):
                 # Encuentra la profundidad de referencia más cercana a cada dato
                 idx = (numpy.abs(profundidades_referencia - datos_botellas['presion_ctd'][idato])).argmin()
-                datos_botellas['prof_referencia'][idato] =  profundidades_referencia[idx]
+                datos_botellas['prof_teorica'][idato] =  profundidades_referencia[idx]
     else:
-        datos_botellas['prof_referencia'] = [None]*datos_botellas.shape[0]
+        datos_botellas['prof_teorica'] = [None]*datos_botellas.shape[0]
 
     # En el caso de un muestreo de la estacion 4, elimina la botella 11 (es un duplicado de la 9)  
     if id_estacion == 5: #E4
@@ -1733,7 +1733,7 @@ def procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,
           # Asigna los datos correspondientes
           df_botella['latitud_muestreo']                = datos_muestreo_perfil['lat_muestreo'].iloc[0]
           df_botella['longitud_muestreo']               = datos_muestreo_perfil['lon_muestreo'].iloc[0]
-          df_botella['prof_referencia']        = 0
+          df_botella['prof_teorica']        = 0
           df_botella['fecha_muestreo']         = datos_muestreo_perfil['fecha_muestreo'].iloc[0]
          
          

@@ -176,7 +176,7 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
   
  
     # Añade una columna con la profundidad de referencia
-    datos_radiales['prof_referencia'] = numpy.zeros(datos_radiales.shape[0],dtype=int)
+    datos_radiales['prof_teorica'] = numpy.zeros(datos_radiales.shape[0],dtype=int)
     for idato in range(datos_radiales.shape[0]):
         # Define las profundidades de referencia en cada estación
         if str(datos_radiales['estacion'][idato]) == '2': #Estación 2
@@ -188,10 +188,10 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
              
         # Encuentra la profundidad de referencia más cercana a cada dato
         idx = (numpy.abs(profundidades_referencia - datos_radiales['presion_ctd'][idato])).argmin()
-        datos_radiales['prof_referencia'][idato] =  profundidades_referencia[idx]
+        datos_radiales['prof_teorica'][idato] =  profundidades_referencia[idx]
 
 #     # Añade una columna con el nombre del muestreo
-#     datos_radiales['prof_referencia'] = numpy.zeros(datos_radiales.shape[0],dtype=int)
+#     datos_radiales['prof_teorica'] = numpy.zeros(datos_radiales.shape[0],dtype=int)
 #     for idato in range(datos_radiales.shape[0]):
 #         # Define las profundidades de referencia en cada estación
 #         if str(int(datos_radiales['estacion'][idato])) == '2': #Estación 2
@@ -255,8 +255,8 @@ def lectura_radiales_historicos(nombre_archivo):
     
     datos_radiales['botella']       = [None]*datos_radiales.shape[0]
     datos_radiales['hora_muestreo'] = [None]*datos_radiales.shape[0]
-    datos_radiales['prof_referencia'] = [None]*datos_radiales.shape[0]
-    datos_radiales['num_cast']        = [None]*datos_radiales.shape[0]
+    datos_radiales['prof_teorica']  = [None]*datos_radiales.shape[0]
+    datos_radiales['num_cast']      = [None]*datos_radiales.shape[0]
     
     datos_radiales['salinidad_ctd_qf']   = int(2)
     datos_radiales['temperatura_ctd_qf'] = int(2)
@@ -425,7 +425,7 @@ def lectura_datos_pelacus(nombre_archivo):
             datos_pelacus['presion_ctd'][idato] = -999   
             
     # Asigna la profundidad teórica como la de referencia
-    datos_pelacus['prof_referencia'] = datos_pelacus['Prof_teor.']
+    datos_pelacus['prof_teorica'] = datos_pelacus['Prof_teor.']
   
     datos_pelacus = datos_pelacus.drop(columns=['Prof_est','Prof_real', 'Prof_teor.'])  
   

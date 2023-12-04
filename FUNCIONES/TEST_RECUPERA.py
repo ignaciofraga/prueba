@@ -23,8 +23,8 @@ puerto         = '5432'
 direccion_host = '193.146.155.99'
 
 # Parámetros
-anho_consulta = 2022
-programa_seleccionado = 'RADPROF'
+anho_consulta = 2018
+programa_seleccionado = 'PELACUS'
 tipo_salida           = 'ANUAL'
 ###### PROCESADO ########
 
@@ -62,4 +62,4 @@ df_muestreos_seleccionados = df_muestreos_seleccionados.sort_values(by=['muestre
 
 df_datos = pandas.merge(df_muestreos_seleccionados, df_datos_discretos, on="muestreo")
 
-df_datos = df_datos[df_datos['carbono_organico_total'].notna()]
+#df_datos = df_datos[df_datos['carbono_organico_total'].notna()]

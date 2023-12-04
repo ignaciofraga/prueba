@@ -776,10 +776,23 @@ def consulta_botellas():
 
     with st.expander("Filtro",expanded=True):
    
-       st.write("Selecciona el filtro")    
+       st.write("Exportar sólo los registros con información de las variables seleccionadas")    
    
        # Selecciona el filtro 
-       filtros_aplicados    = st.multiselect('Filtro ',(listado_variables_filtrado))   
+       filtros_aplicados    = st.multiselect('Filtro ',(listado_variables_filtrado))  
+       
+       # Activar/desactivar promediado
+       st.write("Promediar registros correspondientes a una misma profundidad de muestreo") 
+       
+       col1, col2 = st.columns(2,gap="small")
+       with col1:
+           io_promedio   = st.checkbox('Promediar registros', value=False)
+               
+       with col2:
+           prof_promedio = st.number_input('Diferencia profundidad promedio:',value=1.5)
+   
+       # Selecciona el filtro 
+       filtros_aplicados    = st.multiselect('Filtro ',(listado_variables_filtrado))
 
                        
     # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
@@ -842,76 +855,94 @@ def consulta_botellas():
 
             
         # Elimina las columnas que no interesan
-        df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','prof_referencia','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
+        df_exporta                  = df_muestreos_seleccionados.drop(columns=['salida_mar','estacion','programa','profundidades_referencia','muestreo','latitud_estacion','longitud_estacion'])
     
 
-
-########################################
-
-        df_exporta['prof_promedio'] = None
-        
-        df_exporta['prof_promedio'] = round(df_exporta['presion_ctd']/5)*5
-        
-        
-        listado_variables = df_exporta.columns.values.tolist()
-        
-        df_acc = pandas.DataFrame(columns=listado_variables)
-        
-        listado_variables_promedio = df_exporta.columns.values.tolist() 
-        if 'fecha_muestreo' in listado_variables_promedio:
-            listado_variables_promedio.remove('fecha_muestreo')
-        if 'hora_muestreo' in listado_variables_promedio:
-            listado_variables_promedio.remove('hora_muestreo')
-        listado_variables_promedio.remove('nombre_estacion')
-        listado_variables_promedio.remove('nombre_muestreo')
-        listado_variables_promedio.remove('id_externo')
-        
-        
-        listado_estaciones = df_exporta['nombre_estacion'].unique()
-        
-        for iestacion in range(len(listado_estaciones)):
+        ###
+        # Promedia los registros por profundidades similares si se seleccionó esa opción
+        if io_promedio:
+    
+            # Genera una variable temporal
+            df_exporta['prof_referencia'] = None
+            df_exporta['prof_referencia'] = round(df_exporta['presion_ctd']/prof_promedio)*prof_promedio
             
-            df_estacion   = df_exporta[df_exporta['nombre_estacion']==listado_estaciones[iestacion]]
-        
-            listado_casts = df_estacion['num_cast'].unique()
+            # Genera un dataframe vacío con las variables seleccionadas para su exportación
+            listado_variables = df_exporta.columns.values.tolist()
+            df_promediado = pandas.DataFrame(columns=listado_variables)
             
-            for icast in range(len(listado_casts)):    
-        
-                df_cast      = df_estacion[df_estacion['num_cast']==listado_casts[icast]]
-               
-                profs_unicas = df_cast['prof_promedio'].unique()
+            # Define una lista con las variables de las que se hará el promediado, las que se utilizará el valor común y las que se conertirán el listas e varios valores
+            listado_variables_datos = df_exporta.columns.values.tolist()
+
+            listado_variables_unificadas =[]
+            if 'fecha_muestreo' in listado_variables_datos:
+                listado_variables_unificadas = listado_variables_unificadas + ['fecha_muestreo']
+            if 'hora_muestreo' in listado_variables_datos:
+                listado_variables_unificadas = listado_variables_unificadas + ['hora_muestreo']
+            listado_variables_unificadas = listado_variables_unificadas + ['nombre_estacion']
+            
+            listado_variables_listadas = []
+            if 'tubo_nutrientes' in listado_variables_datos:
+                listado_variables_listadas = listado_variables_listadas + ['tubo_nutrientes']                
+            listado_variables_listadas = listado_variables_listadas + ['nombre_muestreo','id_externo']             
+            
+            listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas
+            listado_variables_promedio  = [x for x in listado_variables_datos if x not in listado_variables_excluidas]
+            
+            
+            
+            # Redondea las profundidades a partir del umbral definido como dato de entrada
+            df_exporta['prof_referencia'] = None
+            df_exporta['prof_referencia'] = round(df_exporta['presion_ctd']/prof_promedio)*prof_promedio            
+            
+            # Busca las estaciones incluidas en los datos a exportar
+            listado_estaciones = df_exporta['nombre_estacion'].unique()
+            
+            # Itera en cada estación
+            for iestacion in range(len(listado_estaciones)):
                 
-                for iprof_unica in range(len(profs_unicas)):
+                df_estacion   = df_exporta[df_exporta['nombre_estacion']==listado_estaciones[iestacion]]
             
-                    datos_prof = df_cast[df_cast['prof_promedio']==profs_unicas[iprof_unica]] 
-                    
-                    st.dataframe(datos_prof)
-                    
-                    if datos_prof.shape[0]>1:
-                    
-                        #promedios = datos_prof.mean(axis=0)
-                        
-                        
-                        
-                        promedios = datos_prof[listado_variables_promedio].mean()
-                        
-                        
-                        df_promedio = pandas.DataFrame([promedios])
-                        
-                        df_promedio['fecha_muestreo'] = datos_prof['fecha_muestreo'].iloc[0]
-
-                    
-                        df_acc = pandas.concat([df_acc, df_promedio])
-                    
-                    else:
+                listado_casts = df_estacion['num_cast'].unique()
                 
-                        df_acc = pandas.concat([df_acc, datos_prof])
+                # Selecciona primero por casts
+                for icast in range(len(listado_casts)):    
+            
+                    df_cast      = df_estacion[df_estacion['num_cast']==listado_casts[icast]]
+                   
+                    profs_unicas = df_cast['prof_referencia'].unique()
+                    
+                    # Selecciona por profundidades
+                    for iprof_unica in range(len(profs_unicas)):
+                
+                        datos_prof = df_cast[df_cast['prof_referencia']==profs_unicas[iprof_unica]] 
+                        
+                        st.dataframe(datos_prof)
+                        
+                        # Si hay varias profundidades muestreadas, promedia los registros
+                        if datos_prof.shape[0]>1:
+                        
+                            promedios = datos_prof[listado_variables_promedio].mean()
+                                
+                            df_promedio = pandas.DataFrame([promedios])
+                            
+                            # Añade los valores de las variables unificadas
+                            for ivariable_unificada in range(len(listado_variables_unificadas)):
+                            
+                                df_promedio[listado_variables_unificadas[ivariable_unificada]] = datos_prof[listado_variables_unificadas[ivariable_unificada]].iloc[0]
+    
+                            # Añade los valores de las variables listadas
+    
+                            df_promediado = pandas.concat([df_promediado, df_promedio])
+                        
+                        # Si solo hay una profundidad muestreada no hacer nada 
+                        else:
+                    
+                            df_promediado = pandas.concat([df_promediado, datos_prof])
+    
+            df_exporta = df_promediado
+        ###            
 
-        df_exporta = df_acc
 
-
-
-#########################################
 
         
     
