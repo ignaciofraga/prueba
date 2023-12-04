@@ -914,11 +914,20 @@ def consulta_botellas():
 
         
         #### Mueve los identificadores de muestreo al final del dataframe ###
-        listado_cols = df_exporta.columns.tolist()
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))        
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
-        listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
+        # original = df_exporta.columns
+        # new_cols = original.delete(original.get_loc('date'))
+        # df.reindex(columns=new_cols)
+        
+        
+        # shift column 'Name' to first position 
+        first_column = df_exporta.pop('nombre_estacion') 
+        df_exporta.insert(0, 'nombre_estacion', first_column) 
+        
+        # listado_cols = df_exporta.columns.tolist()
+        # listado_cols.insert(0, listado_cols.pop(listado_cols.index('longitud_muestreo')))        
+        # listado_cols.insert(0, listado_cols.pop(listado_cols.index('latitud_muestreo')))
+        # listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_estacion')))
+        # listado_cols.insert(0, listado_cols.pop(listado_cols.index('nombre_muestreo')))
         
         
         ##### Modifica el nombre de las variables #####
