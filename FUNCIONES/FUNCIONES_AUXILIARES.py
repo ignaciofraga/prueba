@@ -590,7 +590,7 @@ def consulta_botellas():
             st.write("Selecciona las variables físicas a exportar")    
         
             # Selecciona mostrar o no datos malos y dudosos
-            col1, col2, col3, col4 = st.columns(4,gap="small")
+            col1, col2, col3, col4, col5 = st.columns(5,gap="small")
             with col1:
                 io_temperatura   = st.checkbox('Temperatura(CTD)', value=False)
                 if io_temperatura:
@@ -610,6 +610,11 @@ def consulta_botellas():
                 io_turbidez      = st.checkbox('Turbidez(CTD)', value=False)
                 if io_turbidez:
                     listado_variables = listado_variables + ['turbidez_ctd'] + ['turbidez_ctd_qf']
+                    
+            with col5:
+                io_sigmat      = st.checkbox('Sigmat', value=False)
+                if io_sigmat:
+                    listado_variables = listado_variables + ['sigmat'] 
                     
                     
         with st.expander("Variables biogeoquímicas",expanded=True):
@@ -719,6 +724,7 @@ def consulta_botellas():
 
                                          
     listado_sin_qf = [ x for x in listado_variables if "_qf" not in x ]
+    listado_qf     = [ x for x in listado_variables if "_qf" in x ]
     
     with st.expander("Formatos de salida",expanded=True):
    
@@ -780,11 +786,12 @@ def consulta_botellas():
            prof_promedio = st.number_input('Diferencia profundidad promedio:',value=1.5)
    
 
-
-                           
-    # EXTRAE DATOS DE LAS VARIABLES Y SALIDAS SELECCIONADAS
     
     if len(listado_salidas) > 0:  
+  
+        ########################################################################
+        # EXTRACCION DE LOS DATOS CORRESPONDIENTES A LAS SALIDAS SELECCIONADAS #
+        ########################################################################      
   
         identificadores_salidas         = numpy.zeros(len(listado_salidas),dtype=int)
         for idato in range(len(listado_salidas)):
@@ -837,7 +844,8 @@ def consulta_botellas():
         # Promedia los registros por profundidades similares si se seleccionó esta opción
         if io_promedio:
     
-            # Genera una variable temporal
+            # Genera variables temporales
+            
             df_exporta['prof_referencia'] = None
             df_exporta['prof_referencia'] = round(df_exporta['presion_ctd']/prof_promedio)*prof_promedio
             
@@ -862,6 +870,11 @@ def consulta_botellas():
             
             listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas
             listado_variables_promedio  = [x for x in listado_variables_datos if x not in listado_variables_excluidas]
+            
+            # Genera variables temporales para almacenar las listas 
+            listado_variables_listadas_temporales = [s + '_temp' for s in listado_variables_listadas]
+            for ivartemp in range(len(listado_variables_listadas_temporales)):
+                df_promediado[listado_variables_listadas_temporales[ivartemp]] = None
             
             # Redondea las profundidades a partir del umbral definido como dato de entrada
             df_exporta['prof_referencia'] = None
@@ -894,11 +907,17 @@ def consulta_botellas():
                             df_promedio = pandas.DataFrame([promedios])
                             
                             # Añade los valores de las variables unificadas
-                            for ivariable_unificada in range(len(listado_variables_unificadas)):
-                            
+                            for ivariable_unificada in range(len(listado_variables_unificadas)):                            
                                 df_promedio[listado_variables_unificadas[ivariable_unificada]] = datos_prof[listado_variables_unificadas[ivariable_unificada]].iloc[0]
     
                             # Añade los valores de las variables listadas
+                            for ivariable_listadas in range(len(listado_variables_listadas)):
+                                listado_temp    = datos_prof[listado_variables_listadas[ivariable_listadas]]
+                                listado_no_nulo = [item for item in listado_temp if item is not None]
+                                listado_str     = [str(x) for x in listado_no_nulo]
+                                listado_res     = ','.join(str(x) for x in listado_str)
+                                df_promedio[listado_variables_listadas[ivariable_listadas]] = listado_res
+                                
                             df_promediado = pandas.concat([df_promediado, df_promedio])
                         
                         # Si solo hay una profundidad muestreada no hacer nada 
