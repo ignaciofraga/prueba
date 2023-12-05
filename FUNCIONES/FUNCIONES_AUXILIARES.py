@@ -843,10 +843,7 @@ def consulta_botellas():
 
         # Promedia los registros por profundidades similares si se seleccionó esta opción
         if io_promedio:
-    
-            # Elimina las columnas correspondientes al identificador y el nombre del muestreo
-            df_exporta = df_exporta.drop(columns=['id_externo','nombre_muestreo'])
-    
+        
             # Genera variables temporales
             df_exporta['prof_referencia'] = None
             df_exporta['prof_referencia'] = round(df_exporta['presion_ctd']/prof_promedio)*prof_promedio
@@ -870,7 +867,7 @@ def consulta_botellas():
                 listado_variables_listadas = listado_variables_listadas + ['tubo_nutrientes']                
             listado_variables_listadas = listado_variables_listadas + ['botella']             
                                   
-            listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas #+ ['id_externo','nombre_muestreo']
+            listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas + ['id_externo','nombre_muestreo']
             listado_variables_promedio  = [x for x in listado_variables_datos if x not in listado_variables_excluidas]
             
             # Genera variables temporales para almacenar las listas 
