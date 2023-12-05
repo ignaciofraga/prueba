@@ -908,6 +908,9 @@ def consulta_botellas():
                             promedios   = datos_prof[listado_variables_promedio].mean()                                
                             df_promedio = pandas.DataFrame([promedios])
                             
+                            st.dataframe(datos_prof)
+                            st.dataframe(df_promedio)
+                            
                             # Añade los valores de las variables unificadas
                             for ivariable_unificada in range(len(listado_variables_unificadas)):                            
                                 df_promedio[listado_variables_unificadas[ivariable_unificada]] = datos_prof[listado_variables_unificadas[ivariable_unificada]].iloc[0]
