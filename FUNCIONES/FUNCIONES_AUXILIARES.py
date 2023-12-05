@@ -866,7 +866,7 @@ def consulta_botellas():
             listado_variables_listadas = []
             if 'tubo_nutrientes' in listado_variables_datos:
                 listado_variables_listadas = listado_variables_listadas + ['tubo_nutrientes']                
-            listado_variables_listadas = listado_variables_listadas + ['nombre_muestreo','id_externo','botella']             
+            listado_variables_listadas = listado_variables_listadas + ['botella']             
             
             listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas
             listado_variables_promedio  = [x for x in listado_variables_datos if x not in listado_variables_excluidas]
@@ -912,17 +912,15 @@ def consulta_botellas():
     
                             # Añade los valores de las variables listadas
                             for ivariable_listadas in range(len(listado_variables_listadas)):
-                                listado_temp    = datos_prof[listado_variables_listadas[ivariable_listadas]]
+                                listado_temp    = datos_prof[listado_variables_listadas[ivariable_listadas]].sort()
                                 listado_no_nulo = [item for item in listado_temp if item is not None]
                                 try:
                                     listado_str     = [str(int(x)) for x in listado_no_nulo]
                                 except:
                                     listado_str     = [str(x) for x in listado_no_nulo]
                                 listado_res     = ','.join(str(x) for x in listado_str)
-                                
-                                st.text(listado_res)
-                                
-                                df_promedio[listado_variables_listadas[ivariable_listadas]] = listado_res
+                                                                
+                                df_promedio[listado_variables_listadas_temporales[ivariable_listadas]] = listado_res
                                 
                             df_promediado = pandas.concat([df_promediado, df_promedio])
                         
@@ -932,6 +930,8 @@ def consulta_botellas():
                             df_promediado = pandas.concat([df_promediado, datos_prof])
     
             df_exporta = df_promediado
+        
+            st.dataframe(df_exporta)
         
 
         # Elimina las filas sin datos de las variables-filtro si se seleccionó esta opción
