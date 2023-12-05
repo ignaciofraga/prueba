@@ -913,12 +913,9 @@ def consulta_botellas():
                             # Añade los valores de las variables listadas
                             for ivariable_listadas in range(len(listado_variables_listadas)):
                                 listado_temp    = datos_prof[listado_variables_listadas[ivariable_listadas]]
-                                listado_no_nulo = list([item for item in listado_temp if item is not None])
-                                st.text(listado_variables_listadas[ivariable_listadas])
-                                st.text(listado_no_nulo)
+                                listado_no_nulo = [item for item in listado_temp if item is not None]
                                 if len(listado_no_nulo)>0:
                                     try:
-                                        listado_no_nulo = listado_no_nulo
                                         listado_str     = [str(int(x)) for x in listado_no_nulo]
                                     except:
                                         listado_str     = [str(x) for x in listado_no_nulo]
