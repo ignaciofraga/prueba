@@ -868,9 +868,9 @@ def consulta_botellas():
             listado_variables_listadas = listado_variables_listadas + ['botella']             
                                   
             listado_variables_qf        = [i for i in listado_variables_datos if '_qf' in i]
-            st.text(listado_variables_qf)
+
             
-            listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas + ['id_externo','nombre_muestreo']
+            listado_variables_excluidas = listado_variables_unificadas + listado_variables_qf + listado_variables_listadas + ['id_externo','nombre_muestreo']
             listado_variables_promedio  = [x for x in listado_variables_datos if x not in listado_variables_excluidas]
             
             # Genera variables temporales para almacenar las listas 
@@ -924,6 +924,14 @@ def consulta_botellas():
                                     listado_res     = ','.join(str(x) for x in listado_str)
                                                                     
                                     df_promedio[listado_variables_listadas_temporales[ivariable_listadas]] = listado_res
+                                    
+                            # QF
+                            for ivariable_qf in range(len(listado_variables_qf)): 
+                                datos_prof[datos_prof[listado_variables_qf[ivariable_qf]]==9] = None
+                                if len(datos_prof[listado_variables_qf[ivariable_qf]].dropna().unique())!=1:
+                                    df_promedio[listado_variables_qf[ivariable_qf]] = 6
+                                else:
+                                    df_promedio[listado_variables_qf[ivariable_qf]] = int(listado_variables_qf[ivariable_qf].dropna().unique()[0])
                                 
                             df_promediado = pandas.concat([df_promediado, df_promedio])
                         
@@ -946,7 +954,7 @@ def consulta_botellas():
         
             df_exporta = df_promediado
         
-        
+            st.dataframe(df_exporta)
 
         # Elimina las filas sin datos de las variables-filtro si se seleccionó esta opción
         if len(filtros_aplicados) > 0:
