@@ -914,7 +914,7 @@ def consulta_botellas():
                             for ivariable_listadas in range(len(listado_variables_listadas)):
                                 listado_temp    = datos_prof[listado_variables_listadas[ivariable_listadas]]
                                 listado_no_nulo = [item for item in listado_temp if item is not None]
-                                listado_str     = [str(x) for x in listado_no_nulo]
+                                listado_str     = [str(int(x)) for x in listado_no_nulo]
                                 listado_res     = ','.join(str(x) for x in listado_str)
                                 
                                 st.text(listado_res)
