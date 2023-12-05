@@ -928,6 +928,9 @@ def consulta_botellas():
                             # QF
                             for ivariable_qf in range(len(listado_variables_qf)): 
                                 datos_prof[datos_prof[listado_variables_qf[ivariable_qf]]==9] = None
+                                
+                                st.dataframe(datos_prof)
+                                
                                 if len(datos_prof[listado_variables_qf[ivariable_qf]].dropna().unique())!=1:
                                     df_promedio[listado_variables_qf[ivariable_qf]] = 6
                                 else:
