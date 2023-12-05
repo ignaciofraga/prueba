@@ -914,14 +914,15 @@ def consulta_botellas():
                             for ivariable_listadas in range(len(listado_variables_listadas)):
                                 listado_temp    = datos_prof[listado_variables_listadas[ivariable_listadas]]
                                 listado_no_nulo = [item for item in listado_temp if item is not None]
-                                try:
-                                    listado_no_nulo = listado_no_nulo.sort()
-                                    listado_str     = [str(int(x)) for x in listado_no_nulo]
-                                except:
-                                    listado_str     = [str(x) for x in listado_no_nulo]
-                                listado_res     = ','.join(str(x) for x in listado_str)
-                                                                
-                                df_promedio[listado_variables_listadas_temporales[ivariable_listadas]] = listado_res
+                                if len(listado_no_nulo)>0:
+                                    try:
+                                        listado_no_nulo = listado_no_nulo.sort()
+                                        listado_str     = [str(int(x)) for x in listado_no_nulo]
+                                    except:
+                                        listado_str     = [str(x) for x in listado_no_nulo]
+                                    listado_res     = ','.join(str(x) for x in listado_str)
+                                                                    
+                                    df_promedio[listado_variables_listadas_temporales[ivariable_listadas]] = listado_res
                                 
                             df_promediado = pandas.concat([df_promediado, df_promedio])
                         
