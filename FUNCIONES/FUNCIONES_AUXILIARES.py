@@ -866,7 +866,7 @@ def consulta_botellas():
             listado_variables_listadas = []
             if 'tubo_nutrientes' in listado_variables_datos:
                 listado_variables_listadas = listado_variables_listadas + ['tubo_nutrientes']                
-            listado_variables_listadas = listado_variables_listadas + ['id_externo','tubo_nutrientes','botella']             
+            listado_variables_listadas = listado_variables_listadas + ['id_externo','nombre_muestreo','botella']             
             
             listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas
             listado_variables_promedio  = [x for x in listado_variables_datos if x not in listado_variables_excluidas]
