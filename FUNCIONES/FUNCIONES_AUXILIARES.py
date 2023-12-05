@@ -867,7 +867,7 @@ def consulta_botellas():
             if 'tubo_nutrientes' in listado_variables_datos:
                 listado_variables_listadas = listado_variables_listadas + ['tubo_nutrientes']                
             listado_variables_listadas = listado_variables_listadas + ['botella']             
-            
+                                  
             listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas + ['id_externo','nombre_muestreo']
             listado_variables_promedio  = [x for x in listado_variables_datos if x not in listado_variables_excluidas]
             
@@ -875,6 +875,11 @@ def consulta_botellas():
             listado_variables_listadas_temporales = [s + '_temp' for s in listado_variables_listadas]
             for ivartemp in range(len(listado_variables_listadas_temporales)):
                 df_promediado[listado_variables_listadas_temporales[ivartemp]] = None
+
+            
+            st.text(listado_variables_listadas)
+            st.text(listado_variables_listadas_temporales)
+
             
             # Redondea las profundidades a partir del umbral definido como dato de entrada
             df_exporta['prof_referencia'] = None
