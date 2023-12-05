@@ -931,7 +931,7 @@ def consulta_botellas():
                                 
                             df_promediado = pandas.concat([df_promediado, df_promedio])
                         
-                        # Si solo hay una profundidad muestreada no hacer nada 
+                        # Si solo hay una profundidad muestreada,únicamente pasar las variables listadas a textos (para que sea coherente con las que tienen varias observaciones a misma profundidad) 
                         else:
                                                 
                             for ivariable_listadas in range(len(listado_variables_listadas)):
@@ -940,12 +940,15 @@ def consulta_botellas():
                                 except:
                                     datos_prof[listado_variables_listadas_temporales[ivariable_listadas]] = str(datos_prof[listado_variables_listadas[ivariable_listadas]].iloc[0])
                                     
-                            
                             df_promediado = pandas.concat([df_promediado, datos_prof])
+    
+            # Elimina las variables temporales (listadas) y reemplaza por las nuevas
+            df_promediado = df_promediado.drop(columns=listado_variables_listadas)   
+            for ivariable in range(len(listado_variables_listadas)):
+                df_promediado = df_promediado.rename(columns={listado_variables_listadas_temporales[ivariable]:listado_variables_listadas[ivariable]})
     
             df_exporta = df_promediado
         
-            st.dataframe(df_exporta)
         
 
         # Elimina las filas sin datos de las variables-filtro si se seleccionó esta opción
