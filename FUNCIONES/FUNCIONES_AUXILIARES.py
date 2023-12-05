@@ -875,12 +875,6 @@ def consulta_botellas():
             listado_variables_listadas_temporales = [s + '_temp' for s in listado_variables_listadas]
             for ivartemp in range(len(listado_variables_listadas_temporales)):
                 df_promediado[listado_variables_listadas_temporales[ivartemp]] = None
-
-            
-            st.text(listado_variables_listadas)
-            st.text(listado_variables_listadas_temporales)
-            st.dataframe(df_exporta)
-
             
             # Redondea las profundidades a partir del umbral definido como dato de entrada
             df_exporta['prof_referencia'] = None
@@ -946,6 +940,8 @@ def consulta_botellas():
             df_promediado = df_promediado.drop(columns=listado_variables_listadas)   
             for ivariable in range(len(listado_variables_listadas)):
                 df_promediado = df_promediado.rename(columns={listado_variables_listadas_temporales[ivariable]:listado_variables_listadas[ivariable]})
+    
+            st.dataframe(df_promediado)
     
             df_exporta = df_promediado
         
