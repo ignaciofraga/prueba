@@ -866,9 +866,9 @@ def consulta_botellas():
             listado_variables_listadas = []
             if 'tubo_nutrientes' in listado_variables_datos:
                 listado_variables_listadas = listado_variables_listadas + ['tubo_nutrientes']                
-            listado_variables_listadas = listado_variables_listadas + ['id_externo','nombre_muestreo','botella']             
+            listado_variables_listadas = listado_variables_listadas + ['botella']             
             
-            listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas
+            listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas + ['id_externo','nombre_muestreo']
             listado_variables_promedio  = [x for x in listado_variables_datos if x not in listado_variables_excluidas]
             
             # Genera variables temporales para almacenar las listas 
@@ -928,6 +928,9 @@ def consulta_botellas():
                         # Si solo hay una profundidad muestreada no hacer nada 
                         else:
                     
+                            for ivariable_listadas in range(len(listado_variables_listadas)):
+                                df_promedio[listado_variables_listadas_temporales[ivariable_listadas]] = df_promedio[listado_variables_listadas[ivariable_listadas]]
+                            
                             df_promediado = pandas.concat([df_promediado, datos_prof])
     
             df_exporta = df_promediado
