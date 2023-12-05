@@ -918,7 +918,7 @@ def consulta_botellas():
                                 st.text(listado_no_nulo)
                                 if len(listado_no_nulo)>0:
                                     try:
-                                        listado_no_nulo = listado_no_nulo.sort()
+                                        listado_no_nulo = listado_no_nulo
                                         listado_str     = [str(int(x)) for x in listado_no_nulo]
                                     except:
                                         listado_str     = [str(x) for x in listado_no_nulo]
