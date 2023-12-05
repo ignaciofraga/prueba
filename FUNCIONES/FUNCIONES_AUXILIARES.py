@@ -929,12 +929,10 @@ def consulta_botellas():
                             for ivariable_qf in range(len(listado_variables_qf)): 
                                 datos_prof[datos_prof[listado_variables_qf[ivariable_qf]]==9] = None
                                 
-                                st.dataframe(datos_prof)
-                                st.text(listado_variables_qf[ivariable_qf].dropna().unique()[0])
                                 if len(datos_prof[listado_variables_qf[ivariable_qf]].dropna().unique())!=1:
                                     df_promedio[listado_variables_qf[ivariable_qf]] = 6
                                 else:
-                                    df_promedio[listado_variables_qf[ivariable_qf]] = int(listado_variables_qf[ivariable_qf].dropna().unique()[0])
+                                    df_promedio[listado_variables_qf[ivariable_qf]] = int(datos_prof[listado_variables_qf[ivariable_qf]].dropna().unique()[0])
                                 
                             df_promediado = pandas.concat([df_promediado, df_promedio])
                         
