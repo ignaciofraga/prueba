@@ -852,7 +852,7 @@ def consulta_botellas():
             listado_variables = df_exporta.columns.values.tolist()
             df_promediado = pandas.DataFrame(columns=listado_variables)
             
-            # Define una lista con las variables de las que se hará el promediado, las que se utilizará el valor común y las que se conertirán el listas e varios valores
+            # Define una lista con las variables de las que se hará el promediado, las que se utilizará el valor común, las que se conertirán el listas de varios valores y las que corresponden a QF
             listado_variables_datos = df_exporta.columns.values.tolist()
 
             listado_variables_unificadas =[]
@@ -867,6 +867,9 @@ def consulta_botellas():
                 listado_variables_listadas = listado_variables_listadas + ['tubo_nutrientes']                
             listado_variables_listadas = listado_variables_listadas + ['botella']             
                                   
+            listado_variables_qf        = [i for i in listado_variables_datos if '_qf' in i]
+            st.text(listado_variables_qf)
+            
             listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas + ['id_externo','nombre_muestreo']
             listado_variables_promedio  = [x for x in listado_variables_datos if x not in listado_variables_excluidas]
             
@@ -940,9 +943,7 @@ def consulta_botellas():
             df_promediado = df_promediado.drop(columns=listado_variables_listadas)   
             for ivariable in range(len(listado_variables_listadas)):
                 df_promediado = df_promediado.rename(columns={listado_variables_listadas_temporales[ivariable]:listado_variables_listadas[ivariable]})
-    
-            st.dataframe(df_promediado)
-    
+        
             df_exporta = df_promediado
         
         
