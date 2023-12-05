@@ -934,10 +934,10 @@ def consulta_botellas():
                         # Si solo hay una profundidad muestreada no hacer nada 
                         else:
                     
-                            st.dataframe(df_promediado)
+                            st.dataframe(datos_prof)
                             
                             for ivariable_listadas in range(len(listado_variables_listadas)):
-                                df_promedio[listado_variables_listadas_temporales[ivariable_listadas]] = df_promedio[listado_variables_listadas[ivariable_listadas]].iloc[0]
+                                datos_prof[listado_variables_listadas_temporales[ivariable_listadas]] = datos_prof[listado_variables_listadas[ivariable_listadas]].iloc[0]
                             
                             df_promediado = pandas.concat([df_promediado, datos_prof])
     
