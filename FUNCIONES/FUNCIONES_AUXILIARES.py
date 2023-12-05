@@ -933,11 +933,13 @@ def consulta_botellas():
                         
                         # Si solo hay una profundidad muestreada no hacer nada 
                         else:
-                    
-                            st.dataframe(datos_prof)
-                            
+                                                
                             for ivariable_listadas in range(len(listado_variables_listadas)):
-                                datos_prof[listado_variables_listadas_temporales[ivariable_listadas]] = datos_prof[listado_variables_listadas[ivariable_listadas]].iloc[0]
+                                try:
+                                    datos_prof[listado_variables_listadas_temporales[ivariable_listadas]] = str(int(datos_prof[listado_variables_listadas[ivariable_listadas]].iloc[0]))
+                                except:
+                                    datos_prof[listado_variables_listadas_temporales[ivariable_listadas]] = str(datos_prof[listado_variables_listadas[ivariable_listadas]].iloc[0])
+                                    
                             
                             df_promediado = pandas.concat([df_promediado, datos_prof])
     
