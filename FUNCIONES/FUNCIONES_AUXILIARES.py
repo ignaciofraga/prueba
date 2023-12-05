@@ -879,6 +879,7 @@ def consulta_botellas():
             
             st.text(listado_variables_listadas)
             st.text(listado_variables_listadas_temporales)
+            st.dataframe(df_exporta)
 
             
             # Redondea las profundidades a partir del umbral definido como dato de entrada
