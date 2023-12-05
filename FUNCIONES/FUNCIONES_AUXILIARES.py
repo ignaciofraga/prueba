@@ -866,7 +866,7 @@ def consulta_botellas():
             listado_variables_listadas = []
             if 'tubo_nutrientes' in listado_variables_datos:
                 listado_variables_listadas = listado_variables_listadas + ['tubo_nutrientes']                
-            listado_variables_listadas = listado_variables_listadas + ['nombre_muestreo','id_externo']             
+            listado_variables_listadas = listado_variables_listadas + ['nombre_muestreo','id_externo','botella']             
             
             listado_variables_excluidas = listado_variables_unificadas + listado_variables_listadas
             listado_variables_promedio  = [x for x in listado_variables_datos if x not in listado_variables_excluidas]
@@ -916,6 +916,9 @@ def consulta_botellas():
                                 listado_no_nulo = [item for item in listado_temp if item is not None]
                                 listado_str     = [str(x) for x in listado_no_nulo]
                                 listado_res     = ','.join(str(x) for x in listado_str)
+                                
+                                st.text(listado_res)
+                                
                                 df_promedio[listado_variables_listadas[ivariable_listadas]] = listado_res
                                 
                             df_promediado = pandas.concat([df_promediado, df_promedio])
