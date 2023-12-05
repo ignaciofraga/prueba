@@ -929,11 +929,12 @@ def consulta_botellas():
                         else:
                                                 
                             for ivariable_listadas in range(len(listado_variables_listadas)):
-                                try:
-                                    datos_prof[listado_variables_listadas_temporales[ivariable_listadas]] = str(int(datos_prof[listado_variables_listadas[ivariable_listadas]].iloc[0]))
-                                except:
-                                    datos_prof[listado_variables_listadas_temporales[ivariable_listadas]] = str(datos_prof[listado_variables_listadas[ivariable_listadas]].iloc[0])
-                                    
+                                if datos_prof[listado_variables_listadas[ivariable_listadas]].iloc[0] is not None:                                
+                                    try:
+                                        datos_prof[listado_variables_listadas_temporales[ivariable_listadas]] = str(int(datos_prof[listado_variables_listadas[ivariable_listadas]].iloc[0]))
+                                    except:
+                                        datos_prof[listado_variables_listadas_temporales[ivariable_listadas]] = str(datos_prof[listado_variables_listadas[ivariable_listadas]].iloc[0])
+                                        
                             df_promediado = pandas.concat([df_promediado, datos_prof])
     
             # Elimina las variables temporales (listadas) y reemplaza por las nuevas
