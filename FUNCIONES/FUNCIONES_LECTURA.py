@@ -569,8 +569,42 @@ def lectura_datos_radcan(nombre_archivo):
     datos_radcan['fosfato'][datos_radcan['fosfato']<0]=0
     datos_radcan['silicato'][datos_radcan['silicato']<0]=0
     
- 
+    # Cambia el nombre de las estaciones
+    for idato in range(datos_radcan.shape[0]):
+        if datos_radcan['estacion'].iloc[idato] == 'C1':
+            datos_radcan['estacion'].iloc[idato]  = 'E1CU'
+        if datos_radcan['estacion'].iloc[idato] == 'C2':
+            datos_radcan['estacion'].iloc[idato]  = 'E2CU'        
+        if datos_radcan['estacion'].iloc[idato] == 'C3':
+            datos_radcan['estacion'].iloc[idato]  = 'E3CU'    
+            
+        if datos_radcan['estacion'].iloc[idato] == 'G1':
+            datos_radcan['estacion'].iloc[idato]  = 'E1GI'
+        if datos_radcan['estacion'].iloc[idato] == 'G2':
+            datos_radcan['estacion'].iloc[idato]  = 'E2GI'        
+        if datos_radcan['estacion'].iloc[idato] == 'G3':
+            datos_radcan['estacion'].iloc[idato]  = 'E3GI'  
+        if datos_radcan['estacion'].iloc[idato] == 'G4':
+            datos_radcan['estacion'].iloc[idato]  = 'E4GI'   
 
+        if datos_radcan['estacion'].iloc[idato] == 'S1':
+            datos_radcan['estacion'].iloc[idato]  = 'E1SA'
+        if datos_radcan['estacion'].iloc[idato] == 'S2':
+            datos_radcan['estacion'].iloc[idato]  = 'E2SA'        
+        if datos_radcan['estacion'].iloc[idato] == 'S3':
+            datos_radcan['estacion'].iloc[idato]  = 'E3SA'  
+        if datos_radcan['estacion'].iloc[idato] == 'S4':
+            datos_radcan['estacion'].iloc[idato]  = 'E4SA'
+        if datos_radcan['estacion'].iloc[idato] == 'S5':
+            datos_radcan['estacion'].iloc[idato]  = 'E5SA'
+        if datos_radcan['estacion'].iloc[idato] == 'S6':
+            datos_radcan['estacion'].iloc[idato]  = 'E6SA'        
+        if datos_radcan['estacion'].iloc[idato] == 'S7':
+            datos_radcan['estacion'].iloc[idato]  = 'E7SA'  
+        if datos_radcan['estacion'].iloc[idato] == 'S8':
+            datos_radcan['estacion'].iloc[idato]  = 'E8SA'            
+        if datos_radcan['estacion'].iloc[idato] == 'S9':
+            datos_radcan['estacion'].iloc[idato]  = 'E9SA'  
     return datos_radcan
 
 

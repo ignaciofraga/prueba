@@ -31,24 +31,42 @@ direccion_host = '193.146.155.99'
 con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
 conn_psql        = create_engine(con_engine)
 df_salidas_muestreos  = psql.read_sql('SELECT * FROM salidas_muestreos', conn_psql)
-df_salidas_muestreos_temp = psql.read_sql('SELECT * FROM salidas_muestreos_temp', conn_psql)
+
 
 #subset_radiales_temp = df_salidas_muestreos_temp[df_salidas_muestreos_temp['programa']==3]
-subset_radiales = df_salidas_muestreos_temp[df_salidas_muestreos_temp['programa']==3]
+subset_radiales = df_salidas_muestreos[df_salidas_muestreos['programa']==2]
 
-for isalida in range(subset_radiales.shape[0]):
+instruccion_sql = 'UPDATE salidas_muestreos SET estaciones =%s WHERE id_salida = %s;'
+
+# for isalida in range(subset_radiales.shape[0]):
     
+#     listado_estaciones = subset_radiales['estaciones'].iloc[isalida]  
     
-    instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,estaciones,participantes_comisionados,participantes_no_comisionados,variables_muestreadas,observaciones)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;''' 
+#     if listado_estaciones is not None:
+        
+#         nuevo_listado = []
+#         for iestacion in range(len(listado_estaciones)):
+#             nuevo_listado = nuevo_listado + ['E' + listado_estaciones[iestacion] + 'CO' ]
             
-    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    cursor = conn.cursor()
+#         json_estaciones         = json.dumps(nuevo_listado)
+            
+#         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+#         cursor = conn.cursor()                    
+#         cursor.execute(instruccion_sql, (json_estaciones,int(subset_radiales['id_salida'].iloc[isalida])))
+#         conn.commit()
+#         cursor.close()
+#         conn.close()    
+    
+    # instruccion_sql = '''INSERT INTO salidas_muestreos (nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,hora_salida,fecha_retorno,hora_retorno,buque,estaciones,participantes_comisionados,participantes_no_comisionados,variables_muestreadas,observaciones)
+    #     VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;''' 
+            
+    # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    # cursor = conn.cursor()
 
-    cursor.execute(instruccion_sql, (subset_radiales['nombre_salida'].iloc[isalida],int(subset_radiales['programa'].iloc[isalida]),subset_radiales['nombre_programa'].iloc[isalida],subset_radiales['tipo_salida'].iloc[isalida],subset_radiales['fecha_salida'].iloc[isalida],subset_radiales['hora_salida'].iloc[isalida],subset_radiales['fecha_retorno'].iloc[isalida],subset_radiales['hora_retorno'].iloc[isalida],int(subset_radiales['buque'].iloc[isalida]),json.dumps(subset_radiales['estaciones'].iloc[isalida]),json.dumps(subset_radiales['participantes_comisionados'].iloc[isalida]),json.dumps(subset_radiales['participantes_no_comisionados'].iloc[isalida]),json.dumps(subset_radiales['variables_muestreadas'].iloc[isalida]),subset_radiales['observaciones'].iloc[isalida]))
-    conn.commit()
-    cursor.close()
-    conn.close()
+    # cursor.execute(instruccion_sql, (subset_radiales['nombre_salida'].iloc[isalida],int(subset_radiales['programa'].iloc[isalida]),subset_radiales['nombre_programa'].iloc[isalida],subset_radiales['tipo_salida'].iloc[isalida],subset_radiales['fecha_salida'].iloc[isalida],subset_radiales['hora_salida'].iloc[isalida],subset_radiales['fecha_retorno'].iloc[isalida],subset_radiales['hora_retorno'].iloc[isalida],int(subset_radiales['buque'].iloc[isalida]),json.dumps(subset_radiales['estaciones'].iloc[isalida]),json.dumps(subset_radiales['participantes_comisionados'].iloc[isalida]),json.dumps(subset_radiales['participantes_no_comisionados'].iloc[isalida]),json.dumps(subset_radiales['variables_muestreadas'].iloc[isalida]),subset_radiales['observaciones'].iloc[isalida]))
+    # conn.commit()
+    # cursor.close()
+    # conn.close()
 
 
 

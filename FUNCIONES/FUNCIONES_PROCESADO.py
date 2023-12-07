@@ -1721,7 +1721,7 @@ def procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,
                             
     #inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto)
    
-    if nombre_estacion == '2' and abreviatura_programa == 'RADCOR' :  # Estacion 2 del programa radiales, añadir muestreo correspondiente a la botella en superficie
+    if nombre_estacion == 'E2CO' and abreviatura_programa == 'RADCOR' :  # Estacion 2 del programa radiales, añadir muestreo correspondiente a la botella en superficie
 
           # Genera dataframe con el muestreo de la estacion 2
           pres_min                             = min(datos_perfil['presion_ctd'])
