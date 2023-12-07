@@ -1337,8 +1337,8 @@ def entrada_archivos_roseta():
         st.subheader('Entrada de datos procedentes de botellas y perfiles') 
     
         # Recupera tablas con informacion utilizada en el procesado
-        df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,tabla_variables,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles = carga_datos_entrada_archivo_roseta()
-        
+        df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles = carga_datos_entrada_archivo_roseta()
+
         id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
 
         #with st.form("Formulario seleccion"): 
