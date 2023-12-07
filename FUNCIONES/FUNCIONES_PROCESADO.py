@@ -128,7 +128,7 @@ def recupera_id_programa(nombre_programa,direccion_host,base_datos,usuario,contr
 def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos):
     
     # Cambia nombres a minusculas para comparar 
-    tabla_estaciones['nombre_estacion'] = tabla_estaciones['nombre_estacion'].apply(lambda x:x.lower())
+    tabla_estaciones['nombre_estacion'] = tabla_estaciones['nombre_estacion'].apply(lambda x:x.upper())
     
     # Columna para punteros de estaciones
     datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
@@ -148,9 +148,9 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         except:
             pass
 
-        # Cambia los nombres a minusculas
+        # Cambia los nombres a mayúsculas
         datos['estacion'] = datos['estacion'].astype(str)
-        datos['estacion'] = datos['estacion'].apply(lambda x:x.lower())
+        datos['estacion'] = datos['estacion'].apply(lambda x:x.upper())
         
         # Recorta el dataframe para tener sólo las estaciones del programa seleccionado
         estaciones_programa            = tabla_estaciones[tabla_estaciones['programa'] == id_programa]
@@ -160,9 +160,9 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         
         listado_variables = datos.columns.tolist()
         if 'latitud' not in listado_variables:
-            datos['latitud'] = [None]*datos.shape[0]
+            datos['latitud_muestreo'] = [None]*datos.shape[0]
         if 'longitud' not in listado_variables:
-            datos['longitud'] = [None]*datos.shape[0]   
+            datos['longitud_muestreo'] = [None]*datos.shape[0]   
             
         # Genera un dataframe con las estaciones incluidas en el muestreo
         estaciones_muestreadas                      = datos['estacion'].unique()
@@ -194,9 +194,9 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                 
                 # Asigna lat/lon a la medida si ésta no la tenía
                 if 'latitud' not in listado_variables:
-                    datos['latitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['latitud_estacion'].iloc[0] 
+                    datos['latitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['latitud_estacion'].iloc[0] 
                 if 'longitud' not in listado_variables:
-                    datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['longitud_estacion'].iloc[0] 
+                    datos['longitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['longitud_estacion'].iloc[0] 
                 
                  
             # Nueva estación, asignar orden creciente de identificador
@@ -392,7 +392,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
      
                 subset_anual     = datos[datos['año']==anhos_salida_mar[ianho]] 
                 
-                if id_programa == 3: # PROGRAMA RADIALES CORUÑA. busco las salidas por fechas únicas (salidas de 1 día)
+                if id_programa == 3 or id_programa == 2: # PROGRAMAS RADIALES CORUÑA/VIGO. busco las salidas por fechas únicas (salidas de 1 día)
                 
                     fechas_salidas_mar = subset_anual['fecha_muestreo'].unique()
                     fechas_partida     = fechas_salidas_mar
@@ -452,7 +452,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                         conn.close()
                         
                     # Asigna el id de la salida al dataframe
-                    if id_programa == 3:
+                    if id_programa == 3 or id_programa == 2:
                         datos['id_salida'][datos['fecha_muestreo']==fechas_salidas_mar[isalida]] = id_salida
                     if id_programa == 4:                
                         #datos['id_salida'][(datos['año']==anhos_salida_mar[ianho]) & (datos['mes']==fechas_partida[isalida].month)] = id_salida
@@ -533,6 +533,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         ultimo_registro_bd         = max(tabla_muestreos['muestreo'])
         datos['io_nuevo_muestreo'] = numpy.ones(datos.shape[0],dtype=int)
 
+        if 'botella' not in listado_variables_datos:
+            df_datos_salidas.presion_ctd = df_datos_salidas.presion_ctd.round()
+
         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
         cursor = conn.cursor()
             
@@ -562,7 +565,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                              
                 else:
 
-                    df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (int(df_datos_salidas['presion_ctd'])== int(datos['presion_ctd'].iloc[idato]))]
+                    df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['presion_ctd']== round(datos['presion_ctd'].iloc[idato]))]
                 
             # Bucle para insertar identificadores de muestreos (vial nutrientes/TOC)
             if df_temp.shape[0]> 0:

@@ -1403,78 +1403,81 @@ def entrada_archivos_roseta():
                 nombre_archivo_btl = archivo_btl.name
                 posicion_inicio    = nombre_archivo_btl.find('e') + 1
                 posicion_final     = nombre_archivo_btl.find('.')
-                nombre_estacion    = nombre_archivo_btl[posicion_inicio:posicion_final].upper() #+ 'CO' 
+                nombre_estacion    = nombre_archivo_btl[posicion_inicio:posicion_final].upper() + 'CO' 
                 id_estacion        = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
                
 
-                texto_estado = 'Procesando la información de la estación ' + nombre_estacion
-                with st.spinner(texto_estado):
-                                    
-                    # Lee los datos de cada archivo de botella
-                    #datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines()
-                    datos_archivo = archivo_btl.getvalue().decode('ISO-8859-1').splitlines()
-                    
-                    # Comprueba que la fecha del archivo y de la salida coinciden
-                    fecha_salida_texto    = nombre_archivo_btl[0:8]
-                    fecha_salida_archivo  = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
-                    
-                    if fecha_salida_archivo == fecha_salida:
-                    
-                        ### DATOS DE BOTELLERO ###
-                        mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_btl,datos_archivo)
-                      
-                        datos_botellas = FUNCIONES_PROCESADO.procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_salida,tabla_estaciones_programa)
-                      
-                        st.dataframe(datos_botellas)  
-                      
-                        
-                        # Aplica control de calidad
-                        datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
-           
-                        # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-                        datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
-                                
-                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,df_datos_discretos,df_muestreos)
-                        if texto_insercion:
-                            st.success(texto_insercion)   
-                        
-                    else:
-                    
-                        texto_error = 'La fecha del archivo ' + archivo_btl.name + ' no coindice con la fecha seleccionada '
-                        st.warning(texto_error, icon="⚠️")  
+                st.text(nombre_estacion)
+                st.text(id_estacion)
 
-                texto_exito = 'Estación ' + nombre_estacion + ' procesada correctamente. Información subida a la base de datos'
-                st.success(texto_exito)                            
+            #     texto_estado = 'Procesando la información de la estación ' + nombre_estacion
+            #     with st.spinner(texto_estado):
+                                    
+            #         # Lee los datos de cada archivo de botella
+            #         #datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines()
+            #         datos_archivo = archivo_btl.getvalue().decode('ISO-8859-1').splitlines()
+                    
+            #         # Comprueba que la fecha del archivo y de la salida coinciden
+            #         fecha_salida_texto    = nombre_archivo_btl[0:8]
+            #         fecha_salida_archivo  = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
+                    
+            #         if fecha_salida_archivo == fecha_salida:
+                    
+            #             ### DATOS DE BOTELLERO ###
+            #             mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_btl,datos_archivo)
+                      
+            #             datos_botellas = FUNCIONES_PROCESADO.procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_salida,tabla_estaciones_programa)
+                      
+            #             st.dataframe(datos_botellas)  
+                      
+                        
+            #             # Aplica control de calidad
+            #             datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
+           
+            #             # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+            #             datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
+                                
+            #             texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,df_datos_discretos,df_muestreos)
+            #             if texto_insercion:
+            #                 st.success(texto_insercion)   
+                        
+            #         else:
+                    
+            #             texto_error = 'La fecha del archivo ' + archivo_btl.name + ' no coindice con la fecha seleccionada '
+            #             st.warning(texto_error, icon="⚠️")  
+
+            #     texto_exito = 'Estación ' + nombre_estacion + ' procesada correctamente. Información subida a la base de datos'
+            #     st.success(texto_exito)                            
              
                         
                       
                         
-            ### DATOS DE PERFILES
+            # ### DATOS DE PERFILES
             
-            for archivo_cnv in listado_archivos_cnv:
+            # for archivo_cnv in listado_archivos_cnv:
                               
-                texto_estado = 'Procesando la información del perfil ' + archivo_cnv
-                with st.spinner(texto_estado):
+            #     texto_estado = 'Procesando la información del perfil ' + archivo_cnv
+            #     with st.spinner(texto_estado):
                                                                             
-                    datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
+            #         datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
                                   
-                    datos_perfil,df_perfiles,datos_muestreo_perfil = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
+            #         datos_perfil,df_perfiles,datos_muestreo_perfil = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
                                                      
-                    df_botellas,df_perfiles = FUNCIONES_PROCESADO.procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,id_programa,abreviatura_programa,nombre_estacion,id_estacion,direccion_host,base_datos,usuario,contrasena,puerto)
+            #         df_botellas,df_perfiles = FUNCIONES_PROCESADO.procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,id_programa,abreviatura_programa,nombre_estacion,id_estacion,direccion_host,base_datos,usuario,contrasena,puerto)
                 
-                    if df_botellas is not None:     
+            #         if df_botellas is not None:     
                         
-                        conn                      = init_connection()
-                        tabla_datos_discretos = psql.read_sql('SELECT * FROM datos_discretos', conn)
-                        conn.close()
+            #             conn                      = init_connection()
+            #             tabla_datos_discretos = psql.read_sql('SELECT * FROM datos_discretos', conn)
+            #             conn.close()
                         
-                        df_botellas = FUNCIONES_PROCESADO.evalua_registros(df_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
+            #             df_botellas = FUNCIONES_PROCESADO.evalua_registros(df_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
                                
-                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_discretos,df_muestreos)
+            #             texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_discretos,df_muestreos)
         
-                    texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles)
+            #         texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles)
            
-                    st.success(texto_insercion)      
+            #         st.success(texto_insercion)      
 
 
 

@@ -40,12 +40,13 @@ conn.dispose()
 
 # Rutas de los archivos a importar  
 #archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx' 
-archivo_datos                ='C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/2022/RADPROF_2022_BTL_03032023_AB_FORMATO.xlsx'
+archivo_datos                ='C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADPROF/2023/RADPROF2023_BTL_SACO_FORMATO.xlsx'
 
 # Importa el .xlsx
 df_datos_importacion = pandas.read_excel(archivo_datos,index_col=None)
-
-
+df_datos_importacion['temperatura_ctd_qf'] = 2
+df_datos_importacion['salinidad_ctd_qf'] = 2
+df_datos_importacion['fluorescencia_ctd_qf'] = 2
 # Realiza un control de calidad primario a los datos importados   
 datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
 

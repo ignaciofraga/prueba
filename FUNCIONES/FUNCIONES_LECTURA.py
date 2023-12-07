@@ -13,6 +13,7 @@ import pandas.io.sql as psql
 from sqlalchemy import create_engine
 import re
 import math
+import seawater
 
 
 
@@ -202,7 +203,9 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
     
     return datos_radiales
  
-    
+
+   
+
 ############################################################################
 ######## FUNCION PARA LEER DATOS HISTORICOS DE LA  CAMPAÑA RADIALES  #######
 ############################################################################ 
@@ -228,11 +231,18 @@ def lectura_radiales_historicos(nombre_archivo):
     # Corrige las concentraciones para pasarlas de mmol/m3 (o umol/l) a umol/kg
     
     # Calculo de densidades
-    datos_radiales['densidad'] = numpy.ones(datos_radiales.shape[0])
-    for idato in range(datos_radiales.shape[0]):
-        if datos_radiales['sigmat'].iloc[idato] is not None:
-            datos_radiales['densidad'].iloc[idato]  =  1 + datos_radiales['sigmat'].iloc[idato]/1000
-    
+    listado_variables_datos = datos_radiales.columns.values.tolist()
+    if 'sigmat' in listado_variables_datos:
+        datos_radiales['densidad'] = numpy.ones(datos_radiales.shape[0])
+        for idato in range(datos_radiales.shape[0]):
+            if datos_radiales['sigmat'].iloc[idato] is not None:
+                datos_radiales['densidad'].iloc[idato]  =  1 + datos_radiales['sigmat'].iloc[idato]/1000
+    else:
+        datos_radiales['densidad'] = numpy.ones(datos_radiales.shape[0])        
+        for idato in range(datos_radiales.shape[0]):
+            if datos_radiales['S'].iloc[idato] is not None and datos_radiales['t'].iloc[idato] is not None:
+                datos_radiales['densidad'].iloc[idato] = seawater.eos80.dens0(datos_radiales['S'].iloc[idato], datos_radiales['t'].iloc[idato])
+        
     datos_radiales = datos_radiales.rename(columns={"Fecha": "fecha_muestreo", "Prof":"presion_ctd", "t":"temperatura_ctd","S":"salinidad_ctd","E":"par_ctd", 
                                                     "O2 umol/kg":"oxigeno_wk","Cla":"clorofila_a","ID_estacion":"estacion","Clb":"clorofila_b","Clc":"clorofila_c","PP":"prod_primaria","COP":"carbono_organico_particulado",'NOP':'nitrogeno_organico_particulado'})
     
@@ -294,19 +304,33 @@ def lectura_radiales_historicos(nombre_archivo):
             datos_radiales['silicato_qf'].iloc[idato]  = int(9)   
             
             
-        # QF
-        if datos_radiales['NO3flag'].iloc[idato] is not None:
-            datos_radiales['nitrato_qf'].iloc[idato]  = datos_radiales['NO3flag'].iloc[idato]  
-        if datos_radiales['NO2flag'].iloc[idato] is not None:
-            datos_radiales['nitrito_qf'].iloc[idato]  = datos_radiales['NO2flag'].iloc[idato]  
-        if datos_radiales['NH4flag'].iloc[idato] is not None:
-            datos_radiales['amonio_qf'].iloc[idato]  = datos_radiales['NH4flag'].iloc[idato]
-        if datos_radiales['PO4flag'].iloc[idato] is not None:
-            datos_radiales['fosfato_qf'].iloc[idato]  = datos_radiales['PO4flag'].iloc[idato]          
-        if datos_radiales['SiO2flag'].iloc[idato] is not None:
-            datos_radiales['silicato_qf'].iloc[idato]  = datos_radiales['SiO2flag'].iloc[idato]           
+    # QF
+    if 'NO3flag' in listado_variables_datos:
+        for idato in range(datos_radiales.shape[0]):
+            if datos_radiales['NO3flag'].iloc[idato] is not None:
+                datos_radiales['nitrato_qf'].iloc[idato]  = datos_radiales['NO3flag'].iloc[idato]  
+
+    if 'NO2flag' in listado_variables_datos:
+        for idato in range(datos_radiales.shape[0]):                
+            if datos_radiales['NO2flag'].iloc[idato] is not None:
+                datos_radiales['nitrito_qf'].iloc[idato]  = datos_radiales['NO2flag'].iloc[idato]  
+                
+    if 'NH4flag' in listado_variables_datos:   
+        for idato in range(datos_radiales.shape[0]):              
+            if datos_radiales['NH4flag'].iloc[idato] is not None:
+                datos_radiales['amonio_qf'].iloc[idato]  = datos_radiales['NH4flag'].iloc[idato]
+                
+    if 'PO4flag' in listado_variables_datos: 
+        for idato in range(datos_radiales.shape[0]):                 
+            if datos_radiales['PO4flag'].iloc[idato] is not None:
+                datos_radiales['fosfato_qf'].iloc[idato]  = datos_radiales['PO4flag'].iloc[idato]        
+                
+    if 'SiO2flag' in listado_variables_datos: 
+        for idato in range(datos_radiales.shape[0]):               
+            if datos_radiales['SiO2flag'].iloc[idato] is not None:
+                datos_radiales['silicato_qf'].iloc[idato]  = datos_radiales['SiO2flag'].iloc[idato]           
     
-        # calculo del TON 
+        # calculo del TIN 
         if datos_radiales['nitrato'].iloc[idato] is not None and datos_radiales['nitrito'].iloc[idato] is not None:
             datos_radiales['nitrogeno_inorganico_total'].iloc[idato]  = datos_radiales['nitrato'].iloc[idato] + datos_radiales['nitrito'].iloc[idato]
             if datos_radiales['amonio'].iloc[idato] is not None:
@@ -329,22 +353,7 @@ def lectura_radiales_historicos(nombre_archivo):
             datos_radiales['clorofila_b_qf'].iloc[idato] = int(9) 
         if datos_radiales['clorofila_c'].iloc[idato] is None:
             datos_radiales['clorofila_c_qf'].iloc[idato] = int(9)          
-            
-        # aprovecho para cambiar el nombre de la estación
-        if datos_radiales['estacion'].iloc[idato] == 'E2CO':
-            datos_radiales['estacion'].iloc[idato]  = '2'    
-        if datos_radiales['estacion'].iloc[idato] == 'E4CO':
-            datos_radiales['estacion'].iloc[idato]  = '4'    
-        if datos_radiales['estacion'].iloc[idato] == 'E3CO':
-            datos_radiales['estacion'].iloc[idato]  = '3' 
-        if datos_radiales['estacion'].iloc[idato] == 'E3ACO':
-            datos_radiales['estacion'].iloc[idato]  = '3A' 
-        if datos_radiales['estacion'].iloc[idato] == 'E3BCO':
-            datos_radiales['estacion'].iloc[idato]  = '3B' 
-        if datos_radiales['estacion'].iloc[idato] == 'E3CCO':
-            datos_radiales['estacion'].iloc[idato]  = '3C'    
- 
-    
+                
     return datos_radiales 
     
 ############################################################################
