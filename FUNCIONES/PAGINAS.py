@@ -1404,9 +1404,8 @@ def entrada_archivos_roseta():
                 posicion_inicio    = nombre_archivo_btl.find('e') 
                 posicion_final     = nombre_archivo_btl.find('.')
                 nombre_estacion    = nombre_archivo_btl[posicion_inicio:posicion_final].upper() + 'CO' 
-                st.text(nombre_estacion)
                 id_estacion        = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
-               
+                              
                 texto_estado = 'Procesando la información de la estación ' + nombre_estacion
                 with st.spinner(texto_estado):
                                     
@@ -1425,9 +1424,13 @@ def entrada_archivos_roseta():
                       
                         datos_botellas = FUNCIONES_PROCESADO.procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_salida,tabla_estaciones_programa)
                       
-                        st.dataframe(datos_botellas)  
-                      
+                        # Vuelve a cargar los datos disponibles
+                        conn                      = init_connection()
+                        df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+                        df_datos_discretos        = psql.read_sql('SELECT * FROM datos_discretos', conn)
+                        conn.close() 
                         
+                      
                         # Aplica control de calidad
                         datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
            
