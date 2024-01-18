@@ -1424,29 +1424,27 @@ def entrada_archivos_roseta():
                       
                         datos_botellas = FUNCIONES_PROCESADO.procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_salida,tabla_estaciones_programa)
                     
-                        st.dataframe(datos_botellas)    
-                    
-                    #     # Vuelve a cargar los datos disponibles
-                    #     conn                      = init_connection()
-                    #     df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-                    #     df_datos_discretos        = psql.read_sql('SELECT * FROM datos_discretos', conn)
-                    #     conn.close() 
+                        # Vuelve a cargar los datos disponibles
+                        conn                      = init_connection()
+                        df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+                        df_datos_discretos        = psql.read_sql('SELECT * FROM datos_discretos', conn)
+                        conn.close() 
                         
                       
-                    #     # Aplica control de calidad
-                    #     datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
+                        # Aplica control de calidad
+                        datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
            
-                    #     # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-                    #     datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
+                        # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+                        datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
                                 
-                    #     texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,df_datos_discretos,df_muestreos)
-                    #     if texto_insercion:
-                    #         st.success(texto_insercion)   
+                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,df_datos_discretos,df_muestreos)
+                        if texto_insercion:
+                            st.success(texto_insercion)   
                         
-                    # else:
+                    else:
                     
-                    #     texto_error = 'La fecha del archivo ' + archivo_btl.name + ' no coindice con la fecha seleccionada '
-                    #     st.warning(texto_error, icon="⚠️")  
+                        texto_error = 'La fecha del archivo ' + archivo_btl.name + ' no coindice con la fecha seleccionada '
+                        st.warning(texto_error, icon="⚠️")  
 
                 texto_exito = 'Estación ' + nombre_estacion + ' procesada correctamente. Información subida a la base de datos'
                 st.success(texto_exito)                            
