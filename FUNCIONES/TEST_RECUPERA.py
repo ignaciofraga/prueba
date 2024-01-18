@@ -23,9 +23,9 @@ puerto         = '5432'
 direccion_host = '193.146.155.99'
 
 # Parámetros
-anho_consulta = 2023
-programa_seleccionado = 'RADPROF'
-tipo_salida           = 'ANUAL'
+anho_consulta = 2024
+programa_seleccionado = 'RADIAL CORUÑA'
+tipo_salida           = 'MENSUAL'
 ###### PROCESADO ########
 
 
