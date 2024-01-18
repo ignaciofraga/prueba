@@ -981,7 +981,7 @@ def lectura_btl(nombre_archivo,datos_archivo):
                         io_fluor        = 0                    
                 
                 try:
-                    indice_O2       = datos_linea.index("Sbeox0Mm/Kg")
+                    indice_O2       = datos_linea.index("Sbox0Mm/Kg")#datos_linea.index("Sbeox0Mm/Kg")
                     io_O2           = 1                   
                 except:
                     indice_O2       =  None  
