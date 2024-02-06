@@ -1401,7 +1401,7 @@ def entrada_archivos_roseta():
                             
                 # encuentra el nombre de la estación
                 nombre_archivo_btl = archivo_btl.name
-                posicion_inicio    = nombre_archivo_btl.find('e') 
+                posicion_inicio    = nombre_archivo_btl.find('e') + 1
                 posicion_final     = nombre_archivo_btl.find('.')
                 nombre_estacion    = nombre_archivo_btl[posicion_inicio:posicion_final].upper() + 'CO' 
                 id_estacion        = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
@@ -1452,40 +1452,40 @@ def entrada_archivos_roseta():
                         
                       
                         
-            # ### DATOS DE PERFILES
+            ### DATOS DE PERFILES
             
-            # for archivo_cnv in listado_archivos_cnv:
+            for archivo_cnv in listado_archivos_cnv:
                 
-            #     # encuentra el nombre de la estación
-            #     nombre_archivo_cnv = archivo_cnv.name
-            #     posicion_inicio    = nombre_archivo_cnv.find('e') 
-            #     posicion_final     = nombre_archivo_cnv.find('.')
-            #     nombre_estacion    = nombre_archivo_cnv[posicion_inicio:posicion_final].upper() + 'CO' 
-            #     id_estacion        = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
+                # encuentra el nombre de la estación
+                nombre_archivo_cnv = archivo_cnv.name
+                posicion_inicio    = nombre_archivo_cnv.find('e') + 1
+                posicion_final     = nombre_archivo_cnv.find('.')
+                nombre_estacion    = nombre_archivo_cnv[posicion_inicio:posicion_final].upper() + 'CO' 
+                id_estacion        = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
                               
                               
-            #     texto_estado = 'Procesando la información del perfil ' + archivo_cnv.name
-            #     with st.spinner(texto_estado):
+                texto_estado = 'Procesando la información del perfil ' + archivo_cnv.name
+                with st.spinner(texto_estado):
                                                                             
-            #         datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
+                    datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
                                   
-            #         datos_perfil,df_perfiles,datos_muestreo_perfil = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
+                    datos_perfil,df_perfiles,datos_muestreo_perfil = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
                                                      
-            #         df_botellas,df_perfiles = FUNCIONES_PROCESADO.procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,id_programa,abreviatura_programa,nombre_estacion,id_estacion,direccion_host,base_datos,usuario,contrasena,puerto)
+                    df_botellas,df_perfiles = FUNCIONES_PROCESADO.procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,id_programa,abreviatura_programa,nombre_estacion,id_estacion,direccion_host,base_datos,usuario,contrasena,puerto)
                 
-            #         if df_botellas is not None:     
+                    if df_botellas is not None:     
                         
-            #             conn                      = init_connection()
-            #             tabla_datos_discretos = psql.read_sql('SELECT * FROM datos_discretos', conn)
-            #             conn.close()
+                        conn                      = init_connection()
+                        tabla_datos_discretos = psql.read_sql('SELECT * FROM datos_discretos', conn)
+                        conn.close()
                         
-            #             df_botellas = FUNCIONES_PROCESADO.evalua_registros(df_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
+                        df_botellas = FUNCIONES_PROCESADO.evalua_registros(df_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
                                
-            #             texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_discretos,df_muestreos)
+                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_discretos,df_muestreos)
         
-            #         texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles)
+                    texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles)
            
-            #         st.success(texto_insercion)      
+                    st.success(texto_insercion)      
 
 
 
@@ -2145,6 +2145,8 @@ def entrada_datos_excel():
         # Recupera el identificador del programa de muestreo
         id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
                 
+        st.text(id_programa)
+        
         with st.spinner('Asignando la estación y salida al mar de cada medida'):
             # Encuentra la estación asociada a cada registro
             datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
