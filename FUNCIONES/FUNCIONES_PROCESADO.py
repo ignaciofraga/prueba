@@ -462,71 +462,72 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                         tabla_salidas['mes_salida'].iloc[idato] =  tabla_salidas['fecha_salida'].iloc[idato].month    
                         
                         
-                for isalida in range(len(fechas_partida)):            
-        
-                    #df_temporal = tabla_salidas[tabla_salidas['fecha_salida']==fechas_partida[isalida]]
-                    df_temporal = tabla_salidas[(tabla_salidas['mes_salida']==fechas_partida[isalida].month) & (tabla_salidas['programa']==id_programa)]
+                    for isalida in range(len(fechas_partida)):            
             
-                    # Salida ya incluida en la base de datos. Recuperar identificador
-                    if df_temporal.shape[0]>0:
+                        #df_temporal = tabla_salidas[tabla_salidas['fecha_salida']==fechas_partida[isalida]]
+                        df_temporal = tabla_salidas[(tabla_salidas['mes_salida']==fechas_partida[isalida].month) & (tabla_salidas['programa']==id_programa)]
+                
+                        # Salida ya incluida en la base de datos. Recuperar identificador
+                        if df_temporal.shape[0]>0:
+                            
+                            tabla_salidas['fecha_salida']==fechas_partida[isalida]
+                            
+                            id_salida = df_temporal['id_salida'].iloc[0]
+    
+                            # Comprueba que las fechas de salida y llegada están bien en la base de datos. En caso contrario, actualizar fechas y estaciones
+                            io_modifica_salida = 0
+                            if df_temporal['fecha_salida'].iloc[0]>fechas_partida[isalida]:
+                                instruccion_sql = 'UPDATE salidas_muestreos SET fecha_salida =%s WHERE id_salida = %s;'
+                                cursor.execute(instruccion_sql, (fechas_partida[isalida],int(id_salida)))
+                                conn.commit()
+                                io_modifica_salida = 1
+                            if df_temporal['fecha_retorno'].iloc[0]<fechas_partida[isalida]:
+                                instruccion_sql = 'UPDATE salidas_muestreos SET fecha_retorno =%s WHERE id_salida = %s;'
+                                cursor.execute(instruccion_sql, (fechas_regreso[isalida],int(id_salida)))
+                                conn.commit()
+                                io_modifica_salida = 1
+                            if io_modifica_salida == 1:
+                                identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
+                                estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
+                                for iestacion in range(len(estaciones_muestreadas)):
+                                    estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
+                                json_estaciones        = json.dumps(df_temporal['estaciones'].iloc[0] + estaciones_muestreadas)                            
+                                
+                            
+    
+                            
+                        # Salida no incluida. Añadirla a la base de datos.
+                        else:
                         
-                        tabla_salidas['fecha_salida']==fechas_partida[isalida]
+                            id_salida           = id_ultima_salida_bd + iconta_nueva_salida
+                            iconta_nueva_salida = iconta_nueva_salida + 1
                         
-                        id_salida = df_temporal['id_salida'].iloc[0]
-
-                        # Comprueba que las fechas de salida y llegada están bien en la base de datos. En caso contrario, actualizar fechas y estaciones
-                        io_modifica_salida = 0
-                        if df_temporal['fecha_salida'].iloc[0]>fechas_partida[isalida]:
-                            instruccion_sql = 'UPDATE salidas_muestreos SET fecha_salida =%s WHERE id_salida = %s;'
-                            cursor.execute(instruccion_sql, (fechas_partida[isalida],int(id_salida)))
-                            conn.commit()
-                            io_modifica_salida = 1
-                        if df_temporal['fecha_retorno'].iloc[0]<fechas_partida[isalida]:
-                            instruccion_sql = 'UPDATE salidas_muestreos SET fecha_retorno =%s WHERE id_salida = %s;'
-                            cursor.execute(instruccion_sql, (fechas_regreso[isalida],int(id_salida)))
-                            conn.commit()
-                            io_modifica_salida = 1
-                        if io_modifica_salida == 1:
+                            # Encuentra las estaciones muestreadas
+                            #subset_salida                        = datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]
+                            
+                            subset_salida = datos[(datos['fecha_muestreo']>=fechas_partida[isalida]) & (datos['fecha_muestreo']<=fechas_regreso[isalida])]
+                            
                             identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
                             estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
                             for iestacion in range(len(estaciones_muestreadas)):
                                 estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
-                            json_estaciones        = json.dumps(df_temporal['estaciones'].iloc[0] + estaciones_muestreadas)                            
+                            json_estaciones        = json.dumps(estaciones_muestreadas)
+                               
+                            # Define nombre
+                            nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_partida[isalida].month-1]) + ' ' +  str(fechas_partida[isalida].year)
+                            # Inserta en la base de datos
+                            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                            cursor = conn.cursor()                      
+                            instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''        
+                            cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_partida[isalida],fechas_regreso[isalida],json_estaciones))
+                            conn.commit()
+                            cursor.close()
+                            conn.close()
                             
-                        
-
-                        
-                    # Salida no incluida. Añadirla a la base de datos.
-                    else:
-                    
-                        id_salida           = id_ultima_salida_bd + iconta_nueva_salida
-                        iconta_nueva_salida = iconta_nueva_salida + 1
-                    
-                        # Encuentra las estaciones muestreadas
-                        #subset_salida                        = datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]
-                        
-                        subset_salida = datos[(datos['fecha_muestreo']>=fechas_partida[isalida]) & (datos['fecha_muestreo']<=fechas_regreso[isalida])]
-                        
-                        identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
-                        estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
-                        for iestacion in range(len(estaciones_muestreadas)):
-                            estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
-                        json_estaciones        = json.dumps(estaciones_muestreadas)
-                           
-                        # Define nombre
-                        nombre_salida = nombre_programa + ' ' + tipo_salida + ' ' +   str(meses[fechas_partida[isalida].month-1]) + ' ' +  str(fechas_partida[isalida].year)
-                        # Inserta en la base de datos
-                        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                        cursor = conn.cursor()                      
-                        instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
-                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''        
-                        cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,fechas_partida[isalida],fechas_regreso[isalida],json_estaciones))
-                        conn.commit()
-                        cursor.close()
-                        conn.close()
-                        
-                    # Asigna el id de la salida al dataframe
-                    datos['id_salida'][(datos['fecha_muestreo']>=fechas_partida[isalida]) & (datos['fecha_muestreo']<=fechas_regreso[isalida])]  = id_salida
+                        # Asigna el id de la salida al dataframe
+                        datos['id_salida'][(datos['fecha_muestreo']>=fechas_partida[isalida]) & (datos['fecha_muestreo']<=fechas_regreso[isalida])]  = id_salida
+  
     return datos
 
 
