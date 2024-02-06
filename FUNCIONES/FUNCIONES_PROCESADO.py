@@ -650,7 +650,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                     
                 if 'tubo_nutrientes' in listado_variables_datos and datos['tubo_nutrientes'].iloc[idato] is not None:
                     instruccion_sql = 'UPDATE muestreos_discretos SET tubo_nutrientes =%s WHERE muestreo = %s;'
-                    cursor.execute(instruccion_sql, (datos['tubo_nutrientes'].iloc[idato],int(datos['muestreo'].iloc[idato])))
+                    cursor.execute(instruccion_sql, (str(datos['tubo_nutrientes'].iloc[idato]),int(datos['muestreo'].iloc[idato])))
                     conn.commit()
                     
                 if 'vial_toc' in listado_variables_datos and datos['vial_toc'].iloc[idato] is not None:                     
