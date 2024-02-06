@@ -1662,9 +1662,7 @@ def procesado_nutrientes():
 
         df_muestreos_salidas_seleccionadas = df_muestreos[df_muestreos['salida_mar'].isin(listado_salidas)]
         df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos_salidas_seleccionadas, on="muestreo") 
-        
-        st.dataframe(df_datos_disponibles)
-        
+                
         with st.form("Formulario", clear_on_submit=False):
               
             # Despliega un formulario para subir los archivos del AA y las referencias
@@ -2144,9 +2142,7 @@ def entrada_datos_excel():
 
         # Recupera el identificador del programa de muestreo
         id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
-                
-        st.text(id_programa)
-        
+                        
         with st.spinner('Asignando la estación y salida al mar de cada medida'):
             # Encuentra la estación asociada a cada registro
             datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
