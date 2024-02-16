@@ -995,6 +995,8 @@ def consulta_botellas():
             df_exporta.insert(df_exporta.shape[1], listado_variables_final[ivariable], columna_auxiliar) 
         
 
+        # Elimina las columnas de umero de vial de toc y nutriente
+        df_exporta = df_exporta.drop(columns=['tubo_nutrientes','vial_toc'])
         
         
         ##### Modifica el nombre de las variables #####
