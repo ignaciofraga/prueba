@@ -46,49 +46,86 @@ conn.dispose()
 
 # # DATOS HISTORICOS (CORUÑA: 1988 - 2012, VIGO: 1988 - 2015)
 
-listado_programas = ['RADIAL VIGO','RADIAL CORUÑA']
-listado_archivos  = ['C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VIGO/20171026_RADIALES-Vigo_botellas.xlsx','C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/HISTORICO/HISTORICO_MODIFICADO.xlsx']
+######### CORUÑA #########
 
-for iprograma in range(len(listado_programas)):
+programa_muestreo = 'RADIAL CORUÑA'
 
-    programa_muestreo = listado_programas[iprograma]
+# Recupera el identificador del programa de muestreo
+id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
 
-    # Recupera el identificador del programa de muestreo
-    id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
-    
-    # Carga de informacion disponible
-    con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    conn             = create_engine(con_engine)
-    tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-    tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-    tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
-    tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
-    conn.dispose() 
-    
-    print('Lectura de excel con los datos históricos') 
-    nombre_archivo    = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/HISTORICO/HISTORICO_MODIFICADO.xlsx'
-    datos_radiales_historicos = FUNCIONES_LECTURA.lectura_radiales_historicos(nombre_archivo)
-    
-    print('Realizando control de calidad')
-    datos_radiales_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radiales_historicos)  
-    
-    # Encuentra la estación asociada a cada registro
-    print('Asignando la estación correspondiente a cada medida')
-    datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_estaciones(datos_radiales_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
-    
-    # Encuentra las salidas al mar correspondientes
-    tipo_salida = 'MENSUAL'   
-    datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_salidas(datos_radiales_corregido,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
-     
-    # Encuentra el identificador asociado a cada registro
-    print('Asignando el registro correspondiente a cada medida')
-    datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
-       
-    # # # # # Introduce los datos en la base de datos
-    print('Introduciendo los datos en la base de datos')
-    texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
-    
-    
+# Carga de informacion disponible
+con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+conn             = create_engine(con_engine)
+tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
+tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+conn.dispose() 
+
+print('Lectura de excel con los datos históricos') 
+nombre_archivo    = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES/HISTORICO/HISTORICO.xlsx'
+datos_radiales_historicos = FUNCIONES_LECTURA.lectura_radiales_historicos(nombre_archivo)
+
+print('Realizando control de calidad')
+datos_radiales_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radiales_historicos)  
+
+# Encuentra la estación asociada a cada registro
+print('Asignando la estación correspondiente a cada medida')
+datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_estaciones(datos_radiales_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
+
+# Encuentra las salidas al mar correspondientes
+tipo_salida = 'MENSUAL'   
+datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_salidas(datos_radiales_corregido,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
+ 
+# Encuentra el identificador asociado a cada registro
+print('Asignando el registro correspondiente a cada medida')
+datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
+   
+# # # # Introduce los datos en la base de datos
+print('Introduciendo los datos en la base de datos')
+texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
+
+
+# ######### VIGO #########
+
+# programa_muestreo = 'RADIAL VIGO'
+
+# # Recupera el identificador del programa de muestreo
+# id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+
+# # Carga de informacion disponible
+# con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+# conn             = create_engine(con_engine)
+# tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+# tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+# tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
+# tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+# conn.dispose() 
+
+# print('Lectura de excel con los datos históricos') 
+# nombre_archivo    = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/VIGO/20171026_RADIALES-Vigo_botellas.xlsx'
+# datos_radiales_historicos = FUNCIONES_LECTURA.lectura_radiales_historicos(nombre_archivo)
+
+# print('Realizando control de calidad')
+# datos_radiales_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radiales_historicos)  
+
+# # Encuentra la estación asociada a cada registro
+# print('Asignando la estación correspondiente a cada medida')
+# datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_estaciones(datos_radiales_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
+
+# # Encuentra las salidas al mar correspondientes
+# tipo_salida = 'MENSUAL'   
+# datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_salidas(datos_radiales_corregido,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
+ 
+# # Encuentra el identificador asociado a cada registro
+# print('Asignando el registro correspondiente a cada medida')
+# datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_registros(datos_radiales_corregido,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
+   
+# # # # # # Introduce los datos en la base de datos
+# print('Introduciendo los datos en la base de datos')
+# texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_radiales_corregido,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
+
+
 
 
 

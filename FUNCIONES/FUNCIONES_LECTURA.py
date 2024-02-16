@@ -353,7 +353,30 @@ def lectura_radiales_historicos(nombre_archivo):
             datos_radiales['clorofila_b_qf'].iloc[idato] = int(9) 
         if datos_radiales['clorofila_c'].iloc[idato] is None:
             datos_radiales['clorofila_c_qf'].iloc[idato] = int(9)          
+
+    # Asigna numero de botella
+    datos_radiales['botella'] = None
+    df_datos  = pandas.DataFrame()
+    listado_salidas = datos_radiales['fecha_muestreo'].unique()   
+    for isalida in range(len(listado_salidas)):
+        
+        subset_salida = datos_radiales[datos_radiales['fecha_muestreo'] == listado_salidas[isalida]]
+        
+        listado_estaciones = subset_salida['estacion'].unique()
+        
+        for iestacion in range(len(listado_estaciones)):
+        
+            datos_estacion = subset_salida[subset_salida['estacion']==listado_estaciones[iestacion]]
+            datos_estacion = datos_estacion.sort_values(by=['presion_ctd'])
+            
+            for idato in range(datos_estacion.shape[0]):
                 
+                datos_estacion['botella'].iloc[idato] = int(idato + 1)
+                
+            df_datos = pandas.concat([df_datos, datos_estacion])                 
+
+    datos_radiales =  df_datos      
+    
     return datos_radiales 
     
 ############################################################################

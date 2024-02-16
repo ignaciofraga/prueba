@@ -975,7 +975,7 @@ def consulta_botellas():
         ##############################################
 
         ##### Ordena los valores por estacion/botella #####
-        df_exporta = df_exporta.sort_values(['nombre_estacion','presion_ctd'],ascending=[True,False])
+        df_exporta = df_exporta.sort_values(['fecha_muestreo','nombre_estacion','presion_ctd'],ascending=[True,True,False])
         indices_dataframe     = numpy.arange(0,df_exporta.shape[0],1,dtype=int)
         df_exporta['id_temp'] = indices_dataframe
         df_exporta.set_index('id_temp',drop=True,append=False,inplace=True)
