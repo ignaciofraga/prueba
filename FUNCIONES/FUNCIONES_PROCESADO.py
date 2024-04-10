@@ -423,7 +423,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                         identificador_estaciones_muestreadas = list(subset_salida['id_estacion_temp'].unique())
                         estaciones_muestreadas               =[None]*len(identificador_estaciones_muestreadas)
                         for iestacion in range(len(estaciones_muestreadas)):
-                            estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas[iestacion]].iloc[0]
+                            estaciones_muestreadas[iestacion] = tabla_estaciones['nombre_estacion'][tabla_estaciones['id_estacion']==identificador_estaciones_muestreadas.iloc[iestacion]].iloc[0]
                         json_estaciones        = json.dumps(estaciones_muestreadas)
                            
                         # Define nombre
