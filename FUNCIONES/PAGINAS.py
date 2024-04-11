@@ -96,385 +96,106 @@ def consulta_estado():
              
     ### Encabezados y titulos 
     #st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
-    st.title('Servicio de consulta de información disponible del C.O de A Coruña')
+    st.title('Estado de las analíticas de nutrientes realizadas en el C.O de A Coruña')
     
-    # Despliega un botón lateral para seleccionar el tipo de información a introducir       
-    entradas     = ['Estado del procesado de programas', 'Evolución en el procesado de programas']
-    tipo_entrada = st.sidebar.radio("Indicar la consulta a realizar",entradas)
+    # Recupera la tabla de los programas disponibles como un dataframe
+    conn = init_connection()
+    df_programas = psql.read_sql('SELECT * FROM programas', conn)
+    conn.close()
+    
+    # Despliega un formulario para elegir el programa y la fecha a consultar
+    with st.form("Formulario seleccion"):
+        nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
 
-    # Consulta del estado del procesado    
-    if tipo_entrada == entradas[0]:
+        # Botón de envío para confirmar selección
+        submit = st.form_submit_button("Enviar")
     
-        # Recupera la tabla de los programas disponibles como un dataframe
+ 
+    if submit:
+    
+        # Recupera el identificador del programa seleccionado
+        id_programa = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
+        
+        ### Consulta a la base de datos las fechas de los distintos procesos (muestreo, análisis y post-procesado)
+        
+        # Recupera la tabla del estado de los procesos como un dataframe
         conn = init_connection()
-        df_programas = psql.read_sql('SELECT * FROM programas', conn)
+        temporal_estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
         conn.close()
         
-        # Despliega un formulario para elegir el programa y la fecha a consultar
-        with st.form("Formulario seleccion"):
-            nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
-
-            # Botón de envío para confirmar selección
-            submit = st.form_submit_button("Enviar")
+        # Extrae los datos disponibles del programa consultado 
+        estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['programa']==id_programa]
         
-     
-        if submit:
+        # Bucle if para desplegar información únicamente si hay información del programa seleccionado
+        if estado_procesos_programa.shape[0] == 0:
+            
+            st.warning('No se dispone de información acerca del estado del programa de muestreo seleccionado', icon="⚠️")
         
-            # Recupera el identificador del programa seleccionado
-            id_programa = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
+        else:
             
-            ### Consulta a la base de datos las fechas de los distintos procesos (muestreo, análisis y post-procesado)
+            estado_procesos_programa = estado_procesos_programa.sort_values('año')
             
-            # Recupera la tabla del estado de los procesos como un dataframe
-            conn = init_connection()
-            temporal_estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
-            conn.close()
-            
-            # Extrae los datos disponibles del programa consultado 
-            estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['programa']==id_programa]
-            
-            # Bucle if para desplegar información únicamente si hay información del programa seleccionado
-            if estado_procesos_programa.shape[0] == 0:
-                
-                st.warning('No se dispone de información acerca del estado del programa de muestreo seleccionado', icon="⚠️")
-            
-            else:
-                
-                estado_procesos_programa = estado_procesos_programa.sort_values('año')
-                
-                # Determina el estado en cada caso 0-campaña no realizada 1-pendiente de analisis 2-analisis parcial 3-terminado
-                nombre_estados  = ['Campaña no realizada','Pendiente de analizar','Analizado parcialmente','Analizado completamente']
-                colores_estados = ['#000000','#CD5C5C','#87CEEB','#00b300'] 
-                          
-                estado_procesos_programa['estado'] = None
-                for idato in range(estado_procesos_programa.shape[0]):
-                    if estado_procesos_programa['campaña_realizada'].iloc[idato] == False:
-                        estado_procesos_programa['estado'].iloc[idato] = 'Campaña no realizada'
+            # Determina el estado en cada caso 0-campaña no realizada 1-pendiente de analisis 2-analisis parcial 3-terminado
+            nombre_estados  = ['Campaña no realizada','Pendiente de analizar','Analizado parcialmente','Analizado completamente']
+            colores_estados = ['#000000','#CD5C5C','#87CEEB','#00b300'] 
+                      
+            estado_procesos_programa['estado'] = None
+            for idato in range(estado_procesos_programa.shape[0]):
+                if estado_procesos_programa['campaña_realizada'].iloc[idato] == False:
+                    estado_procesos_programa['estado'].iloc[idato] = 'Campaña no realizada'
+                else:
+                    if estado_procesos_programa['analisis_finalizado'].iloc[idato] == True:
+                        estado_procesos_programa['estado'].iloc[idato] = 'Analizado completamente'
                     else:
-                        if estado_procesos_programa['analisis_finalizado'].iloc[idato] == True:
-                            estado_procesos_programa['estado'].iloc[idato] = 'Analizado completamente'
+                        if estado_procesos_programa['fecha_analisis_laboratorio'].iloc[idato] is None:
+                            estado_procesos_programa['estado'].iloc[idato] = 'Pendiente de analizar'
                         else:
-                            if estado_procesos_programa['fecha_analisis_laboratorio'].iloc[idato] is None:
-                                estado_procesos_programa['estado'].iloc[idato] = 'Pendiente de analizar'
-                            else:
-                                estado_procesos_programa['estado'].iloc[idato] = 'Analizado parcialmente'
-                                
-                    
-                # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
-                num_valores = numpy.zeros(len(nombre_estados),dtype=int)
-                for ivalor in range(len(nombre_estados)):
-                    try:
-                        num_valores[ivalor] = estado_procesos_programa.estado.value_counts()[nombre_estados[ivalor]]
-                    except:
-                        pass
-                porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),2)
+                            estado_procesos_programa['estado'].iloc[idato] = 'Analizado parcialmente'
+                            
                 
-                # Despliega la información en una tabla
-                def color_tabla(s):
-                    if s.estado == 'Campaña no realizada':
-                        return ['background-color: #000000']*len(s)
-                    if s.estado == 'Pendiente de analizar':
-                        return ['background-color: #CD5C5C']*len(s)
-                    if s.estado == 'Analizado parcialmente':
-                        return ['background-color: #87CEEB']*len(s)                    
-                    if s.estado == 'Analizado completamente':
-                        return ['background-color: #00b300']*len(s)
-                
-                estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa','analisis_finalizado','campaña_realizada']) 
-                estado_procesos_programa = estado_procesos_programa.rename(columns={"año":"Año","fecha_analisis_laboratorio":"Fecha de analisis"})
-                st.dataframe(estado_procesos_programa.style.apply(color_tabla, axis=1),use_container_width=True)  
-                
-                # Construye el gráfico
-                cm              = 1/2.54 # pulgadas a cm
-                fig, ax1 = plt.subplots(figsize=(8*cm, 8*cm))
-                patches, texts= ax1.pie(num_valores, colors=colores_estados,shadow=True, startangle=90,radius=1.2)
-                ax1.axis('equal')  # Para representar el pie-chart como un circulo
-                
-                # Representa y ordena la leyenda
-                etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
-                plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(1.5, 0.5),fontsize=8)                
+            # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
+            num_valores = numpy.zeros(len(nombre_estados),dtype=int)
+            for ivalor in range(len(nombre_estados)):
+                try:
+                    num_valores[ivalor] = estado_procesos_programa.estado.value_counts()[nombre_estados[ivalor]]
+                except:
+                    pass
+            porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),2)
+            
+            # Despliega la información en una tabla
+            def color_tabla(s):
+                if s.estado == 'Campaña no realizada':
+                    return ['background-color: #000000']*len(s)
+                if s.estado == 'Pendiente de analizar':
+                    return ['background-color: #CD5C5C']*len(s)
+                if s.estado == 'Analizado parcialmente':
+                    return ['background-color: #87CEEB']*len(s)                    
+                if s.estado == 'Analizado completamente':
+                    return ['background-color: #00b300']*len(s)
+            
+            estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa','analisis_finalizado','campaña_realizada']) 
+            estado_procesos_programa = estado_procesos_programa.rename(columns={"año":"Año","fecha_analisis_laboratorio":"Fecha de analisis"})
+            st.dataframe(estado_procesos_programa.style.apply(color_tabla, axis=1),use_container_width=True)  
+            
+            # Construye el gráfico
+            cm              = 1/2.54 # pulgadas a cm
+            fig, ax1 = plt.subplots(figsize=(8*cm, 8*cm))
+            patches, texts= ax1.pie(num_valores, colors=colores_estados,shadow=True, startangle=90,radius=1.2)
+            ax1.axis('equal')  # Para representar el pie-chart como un circulo
+            
+            # Representa y ordena la leyenda
+            etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
+            plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(1.5, 0.5),fontsize=8)                
 
-                # Representa el pie-chart con el estado de los procesos
-                buf = BytesIO()
-                fig.savefig(buf, format="png",bbox_inches='tight')
-                st.image(buf)                
-
-
-        
-    # Consulta del estado del procesado    
-    if tipo_entrada == entradas[1]:
-            
-        listado_meses = numpy.arange(2,12,dtype=int)
-        
-        # Recupera la tabla de los programas disponibles como un dataframe
-        conn = init_connection()
-        df_programas       = psql.read_sql('SELECT * FROM programas', conn)
-        df_estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
-        conn.close()
-        
-    
-        # Despliega un formulario para elegir el programa y la fecha a consultar
-        with st.form("Formulario seleccion"):
-            col1, col2 = st.columns(2,gap="small")
-            #nombre_programa, tiempo_consulta = st.columns((1, 1))
-            with col1:
-                tiempo_final_consulta = st.date_input("Selecciona la fecha de finalización del periodo de consulta",datetime.date.today())
-            with col2:
-                num_meses_previos     = st.selectbox("Selecciona el número de meses del periodo de consulta",listado_meses,index=4)
-      
-            texto_error = 'Para visualizar correctamente los resultados se recomienda evitar periodos de consulta elevados.'
-            st.warning(texto_error, icon="⚠️")   
-      
-            # Botón de envío para confirmar selección
-            envio = st.form_submit_button("Enviar")
-            
-            
-        if envio :
-        
-            tiempo_final_consulta  = datetime.date.today()
-            tiempo_inicio_consulta = tiempo_final_consulta + relativedelta(months=-num_meses_previos)
-            
-            fechas_final_mes   = pandas.date_range(tiempo_inicio_consulta,tiempo_final_consulta,freq='m')
-            if tiempo_final_consulta != (fechas_final_mes[-1]).date():
-                fechas_mes_actual  = pandas.date_range(fechas_final_mes[-1],tiempo_final_consulta,periods=2)
-                fechas_comparacion = fechas_final_mes.union(fechas_mes_actual)
-            else:
-                fechas_comparacion  = fechas_final_mes  
-                
-               
-            # Predimensiona contador
-            num_valores = numpy.zeros((len(fechas_comparacion),df_programas.shape[0],len(nombre_estados)),dtype=int)
-            
-            # Bucle para determinar el estado de cada programa, en cada fecha
-            for iprograma in range(df_programas.shape[0]):
-                
-                nombre_programa = df_programas['nombre_programa'].iloc[iprograma]
-        
-                for ifecha in range(len(fechas_comparacion)):
-                    
-                    fecha_consulta = fechas_comparacion[ifecha]
-                    df_estados     = FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,fecha_consulta,nombre_estados,df_estado_procesos)
-                          
-                    for ivalor in range(len(nombre_estados)):
-                        try:
-                            num_valores[ifecha,iprograma,ivalor] = df_estados.Estado.value_counts()[nombre_estados[ivalor]]
-                        except:
-                            pass
-        
-                    
-        
-        
-            # Representa el gráfico
-            fig, ax           = plt.subplots()
-            anchura_barra     = 0.125
-            altura_base       = 1.5
-            etiquetas         = df_programas['abreviatura']
-            id_mes            = numpy.arange(0,len(fechas_comparacion))
-            
-            nombres_meses     =['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-            vector_nombres    = [None]*fechas_comparacion.shape[0]
-            for idato in range(fechas_comparacion.shape[0]):
-                vector_nombres[idato] = nombres_meses[fechas_comparacion[idato].month-1] + ' ' + fechas_comparacion[idato].strftime("%y")
-            
-            # Bucle con cada programa de muestreo
-            valor_maximo_programa = numpy.zeros(df_programas.shape[0])
-            for iprograma in range(df_programas.shape[0]): 
-                
-                # Desplaza la coordenada x de cada programa para representarlo separado de los demás
-                posicion_x_programa    = id_mes + anchura_barra*(iprograma - 2)
-                
-                # Extrae los valores de muestras en cada estado para el programa correspondiente
-                valores_programa   = num_valores[:,iprograma,:]
-                
-                # Busca la posición del fondo de cada barra a partir de los valores de la barra anterior
-                valores_acumulados = numpy.cumsum(valores_programa,axis =1)
-                acumulados_mod     = numpy.c_[ numpy.zeros(valores_acumulados.shape[0]), valores_acumulados]
-                acumulados_mod     = numpy.delete(acumulados_mod, -1, axis = 1)
-            
-                # Determina la posición de las etiquetas y la máxima altura (para luego definir el rango del eje y)
-                etiqueta_altura                   = valores_acumulados[:,-1] + altura_base
-                valor_maximo_programa [iprograma] = max(etiqueta_altura)
-                
-                # Representa la barra correspondiente a cada estado, en los distintos tiempos considerados
-                for igrafico in range(num_valores.shape[2]):
-                    
-                    posicion_fondo = acumulados_mod[:,igrafico]
-                    
-                    plt.bar(posicion_x_programa, num_valores[:,iprograma,igrafico], anchura_barra, bottom = posicion_fondo ,color=colores_estados[igrafico],edgecolor='k')
-            
-                # Añade una etiqueta para identificar al programa
-                etiqueta_nombre   = [etiquetas[iprograma]]*num_valores.shape[0]
-                for ifecha in range(num_valores.shape[0]):
-                    
-                    # Etiqueta con el nombre del programa
-                    angulo_giro = 90
-                    if etiqueta_altura[ifecha] > altura_base:
-                        ax.text(posicion_x_programa[ifecha], etiqueta_altura[ifecha], etiqueta_nombre[ifecha], ha="center", va="bottom",rotation=angulo_giro)
-                    
-                    # Etiqueta con el valor de cada uno de los estados
-                    if valores_programa[ifecha,0] > 0:
-                        ax.text(posicion_x_programa[ifecha], valores_acumulados[ifecha,0] , str(valores_programa[ifecha,0]), ha="center", va="bottom")
-                    if valores_programa[ifecha,1] > 0:
-                        ax.text(posicion_x_programa[ifecha], valores_acumulados[ifecha,1] , str(valores_programa[ifecha,1]), ha="center", va="bottom")
-                    if valores_programa[ifecha,2] > 0:
-                        ax.text(posicion_x_programa[ifecha], valores_acumulados[ifecha,2] , str(valores_programa[ifecha,2]), ha="center", va="bottom")
-                    if valores_programa[ifecha,3] > 0:
-                        ax.text(posicion_x_programa[ifecha], valores_acumulados[ifecha,3] , str(valores_programa[ifecha,3]), ha="center", va="bottom")
-            
-            # Cambia el nombre de los valores del eje X. De nºs enteros al mes correspondiente
-            plt.xticks(id_mes,vector_nombres)
-            
-            # Ajusta límites del gráfico
-            plt.ylim([0, max(valor_maximo_programa)+2])
-                 
-            # Ajusta tamaño 
-            fig.set_size_inches(16.5, 5.5)
-            
-            # Añade leyenda
-            plt.legend(nombre_estados, bbox_to_anchor = (0.85, 1.085), ncol=len(nombre_estados)) # ,loc="upper left"
-            
-            # Añade nombre a los ejes
-            plt.xlabel('Fecha')
-            plt.ylabel('Años de muestreo')
-            
-            # Añade un cuadro de texto explicado las abreviaturas
-            textstr = ''
-            for iprograma in range(df_programas.shape[0]):
-                textstr = textstr + df_programas['abreviatura'][iprograma] + '=' + df_programas['nombre_programa'][iprograma] + '; '
-            ax.text(0.15, 1.125, textstr, transform=ax.transAxes, fontsize=11,
-                    verticalalignment='top', bbox={'edgecolor':'none','facecolor':'white'})
-                   
+            # Representa el pie-chart con el estado de los procesos
             buf = BytesIO()
             fig.savefig(buf, format="png",bbox_inches='tight')
-            st.image(buf)       
-            
-            st.download_button("DESCARGAR GRÁFICO",buf,'GRAFICO.png')
-            
-            
-        
+            st.image(buf)                
+
+
         
 
     
-###############################################################################
-#################### PÁGINA DE PROCESOS EN CURSO ##############################
-###############################################################################    
-    
-def consulta_procesos():
-    
-    # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    entradas     = ['Análisis en curso', 'Análisis realizados en un periodo de tiempo']
-    tipo_entrada = st.sidebar.radio("Indicar la consulta a realizar",entradas)
-    # Consulta procesos actualmente en curso
-    if tipo_entrada == entradas[0]:    
-    
-        st.subheader('Listado de análisis en curso')
-        
-        # Muestra el listado de los análisis en curso 
-        altura_tabla       = 300 # Altura de la tabla con los procesos en curso 
-        estado_procesos(altura_tabla)
-        
-        
-        
-    # Consulta procesos realizados entre dos fechas
-    if tipo_entrada == entradas[1]:  
-        
-        st.subheader('Listado de procesos realizados y en curso durante un periodo de tiempo')
-        
-        fecha_actual         = datetime.date.today()
-        fecha_inicio_defecto = fecha_actual - datetime.timedelta(days=30)
-        
-        altura_tabla       = 300 # Altura de las tablas con información de los procesos
-        
-        # Despliega un formulario para seleccionar las fechas de inicio y final
-        with st.form("Formulario seleccion"):
-                   
-            col1, col2= st.columns(2,gap="small")
-            
-            with col1:
-                fecha_inicio_consulta = st.date_input('Fecha de incio del periodo de consulta',max_value=fecha_actual,value=fecha_inicio_defecto)
-            with col2:
-                fecha_final_consulta = st.date_input('Fecha de finalización del periodo de consulta',max_value=fecha_actual,value=fecha_actual)
-
-            submit = st.form_submit_button("Consultar")
-    
-            if submit == True:
-
-                # Recupera todos los muestreos almacenados 
-                conn = init_connection()
-                df_muestreos = psql.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
-                conn.close()
-                
-                # Renombra las columnas
-                df_muestreos = df_muestreos.rename(columns={'nombre_proceso':'Muestras','nombre_programa':'Programa','año':'Año','num_muestras':'Número muestras','fecha_inicio':'Inicio','fecha_estimada_fin':'Final estimado','fecha_real_fin':'Final real'})
-                
-                # Genera un dataframe con los procesos terminados entre ambas fechas, elimina las columnas que no interesa mostrar, define una columna índice y ajusta el formato de las fechas
-                df_muestreos_terminados = df_muestreos.loc[(df_muestreos['Final real'] >= fecha_inicio_consulta) & (df_muestreos['Final real'] <= fecha_final_consulta)]
-                df_muestreos_terminados = df_muestreos_terminados.drop(columns=['id_proceso','programa','io_estado'])
-                
-                indices_dataframe                 = numpy.arange(0,df_muestreos_terminados.shape[0],1,dtype=int)
-                df_muestreos_terminados['indice'] = indices_dataframe
-                df_muestreos_terminados.set_index('indice',drop=True,append=False,inplace=True)
-                
-                for idato in range(df_muestreos_terminados.shape[0]):
-                    df_muestreos_terminados['Inicio'][idato]         =  df_muestreos_terminados['Inicio'][idato].strftime("%Y-%m-%d")
-                    df_muestreos_terminados['Final estimado'][idato] =  df_muestreos_terminados['Final estimado'][idato].strftime("%Y-%m-%d")    
-                    df_muestreos_terminados['Final real'][idato]     =  df_muestreos_terminados['Final real'][idato].strftime("%Y-%m-%d")    
-                                
-            
-                # Genera un dataframe con los procesos en curso, elimina las columnas que no interesa mostrar, define una columna índice y ajusta el formato de las fechas
-                if fecha_final_consulta == fecha_actual:
-                    df_muestreos_curso = df_muestreos[df_muestreos['io_estado']==1]
-                
-                else: 
-                    df_muestreos_curso = df_muestreos.loc[(df_muestreos['Final real'] >= fecha_final_consulta) & (df_muestreos['Inicio'] >= fecha_inicio_consulta)]
-
-                df_muestreos_curso = df_muestreos_curso.drop(columns=['id_proceso','programa','io_estado'])
-                
-                indices_dataframe            = numpy.arange(0,df_muestreos_curso.shape[0],1,dtype=int)
-                df_muestreos_curso['indice'] = indices_dataframe
-                df_muestreos_curso.set_index('indice',drop=True,append=False,inplace=True)
-                
-                for idato in range(df_muestreos_curso.shape[0]):
-                    df_muestreos_curso['Inicio'][idato]         =  df_muestreos_curso['Inicio'][idato].strftime("%Y-%m-%d")
-                    df_muestreos_curso['Final estimado'][idato] =  df_muestreos_curso['Final estimado'][idato].strftime("%Y-%m-%d")
-                                  
-                # Muestra sendos dataframes
-                
-                st.subheader('Listado de procesos en curso')
-                if df_muestreos_curso.shape[0] > 0:
-                        
-                    # Muestra una tabla con los análisis en curso
-                    st.dataframe(df_muestreos_terminados,height=150,use_container_width=True)
-                else:
-                    
-                    texto_error = 'No hay ninguna muestra en proceso durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
-                    st.warning(texto_error, icon="⚠️") 
-
-                st.subheader('Listado de procesos terminados')
-
-                if df_muestreos_terminados.shape[0] > 0:
-                        
-                    # Muestra una tabla con los análisis en curso
-                    st.dataframe(df_muestreos_terminados,height=300,use_container_width=True)
-                    # altura_tabla = 300
-                    # gb = st_aggrid.grid_options_builder.GridOptionsBuilder.from_dataframe(df_muestreos_terminados)
-                    # gridOptions = gb.build()
-                    # st_aggrid.AgGrid(df_muestreos_terminados,gridOptions=gridOptions,height = altura_tabla,enable_enterprise_modules=True,allow_unsafe_jscode=True)    
-            
-                else:
-                    
-                    texto_error = 'No se terminó ningún análisis durante el periodo de tiempo consultado (' + fecha_inicio_consulta.strftime("%Y/%m/%d") + '-' + fecha_final_consulta.strftime("%Y/%m/%d") + ')'
-                    st.warning(texto_error, icon="⚠️")  
-                
-                    
-
-        
- 
-
-
-
-
-
 ###############################################################################
 ################# PÁGINA DE ENTRADA DE SALIDAS A MAR ##########################
 ###############################################################################    

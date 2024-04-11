@@ -41,13 +41,12 @@ if FUNCIONES_AUXILIARES.log_in() is True:
         if st.session_state["usuario"] == 'COAC - Laboratorio Química':
         
             paginas = {"INICIO": PAGINAS.principal,
-                        "PROCESOS EN CURSO": PAGINAS.actualiza_procesos, 
                         "CONSULTA DATOS":PAGINAS.consulta_datos,
                         "REFERENCIAS NUTRIENTES":PAGINAS.referencias_nutrientes,                        
                         "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes,
                         "ENTRADA DATOS DE LABORATORIO":PAGINAS.entrada_datos_laboratorio,  
                         "ENTRADA DATOS TOC/TN":PAGINAS.entrada_toc,                         
-                        "ENTRADA DATOS":PAGINAS.entrada_datos_excel
+                        "ENTRADA DATOS GENERALES":PAGINAS.entrada_datos_excel
                         }
 
             
@@ -55,7 +54,6 @@ if FUNCIONES_AUXILIARES.log_in() is True:
      
             paginas = {"INICIO": PAGINAS.principal,
                      "CONSULTA PROGRAMA ANALIZADOS": PAGINAS.consulta_estado, 
-                     "CONSULTA PROCESOS EN CURSO": PAGINAS.consulta_procesos,
                      "CONSULTA DATOS":PAGINAS.consulta_datos
                       }           
             
