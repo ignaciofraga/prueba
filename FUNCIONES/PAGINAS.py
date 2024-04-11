@@ -156,13 +156,13 @@ def consulta_estado():
                     if estado_procesos_programa['campaña_realizada'].iloc[idato] is False:
                         estado_procesos_programa['estado'].iloc[idato] = 0
                     else:
-                        if estado_procesos_programa['analisis_finalizado'].iloc[idato] == 'True':
+                        if estado_procesos_programa['analisis_finalizado'].iloc[idato] is True:
                             estado_procesos_programa['estado'].iloc[idato] = 3
-                        else:
-                            if estado_procesos_programa['fecha_analisis_laboratorio'].iloc[idato] is None:
-                                estado_procesos_programa['estado'].iloc[idato] = 2
-                            else:
-                                estado_procesos_programa['estado'].iloc[idato] = 1
+                        # else:
+                        #     if estado_procesos_programa['fecha_analisis_laboratorio'].iloc[idato] is None:
+                        #         estado_procesos_programa['estado'].iloc[idato] = 2
+                        #     else:
+                        #         estado_procesos_programa['estado'].iloc[idato] = 1
                 
             
                 # Despliega la información en una tabla
