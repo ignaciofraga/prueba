@@ -152,10 +152,10 @@ def consulta_estado():
                         estado_procesos_programa['estado'].iloc[idato] = 'Campaña no realizada'
                     else:
                         if estado_procesos_programa['analisis_finalizado'].iloc[idato] == True:
-                            estado_procesos_programa['estado'].iloc[idato] = 'Terminado'
+                            estado_procesos_programa['estado'].iloc[idato] = 'Analizado completamente'
                         else:
                             if estado_procesos_programa['fecha_analisis_laboratorio'].iloc[idato] is None:
-                                estado_procesos_programa['estado'].iloc[idato] = 'No disponible'
+                                estado_procesos_programa['estado'].iloc[idato] = 'Pendiente de analizar'
                             else:
                                 estado_procesos_programa['estado'].iloc[idato] = 'Analizado parcialmente'
                                 
@@ -173,11 +173,11 @@ def consulta_estado():
                 def color_tabla(s):
                     if s.estado == 'Campaña no realizada':
                         return ['background-color: #000000']*len(s)
-                    if s.estado == 'No disponible':
+                    if s.estado == 'Pendiente de analizar':
                         return ['background-color: #CD5C5C']*len(s)
                     if s.estado == 'Analizado parcialmente':
                         return ['background-color: #87CEEB']*len(s)                    
-                    if s.estado == 'Terminado':
+                    if s.estado == 'Analizado completamente':
                         return ['background-color: #00b300']*len(s)
                 
                 estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa','analisis_finalizado','campaña_realizada']) 
