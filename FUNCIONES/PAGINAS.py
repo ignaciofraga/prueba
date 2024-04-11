@@ -181,6 +181,7 @@ def consulta_estado():
                         return ['background-color: #00b300']*len(s)
                 
                 estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa','analisis_finalizado','campaña_realizada']) 
+                estado_procesos_programa = estado_procesos_programa.rename(columns={"año":"Año","fecha_analisis_laboratorio":"Fecha de analisis","estado":"Estado"})
                 st.dataframe(estado_procesos_programa.style.apply(color_tabla, axis=1),use_container_width=True)  
                 
                 # Construye el gráfico

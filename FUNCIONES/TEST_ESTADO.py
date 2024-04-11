@@ -74,8 +74,8 @@ direccion_host = '193.146.155.99'
 # 6	"OTROS"
 
 
-id_programa = 3
-nombre_programa = 'RADIAL CORUÑA'
+id_programa = 2
+nombre_programa = 'RADIAL VIGO'
 
 con_engine          = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
 conn_psql           = create_engine(con_engine)
