@@ -140,17 +140,14 @@ def consulta_estado():
             
             else:
                 
-                estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa']) 
-                        
                 estado_procesos_programa = estado_procesos_programa.sort_values('año')
                 
                 # Determina el estado en cada caso 0-campaña no realizada 1-pendiente de analisis 2-analisis parcial 3-terminado
                 nombre_estados  = ['Campaña no realizada','No disponible','Analizado parcialmente','Terminado']
                 colores_estados = ['#000000','#CD5C5C','#F4A460','#87CEEB'] 
-                
-
-                
+                          
                 estado_procesos_programa['estado'] = None
+                estado_procesos_programa['nombre_estado'] = None
                 for idato in range(estado_procesos_programa.shape[0]):
                     if estado_procesos_programa['campaña_realizada'].iloc[idato] == False:
                         estado_procesos_programa['estado'].iloc[idato] = 0
@@ -162,23 +159,14 @@ def consulta_estado():
                                 estado_procesos_programa['estado'].iloc[idato] = 2
                             else:
                                 estado_procesos_programa['estado'].iloc[idato] = 1
+                                
+                    estado_procesos_programa['nombre_estado'] = nombre_estados[estado_procesos_programa['estado'].iloc[idato]]
                 
-                st.dataframe(estado_procesos_programa)
-                st.text(estado_procesos_programa['analisis_finalizado'].iloc[0])
             
-                # Despliega la información en una tabla
-                def color_tabla(s):
-                    if s.estado == 0:
-                        return ['background-color: #000000']*len(s)
-                    if s.estado == 1:
-                        return ['background-color: #CD5C5C']*len(s)
-                    if s.estado == 2:
-                        return ['background-color: #87CEEB']*len(s)                    
-                    if s.estado == 3:
-                        return ['background-color: #00b300']*len(s)                    
+                    
 
     
-                st.dataframe(estado_procesos_programa.style.apply(color_tabla, axis=1),use_container_width=True)    
+                  
                 
                     
                 # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
@@ -189,6 +177,19 @@ def consulta_estado():
                     except:
                         pass
                 porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),0)
+                
+                # Despliega la información en una tabla
+                def color_tabla(s):
+                    if s.estado == 0:
+                        return ['background-color: #000000']*len(s)
+                    if s.estado == 1:
+                        return ['background-color: #CD5C5C']*len(s)
+                    if s.estado == 2:
+                        return ['background-color: #87CEEB']*len(s)                    
+                    if s.estado == 3:
+                        return ['background-color: #00b300']*len(s)
+                estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa','analisis_finalizado','campaña_realizada','estado']) 
+                st.dataframe(estado_procesos_programa.style.apply(color_tabla, axis=1),use_container_width=True)  
                 
                 # Construye el gráfico
                 cm              = 1/2.54 # pulgadas a cm
