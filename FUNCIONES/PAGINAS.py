@@ -143,7 +143,7 @@ def consulta_estado():
                 estado_procesos_programa = estado_procesos_programa.sort_values('año')
                 
                 # Determina el estado en cada caso 0-campaña no realizada 1-pendiente de analisis 2-analisis parcial 3-terminado
-                nombre_estados  = ['Campaña no realizada','No disponible','Analizado parcialmente','Terminado']
+                nombre_estados  = ['Campaña no realizada','Pendiente de analizar','Analizado parcialmente','Analizado completamente']
                 colores_estados = ['#000000','#CD5C5C','#F4A460','#87CEEB'] 
                           
                 estado_procesos_programa['estado'] = None
@@ -164,7 +164,7 @@ def consulta_estado():
                 num_valores = numpy.zeros(len(nombre_estados),dtype=int)
                 for ivalor in range(len(nombre_estados)):
                     try:
-                        num_valores[ivalor] = estado_procesos_programa.estado.value_counts()[ivalor]
+                        num_valores[ivalor] = estado_procesos_programa.estado.value_counts()[nombre_estados[ivalor]]
                     except:
                         pass
                 porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),0)
