@@ -144,7 +144,7 @@ def consulta_estado():
                 
                 # Determina el estado en cada caso 0-campaña no realizada 1-pendiente de analisis 2-analisis parcial 3-terminado
                 nombre_estados  = ['Campaña no realizada','Pendiente de analizar','Analizado parcialmente','Analizado completamente']
-                colores_estados = ['#000000','#CD5C5C','#F4A460','#87CEEB'] 
+                colores_estados = ['#000000','#CD5C5C','#87CEEB','#00b300'] 
                           
                 estado_procesos_programa['estado'] = None
                 for idato in range(estado_procesos_programa.shape[0]):
@@ -167,7 +167,7 @@ def consulta_estado():
                         num_valores[ivalor] = estado_procesos_programa.estado.value_counts()[nombre_estados[ivalor]]
                     except:
                         pass
-                porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),0)
+                porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),2)
                 
                 # Despliega la información en una tabla
                 def color_tabla(s):
