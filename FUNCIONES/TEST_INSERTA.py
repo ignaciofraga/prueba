@@ -25,7 +25,7 @@ direccion_host = '193.146.155.99'
 
 # Parámetros
 programa_muestreo = 'RADIAL VIGO'
-tipo_salida       = 'MENSUAL'
+tipo_salida       = 'SEMANAL'
 
 
 con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
@@ -40,17 +40,27 @@ conn.dispose()
 
 # Rutas de los archivos a importar  
 #archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx' 
-archivo_datos                ='C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIAL VIGO/Radial_Vigo_2020_final_formateado.xlsx'
+archivo_datos                ='C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIAL VIGO/BTL_RADVIGO_2023.xlsx'
 
 # Importa el .xlsx
 df_datos_importacion = pandas.read_excel(archivo_datos,index_col=None)
 df_datos_importacion['temperatura_ctd_qf'] = 2
 df_datos_importacion['salinidad_ctd_qf'] = 2
 
-df_datos_importacion['nitrito_qf'] = 2
-df_datos_importacion['fosfato_qf'] = 2
-df_datos_importacion['nitrato_qf'] = 2
-df_datos_importacion['silicato_qf'] = 2
+# df_datos_importacion['nitrito_qf'] = 2
+# df_datos_importacion['fosfato_qf'] = 2
+# df_datos_importacion['nitrato_qf'] = 2
+# df_datos_importacion['silicato_qf'] = 2
+
+for idato in range(df_datos_importacion.shape[0]):
+    if df_datos_importacion['estacion'].iloc[idato] == 'E3':
+        df_datos_importacion['estacion'].iloc[idato] = 'E3VI'
+    if df_datos_importacion['estacion'].iloc[idato] == 'EF':
+        df_datos_importacion['estacion'].iloc[idato] = 'EFVI'
+    if df_datos_importacion['estacion'].iloc[idato] == 'B1':
+        df_datos_importacion['estacion'].iloc[idato] = 'EB1VI'
+    # if df_datos_importacion['estacion'].iloc == 'B1':
+    #     df_datos_importacion['estacion'].iloc == 'EB1VI'
 
 # Realiza un control de calidad primario a los datos importados   
 datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
@@ -69,19 +79,19 @@ datos_estadillo = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_prog
 # Encuentra las salidas al mar correspondientes 
 datos_estadillo = FUNCIONES_PROCESADO.evalua_salidas(datos_estadillo,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
 
-# import time
-# t_init = time.time()
+# # import time
+# # t_init = time.time()
  
 # Encuentra el identificador asociado a cada registro
 print('Asignando el registro correspondiente a cada medida')
 datos_estadillo = FUNCIONES_PROCESADO.evalua_registros(datos_estadillo,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
    
-# t_end = time.time()
+# # t_end = time.time()
 
-# # dt1 = t_end - t_init
+# # # dt1 = t_end - t_init
 
 # # Introduce los datos en la base de datos
-# print('Introduciendo los datos en la base de datos')
+print('Introduciendo los datos en la base de datos')
 texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_estadillo,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
 
 
