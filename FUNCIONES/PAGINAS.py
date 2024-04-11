@@ -148,6 +148,8 @@ def consulta_estado():
                 nombre_estados  = ['Campaña no realizada','No disponible','Analizado parcialmente','Terminado']
                 colores_estados = ['#000000','#CD5C5C','#F4A460','#87CEEB'] 
                 
+                st.dataframe(estado_procesos_programa)
+                
                 estado_procesos_programa['estado'] = None
                 for idato in range(estado_procesos_programa.shape[0]):
                     if estado_procesos_programa['campaña_realizada'].iloc[idato] is False:
