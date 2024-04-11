@@ -174,17 +174,31 @@ def lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,cont
     except:
         pass
   
-  
- 
+    # Modifica el nombre de la estación para igualarlo al criterio utilizado en la base de datos
+    for idato in range(datos_radiales.shape[0]):
+        # Define las profundidades de referencia en cada estación
+        if str(datos_radiales['estacion'].iloc[idato]) == '2': #Estación 2
+            datos_radiales['estacion'].iloc[idato] = 'E2CO'
+        if str(datos_radiales['estacion'][idato]) == '4': #Estación 2        
+            datos_radiales['estacion'].iloc[idato] = 'E4CO' 
+        if str(datos_radiales['estacion'][idato]).upper()  == '3C': #Estación 2        
+            datos_radiales['estacion'].iloc[idato] = 'E3CCO'     
+        if str(datos_radiales['estacion'][idato]).upper() == '3B': #Estación 2        
+            datos_radiales['estacion'].iloc[idato] = 'E3BCO'  
+        if str(datos_radiales['estacion'][idato]).upper() == '3A': #Estación 2        
+            datos_radiales['estacion'].iloc[idato] = 'E3ACO' 
+        if str(datos_radiales['estacion'][idato]) == '3': #Estación 2        
+            datos_radiales['estacion'].iloc[idato] = 'E3CO' 
+    
     # Añade una columna con la profundidad de referencia
     datos_radiales['prof_teorica'] = numpy.zeros(datos_radiales.shape[0],dtype=int)
     for idato in range(datos_radiales.shape[0]):
         # Define las profundidades de referencia en cada estación
-        if str(datos_radiales['estacion'][idato]) == '2': #Estación 2
+        if str(datos_radiales['estacion'][idato]) == 'E2CO': #Estación 2
             profundidades_referencia = numpy.asarray([0,5,10,20,30,40,70])
-        if str(datos_radiales['estacion'][idato]) == '4': #Estación 2        
+        if str(datos_radiales['estacion'][idato]) == 'E4CO': #Estación 4        
             profundidades_referencia = numpy.asarray([0,4,8,12,18]) 
-        if str(datos_radiales['estacion'][idato]) == '3c': #Estación 2        
+        if str(datos_radiales['estacion'][idato]) == 'E3CCO': #Estación 3c        
              profundidades_referencia = numpy.asarray([0,5,10,20,30,35,40]) 
              
         # Encuentra la profundidad de referencia más cercana a cada dato
@@ -594,39 +608,39 @@ def lectura_datos_radcan(nombre_archivo):
     
     # Cambia el nombre de las estaciones
     for idato in range(datos_radcan.shape[0]):
-        if datos_radcan['estacion'].iloc[idato] == 'C1':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'C1':
             datos_radcan['estacion'].iloc[idato]  = 'E1CU'
-        if datos_radcan['estacion'].iloc[idato] == 'C2':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'C2':
             datos_radcan['estacion'].iloc[idato]  = 'E2CU'        
-        if datos_radcan['estacion'].iloc[idato] == 'C3':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'C3':
             datos_radcan['estacion'].iloc[idato]  = 'E3CU'    
             
-        if datos_radcan['estacion'].iloc[idato] == 'G1':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'G1':
             datos_radcan['estacion'].iloc[idato]  = 'E1GI'
-        if datos_radcan['estacion'].iloc[idato] == 'G2':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'G2':
             datos_radcan['estacion'].iloc[idato]  = 'E2GI'        
-        if datos_radcan['estacion'].iloc[idato] == 'G3':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'G3':
             datos_radcan['estacion'].iloc[idato]  = 'E3GI'  
-        if datos_radcan['estacion'].iloc[idato] == 'G4':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'G4':
             datos_radcan['estacion'].iloc[idato]  = 'E4GI'   
 
-        if datos_radcan['estacion'].iloc[idato] == 'S1':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'S1':
             datos_radcan['estacion'].iloc[idato]  = 'E1SA'
-        if datos_radcan['estacion'].iloc[idato] == 'S2':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'S2':
             datos_radcan['estacion'].iloc[idato]  = 'E2SA'        
-        if datos_radcan['estacion'].iloc[idato] == 'S3':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'S3':
             datos_radcan['estacion'].iloc[idato]  = 'E3SA'  
-        if datos_radcan['estacion'].iloc[idato] == 'S4':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'S4':
             datos_radcan['estacion'].iloc[idato]  = 'E4SA'
-        if datos_radcan['estacion'].iloc[idato] == 'S5':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'S5':
             datos_radcan['estacion'].iloc[idato]  = 'E5SA'
-        if datos_radcan['estacion'].iloc[idato] == 'S6':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'S6':
             datos_radcan['estacion'].iloc[idato]  = 'E6SA'        
-        if datos_radcan['estacion'].iloc[idato] == 'S7':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'S7':
             datos_radcan['estacion'].iloc[idato]  = 'E7SA'  
-        if datos_radcan['estacion'].iloc[idato] == 'S8':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'S8':
             datos_radcan['estacion'].iloc[idato]  = 'E8SA'            
-        if datos_radcan['estacion'].iloc[idato] == 'S9':
+        if datos_radcan['estacion'].iloc[idato].upper() == 'S9':
             datos_radcan['estacion'].iloc[idato]  = 'E9SA'  
     return datos_radcan
 

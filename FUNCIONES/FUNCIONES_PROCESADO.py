@@ -180,11 +180,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             id_ultima_estacion_bd = 0
             
         iconta_nueva_estacion     = 1
-        
-        import streamlit as st
-        st.dataframe(estaciones_muestreadas)
-        st.dataframe(estaciones_programa)
-        
+                
         # Encuentra el identificador asociado a cada estacion en la base de datos
         for iestacion in range(estaciones_muestreadas.shape[0]):
             

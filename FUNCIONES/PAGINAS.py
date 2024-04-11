@@ -102,10 +102,6 @@ def consulta_estado():
     entradas     = ['Estado del procesado de programas', 'Evolución en el procesado de programas']
     tipo_entrada = st.sidebar.radio("Indicar la consulta a realizar",entradas)
 
-    # Vector con nombre de los procesos y colores asociados
-    nombre_estados  = ['No disponible','Pendiente de análisis','Analizado','Control de calidad secundario']
-    colores_estados = ['#CD5C5C','#F4A460','#87CEEB','#66CDAA','#2E8B57']  
-
     # Consulta del estado del procesado    
     if tipo_entrada == entradas[0]:
     
@@ -116,12 +112,8 @@ def consulta_estado():
         
         # Despliega un formulario para elegir el programa y la fecha a consultar
         with st.form("Formulario seleccion"):
-            col1, col2 = st.columns(2,gap="small")
-            with col1:
-                nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
-            with col2:
-                fecha_consulta = st.date_input("Selecciona fecha de consulta",datetime.date.today())
-        
+            nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
+
             # Botón de envío para confirmar selección
             submit = st.form_submit_button("Enviar")
         
@@ -147,30 +139,49 @@ def consulta_estado():
                 st.warning('No se dispone de información acerca del estado del programa de muestreo seleccionado', icon="⚠️")
             
             else:
+                
+                estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa']) 
                         
-                df_estados = FUNCIONES_AUXILIARES.comprueba_estado(nombre_programa,fecha_consulta,nombre_estados,temporal_estado_procesos)
-                        
-                df_estados = df_estados.sort_values('Año')
+                estado_procesos_programa = estado_procesos_programa.sort_values('año')
+                
+                # Determina el estado en cada caso 0-campaña no realizada 1-pendiente de analisis 2-analisis parcial 3-terminado
+                nombre_estados  = ['Campaña no realizada','No disponible','Analizado parcialmente','Terminado']
+                colores_estados = ['#000000','#CD5C5C','#F4A460','#87CEEB'] 
+                
+                estado_procesos_programa['estado'] = None
+                for idato in range(estado_procesos_programa.shape[0]):
+                    if estado_procesos_programa['campaña_realizada'].iloc[idato] is False:
+                        estado_procesos_programa['estado'].iloc[idato] = 0
+                    else:
+                        if estado_procesos_programa['analisis_finalizado'].iloc[idato] is True:
+                            estado_procesos_programa['estado'].iloc[idato] = 3
+                        else:
+                            if estado_procesos_programa['fecha_analisis_laboratorio'].iloc[idato] is None:
+                                estado_procesos_programa['estado'].iloc[idato] = 2
+                            else:
+                                estado_procesos_programa['estado'].iloc[idato] = 1
+                
             
                 # Despliega la información en una tabla
                 def color_tabla(s):
-                    if s.Estado == 'No disponible':
+                    if s.estado == 0:
+                        return ['background-color: #000000']*len(s)
+                    if s.estado == 1:
                         return ['background-color: #CD5C5C']*len(s)
-                    elif s.Estado == 'Pendiente de análisis':
-                        return ['background-color:#F4A460']*len(s)
-                    elif s.Estado == 'Analizado':
-                        return ['background-color:#87CEEB']*len(s)
-                    elif s.Estado == 'Control de calidad secundario':                    
-                        return ['background-color:#66CDAA']*len(s)
+                    if s.estado == 2:
+                        return ['background-color: #87CEEB']*len(s)                    
+                    if s.estado == 3:
+                        return ['background-color: #00b300']*len(s)                    
+
     
-                st.dataframe(df_estados.style.apply(color_tabla, axis=1),use_container_width=True)    
+                st.dataframe(estado_procesos_programa.style.apply(color_tabla, axis=1),use_container_width=True)    
                 
                     
                 # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
                 num_valores = numpy.zeros(len(nombre_estados),dtype=int)
                 for ivalor in range(len(nombre_estados)):
                     try:
-                        num_valores[ivalor] = df_estados.Estado.value_counts()[nombre_estados[ivalor]]
+                        num_valores[ivalor] = estado_procesos_programa.estado.value_counts()[ivalor]
                     except:
                         pass
                 porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),0)
@@ -343,186 +354,7 @@ def consulta_estado():
             
             
         
- 
         
-        
-        
-        
-        
-###############################################################################
-############## PÁGINA PARA INTRODUCIR LAS MUESTRAS EN PROCESO #################
-###############################################################################    
-    
-def actualiza_procesos():
-
-    # Despliega un botón lateral para seleccionar el tipo de información a introducir       
-    entradas     = ['Añadir Run en proceso', 'Run terminado','Campaña terminada']
-    tipo_entrada = st.sidebar.radio("Indicar la información a introducir",entradas)
-
-    fecha_actual = datetime.date.today()
-
-    if tipo_entrada == entradas[0]:
-
-        st.header('Añadir muestras en proceso')
-        
-        # Busca el año actual para limitar la fecha de entrada 
-        anho_actual = fecha_actual.year
-    
-        # Recupera la tabla de los programas disponibles como un dataframe
-        conn = init_connection()
-        df_programas = psql.read_sql('SELECT * FROM programas', conn)
-        conn.close()
-       
-        # Despliega un formulario para introducir los datos de las muestras que se están analizando
-        with st.form("Formulario seleccion"):
-        
-            nombre_muestras = st.text_input('Nombre del run', value="")
-            
-            col1, col2, col3= st.columns(3,gap="small")
-            with col1:
-                num_muestras = st.number_input('Número de muestras:',format='%i',value=round(1),min_value=1)
-                num_muestras = round(num_muestras)
-            with col2:
-                nombre_programa  = st.selectbox('Selecciona el programa',(df_programas['nombre_programa']))
-                # Recupera el identificador del programa seleccionado
-                id_programa_elegido = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
-    
-            with col3:
-                anho_consulta = st.number_input('Año:',format='%i',value=anho_actual,max_value=anho_actual)
-        
-            col1, col2= st.columns(2,gap="small")
-            with col1:
-                fecha_inicio       = st.date_input('Fecha de inicio',value=fecha_actual)
-            with col2:
-                fecha_estimada_fin = st.date_input('Fecha estimada de finalizacion',min_value=fecha_actual,value=fecha_actual)
-
-            observaciones_muestras = st.text_input('Observaciones', value="")
-        
-            # Botón de envío para confirmar selección
-            submit = st.form_submit_button("Enviar")
-    
-            if submit == True:
-                
-                conn = init_connection()
-                cursor = conn.cursor()           
-                instruccion_sql = "INSERT INTO procesado_actual_nutrientes (nombre_proceso,programa,nombre_programa,año,num_muestras,fecha_inicio,fecha_estimada_fin,fecha_real_fin,observaciones,io_estado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_proceso) DO UPDATE SET (programa,año,nombre_programa,num_muestras,fecha_inicio,fecha_estimada_fin,fecha_real_fin,observaciones,io_estado) = (EXCLUDED.programa,EXCLUDED.año,EXCLUDED.nombre_programa,EXCLUDED.num_muestras,EXCLUDED.fecha_inicio,EXCLUDED.fecha_estimada_fin,EXCLUDED.fecha_real_fin,EXCLUDED.observaciones,EXCLUDED.io_estado);"   
-                cursor.execute(instruccion_sql, (nombre_muestras,id_programa_elegido,nombre_programa,anho_consulta,num_muestras,fecha_inicio,fecha_estimada_fin,None,observaciones_muestras,1)) 
-                conn.commit() 
-                cursor.close()
-                conn.close()  
-                
-                texto_exito = 'Muestras ' + nombre_muestras + ' añadidas a la cola de procesado'
-                st.success(texto_exito)
-
-
-    if tipo_entrada == entradas[1]:
-        
-        st.subheader('Listado de análisis en curso')
-        
-        # Muestra el listado de los análisis en curso 
-        altura_tabla       = 200 # Altura de la tabla con los procesos en curso 
-        
-        df_muestreos_curso = estado_procesos(altura_tabla)
-
-        if df_muestreos_curso.shape[0] > 0:
-
-            # Despliega una selección del análisis a marcar como finalizado
-            with st.form("Formulario seleccion"):
-                       
-                nombre_muestra_terminada  = st.selectbox('Selecciona el análisis terminado',(df_muestreos_curso['Muestras']))
-    
-                submit = st.form_submit_button("Enviar")
-    
-                if submit == True:
-                    
-                    fecha_actual = datetime.date.today()
-                    
-                    conn = init_connection()
-                    cursor = conn.cursor() 
-                    instruccion_sql = "UPDATE procesado_actual_nutrientes SET io_estado = %s,fecha_real_fin = %s WHERE nombre_proceso = %s;"
-                    cursor.execute(instruccion_sql, (int(0),fecha_actual,nombre_muestra_terminada))                
-                    conn.commit() 
-                    cursor.close()
-                    conn.close()  
-                    
-                    texto_exito = 'Estado de las muestras ' + nombre_muestra_terminada + ' actualizado correctamente'
-                    st.success(texto_exito)
-                    
-                    st.experimental_rerun()
-
-
-    if tipo_entrada == entradas[2]:
-
-        st.header('Campaña/proyecto terminado')
-        
-        # Busca el año actual para limitar la fecha de entrada 
-        anho_actual = fecha_actual.year
-    
-        # Recupera la tabla de los programas disponibles como un dataframe
-        conn = init_connection()
-        df_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
-        conn.close()
-        
-        # Listado tareas
-        procesos = ['Análisis de muestras en laboratorio','Post-Procesado y control de calidad']
-        
-        # Despliega un formulario para seleccionar el proyecto o campaña terminado
-        with st.form("Formulario seleccion"):
-                   
-           
-            col1, col2= st.columns(2,gap="small")
-            
-            with col1:
-                
-                listado_programas        = df_procesos['nombre_programa'].unique()
-                programa_seleccionado    = st.selectbox('Programa ',(listado_programas))
-                
-                df_programa_seleccionado = df_procesos[df_procesos['nombre_programa']==programa_seleccionado]
-                df_programa_seleccionado = df_programa_seleccionado.sort_values('año')
-                                   
-            with col2:               
-                anho_procesado            = st.selectbox('Año ',(df_programa_seleccionado['año']))
-                id_proceso                = df_programa_seleccionado['id_proceso'][df_programa_seleccionado['año']==anho_procesado]
- 
-            tipo_proceso              = st.selectbox('Tipo de proceso terminado ',(procesos))
-            id_tipo_proceso           = procesos.index(tipo_proceso)
-        
-            col1, col2= st.columns(2,gap="small")
-            
-            with col1:        
-        
-                fecha_actualiza  = st.date_input('Fecha de finalización ',max_value=fecha_actual,value=fecha_actual)
-
-            with col2:        
-        
-                correo_contacto  = st.text_input('Correo de contacto del responsable ', value="")
-        
-                if id_tipo_proceso == 0:
-                    campo_fecha    = 'fecha_analisis_laboratorio'
-                    campo_contacto = 'contacto_analisis_laboratorio'
-                else:
-                    campo_fecha    = 'fecha_post_procesado'                    
-                    campo_contacto = 'contacto_analisis_laboratorio'
-                    
-                submit = st.form_submit_button("Enviar")
-    
-                if submit == True:
-                    
-                    fecha_actual = datetime.date.today()
-                    
-                    conn = init_connection()
-                    cursor = conn.cursor() 
-                    instruccion_sql = "UPDATE estado_procesos SET " + campo_fecha + " = %s," + campo_contacto + " = %s WHERE id_proceso = %s;"
-                    cursor.execute(instruccion_sql, (fecha_actualiza,correo_contacto,int(id_proceso)))                
-                    conn.commit() 
-                    cursor.close()
-                    conn.close()  
-                    
-                    texto_exito = 'Estado del procesado de ' + programa_seleccionado + ' ' + str(anho_procesado) + ' actualizado correctamente'
-                    st.success(texto_exito)
-                    
-                    st.experimental_rerun()
-
 
     
 ###############################################################################
@@ -1686,8 +1518,12 @@ def procesado_nutrientes():
             if iq_elegido == 'No evaluado':
                 iq_asignado = 1
             
-            io_add_data                 = st.checkbox('Añadir datos procesados a la base de datos',value=True)
-                            
+            col1, col2 = st.columns(2,gap="small")
+            with col1:
+                io_add_data                 = st.checkbox('Añadir datos procesados a la base de datos',value=True)
+            with col2:
+                io_dato_completo            = st.checkbox('Datos correspondientes al total de la campaña',value=True)            
+                
             io_envio                    = st.form_submit_button("Procesar el archivo subido")        
         
         if archivo_AA is not None and io_envio is True:
@@ -1799,6 +1635,11 @@ def procesado_nutrientes():
                     with st.spinner('Insertando datos en la base de datos'):
                         texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_exporta,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
                     st.success(texto_insercion)
+                    
+                    # Actualiza el estado de los procesos
+                    fecha_actualizacion = datetime.date.today()
+                    FUNCIONES_AUXILIARES.actualiza_estado(indice_programa,programa_seleccionado,anho_seleccionado,fecha_actualizacion,io_dato_completo,direccion_host,base_datos,usuario,contrasena,puerto)
+                    st.success('Estado del procesado actualizado correctamente')
 
                 # Añade nombre de la estacion
                 df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
