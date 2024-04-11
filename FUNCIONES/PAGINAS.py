@@ -155,9 +155,9 @@ def consulta_estado():
                             estado_procesos_programa['estado'].iloc[idato] = 'Terminado'
                         else:
                             if estado_procesos_programa['fecha_analisis_laboratorio'].iloc[idato] is None:
-                                estado_procesos_programa['estado'].iloc[idato] = 'Analizado parcialmente'
-                            else:
                                 estado_procesos_programa['estado'].iloc[idato] = 'No disponible'
+                            else:
+                                estado_procesos_programa['estado'].iloc[idato] = 'Analizado parcialmente'
                                 
                     
                 # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
