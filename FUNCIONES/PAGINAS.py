@@ -147,27 +147,18 @@ def consulta_estado():
                 colores_estados = ['#000000','#CD5C5C','#F4A460','#87CEEB'] 
                           
                 estado_procesos_programa['estado'] = None
-                estado_procesos_programa['nombre_estado'] = None
                 for idato in range(estado_procesos_programa.shape[0]):
                     if estado_procesos_programa['campaña_realizada'].iloc[idato] == False:
-                        estado_procesos_programa['estado'].iloc[idato] = 0
+                        estado_procesos_programa['estado'].iloc[idato] = 'Campaña no realizada'
                     else:
                         if estado_procesos_programa['analisis_finalizado'].iloc[idato] == True:
-                            estado_procesos_programa['estado'].iloc[idato] = 3
+                            estado_procesos_programa['estado'].iloc[idato] = 'Terminado'
                         else:
                             if estado_procesos_programa['fecha_analisis_laboratorio'].iloc[idato] is None:
-                                estado_procesos_programa['estado'].iloc[idato] = 2
+                                estado_procesos_programa['estado'].iloc[idato] = 'Analizado parcialmente'
                             else:
-                                estado_procesos_programa['estado'].iloc[idato] = 1
+                                estado_procesos_programa['estado'].iloc[idato] = 'No disponible'
                                 
-                    estado_procesos_programa['nombre_estado'] = nombre_estados[estado_procesos_programa['estado'].iloc[idato]]
-                
-            
-                    
-
-    
-                  
-                
                     
                 # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
                 num_valores = numpy.zeros(len(nombre_estados),dtype=int)
@@ -180,16 +171,16 @@ def consulta_estado():
                 
                 # Despliega la información en una tabla
                 def color_tabla(s):
-                    if s.estado == 0:
+                    if s.estado == 'Campaña no realizada':
                         return ['background-color: #000000']*len(s)
-                    if s.estado == 1:
+                    if s.estado == 'No disponible':
                         return ['background-color: #CD5C5C']*len(s)
-                    if s.estado == 2:
+                    if s.estado == 'Analizado parcialmente':
                         return ['background-color: #87CEEB']*len(s)                    
-                    if s.estado == 3:
+                    if s.estado == 'Terminado':
                         return ['background-color: #00b300']*len(s)
                 
-                estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa','analisis_finalizado','campaña_realizada','estado']) 
+                estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa','analisis_finalizado','campaña_realizada']) 
                 st.dataframe(estado_procesos_programa.style.apply(color_tabla, axis=1),use_container_width=True)  
                 
                 # Construye el gráfico
