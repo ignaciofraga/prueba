@@ -149,6 +149,7 @@ def consulta_estado():
                 colores_estados = ['#000000','#CD5C5C','#F4A460','#87CEEB'] 
                 
                 st.dataframe(estado_procesos_programa)
+                st.text(estado_procesos_programa['analisis_finalizado'].iloc[0])
                 
                 estado_procesos_programa['estado'] = None
                 for idato in range(estado_procesos_programa.shape[0]):
