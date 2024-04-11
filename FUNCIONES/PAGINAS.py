@@ -152,16 +152,16 @@ def consulta_estado():
                 
                 estado_procesos_programa['estado'] = None
                 for idato in range(estado_procesos_programa.shape[0]):
-                    if estado_procesos_programa['campaña_realizada'].iloc[idato] is False:
+                    if estado_procesos_programa['campaña_realizada'].iloc[idato] == False:
                         estado_procesos_programa['estado'].iloc[idato] = 0
                     else:
                         if estado_procesos_programa['analisis_finalizado'].iloc[idato] == True:
                             estado_procesos_programa['estado'].iloc[idato] = 3
-                        # else:
-                        #     if estado_procesos_programa['fecha_analisis_laboratorio'].iloc[idato] is None:
-                        #         estado_procesos_programa['estado'].iloc[idato] = 2
-                        #     else:
-                        #         estado_procesos_programa['estado'].iloc[idato] = 1
+                        else:
+                            if estado_procesos_programa['fecha_analisis_laboratorio'].iloc[idato] is None:
+                                estado_procesos_programa['estado'].iloc[idato] = 2
+                            else:
+                                estado_procesos_programa['estado'].iloc[idato] = 1
                 
                 st.dataframe(estado_procesos_programa)
                 st.text(estado_procesos_programa['analisis_finalizado'].iloc[0])
