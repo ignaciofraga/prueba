@@ -1661,9 +1661,7 @@ def entrada_datos_excel():
     if archivo_datos is not None and io_envio is True:
         
         df_datos_importacion  = pandas.read_excel(archivo_datos) 
-        
-        st.dataframe(df_datos_importacion)
-        
+                
         # Identifica las variables que contiene el archivo
         df_variables = tabla_variables[tabla_variables['tipo']=='variable_muestreo']
         
