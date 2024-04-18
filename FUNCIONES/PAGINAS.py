@@ -1274,9 +1274,7 @@ def procesado_nutrientes():
 
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_alto)]
             ref_inicial       = datos_referencias['Peak Number'].iloc[0] + 2
-            st.dataframe(datos_referencias)
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
-            st.dataframe(datos_referencias)
             ref_final         = datos_referencias['Peak Number'].iloc[1] - 2
             
             # Encuentra la salinidad de cada muestra
@@ -1663,6 +1661,8 @@ def entrada_datos_excel():
     if archivo_datos is not None and io_envio is True:
         
         df_datos_importacion  = pandas.read_excel(archivo_datos) 
+        
+        st.dataframe(df_datos_importacion)
         
         # Identifica las variables que contiene el archivo
         df_variables = tabla_variables[tabla_variables['tipo']=='variable_muestreo']
