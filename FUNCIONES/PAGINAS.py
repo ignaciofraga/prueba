@@ -1676,8 +1676,11 @@ def entrada_datos_excel():
         if 'fecha_muestreo' in variables_archivo:
             df_datos_importacion['fecha_muestreo'] =  pandas.to_datetime(df_datos_importacion['fecha_muestreo'], format='%d%m%Y').dt.date
         if 'hora_muestreo' in variables_archivo:
-            df_datos_importacion['hora_muestreo']  =  pandas.to_datetime(df_datos_importacion['hora_muestreo'], format='%H:%M').dt.time
-
+            try:
+                df_datos_importacion['hora_muestreo']  =  pandas.to_datetime(df_datos_importacion['hora_muestreo'], format='%H:%M').dt.time
+            except:
+                df_datos_importacion['hora_muestreo']  =  pandas.to_datetime(df_datos_importacion['hora_muestreo'], format='%H:%M:%S').dt.time
+                
         # Cambia el nombre del identificador 
         try:
             df_datos_importacion = df_datos_importacion.rename(columns={"ID": "id_externo"})
