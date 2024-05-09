@@ -1269,20 +1269,10 @@ def procesado_nutrientes():
             # spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
             # listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
 
-            st.dataframe(datos_AA)
-
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_alto)]
             ref_inicial       = datos_referencias['Peak Number'].iloc[0] + 2
-            
-            st.dataframe(datos_referencias)
-            
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
             ref_final         = datos_referencias['Peak Number'].iloc[1] - 2
-            
-            st.text(ref_inicial)
-            st.text(ref_final)
-            
-            st.dataframe(datos_referencias)
             
             # Encuentra la salinidad de cada muestra
             datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
@@ -1291,13 +1281,8 @@ def procesado_nutrientes():
                 
                 if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
      
-                    
-                    st.text(datos_AA['Sample ID'].iloc[idato])
-        
                     id_temp = df_datos_disponibles['muestreo'][df_datos_disponibles['id_externo']==datos_AA['Sample ID'].iloc[idato]]
-        
-                    st.dataframe(id_temp)            
-        
+                
                     if len(id_temp) > 0:
                         datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
                         datos_AA['io_procesado'].iloc[idato]  = 1
