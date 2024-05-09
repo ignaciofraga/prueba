@@ -1285,8 +1285,13 @@ def procesado_nutrientes():
             for idato in range(ref_inicial,ref_final):
                 if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
      
+                    
+                    st.text(datos_AA['Sample ID'].iloc[idato])
+        
                     id_temp = df_datos_disponibles['muestreo'][df_datos_disponibles['id_externo']==datos_AA['Sample ID'].iloc[idato]]
-                        
+        
+                    st.dataframe(id_temp)            
+        
                     if len(id_temp) > 0:
                         datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
                         datos_AA['io_procesado'].iloc[idato]  = 1
