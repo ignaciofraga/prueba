@@ -1272,7 +1272,7 @@ def procesado_nutrientes():
             # spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
             # listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
 
-
+            st.dataframe(datos_AA)
 
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_alto)]
             ref_inicial       = datos_referencias['Peak Number'].iloc[0] + 2
