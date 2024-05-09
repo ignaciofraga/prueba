@@ -1276,6 +1276,9 @@ def procesado_nutrientes():
 
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_alto)]
             ref_inicial       = datos_referencias['Peak Number'].iloc[0] + 2
+            
+            st.dataframe(datos_referencias)
+            
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
             ref_final         = datos_referencias['Peak Number'].iloc[1] - 2
             
