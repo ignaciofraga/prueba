@@ -1283,6 +1283,10 @@ def procesado_nutrientes():
             datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
             datos_AA['io_procesado']  = None
             for idato in range(ref_inicial,ref_final):
+                
+                st.text(datos_AA['Cup Type'].iloc[idato])
+                st.text(datos_AA['Sample ID'].iloc[idato])
+                
                 if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
      
                     
