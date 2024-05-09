@@ -1210,11 +1210,8 @@ def procesado_nutrientes():
             salidas_seleccionadas = df_prog_sel[df_prog_sel['año']==anho_seleccionado]
             listado_salidas       = salidas_seleccionadas['salida_mar']
     
-
         df_muestreos_salidas_seleccionadas = df_muestreos[df_muestreos['salida_mar'].isin(listado_salidas)]
         df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos_salidas_seleccionadas, on="muestreo") 
-                
-        st.dataframe(df_muestreos_salidas_seleccionadas)
         
         with st.form("Formulario", clear_on_submit=False):
               
