@@ -24,8 +24,8 @@ puerto         = '5432'
 direccion_host = '193.146.155.99'
 
 # Parámetros
-programa_muestreo = 'PELACUS'
-tipo_salida       = 'ANUAL'
+programa_muestreo = 'RADIAL VIGO'
+tipo_salida       = 'SEMANAL'
 
 
 con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
@@ -40,46 +40,12 @@ conn.dispose()
 
 # Rutas de los archivos a importar  
 #archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx' 
-archivo_datos                ='C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2023_formato.xlsx'
+archivo_datos                ='C:/Users/ifraga/Downloads/BTL_RADVIGO_2023.xlsx'
 
 # Importa el .xlsx
 df_datos_importacion = pandas.read_excel(archivo_datos,index_col=None)
-df_datos_importacion['temperatura_ctd_qf'] = 2
-df_datos_importacion['salinidad_ctd_qf'] = 2
 
-df_datos_importacion['nitrito_qf'] = 2
-df_datos_importacion['fosfato_qf'] = 2
-df_datos_importacion['nitrogeno_inorganico_total_qf'] = 2
-df_datos_importacion['silicato_qf'] = 2
-
-# for idato in range(df_datos_importacion.shape[0]):
-#     if df_datos_importacion['estacion'].iloc[idato] == 'G1':
-#         df_datos_importacion['estacion'].iloc[idato] = 'E1GI'
-#     if df_datos_importacion['estacion'].iloc[idato] == 'G2':
-#         df_datos_importacion['estacion'].iloc[idato] = 'E2GI'
-#     if df_datos_importacion['estacion'].iloc[idato] == 'G3':
-#         df_datos_importacion['estacion'].iloc[idato] = 'E3GI'
-#     if df_datos_importacion['estacion'].iloc[idato] == 'G4':
-#         df_datos_importacion['estacion'].iloc[idato] = 'E4GI'
-#     if df_datos_importacion['estacion'].iloc[idato] == 'G4':
-#         df_datos_importacion['estacion'].iloc[idato] = 'E4GI'
-#     if df_datos_importacion['estacion'].iloc[idato] == 'S7':
-#         df_datos_importacion['estacion'].iloc[idato] = 'E7SA'
-#     if df_datos_importacion['estacion'].iloc[idato] == 'C1':
-#         df_datos_importacion['estacion'].iloc[idato] = 'E1CU'
-#     if df_datos_importacion['estacion'].iloc[idato] == 'C2':
-#         df_datos_importacion['estacion'].iloc[idato] = 'E2CU'
-#     if df_datos_importacion['estacion'].iloc[idato] == 'C3':
-#         df_datos_importacion['estacion'].iloc[idato] = 'E3CU'
-#     if df_datos_importacion['estacion'].iloc[idato].upper() == 'S2':
-#         df_datos_importacion['estacion'].iloc[idato] = 'E2SA'
-#     if df_datos_importacion['estacion'].iloc[idato] == 'S4':
-#         df_datos_importacion['estacion'].iloc[idato] = 'E4SA'
-#     if df_datos_importacion['estacion'].iloc[idato] == 'S6':
-#         df_datos_importacion['estacion'].iloc[idato] = 'E6SA'
-#     if df_datos_importacion['estacion'].iloc[idato] == 'S9':
-#         df_datos_importacion['estacion'].iloc[idato] = 'E9SA'        
-        
+            
 # Realiza un control de calidad primario a los datos importados   
 datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
 

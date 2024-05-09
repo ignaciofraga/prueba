@@ -23,9 +23,9 @@ puerto         = '5432'
 direccion_host = '193.146.155.99'
 
 # Parámetros
-anho_consulta = 2020
-programa_seleccionado = 'RADIAL CORUÑA'
-tipo_salida           = 'MENSUAL'
+anho_consulta = 2023
+programa_seleccionado = 'RADIAL VIGO'
+tipo_salida           = 'SEMANAL'
 ###### PROCESADO ########
 
 
