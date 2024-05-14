@@ -494,7 +494,7 @@ def actualiza_estado(id_programa,nombre_programa,anho_datos,fecha_actualizacion,
     # En caso contrario, actualiza
     else:
         instruccion_actualiza = 'UPDATE estado_procesos SET fecha_analisis_laboratorio =%s WHERE programa = %s AND año = %s;'
-        cursor.execute(instruccion_actualiza, (fecha_actualizacion,id_programa,anho_datos))
+        cursor.execute(instruccion_actualiza, (fecha_actualizacion,int(id_programa),int(anho_datos)))
         conn.commit()
     
         instruccion_actualiza = 'UPDATE estado_procesos SET analisis_finalizado =%s WHERE programa = %s AND año = %s;'
