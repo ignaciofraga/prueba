@@ -480,12 +480,7 @@ def actualiza_estado(id_programa,nombre_programa,anho_datos,fecha_actualizacion,
 
     # Comprueba si hay un estado para el año considerado
     df_anual            = df_estados[df_estados['año']==int(anho_datos)]
-    
-    st.dataframe(df_anual)
-    st.text(fecha_actualizacion)
-    st.text(id_programa)
-    st.text(anho_datos)
-    
+        
     # Si no lo hay añade línea a la matriz de estados
     if df_anual.shape[0] == 0:
         instruccion_actualiza = 'INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_analisis_laboratorio,analisis_finalizado,campaña_realizada) VALUES (%s,%s,%s,%s,%s,%s) ;' 
