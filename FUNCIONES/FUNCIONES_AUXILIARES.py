@@ -489,7 +489,7 @@ def actualiza_estado(id_programa,nombre_programa,anho_datos,fecha_actualizacion,
     # Si no lo hay añade línea a la matriz de estados
     if df_anual.shape[0] == 0:
         instruccion_actualiza = 'INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_analisis_laboratorio,analisis_finalizado,campaña_realizada) VALUES (%s,%s,%s,%s,%s,%s) ;' 
-        cursor.execute(instruccion_actualiza, (id_programa,nombre_programa,anho_datos,fecha_actualizacion,io_terminado,True))
+        cursor.execute(instruccion_actualiza, (int(id_programa),nombre_programa,int(anho_datos),fecha_actualizacion,io_terminado,True))
         conn.commit()
     # En caso contrario, actualiza
     else:
@@ -498,7 +498,7 @@ def actualiza_estado(id_programa,nombre_programa,anho_datos,fecha_actualizacion,
         conn.commit()
     
         instruccion_actualiza = 'UPDATE estado_procesos SET analisis_finalizado =%s WHERE programa = %s AND año = %s;'
-        cursor.execute(instruccion_actualiza, (io_terminado,id_programa,anho_datos))
+        cursor.execute(instruccion_actualiza, (io_terminado,int(id_programa),int(anho_datos)))
         conn.commit()
 
     cursor.close()
