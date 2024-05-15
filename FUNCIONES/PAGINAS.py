@@ -1683,7 +1683,25 @@ def entrada_datos_excel():
         except:
             texto_aviso = "Los datos importados no contienen identificador."
             st.warning(texto_aviso, icon="⚠️")
+            
+            
+        # Cambia los nombres de latitud/longitud 
+        if 'latitud' in variables_archivo:
+            df_datos_importacion = df_datos_importacion.rename(columns={"latitud": "latitud_muestreo"})
+        else:
+            if 'latitud_muestreo' not in variables_archivo:
+                texto_aviso = "Los datos importados no contienen latitud. Se asignará la correspondiente a la estación."
+                st.warning(texto_aviso, icon="⚠️")
 
+        if 'longitud' in variables_archivo:
+            df_datos_importacion = df_datos_importacion.rename(columns={"longitud": "longitud_muestreo"})
+        else:
+            if 'longitud_muestreo' not in variables_archivo:
+                texto_aviso = "Los datos importados no contienen longitud. Se asignará la correspondiente a la estación."
+                st.warning(texto_aviso, icon="⚠️")
+            
+            
+            
         # Si los datos incluyen informacion del tubo de nutrientes, cambiar el nombre a texto 
         if 'tubo_nutrientes' in variables_discretas:
             for idato in range(df_datos_importacion.shape[0]):

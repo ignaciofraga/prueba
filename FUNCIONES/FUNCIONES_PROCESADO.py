@@ -567,7 +567,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     
     datos['muestreo']  = numpy.zeros(datos.shape[0],dtype=int)
     
-    # si no hay ningun valor en la tabla de registro, meter directamente todos los datos registrados
+    # si no hay ningun valor en la tabla de registros, meter directamente todos los datos registrados
     if tabla_muestreos.shape[0] == 0:
             
         # Busca qué variables están incluidas en los datos a importar
@@ -614,11 +614,12 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     # En caso contrario hay que ver registro a registro, si ya está incluido en la base de datos
     else:
     
+        # Busca cuál es el último registro
         ultimo_registro_bd         = max(tabla_muestreos['muestreo'])
         datos['io_nuevo_muestreo'] = numpy.ones(datos.shape[0],dtype=int)
 
-        if 'botella' not in listado_variables_datos:
-            df_datos_salidas.presion_ctd = df_datos_salidas.presion_ctd.round()
+        # Crea una nueva variable, con las presiones redondeadas a enteros. Así cuando se busquen registros se evitan problemas por distinto número de decimales en la profundidad
+        df_datos_salidas['presion_ctd_comparacion'] = df_datos_salidas['presion_ctd'].apply(lambda x: round(x, 0))
 
         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
         cursor = conn.cursor()
@@ -649,7 +650,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                              
                 else:
 
-                    df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['presion_ctd']== round(datos['presion_ctd'].iloc[idato]))]
+                    df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['presion_ctd_comparacion']== round(datos['presion_ctd'].iloc[idato]))]
                 
             # Bucle para insertar identificadores de muestreos (vial nutrientes/TOC)
             if df_temp.shape[0]> 0:
@@ -679,7 +680,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         cursor.close()
         conn.close()
            
-        
+        # Elimina la columna con el redondeo de profundidades
+        df_datos_salidas = df_datos_salidas.drop(columns=['presion_ctd_comparacion'])
+
         if numpy.count_nonzero(datos['io_nuevo_muestreo']) > 0:
         
             # Genera un dataframe sólo con los valores nuevos, a incluir (io_nuevo_muestreo = 1)
