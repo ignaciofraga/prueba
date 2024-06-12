@@ -956,8 +956,6 @@ def entrada_archivos_roseta():
                 posicion_final     = nombre_archivo_btl.find('.')
                 nombre_estacion    = nombre_archivo_btl[posicion_inicio:posicion_final].upper() + 'CO' 
                 
-                st.text(nombre_estacion)
-                st.dataframe(tabla_estaciones_programa)
                 id_estacion        = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
                               
                 texto_estado = 'Procesando la información de la estación ' + nombre_estacion
@@ -1012,7 +1010,7 @@ def entrada_archivos_roseta():
                 
                 # encuentra el nombre de la estación
                 nombre_archivo_cnv = archivo_cnv.name
-                posicion_inicio    = nombre_archivo_cnv.find('e') + 1
+                posicion_inicio    = nombre_archivo_cnv.find('e')
                 posicion_final     = nombre_archivo_cnv.find('.')
                 nombre_estacion    = nombre_archivo_cnv[posicion_inicio:posicion_final].upper() + 'CO' 
                 id_estacion        = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
