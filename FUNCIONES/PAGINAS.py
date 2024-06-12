@@ -957,6 +957,7 @@ def entrada_archivos_roseta():
                 nombre_estacion    = nombre_archivo_btl[posicion_inicio:posicion_final].upper() + 'CO' 
                 
                 st.text(nombre_estacion)
+                st.dataframe(tabla_estaciones_programa)
                 id_estacion        = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
                               
                 texto_estado = 'Procesando la información de la estación ' + nombre_estacion
