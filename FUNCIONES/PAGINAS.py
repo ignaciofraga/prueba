@@ -952,7 +952,7 @@ def entrada_archivos_roseta():
                             
                 # encuentra el nombre de la estación
                 nombre_archivo_btl = archivo_btl.name
-                posicion_inicio    = nombre_archivo_btl.find('e') + 1
+                posicion_inicio    = nombre_archivo_btl.find('e') 
                 posicion_final     = nombre_archivo_btl.find('.')
                 nombre_estacion    = nombre_archivo_btl[posicion_inicio:posicion_final].upper() + 'CO' 
                 
