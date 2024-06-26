@@ -5,7 +5,6 @@ Created on Wed Sep 21 08:05:55 2022
 @author: ifraga
 """
 import streamlit as st
-import pandas.io.sql as psql
 import datetime
 import pandas 
 import matplotlib.pyplot as plt
