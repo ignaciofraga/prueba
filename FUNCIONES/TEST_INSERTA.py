@@ -24,8 +24,8 @@ puerto         = '5432'
 direccion_host = '193.146.155.99'
 
 # Parámetros
-programa_muestreo = 'RADIAL VIGO'
-tipo_salida       = 'SEMANAL'
+programa_muestreo = 'RADIAL CANTABRICO'
+tipo_salida       = 'MENSUAL'
 
 
 con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
@@ -41,7 +41,7 @@ conn.dispose()
 # Rutas de los archivos a importar  
 #archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx' 
 archivo_datos                ='C:/Users/ifraga/Downloads/BTL_RADVIGO_2023.xlsx'
-
+archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIAL CANTABRICO/2017/Radcan_costeras_2017enviados_formato.xlsx'
 # Importa el .xlsx
 df_datos_importacion = pandas.read_excel(archivo_datos,index_col=None)
 
@@ -63,8 +63,8 @@ datos_estadillo = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_prog
 # Encuentra las salidas al mar correspondientes 
 datos_estadillo = FUNCIONES_PROCESADO.evalua_salidas(datos_estadillo,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
 
-# # # # # # import time
-# # # # # # t_init = time.time()
+# # # # # # # import time
+# # # # # # # t_init = time.time()
  
 # Encuentra el identificador asociado a cada registro
 print('Asignando el registro correspondiente a cada medida')
