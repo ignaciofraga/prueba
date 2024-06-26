@@ -99,7 +99,7 @@ def consulta_estado():
     
     # Recupera la tabla de los programas disponibles como un dataframe
     conn = init_connection()
-    df_programas = psql.read_sql('SELECT * FROM programas', conn)
+    df_programas = pandas.read_sql('SELECT * FROM programas', conn)
     conn.close()
     
     # Despliega un formulario para elegir el programa y la fecha a consultar
@@ -119,7 +119,7 @@ def consulta_estado():
         
         # Recupera la tabla del estado de los procesos como un dataframe
         conn = init_connection()
-        temporal_estado_procesos = psql.read_sql('SELECT * FROM estado_procesos', conn)
+        temporal_estado_procesos = pandas.read_sql('SELECT * FROM estado_procesos', conn)
         conn.close()
         
         # Extrae los datos disponibles del programa consultado 
@@ -205,13 +205,13 @@ def entrada_salidas_mar():
     @st.cache_data(ttl=300,show_spinner="Cargando información de la base de datos")
     def carga_datos_salidas_mar():
         conn                      = init_connection()
-        df_buques            = psql.read_sql('SELECT * FROM buques', conn)
-        df_config_perfilador = psql.read_sql('SELECT * FROM configuracion_perfilador', conn)
-        df_config_superficie = psql.read_sql('SELECT * FROM configuracion_superficie', conn)
-        df_personal          = psql.read_sql('SELECT * FROM personal_salidas', conn)
-        df_salidas           = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        df_estaciones        = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_programas         = psql.read_sql('SELECT * FROM programas', conn)
+        df_buques            = pandas.read_sql('SELECT * FROM buques', conn)
+        df_config_perfilador = pandas.read_sql('SELECT * FROM configuracion_perfilador', conn)
+        df_config_superficie = pandas.read_sql('SELECT * FROM configuracion_superficie', conn)
+        df_personal          = pandas.read_sql('SELECT * FROM personal_salidas', conn)
+        df_salidas           = pandas.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_estaciones        = pandas.read_sql('SELECT * FROM estaciones', conn)
+        df_programas         = pandas.read_sql('SELECT * FROM programas', conn)
         
         conn.close()
         return df_buques,df_config_perfilador,df_config_superficie,df_personal,df_salidas,df_estaciones,df_programas
@@ -564,10 +564,10 @@ def entrada_condiciones_ambientales():
     @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
     def carga_datos_condiciones_ambientales():
         conn                      = init_connection()
-        df_salidas      = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        df_programas    = psql.read_sql('SELECT * FROM programas', conn)
-        df_estaciones   = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_condiciones  = psql.read_sql('SELECT * FROM condiciones_ambientales_muestreos', conn)
+        df_salidas      = pandas.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_programas    = pandas.read_sql('SELECT * FROM programas', conn)
+        df_estaciones   = pandas.read_sql('SELECT * FROM estaciones', conn)
+        df_condiciones  = pandas.read_sql('SELECT * FROM condiciones_ambientales_muestreos', conn)
         conn.close()
         return df_salidas,df_programas,df_estaciones,df_condiciones
     
@@ -855,15 +855,15 @@ def entrada_archivos_roseta():
     @st.cache_data(ttl=600,show_spinner='Recuperando información de la base de datos')
     def carga_datos_entrada_archivo_roseta():
         conn                      = init_connection()
-        df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-        df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_datos_discretos        = psql.read_sql('SELECT * FROM datos_discretos', conn)
-        df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        df_programas              = psql.read_sql('SELECT * FROM programas', conn)
-        df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
-        tabla_variables           = psql.read_sql('SELECT * FROM variables_procesado', conn)
-        tabla_datos_perfiles      = psql.read_sql('SELECT * FROM datos_perfiles', conn)
-        tabla_muestreo_perfiles   = psql.read_sql('SELECT * FROM perfiles_verticales', conn)
+        df_muestreos              = pandas.read_sql('SELECT * FROM muestreos_discretos', conn)
+        df_estaciones             = pandas.read_sql('SELECT * FROM estaciones', conn)
+        df_datos_discretos        = pandas.read_sql('SELECT * FROM datos_discretos', conn)
+        df_salidas                = pandas.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_programas              = pandas.read_sql('SELECT * FROM programas', conn)
+        df_indices_calidad        = pandas.read_sql('SELECT * FROM indices_calidad', conn)
+        tabla_variables           = pandas.read_sql('SELECT * FROM variables_procesado', conn)
+        tabla_datos_perfiles      = pandas.read_sql('SELECT * FROM datos_perfiles', conn)
+        tabla_muestreo_perfiles   = pandas.read_sql('SELECT * FROM perfiles_verticales', conn)
         conn.close()
         return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles
         
@@ -977,8 +977,8 @@ def entrada_archivos_roseta():
                     
                         # Vuelve a cargar los datos disponibles
                         conn                      = init_connection()
-                        df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-                        df_datos_discretos        = psql.read_sql('SELECT * FROM datos_discretos', conn)
+                        df_muestreos              = pandas.read_sql('SELECT * FROM muestreos_discretos', conn)
+                        df_datos_discretos        = pandas.read_sql('SELECT * FROM datos_discretos', conn)
                         conn.close() 
                         
                       
@@ -1027,7 +1027,7 @@ def entrada_archivos_roseta():
                     if df_botellas is not None:     
                         
                         conn                      = init_connection()
-                        tabla_datos_discretos = psql.read_sql('SELECT * FROM datos_discretos', conn)
+                        tabla_datos_discretos = pandas.read_sql('SELECT * FROM datos_discretos', conn)
                         conn.close()
                         
                         df_botellas = FUNCIONES_PROCESADO.evalua_registros(df_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
@@ -1139,15 +1139,15 @@ def procesado_nutrientes():
     @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
     def carga_datos_procesado_nutrientes():
         conn                      = init_connection()
-        df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-        df_estaciones             = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_datos_discretos        = psql.read_sql('SELECT * FROM datos_discretos', conn)
-        df_salidas                = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        df_programas              = psql.read_sql('SELECT * FROM programas', conn)
-        df_indices_calidad        = psql.read_sql('SELECT * FROM indices_calidad', conn)
-        df_rmns_bajos             = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
-        df_rmns_altos             = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
-        df_variables              = psql.read_sql('SELECT * FROM variables_procesado', conn)
+        df_muestreos              = pandas.read_sql('SELECT * FROM muestreos_discretos', conn)
+        df_estaciones             = pandas.read_sql('SELECT * FROM estaciones', conn)
+        df_datos_discretos        = pandas.read_sql('SELECT * FROM datos_discretos', conn)
+        df_salidas                = pandas.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_programas              = pandas.read_sql('SELECT * FROM programas', conn)
+        df_indices_calidad        = pandas.read_sql('SELECT * FROM indices_calidad', conn)
+        df_rmns_bajos             = pandas.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
+        df_rmns_altos             = pandas.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
+        df_variables              = pandas.read_sql('SELECT * FROM variables_procesado', conn)
         conn.close()
         return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos,df_variables
         
@@ -1489,12 +1489,12 @@ def entrada_datos_laboratorio():
     @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
     def carga_datos_entrada_laboratorio():
         conn                    = init_connection()
-        df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-        df_datos_discretos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
-        df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
-        df_programas            = psql.read_sql('SELECT * FROM programas', conn)
-        df_indices_calidad      = psql.read_sql('SELECT * FROM indices_calidad', conn)
+        df_muestreos            = pandas.read_sql('SELECT * FROM muestreos_discretos', conn)
+        df_datos_discretos      = pandas.read_sql('SELECT * FROM datos_discretos', conn)
+        df_salidas              = pandas.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_estaciones           = pandas.read_sql('SELECT * FROM estaciones', conn)
+        df_programas            = pandas.read_sql('SELECT * FROM programas', conn)
+        df_indices_calidad      = pandas.read_sql('SELECT * FROM indices_calidad', conn)
         conn.close()
         return df_muestreos,df_datos_discretos,df_salidas,df_estaciones,df_programas,df_indices_calidad
         
@@ -1589,12 +1589,12 @@ def entrada_datos_excel():
     @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
     def carga_datos_entrada_datos():
         conn             = init_connection()
-        df_programas     = psql.read_sql('SELECT * FROM programas', conn)
-        tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-        tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
-        tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn)
-        tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-        tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
+        df_programas     = pandas.read_sql('SELECT * FROM programas', conn)
+        tabla_muestreos  = pandas.read_sql('SELECT * FROM muestreos_discretos', conn)
+        tabla_estaciones = pandas.read_sql('SELECT * FROM estaciones', conn)
+        tabla_variables  = pandas.read_sql('SELECT * FROM variables_procesado', conn)
+        tabla_salidas    = pandas.read_sql('SELECT * FROM salidas_muestreos', conn)
+        tabla_datos      = pandas.read_sql('SELECT * FROM datos_discretos', conn)
         conn.close()   
         
         return df_programas,tabla_muestreos,tabla_estaciones,tabla_variables,tabla_salidas,tabla_muestreos,tabla_datos
@@ -1844,8 +1844,8 @@ def referencias_nutrientes():
     # Recupera la tabla con los RMNs utilizados 
     con_engine = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
     conn_psql  = create_engine(con_engine)
-    tabla_rmns_altos = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn_psql)
-    tabla_rmns_bajos = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn_psql)
+    tabla_rmns_altos = pandas.read_sql('SELECT * FROM rmn_alto_nutrientes', conn_psql)
+    tabla_rmns_bajos = pandas.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn_psql)
     conn_psql.dispose()                
 
     st.markdown('RMNs incluidos en la base de datos')
@@ -1886,12 +1886,12 @@ def entrada_toc():
         @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
         def carga_datos_entrada_datos():
             conn             = init_connection()
-            df_programas     = psql.read_sql('SELECT * FROM programas', conn)
-            tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-            tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
-            tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn)
-            tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-            tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
+            df_programas     = pandas.read_sql('SELECT * FROM programas', conn)
+            tabla_muestreos  = pandas.read_sql('SELECT * FROM muestreos_discretos', conn)
+            tabla_estaciones = pandas.read_sql('SELECT * FROM estaciones', conn)
+            tabla_variables  = pandas.read_sql('SELECT * FROM variables_procesado', conn)
+            tabla_salidas    = pandas.read_sql('SELECT * FROM salidas_muestreos', conn)
+            tabla_datos      = pandas.read_sql('SELECT * FROM datos_discretos', conn)
             conn.close()   
             
             return df_programas,tabla_muestreos,tabla_estaciones,tabla_variables,tabla_salidas,tabla_muestreos,tabla_datos
@@ -1982,7 +1982,7 @@ def entrada_toc():
 
     
         conn                  = init_connection()
-        tabla_parametros_toc  = psql.read_sql('SELECT * FROM parametros_analisis_toc', conn)
+        tabla_parametros_toc  = pandas.read_sql('SELECT * FROM parametros_analisis_toc', conn)
         conn.close()   
                 
         tabla_parametros_toc = tabla_parametros_toc.sort_values('fecha_analisis')

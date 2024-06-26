@@ -531,19 +531,47 @@ def consulta_botellas():
     listado_programas       = df_programas['nombre_programa'].tolist()
     id_radiales             = listado_programas.index('RADIAL CORUÑA')
     
+    # # Despliega menús de selección del programa, tipo de salida, año y fecha               
+    # col1, col2, col3= st.columns(3,gap="small")
+ 
+    # with col1: 
+    #     programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
+    #     id_programa_seleccionado  = int(df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0])
+    #     df_salidas_seleccion      = df_salidas[df_salidas['programa']==id_programa_seleccionado]
+        
+    
+    # with col2:
+    #     tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
+    #     df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+    
+    #     indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+    #     df_salidas_seleccion['id_temp'] = indices_dataframe
+    #     df_salidas_seleccion.set_index('id_temp',drop=True,append=False,inplace=True)
+        
+    #     # Define los años con salidas asociadas
+    #     df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
+    #     for idato in range(df_salidas_seleccion.shape[0]):
+    #         df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+    #     df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
+        
+    #     listado_anhos              = df_salidas_seleccion['año'].unique()
+    
+    # with col3:
+    #     anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
+    #     df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+
+    # # A partir del programa y año elegido, selecciona uno o varios muestreos   
+    # listado_salidas                 = st.multiselect('Muestreo',(df_salidas_seleccion['nombre_salida']))   
+
+
     # Despliega menús de selección del programa, tipo de salida, año y fecha               
-    col1, col2, col3= st.columns(3,gap="small")
+    col1, col2 = st.columns(2,gap="small")
  
     with col1: 
         programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
         id_programa_seleccionado  = int(df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0])
         df_salidas_seleccion      = df_salidas[df_salidas['programa']==id_programa_seleccionado]
-        
-    
-    with col2:
-        tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
-        df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
-    
+           
         indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
         df_salidas_seleccion['id_temp'] = indices_dataframe
         df_salidas_seleccion.set_index('id_temp',drop=True,append=False,inplace=True)
@@ -556,12 +584,12 @@ def consulta_botellas():
         
         listado_anhos              = df_salidas_seleccion['año'].unique()
     
-    with col3:
+    with col2:
         anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
         df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
 
-    # A partir del programa y año elegido, selecciona uno o varios muestreos   
-    listado_salidas                 = st.multiselect('Muestreo',(df_salidas_seleccion['nombre_salida']))   
+    listado_salidas = list(df_salidas_seleccion['nombre_salida'])
+
     
     ### SELECCION DE VARIABLES
     with st.form("Formulario seleccion"): 
@@ -707,7 +735,6 @@ def consulta_botellas():
 
                                          
     listado_sin_qf = [ x for x in listado_variables if "_qf" not in x ]
-    listado_qf     = [ x for x in listado_variables if "_qf" in x ]
     
     with st.expander("Formatos de salida",expanded=True):
    
