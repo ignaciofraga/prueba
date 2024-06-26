@@ -9,6 +9,7 @@ import numpy
 import pandas
 import datetime
 import psycopg2
+import pandas.io.sql as psql
 from sqlalchemy import create_engine
 import re
 import math

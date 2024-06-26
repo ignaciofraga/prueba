@@ -7,7 +7,7 @@ Created on Mon Sep 19 13:09:09 2022
 
 import streamlit as st
 import psycopg2
-#import pandas.io.sql as psql
+import pandas.io.sql as psql
 import numpy
 from io import BytesIO
 import pandas
@@ -39,7 +39,7 @@ def log_in():
     if 'usuario' not in st.session_state:
         # Recupera las contraseñas y usuarios de la base de datos
         conn        = init_connection()
-        df_usuarios = pandas.read_sql('SELECT * FROM usuarios_app', conn)
+        df_usuarios = psql.read_sql('SELECT * FROM usuarios_app', conn)
         conn.close()   
         
         listado_usuarios    = df_usuarios['nombre_usuario']
@@ -85,7 +85,7 @@ def estado_procesos(altura_tabla):
     
     # Recupera los muestreos almacenados 
     conn = init_connection()
-    df_muestreos = pandas.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
+    df_muestreos = psql.read_sql('SELECT * FROM procesado_actual_nutrientes', conn)
     conn.close()
     
     # Seleccionar los muestreos en curso como aquellos con io_estado = 1
@@ -511,14 +511,14 @@ def consulta_botellas():
     @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
     def carga_datos_consulta_botellas():
         conn                    = init_connection()
-        df_salidas              = pandas.read_sql('SELECT * FROM salidas_muestreos', conn)
-        df_programas            = pandas.read_sql('SELECT * FROM programas', conn)
-        df_muestreos            = pandas.read_sql('SELECT * FROM muestreos_discretos', conn)
-        df_datos_discretos      = pandas.read_sql('SELECT * FROM datos_discretos', conn)
-        df_estaciones           = pandas.read_sql('SELECT * FROM estaciones', conn)
-        variables_bd            = pandas.read_sql('SELECT * FROM variables_procesado', conn)
-        df_rmn_altos            = pandas.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
-        df_rmn_bajos            = pandas.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
+        df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_programas            = psql.read_sql('SELECT * FROM programas', conn)
+        df_muestreos            = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+        df_datos_discretos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
+        df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
+        variables_bd            = psql.read_sql('SELECT * FROM variables_procesado', conn)
+        df_rmn_altos            = psql.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
+        df_rmn_bajos            = psql.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
         conn.close() 
         return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,variables_bd,df_rmn_altos,df_rmn_bajos
            
@@ -1168,11 +1168,11 @@ def consulta_perfiles():
     def carga_datos_consulta_perfiles():
         # Recupera tablas con informacion utilizada en el procesado
         conn                    = init_connection()
-        df_salidas              = pandas.read_sql('SELECT * FROM salidas_muestreos', conn)
-        df_programas            = pandas.read_sql('SELECT * FROM programas', conn)
-        df_perfiles             = pandas.read_sql('SELECT * FROM perfiles_verticales', conn)
-        df_datos_perfiles       = pandas.read_sql('SELECT * FROM datos_perfiles', conn)
-        df_estaciones           = pandas.read_sql('SELECT * FROM estaciones', conn)
+        df_salidas              = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+        df_programas            = psql.read_sql('SELECT * FROM programas', conn)
+        df_perfiles             = psql.read_sql('SELECT * FROM perfiles_verticales', conn)
+        df_datos_perfiles       = psql.read_sql('SELECT * FROM datos_perfiles', conn)
+        df_estaciones           = psql.read_sql('SELECT * FROM estaciones', conn)
         conn.close()    
         
         return df_salidas,df_programas,df_perfiles,df_datos_perfiles,df_estaciones
@@ -1630,8 +1630,8 @@ def recupera_factores_nutrientes(df_muestreos_seleccionados):
 
     # Recupera información de la base de datos
     conn                      = init_connection()
-    df_factores_nutrientes    = pandas.read_sql('SELECT * FROM factores_correctores_nutrientes', conn)
-    df_muestreos              = pandas.read_sql('SELECT * FROM muestreos_discretos', conn)
+    df_factores_nutrientes    = psql.read_sql('SELECT * FROM factores_correctores_nutrientes', conn)
+    df_muestreos              = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
     conn.close()
 
 
