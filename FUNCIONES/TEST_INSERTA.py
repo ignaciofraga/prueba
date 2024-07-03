@@ -65,9 +65,6 @@ id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(prog
 # # Encuentra las salidas al mar correspondientes 
 #datos_estadillo = FUNCIONES_PROCESADO.evalua_salidas(datos_estadillo,id_programa,programa_muestreo,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
 
-datos_estadillo = FUNCIONES_PROCESADO.evalua_salidas(datos_estadillo,id_programa,programa_muestreo,'TEST0',direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
-
-
 # # Encuentra el identificador asociado a cada registro
 # print('Asignando el registro correspondiente a cada medida')
 #datos_estadillo = FUNCIONES_PROCESADO.evalua_registros(datos_estadillo,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)

@@ -1358,7 +1358,7 @@ def procesado_nutrientes():
                     
                         # Encuentra las salidas al mar correspondientes 
                         datos_estadillo = FUNCIONES_PROCESADO.evalua_salidas(datos_exporta,indice_programa,programa_seleccionado,None,direccion_host,base_datos,usuario,contrasena,puerto,df_estaciones,df_salidas,df_muestreos)
-
+                                                                            #(datos_exporta,indice_programa,programa_seleccionado,None,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)        
                         # Encuentra el identificador asociado a cada registro
                         datos_estadillo = FUNCIONES_PROCESADO.evalua_registros(datos_estadillo,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,df_variables)
 
