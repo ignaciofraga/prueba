@@ -1366,12 +1366,12 @@ def procesado_nutrientes():
                         # # Encuentra el identificador asociado a cada registro
                         # datos_estadillo = FUNCIONES_PROCESADO.evalua_registros(datos_estadillo,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,df_variables)
 
-                        df_test = datos_exporta.dropna()
+                        datos_insercion = datos_exporta.dropna(subset = ['muestreo'])
 
-                        st.dataframe(df_test)
+                        st.dataframe(datos_insercion)
 
                         # Inserta datos
-                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_exporta,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
+                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_insercion,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
                         
                     st.success(texto_insercion)
                     
