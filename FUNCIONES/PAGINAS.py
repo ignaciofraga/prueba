@@ -1356,6 +1356,8 @@ def procesado_nutrientes():
                         # Recupera el identificador del programa de muestreo
                         id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
                     
+                        st.dataframe(datos_exporta)
+                    
                         # Encuentra las salidas al mar correspondientes 
                         df_salidas            = df_salidas.rename(columns={"salida_mar": "id_salida"}) 
                         datos_estadillo = FUNCIONES_PROCESADO.evalua_salidas(datos_exporta,indice_programa,programa_seleccionado,None,direccion_host,base_datos,usuario,contrasena,puerto,df_estaciones,df_salidas,df_muestreos)
