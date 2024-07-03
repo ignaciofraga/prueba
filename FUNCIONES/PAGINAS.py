@@ -1367,6 +1367,10 @@ def procesado_nutrientes():
                         # datos_estadillo = FUNCIONES_PROCESADO.evalua_registros(datos_estadillo,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,df_variables)
 
                         datos_insercion = datos_exporta.dropna(subset = ['muestreo'])
+                        # Define una columna índice
+                        indices_dataframe         = numpy.arange(0,datos_insercion.shape[0],1,dtype=int)
+                        datos_insercion['id_temp'] = indices_dataframe
+                        datos_insercion.set_index('id_temp',drop=True,append=False,inplace=True)
 
                         st.dataframe(datos_insercion)
 
