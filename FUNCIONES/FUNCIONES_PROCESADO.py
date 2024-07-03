@@ -822,6 +822,9 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
 
         try:
         
+            import streamlit as st
+            st.dataframe(tabla_registros)
+        
             # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
             cursor = conn.cursor()
