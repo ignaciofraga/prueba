@@ -1373,6 +1373,10 @@ def procesado_nutrientes():
                         datos_insercion.set_index('id_temp',drop=True,append=False,inplace=True)
 
                         st.dataframe(datos_insercion)
+                        
+                        tipo = datos_insercion.dtypes
+                        
+                        st.text(tipo)
 
                         # Inserta datos
                         texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_insercion,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)

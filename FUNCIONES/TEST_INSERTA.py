@@ -40,14 +40,27 @@ conn.dispose()
 
 # Rutas de los archivos a importar  
 #archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/PELACUS/PELACUS_2000_2021.xlsx' 
-archivo_datos                ='C:/Users/ifraga/Downloads/PROCESADO_230913_RCAN21_SepDic_profR1R1.xlsx'
+#archivo_datos                ='C:/Users/ifraga/Downloads/PROCESADO_230913_RCAN21_SepDic_profR1R1.xlsx'
 #archivo_datos                = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIAL CANTABRICO/2020/RADCAN_2020.xlsx'
 # Importa el .xlsx
-df_datos_importacion = pandas.read_excel(archivo_datos,index_col=None)
+#df_datos_importacion = pandas.read_excel(archivo_datos,index_col=None)
 
            
+
+
+
+archivo_datos                ='C:/Users/ifraga/Downloads/2024-07-03T09-24_export.csv'
+df_datos_importacion = pandas.read_csv(archivo_datos,index_col=None)
 datos_estadillo = df_datos_importacion
-    
+
+import numpy
+datos_estadillo = datos_estadillo.dropna(subset = ['muestreo'])
+# Define una columna índice
+indices_dataframe         = numpy.arange(0,datos_estadillo.shape[0],1,dtype=int)
+datos_estadillo['id_temp'] = indices_dataframe
+datos_estadillo.set_index('id_temp',drop=True,append=False,inplace=True)
+
+
 # Realiza un control de calidad primario a los datos importados   
 #datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
 
@@ -70,12 +83,12 @@ datos_estadillo = df_datos_importacion
 #datos_estadillo = FUNCIONES_PROCESADO.evalua_registros(datos_estadillo,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
 
 
-datos_insercion = datos_estadillo.dropna(subset = ['muestreo'])
+#datos_insercion = datos_estadillo.dropna(subset = ['muestreo'])
 
 
 # # Introduce los datos en la base de datos
 # print('Introduciendo los datos en la base de datos')
-#texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_estadillo,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
+texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_estadillo,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
 
 
 
