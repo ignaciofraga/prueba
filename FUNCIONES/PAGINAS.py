@@ -1353,18 +1353,22 @@ def procesado_nutrientes():
                                        
                     with st.spinner('Insertando datos en la base de datos'):
                         
-                        # Recupera el identificador del programa de muestreo
-                        id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+                        # # Recupera el identificador del programa de muestreo
+                        # id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
                     
                         st.dataframe(datos_exporta)
                     
-                        # Encuentra las salidas al mar correspondientes 
-                        df_salidas            = df_salidas.rename(columns={"salida_mar": "id_salida"}) 
-                        datos_estadillo = FUNCIONES_PROCESADO.evalua_salidas(datos_exporta,indice_programa,programa_seleccionado,None,direccion_host,base_datos,usuario,contrasena,puerto,df_estaciones,df_salidas,df_muestreos)
-                        df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"})                                 
-                                           #(datos_exporta,indice_programa,programa_seleccionado,None,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)        
-                        # Encuentra el identificador asociado a cada registro
-                        datos_estadillo = FUNCIONES_PROCESADO.evalua_registros(datos_estadillo,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,df_variables)
+                        # # Encuentra las salidas al mar correspondientes 
+                        # df_salidas            = df_salidas.rename(columns={"salida_mar": "id_salida"}) 
+                        # datos_estadillo = FUNCIONES_PROCESADO.evalua_salidas(datos_exporta,indice_programa,programa_seleccionado,None,direccion_host,base_datos,usuario,contrasena,puerto,df_estaciones,df_salidas,df_muestreos)
+                        # df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"})                                 
+                        #                    #(datos_exporta,indice_programa,programa_seleccionado,None,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)        
+                        # # Encuentra el identificador asociado a cada registro
+                        # datos_estadillo = FUNCIONES_PROCESADO.evalua_registros(datos_estadillo,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,df_variables)
+
+                        df_test = datos_exporta.dropna()
+
+                        st.dataframe(df_test)
 
                         # Inserta datos
                         texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_exporta,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
