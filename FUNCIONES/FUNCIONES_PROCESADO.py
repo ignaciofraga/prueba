@@ -821,10 +821,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
         conn.close() 
 
         try:
-        
-            import streamlit as st
-            st.dataframe(tabla_registros)
-        
+    
             # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
             cursor = conn.cursor()
@@ -834,15 +831,12 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
             cursor.close()
             conn.close() 
             
-            st.text('as')
-       
+      
             # Inserta el dataframe con los datos anteriores y nuevos en la base de datos 
             conn_psql          = create_engine(con_engine)
             tabla_registros.to_sql(tabla_datos, conn_psql,if_exists='append')
             conn_psql.dispose() 
-            
-            st.text('sd')
-            
+                        
             # Texto con el resultado de la insercion
             texto_insercion = 'Datos insertados correctamente'
             
