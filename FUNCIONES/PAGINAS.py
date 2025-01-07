@@ -1681,6 +1681,9 @@ def entrada_datos_excel():
         
         variables_discretas  = list(set(df_variables['nombre']).intersection(variables_archivo))
 
+
+        st.dataframe(df_variables)
+        st.text(variables_discretas)
                        
         # Corrige el formato de las fechas
         if 'fecha_muestreo' in variables_archivo:
