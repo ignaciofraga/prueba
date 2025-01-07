@@ -1677,13 +1677,7 @@ def entrada_datos_excel():
         # Identifica las variables que contiene el archivo
         df_variables = tabla_variables[tabla_variables['tipo']=='variable_muestreo']
         
-        
-        st.dataframe(df_variables)
-        
-        
         variables_archivo    = df_datos_importacion.columns.tolist()
-        
-        st.text(variables_archivo)
         
         variables_discretas  = list(set(df_variables['nombre']).intersection(variables_archivo))
 
