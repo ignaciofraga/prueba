@@ -1683,6 +1683,7 @@ def entrada_datos_excel():
 
 
         st.dataframe(df_variables)
+        st.text(variables_archivo)
         st.text(variables_discretas)
                        
         # Corrige el formato de las fechas
