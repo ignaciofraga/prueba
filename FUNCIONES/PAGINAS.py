@@ -1677,6 +1677,7 @@ def entrada_datos_excel():
         
         st.dataframe(df_variables)
         
+        
         variables_archivo    = df_datos_importacion.columns.tolist()
         
         st.text(variables_archivo)
