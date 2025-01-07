@@ -1685,93 +1685,93 @@ def entrada_datos_excel():
         
         st.text(variables_archivo)
         
-        # variables_discretas  = list(set(df_variables['nombre']).intersection(variables_archivo))
+        variables_discretas  = list(set(df_variables['nombre']).intersection(variables_archivo))
 
                        
-        # # Corrige el formato de las fechas
-        # if 'fecha_muestreo' in variables_archivo:
-        #     df_datos_importacion['fecha_muestreo'] =  pandas.to_datetime(df_datos_importacion['fecha_muestreo'], format='%d%m%Y').dt.date
-        # if 'hora_muestreo' in variables_archivo:
-        #     try:
-        #         df_datos_importacion['hora_muestreo']  =  pandas.to_datetime(df_datos_importacion['hora_muestreo'], format='%H:%M').dt.time
-        #     except:
-        #         df_datos_importacion['hora_muestreo']  =  pandas.to_datetime(df_datos_importacion['hora_muestreo'], format='%H:%M:%S').dt.time
+        # Corrige el formato de las fechas
+        if 'fecha_muestreo' in variables_archivo:
+            df_datos_importacion['fecha_muestreo'] =  pandas.to_datetime(df_datos_importacion['fecha_muestreo'], format='%d%m%Y').dt.date
+        if 'hora_muestreo' in variables_archivo:
+            try:
+                df_datos_importacion['hora_muestreo']  =  pandas.to_datetime(df_datos_importacion['hora_muestreo'], format='%H:%M').dt.time
+            except:
+                df_datos_importacion['hora_muestreo']  =  pandas.to_datetime(df_datos_importacion['hora_muestreo'], format='%H:%M:%S').dt.time
                 
-        # # Cambia el nombre del identificador 
-        # try:
-        #     df_datos_importacion = df_datos_importacion.rename(columns={"ID": "id_externo"})
-        # except:
-        #     texto_aviso = "Los datos importados no contienen identificador."
-        #     st.warning(texto_aviso, icon="⚠️")
+        # Cambia el nombre del identificador 
+        try:
+            df_datos_importacion = df_datos_importacion.rename(columns={"ID": "id_externo"})
+        except:
+            texto_aviso = "Los datos importados no contienen identificador."
+            st.warning(texto_aviso, icon="⚠️")
             
             
-        # # Cambia los nombres de latitud/longitud 
-        # if 'latitud' in variables_archivo:
-        #     df_datos_importacion = df_datos_importacion.rename(columns={"latitud": "latitud_muestreo"})
-        # else:
-        #     if 'latitud_muestreo' not in variables_archivo:
-        #         texto_aviso = "Los datos importados no contienen latitud. Se asignará la correspondiente a la estación."
-        #         st.warning(texto_aviso, icon="⚠️")
+        # Cambia los nombres de latitud/longitud 
+        if 'latitud' in variables_archivo:
+            df_datos_importacion = df_datos_importacion.rename(columns={"latitud": "latitud_muestreo"})
+        else:
+            if 'latitud_muestreo' not in variables_archivo:
+                texto_aviso = "Los datos importados no contienen latitud. Se asignará la correspondiente a la estación."
+                st.warning(texto_aviso, icon="⚠️")
 
-        # if 'longitud' in variables_archivo:
-        #     df_datos_importacion = df_datos_importacion.rename(columns={"longitud": "longitud_muestreo"})
-        # else:
-        #     if 'longitud_muestreo' not in variables_archivo:
-        #         texto_aviso = "Los datos importados no contienen longitud. Se asignará la correspondiente a la estación."
-        #         st.warning(texto_aviso, icon="⚠️")
+        if 'longitud' in variables_archivo:
+            df_datos_importacion = df_datos_importacion.rename(columns={"longitud": "longitud_muestreo"})
+        else:
+            if 'longitud_muestreo' not in variables_archivo:
+                texto_aviso = "Los datos importados no contienen longitud. Se asignará la correspondiente a la estación."
+                st.warning(texto_aviso, icon="⚠️")
             
             
             
-        # # Si los datos incluyen informacion del tubo de nutrientes, cambiar el nombre a texto 
-        # if 'tubo_nutrientes' in variables_discretas:
-        #     for idato in range(df_datos_importacion.shape[0]):
-        #         try:
-        #             df_datos_importacion['tubo_nutrientes'].iloc[idato] = str(int(df_datos_importacion['tubo_nutrientes'].iloc[idato]))
-        #         except:
-        #             pass
+        # Si los datos incluyen informacion del tubo de nutrientes, cambiar el nombre a texto 
+        if 'tubo_nutrientes' in variables_discretas:
+            for idato in range(df_datos_importacion.shape[0]):
+                try:
+                    df_datos_importacion['tubo_nutrientes'].iloc[idato] = str(int(df_datos_importacion['tubo_nutrientes'].iloc[idato]))
+                except:
+                    pass
                 
-        # # Añade un qf de 1 (no evaluado) a las variables subidas que no tienen un índice de calidad asignado
-        # for ivariable in range(len(variables_discretas)):
-        #     nombre_variable_qf = variables_discretas[ivariable] + '_qf'
-        #     if nombre_variable_qf not in variables_discretas:
-        #         df_datos_importacion[nombre_variable_qf] = int(iq_asignado) #numpy.ones(df_datos_importacion.shape[0],dtype=int)
+        # Añade un qf de 1 (no evaluado) a las variables subidas que no tienen un índice de calidad asignado
+        for ivariable in range(len(variables_discretas)):
+            nombre_variable_qf = variables_discretas[ivariable] + '_qf'
+            if nombre_variable_qf not in variables_discretas:
+                df_datos_importacion[nombre_variable_qf] = int(iq_asignado) #numpy.ones(df_datos_importacion.shape[0],dtype=int)
             
 
 
-        # # Realiza un control de calidad primario a los datos importados   
-        # datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
+        # Realiza un control de calidad primario a los datos importados   
+        datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
 
-        # # Recupera el identificador del programa de muestreo
-        # id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
+        # Recupera el identificador del programa de muestreo
+        id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
                         
-        # with st.spinner('Asignando la estación y salida al mar de cada medida'):
-        #     # Encuentra la estación asociada a cada registro
-        #     datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
+        with st.spinner('Asignando la estación y salida al mar de cada medida'):
+            # Encuentra la estación asociada a cada registro
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_estaciones(datos_corregidos,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
 
-        #     # Encuentra las salidas al mar correspondientes  
-        #     datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_entrada,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
+            # Encuentra las salidas al mar correspondientes  
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_entrada,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
      
-        # # Encuentra el identificador asociado a cada registro
-        # with st.spinner('Asignando el registro correspondiente a cada medida'):
-        #     datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
+        # Encuentra el identificador asociado a cada registro
+        with st.spinner('Asignando el registro correspondiente a cada medida'):
+            datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
 
             
-        # # Añade datos físicos
-        # if len(variables_discretas)>0:
+        # Añade datos físicos
+        if len(variables_discretas)>0:
                             
-        #     with st.spinner('Añadiendo datos discretos'):
+            with st.spinner('Añadiendo datos discretos'):
                 
-        #         texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
+                texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_corregidos,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos,tabla_muestreos)
                 
-        #         if texto_insercion:
-        #             st.success(texto_insercion)    
-        #         else:
-        #             texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
-        #             st.success(texto_exito)
+                if texto_insercion:
+                    st.success(texto_insercion)    
+                else:
+                    texto_exito = 'Datos del archivo ' + archivo_datos.name + ' añadidos correctamente a la base de datos'
+                    st.success(texto_exito)
                     
-        # else:
-        #     texto = 'El archivo ' + archivo_datos.name + ' no contiene informacion de variables muestreadas'
-        #     st.success(texto)
+        else:
+            texto = 'El archivo ' + archivo_datos.name + ' no contiene informacion de variables muestreadas'
+            st.success(texto)
         
 
 
