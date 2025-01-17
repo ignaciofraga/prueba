@@ -440,7 +440,7 @@ def entrada_salidas_mar():
         
         df_salidas_seleccion      = df_salidas_radiales[df_salidas_radiales['tipo_salida']==tipo_salida_seleccionada]
         
-        st.dataframe(df_salidas_seleccion)
+        
        
         # Añade una columna con el nombre del buque utilizado
         df_salidas_seleccion['Buque'] = None
@@ -450,6 +450,8 @@ def entrada_salidas_mar():
 
         # Elimina las columnas que no interesa mostrar
         df_salidas_seleccion = df_salidas_seleccion.drop(columns=['id_salida','programa','nombre_programa','buque','configuracion_perfilador','configuracion_superficie'])
+    
+        st.dataframe(df_salidas_seleccion)
     
         # Renombra las columnas
         df_salidas_seleccion = df_salidas_seleccion.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados'})
