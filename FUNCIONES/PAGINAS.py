@@ -434,6 +434,8 @@ def entrada_salidas_mar():
         
         st.subheader('Consultar salidas al mar realizadas')
         
+        st.dataframe(df_salidas_radiales)
+        
         tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_radiales['tipo_salida'].unique()))   
         df_salidas_seleccion      = df_salidas_radiales[df_salidas_radiales['tipo_salida']==tipo_salida_seleccionada]
         
