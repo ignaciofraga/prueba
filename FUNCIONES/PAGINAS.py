@@ -461,10 +461,10 @@ def entrada_salidas_mar():
             df_salidas_seleccion['Fecha salida'].iloc[idato]   =  df_salidas_seleccion['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
             df_salidas_seleccion['Fecha retorno'].iloc[idato]  =  df_salidas_seleccion['Fecha retorno'].iloc[idato].strftime("%Y-%m-%d")
 
-        st.dataframe(df_salidas_seleccion)
+        #st.dataframe(df_salidas_seleccion)
 
         # Ordena los valores por fechas
-        df_salidas_seleccion = df_salidas_seleccion.sort_values('Fecha salida',ascending=False)
+        #df_salidas_seleccion = df_salidas_seleccion.sort_values('Fecha salida',ascending=False)
 
 
 
