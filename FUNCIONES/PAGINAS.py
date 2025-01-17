@@ -469,12 +469,14 @@ def entrada_salidas_mar():
         listado_cols.append(listado_cols.pop(listado_cols.index('Observaciones')))   
         df_salidas_seleccion = df_salidas_seleccion[listado_cols]
         
+        st.dataframe(df_salidas_seleccion)
+        
         # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
         indices_dataframe        = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
         df_salidas_seleccion['id'] = indices_dataframe
         df_salidas_seleccion.set_index('id',drop=True,append=False,inplace=True)
           
-        st.dataframe(df_salidas_seleccion)
+        
         
         # Muestra una tabla con las salidas realizadas
         st.dataframe(df_salidas_seleccion,use_container_width=True)
