@@ -451,7 +451,7 @@ def entrada_salidas_mar():
         # Elimina las columnas que no interesa mostrar
         df_salidas_seleccion = df_salidas_seleccion.drop(columns=['id_salida','programa','nombre_programa','buque','configuracion_perfilador','configuracion_superficie'])
     
-        st.dataframe(df_salidas_seleccion)
+        
     
         # Renombra las columnas
         df_salidas_seleccion = df_salidas_seleccion.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados'})
@@ -474,6 +474,8 @@ def entrada_salidas_mar():
         df_salidas_seleccion['id'] = indices_dataframe
         df_salidas_seleccion.set_index('id',drop=True,append=False,inplace=True)
           
+        st.dataframe(df_salidas_seleccion)
+        
         # Muestra una tabla con las salidas realizadas
         st.dataframe(df_salidas_seleccion,use_container_width=True)
 
