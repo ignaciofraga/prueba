@@ -464,12 +464,14 @@ def entrada_salidas_mar():
         # Ordena los valores por fechas
         df_salidas_seleccion = df_salidas_seleccion.sort_values('Fecha salida',ascending=False)
 
+        st.dataframe(df_salidas_seleccion)
+
         # Mueve los identificadores de muestreo al final del dataframe
         listado_cols = df_salidas_seleccion.columns.tolist()
         listado_cols.append(listado_cols.pop(listado_cols.index('Observaciones')))   
         df_salidas_seleccion = df_salidas_seleccion[listado_cols]
         
-        st.dataframe(df_salidas_seleccion)
+        
         
         # Define un nuevo índice de filas. Si se han eliminado registros este paso es necesario
         indices_dataframe        = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
