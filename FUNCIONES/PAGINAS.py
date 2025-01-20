@@ -1388,26 +1388,14 @@ def procesado_nutrientes():
                 #     FUNCIONES_AUXILIARES.actualiza_estado(indice_programa,programa_seleccionado,anho_seleccionado,fecha_actualizacion,io_dato_completo,direccion_host,base_datos,usuario,contrasena,puerto)
                 #     st.success('Estado del procesado actualizado correctamente')
 
+
+
+                st.dataframe(df_estaciones)
+#TON, NO2, NO3, SiO2, PO4
                 # Añade nombre de la estacion
                 df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
                 
-                
-                # # busca los RMNS y sw para conservarlos
-                # posicion_RMN_bajos = numpy.zeros(2,dtype=int)
-                # posicion_RMN_altos = numpy.zeros(2,dtype=int)
-
-                # for idato in range(datos_corregidos.shape[0]):
-                #     if datos_entrada['id_externo'].iloc[idato] is not None and datos_entrada['id_externo'].iloc[idato][0:7].lower() == 'rmn low' :
-                #         posicion_RMN_bajos[icont_bajos] = idato
-                #         icont_bajos                     = icont_bajos + 1 
-                #         datos_entrada['salinidad'].iloc[idato]  = df_referencias_bajas['salinidad'].iloc[0]
-                #     if datos_entrada['Sample ID'].iloc[idato] is not None and datos_entrada['Sample ID'].iloc[idato][0:8].lower() == 'rmn high':
-                #         posicion_RMN_altos[icont_altos] = idato
-                #         icont_altos                     = icont_altos + 1
-                #         datos_entrada['salinidad'].iloc[idato]  = df_referencias_altas['salinidad'].iloc[0]
-                
-
-                
+                               
                 # Extrae información de los RMNs y sw al inicio y final del run
                 num_registros_mitad = int((datos_corregidos.shape[0])/2)
                 sw_inicio = []
@@ -1425,8 +1413,7 @@ def procesado_nutrientes():
                 subset_inicio = datos_corregidos.iloc[registros_inicio, :]
                 subset_final = datos_corregidos.iloc[registros_final, :]
                 
-                st.text(registros_final)
-                st.dataframe(datos_corregidos)
+
 
                 
                 datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
