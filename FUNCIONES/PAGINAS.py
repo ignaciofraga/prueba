@@ -1269,6 +1269,8 @@ def procesado_nutrientes():
             variables_procesadas = datos_AA.columns.tolist()
             variables_run        = list(set(variables_procesadas).intersection(variables_procesado_bd))
             
+            st.text(variables_run)
+            
             ### Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
                        
                         
@@ -1426,6 +1428,11 @@ def procesado_nutrientes():
                 # Descarga los datos como una hoja Excel        
                 listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
                 datos_exporta_excel     = datos_exporta_excel[listado_columnas]
+                
+                # first_cols = ['A','B','C']
+                # last_cols = [col for col in df.columns if col not in first_cols]
+
+                # df = df[first_cols+last_cols]
       
                 # Botón para descargar la información como Excel
                 nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
