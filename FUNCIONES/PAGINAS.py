@@ -1347,14 +1347,8 @@ def procesado_nutrientes():
                 variables_elimina       = variables_procesado_bd + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado']
                 df_datos_biogeoquimicos = df_datos_disponibles.drop(columns=variables_elimina)
                 
-                
-                st.dataframe(datos_corregidos)
-                
                 datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="id_externo",how='left')
-                
-                st.dataframe(datos_corregidos)
-                
-                
+                                               
                 # Reduce los decimales y asigna QF a los datos
                 variables_run_qf = []
                 for ivariable_procesada in range(len(variables_run)):
@@ -1367,7 +1361,7 @@ def procesado_nutrientes():
                     datos_corregidos[variables_run_qf[ivariable_procesada]] = int(iq_asignado) #numpy.ones(datos_corregidos.shape[0],dtype=int)
   
                 
-                variables_exporta =  variables_procesado_bd + variables_run_qf + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado','muestreo']
+                variables_exporta =  variables_procesado_bd + variables_run_qf + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado','muestreo','id_externo']
                 datos_exporta = datos_corregidos[variables_exporta]
                 
                 st.dataframe(datos_exporta)
