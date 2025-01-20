@@ -1408,7 +1408,7 @@ def procesado_nutrientes():
                 
 
                 
-                # Busca las posiciones de los sw
+                # Extrae información de los RMNs y sw al inicio y final del run
                 num_registros_mitad = int((datos_corregidos.shape[0])/2)
                 sw_inicio = []
                 for iregistro in range(num_registros_mitad):
@@ -1430,19 +1430,19 @@ def procesado_nutrientes():
                 
                 datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
                 
-                test = pandas.concat([subset_inicio, datos_corregidos], ignore_index=True)
-                st.dataframe(test)
+                datos_exporta_excel = pandas.concat([subset_inicio, datos_corregidos], ignore_index=True)
+                datos_exporta_excel = pandas.concat([datos_exporta_excel, subset_final], ignore_index=True)
                 
                 # Descarga los datos como una hoja Excel        
                 listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
-                datos_corregidos        = datos_corregidos[listado_columnas]
+                datos_exporta_excel     = datos_exporta_excel[listado_columnas]
       
                 # Botón para descargar la información como Excel
                 nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
                        
                 output = BytesIO()
                 writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                datos_excel = datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
+                datos_excel = datos_exporta_excel.to_excel(writer, index=False, sheet_name='DATOS')
                 writer.close()
                 datos_excel = output.getvalue()
             
