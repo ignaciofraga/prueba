@@ -1657,7 +1657,7 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
     # Añade columna con el identificador de cada muestra
     datos_corregidos['id_externo'] = datos_entrada['Sample ID']
        
-    return datos_corregidos
+    return datos_corregidos,posicion_RMN_bajos,posicion_RMN_altos
     
 
 

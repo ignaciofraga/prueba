@@ -1318,7 +1318,7 @@ def procesado_nutrientes():
                 
             
                 # Aplica la corrección de deriva (DRIFT)                 
-                datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
+                datos_corregidos,posicion_RMN_bajos,posicion_RMN_altos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
                             
                 
                 
@@ -1364,7 +1364,6 @@ def procesado_nutrientes():
                 variables_exporta =  variables_procesado_bd + variables_run_qf + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado','muestreo','id_externo']
                 datos_exporta = datos_corregidos[variables_exporta]
                 
-                st.dataframe(datos_exporta)
                 
                 # # Añade los datos a la base de datos si se seleccionó esta opción                        
                 # if io_add_data is True:
@@ -1392,9 +1391,26 @@ def procesado_nutrientes():
                 # Añade nombre de la estacion
                 df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
                 
+                
+                # # busca los RMNS y sw para conservarlos
+                # posicion_RMN_bajos = numpy.zeros(2,dtype=int)
+                # posicion_RMN_altos = numpy.zeros(2,dtype=int)
+
+                # for idato in range(datos_corregidos.shape[0]):
+                #     if datos_entrada['id_externo'].iloc[idato] is not None and datos_entrada['id_externo'].iloc[idato][0:7].lower() == 'rmn low' :
+                #         posicion_RMN_bajos[icont_bajos] = idato
+                #         icont_bajos                     = icont_bajos + 1 
+                #         datos_entrada['salinidad'].iloc[idato]  = df_referencias_bajas['salinidad'].iloc[0]
+                #     if datos_entrada['Sample ID'].iloc[idato] is not None and datos_entrada['Sample ID'].iloc[idato][0:8].lower() == 'rmn high':
+                #         posicion_RMN_altos[icont_altos] = idato
+                #         icont_altos                     = icont_altos + 1
+                #         datos_entrada['salinidad'].iloc[idato]  = df_referencias_altas['salinidad'].iloc[0]
+                
+                st.text(posicion_RMN_bajos)
+                st.text(posicion_RMN_altos)
                 st.dataframe(datos_corregidos)
                 datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
-                st.dataframe(datos_corregidos)
+                
 
                 # Descarga los datos como una hoja Excel        
                 listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
