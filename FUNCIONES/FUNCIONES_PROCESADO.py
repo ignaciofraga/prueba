@@ -1593,6 +1593,7 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
             posicion_RMN_altos[icont_altos] = idato
             icont_altos                     = icont_altos + 1
             datos_entrada['salinidad'].iloc[idato]  = df_referencias_altas['salinidad'].iloc[0]
+            
 
     densidades = seawater.eos80.dens0(datos_entrada['salinidad'], datos_entrada['temp.lab'])
     datos_entrada['DENSIDAD'] = densidades/1000  

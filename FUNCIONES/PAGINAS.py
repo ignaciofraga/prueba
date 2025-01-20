@@ -1409,6 +1409,21 @@ def procesado_nutrientes():
                 st.text(posicion_RMN_bajos)
                 st.text(posicion_RMN_altos)
                 st.dataframe(datos_corregidos)
+                
+                # Busca las posiciones de los sw
+                num_registros_mitad = int((datos_corregidos.shape[0])/2)
+                sw_inicio = []
+                for iregistro in range(num_registros_mitad):
+                    if datos_corregidos['id_externo'].iloc[iregistro].lower() == 'sw':
+                        sw_inicio = sw_inicio + [iregistro]
+                sw_final = []
+                for iregistro in range(num_registros_mitad,datos_corregidos.shape[0]):
+                    if datos_corregidos['id_externo'].iloc[iregistro].lower() == 'sw':
+                        sw_final = sw_final + [iregistro]
+                        
+                st.text(sw_inicio)
+                st.text(sw_final)                
+                        
                 datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
                 
 
