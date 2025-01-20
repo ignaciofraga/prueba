@@ -1425,7 +1425,8 @@ def procesado_nutrientes():
                 subset_inicio = datos_corregidos.iloc[registros_inicio, :]
                 subset_final = datos_corregidos.iloc[registros_final, :]
                 
-                st.dataframe(subset_final)
+                st.text(registros_final)
+                st.dataframe(datos_corregidos)
 
                 
                 datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
