@@ -1389,32 +1389,32 @@ def procesado_nutrientes():
                 #     FUNCIONES_AUXILIARES.actualiza_estado(indice_programa,programa_seleccionado,anho_seleccionado,fecha_actualizacion,io_dato_completo,direccion_host,base_datos,usuario,contrasena,puerto)
                 #     st.success('Estado del procesado actualizado correctamente')
 
-                # # Añade nombre de la estacion
-                # df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
-                # datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
+                # Añade nombre de la estacion
+                df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
+                datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
 
-                # # Descarga los datos como una hoja Excel        
-                # listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
-                # datos_corregidos        = datos_corregidos[listado_columnas]
+                # Descarga los datos como una hoja Excel        
+                listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
+                datos_corregidos        = datos_corregidos[listado_columnas]
       
-                # # Botón para descargar la información como Excel
-                # nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
+                # Botón para descargar la información como Excel
+                nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
                        
-                # output = BytesIO()
-                # writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                # datos_excel = datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
-                # writer.close()
-                # datos_excel = output.getvalue()
+                output = BytesIO()
+                writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                datos_excel = datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
+                writer.close()
+                datos_excel = output.getvalue()
             
-                # st.download_button(
-                #     label="DESCARGA EXCEL CON LOS DATOS PROCESADOS",
-                #     data=datos_excel,
-                #     file_name=nombre_archivo,
-                #     help= 'Descarga un archivo .xlsx con los datos procesados',
-                #     mime="application/vnd.ms-excel"
-                # )              
+                st.download_button(
+                    label="DESCARGA EXCEL CON LOS DATOS PROCESADOS",
+                    data=datos_excel,
+                    file_name=nombre_archivo,
+                    help= 'Descarga un archivo .xlsx con los datos procesados',
+                    mime="application/vnd.ms-excel"
+                )              
        
-                # st.cache_data.clear()
+                st.cache_data.clear()
                               
 
 
