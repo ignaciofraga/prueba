@@ -1423,13 +1423,15 @@ def procesado_nutrientes():
                 registros_final  = sw_final + [posicion_RMN_bajos[1]] + [posicion_RMN_altos[1]]
                         
                 subset_inicio = datos_corregidos.iloc[registros_inicio, :]
+                subset_final = datos_corregidos.iloc[registros_final, :]
                 
-                st.text(registros_inicio)
-                st.dataframe(subset_inicio)                
-                        
+                st.dataframe(datos_corregidos)
+                st.dataframe(subset_final)
+                
                 datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
                 
-
+                st.dataframe(datos_corregidos)
+                
                 # Descarga los datos como una hoja Excel        
                 listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
                 datos_corregidos        = datos_corregidos[listado_columnas]
