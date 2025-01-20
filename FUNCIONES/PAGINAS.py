@@ -1406,9 +1406,7 @@ def procesado_nutrientes():
                 #         icont_altos                     = icont_altos + 1
                 #         datos_entrada['salinidad'].iloc[idato]  = df_referencias_altas['salinidad'].iloc[0]
                 
-                st.text(posicion_RMN_bajos)
-                st.text(posicion_RMN_altos)
-                st.dataframe(datos_corregidos)
+
                 
                 # Busca las posiciones de los sw
                 num_registros_mitad = int((datos_corregidos.shape[0])/2)
@@ -1421,8 +1419,13 @@ def procesado_nutrientes():
                     if datos_corregidos['id_externo'].iloc[iregistro].lower() == 'sw':
                         sw_final = sw_final + [iregistro]
                         
-                st.text(sw_inicio)
-                st.text(sw_final)                
+                registros_inicio = sw_inicio + [posicion_RMN_bajos[0]] + [posicion_RMN_altos[0]]
+                registros_final  = sw_final + [posicion_RMN_bajos[1]] + [posicion_RMN_altos[1]]
+                        
+                subset_inicio = datos_corregidos.iloc[registros_inicio, :]
+                
+                st.text(registros_inicio)
+                st.dataframe(subset_inicio)                
                         
                 datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
                 
