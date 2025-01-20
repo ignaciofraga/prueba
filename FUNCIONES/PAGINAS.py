@@ -1391,7 +1391,10 @@ def procesado_nutrientes():
 
                 # Añade nombre de la estacion
                 df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
+                
+                st.dataframe(datos_corregidos)
                 datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
+                st.dataframe(datos_corregidos)
 
                 # Descarga los datos como una hoja Excel        
                 listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
