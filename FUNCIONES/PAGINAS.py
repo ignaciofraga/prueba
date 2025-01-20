@@ -1315,12 +1315,12 @@ def procesado_nutrientes():
                 
             # En caso contrario procesa los datos
                         
-                st.dataframe(datos_AA)
+                
             
                 # Aplica la corrección de deriva (DRIFT)                 
                 datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
                             
-                st.dataframe(datos_corregidos)
+                
                 
                 # Calcula el NO3 como diferencia entre el TON y el NO2 (sólo si se han procesado estos dos canales)
                 if 'nitrogeno_inorganico_total' in variables_run and 'nitrito' in variables_run:
@@ -1346,9 +1346,13 @@ def procesado_nutrientes():
 
                 variables_elimina       = variables_procesado_bd + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado']
                 df_datos_biogeoquimicos = df_datos_disponibles.drop(columns=variables_elimina)
+                
+                
+                st.dataframe(datos_corregidos)
+                
                 datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="id_externo",how='left')
                 
-                
+                st.dataframe(datos_corregidos)
                 
                 
                 # Reduce los decimales y asigna QF a los datos
