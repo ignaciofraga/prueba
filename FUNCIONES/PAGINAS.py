@@ -1333,6 +1333,8 @@ def procesado_nutrientes():
                     # añade nitrato a variables procesadas (para redondear decimales y añadir qf)
                     variables_run = variables_run + ['nitrato']
             
+                datos_corregidos = datos_corregidos[['id_externo','nitrogeno_inorganico_total','nitrato','nitrito', 'silicato', 'fosfato']]
+            
                 st.dataframe(datos_corregidos)
 #TON, NO2, NO3, SiO2, PO4
             
