@@ -1269,20 +1269,9 @@ def procesado_nutrientes():
             variables_procesadas = datos_AA.columns.tolist()
             variables_run        = list(set(variables_procesadas).intersection(variables_procesado_bd))
             
-            st.text(variables_run)
-            
-            # Cambia el orden
-            orden_inverso = ['fosato','silicato','nitrito','nitrato','nitrogeno_inorganico_total']
-            for iorden in range(len(orden_inverso)):
-                if orden_inverso[iorden] in variables_run : 
-                    variables_run.insert(0, variables_run.pop(variables_run.index(orden_inverso[iorden])))
-            
-
-            st.text(variables_run)
-            
-            ### Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
-                       
                         
+            ### Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
+                                       
             # Adapta el nombre de las sw
             for idato in range(datos_AA.shape[0]):
                 if datos_AA['Sample ID'].iloc[idato][0:2].lower()=='sw':
@@ -1343,6 +1332,17 @@ def procesado_nutrientes():
                     
                     # añade nitrato a variables procesadas (para redondear decimales y añadir qf)
                     variables_run = variables_run + ['nitrato']
+               
+                # Cambia el orden de las variables
+                orden_inverso = ['fosato','silicato','nitrito','nitrato','nitrogeno_inorganico_total']
+                for iorden in range(len(orden_inverso)):
+                    if orden_inverso[iorden] in variables_run : 
+                            variables_run.insert(0, variables_run.pop(variables_run.index(orden_inverso[iorden])))
+ 
+
+ 
+
+                    
             
                 datos_corregidos = datos_corregidos[['id_externo','nitrogeno_inorganico_total','nitrato','nitrito', 'silicato', 'fosfato']]
             
