@@ -1362,55 +1362,57 @@ def procesado_nutrientes():
                 variables_exporta =  variables_procesado_bd + variables_run_qf + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado','muestreo']
                 datos_exporta = datos_corregidos[variables_exporta]
                 
-                # Añade los datos a la base de datos si se seleccionó esta opción                        
-                if io_add_data is True:
+                st.dataframe(datos_exporta)
+                
+                # # Añade los datos a la base de datos si se seleccionó esta opción                        
+                # if io_add_data is True:
                                        
-                    with st.spinner('Insertando datos en la base de datos'):
+                #     with st.spinner('Insertando datos en la base de datos'):
                         
-                        # Mantén sólo los registros con identificador de muestreo asociado
-                        datos_insercion = datos_exporta.dropna(subset = ['muestreo'])
+                #         # Mantén sólo los registros con identificador de muestreo asociado
+                #         datos_insercion = datos_exporta.dropna(subset = ['muestreo'])
 
-                        # Define una columna índice
-                        indices_dataframe         = numpy.arange(0,datos_insercion.shape[0],1,dtype=int)
-                        datos_insercion['id_temp'] = indices_dataframe
-                        datos_insercion.set_index('id_temp',drop=True,append=False,inplace=True)
+                #         # Define una columna índice
+                #         indices_dataframe         = numpy.arange(0,datos_insercion.shape[0],1,dtype=int)
+                #         datos_insercion['id_temp'] = indices_dataframe
+                #         datos_insercion.set_index('id_temp',drop=True,append=False,inplace=True)
                        
-                        # Inserta datos
-                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_insercion,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
+                #         # Inserta datos
+                #         texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_insercion,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
                         
-                    st.success(texto_insercion)
+                #     st.success(texto_insercion)
                     
-                    # Actualiza el estado de los procesos
-                    fecha_actualizacion = datetime.date.today()
-                    FUNCIONES_AUXILIARES.actualiza_estado(indice_programa,programa_seleccionado,anho_seleccionado,fecha_actualizacion,io_dato_completo,direccion_host,base_datos,usuario,contrasena,puerto)
-                    st.success('Estado del procesado actualizado correctamente')
+                #     # Actualiza el estado de los procesos
+                #     fecha_actualizacion = datetime.date.today()
+                #     FUNCIONES_AUXILIARES.actualiza_estado(indice_programa,programa_seleccionado,anho_seleccionado,fecha_actualizacion,io_dato_completo,direccion_host,base_datos,usuario,contrasena,puerto)
+                #     st.success('Estado del procesado actualizado correctamente')
 
-                # Añade nombre de la estacion
-                df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
-                datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
+                # # Añade nombre de la estacion
+                # df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
+                # datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
 
-                # Descarga los datos como una hoja Excel        
-                listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
-                datos_corregidos        = datos_corregidos[listado_columnas]
+                # # Descarga los datos como una hoja Excel        
+                # listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
+                # datos_corregidos        = datos_corregidos[listado_columnas]
       
-                # Botón para descargar la información como Excel
-                nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
+                # # Botón para descargar la información como Excel
+                # nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
                        
-                output = BytesIO()
-                writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-                datos_excel = datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
-                writer.close()
-                datos_excel = output.getvalue()
+                # output = BytesIO()
+                # writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                # datos_excel = datos_corregidos.to_excel(writer, index=False, sheet_name='DATOS')
+                # writer.close()
+                # datos_excel = output.getvalue()
             
-                st.download_button(
-                    label="DESCARGA EXCEL CON LOS DATOS PROCESADOS",
-                    data=datos_excel,
-                    file_name=nombre_archivo,
-                    help= 'Descarga un archivo .xlsx con los datos procesados',
-                    mime="application/vnd.ms-excel"
-                )              
+                # st.download_button(
+                #     label="DESCARGA EXCEL CON LOS DATOS PROCESADOS",
+                #     data=datos_excel,
+                #     file_name=nombre_archivo,
+                #     help= 'Descarga un archivo .xlsx con los datos procesados',
+                #     mime="application/vnd.ms-excel"
+                # )              
        
-                st.cache_data.clear()
+                # st.cache_data.clear()
                               
 
 
