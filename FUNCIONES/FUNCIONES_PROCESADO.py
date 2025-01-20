@@ -1636,7 +1636,7 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
         variable_drift = numpy.zeros(datos_entrada.shape[0])
     
         # Aplica la corrección basada de dos rectas, descrita en Hassenmueller
-        for idato in range(indice_min_correccion,indice_max_correccion):
+        for idato in range(indice_min_correccion,indice_max_correccion+1):
 
             factor_f        = (idato-posicion_RMN_bajos[0])/(posicion_RMN_bajos[1]-posicion_RMN_bajos[0])
             recta_at[idato] = RMN_bajos.iloc[0] +  factor_f*(RMN_bajos.iloc[-1]-RMN_bajos.iloc[0]) 
