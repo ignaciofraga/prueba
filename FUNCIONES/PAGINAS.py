@@ -1390,7 +1390,7 @@ def procesado_nutrientes():
 
 
 
-                st.dataframe(df_estaciones)
+                st.dataframe(datos_corregidos)
 #TON, NO2, NO3, SiO2, PO4
                 # Añade nombre de la estacion
                 df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
