@@ -1333,6 +1333,10 @@ def procesado_nutrientes():
                     # añade nitrato a variables procesadas (para redondear decimales y añadir qf)
                     variables_run = variables_run + ['nitrato']
             
+                st.dataframe(datos_corregidos)
+#TON, NO2, NO3, SiO2, PO4
+            
+            
                 # Añade informacion de RMNs, temperaturas y rendimiento
                 datos_corregidos['rto_columna_procesado']  = rendimiento_columna
                 datos_corregidos['temp_lab_procesado']     = temperatura_laboratorio
@@ -1390,8 +1394,7 @@ def procesado_nutrientes():
 
 
 
-                st.dataframe(datos_corregidos)
-#TON, NO2, NO3, SiO2, PO4
+
                 # Añade nombre de la estacion
                 df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
                 
