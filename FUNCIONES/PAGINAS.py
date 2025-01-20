@@ -1315,9 +1315,13 @@ def procesado_nutrientes():
                 
             # En caso contrario procesa los datos
                         
+                st.dataframe(datos_AA)
+            
                 # Aplica la corrección de deriva (DRIFT)                 
                 datos_corregidos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
-                                            
+                            
+                st.dataframe(datos_corregidos)
+                
                 # Calcula el NO3 como diferencia entre el TON y el NO2 (sólo si se han procesado estos dos canales)
                 if 'nitrogeno_inorganico_total' in variables_run and 'nitrito' in variables_run:
                     datos_corregidos['nitrato'] = datos_corregidos['nitrogeno_inorganico_total'] - datos_corregidos['nitrito']
