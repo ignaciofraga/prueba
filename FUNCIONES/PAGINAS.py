@@ -1271,6 +1271,15 @@ def procesado_nutrientes():
             
             st.text(variables_run)
             
+            # Cambia el orden
+            orden_inverso = ['fosato','silicato','nitrito','nitrato','nitrogeno_inorganico_total']
+            for iorden in range(len(orden_inverso)):
+                if orden_inverso[iorden] in variables_run : 
+                    variables_run.insert(0, variables_run.pop(variables_run.index(orden_inverso[iorden])))
+            
+
+            st.text(variables_run)
+            
             ### Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
                        
                         
