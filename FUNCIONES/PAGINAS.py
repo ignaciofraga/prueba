@@ -464,7 +464,7 @@ def entrada_salidas_mar():
         #st.dataframe(df_salidas_seleccion)
 
         # Ordena los valores por fechas
-        df_salidas_seleccion = df_salidas_seleccion.sort_values('Fecha salida',ascending=False)
+        #df_salidas_seleccion = df_salidas_seleccion.sort_values('Fecha salida',ascending=False)
 
 
 
