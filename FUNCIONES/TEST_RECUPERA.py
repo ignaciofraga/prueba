@@ -12,8 +12,8 @@ import pandas
 pandas.options.mode.chained_assignment = None
 import datetime
 import pandas.io.sql as psql
-from sqlalchemy import create_engine
-import psycopg2
+from sqlalchemy import create_engine, text
+
 
 # Parámetros de la base de datos
 base_datos     = 'COAC'
@@ -22,6 +22,22 @@ contrasena     = 'm0nt34lt0'
 puerto         = '5432'
 direccion_host = '193.146.155.99'
 
+
+# Parámetros de la base de datos
+base_datos     = 'COAC'
+usuario        = 'ignacio'
+contrasena     = '1gn4c10'
+puerto         = '5432'
+direccion_host = '193.146.155.72'
+#193.146.155.72
+
+
+direccion_host = "172.20.0.202"
+port           = 5432
+base_datos     = "COAC"
+usuario        = "ignacio"
+contrasena     = "1gn4c10"
+
 # Parámetros
 anho_consulta = 2023
 programa_seleccionado = 'RADIAL VIGO'
@@ -29,14 +45,18 @@ tipo_salida           = 'SEMANAL'
 ###### PROCESADO ########
 
 
+
+# Recupera datos de la base de datos
+
 con_engine         = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
 conn               = create_engine(con_engine)
-df_programas       = psql.read_sql('SELECT * FROM programas', conn)
-variables_bd       = psql.read_sql('SELECT * FROM variables_procesado', conn)
-df_salidas         = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-df_muestreos       = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-df_datos_discretos = psql.read_sql('SELECT * FROM datos_discretos', conn)
+df_programas       = pandas.DataFrame(conn.connect().execute(text('SELECT * FROM programas')))
+variables_bd       = pandas.DataFrame(conn.connect().execute(text('SELECT * FROM variables_procesado')))
+df_salidas         = pandas.DataFrame(conn.connect().execute(text('SELECT * FROM salidas_muestreos')))
+df_muestreos       = pandas.DataFrame(conn.connect().execute(text('SELECT * FROM muestreos_discretos')))
+df_datos_discretos = pandas.DataFrame(conn.connect().execute(text('SELECT * FROM datos_discretos')))
 conn.dispose() 
+
 
 
 # Recupera el identificador del programa de muestreo
