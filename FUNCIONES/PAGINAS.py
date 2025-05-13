@@ -465,7 +465,7 @@ def entrada_salidas_mar():
 
         # Ordena los valores por fechas
         #df_salidas_seleccion = df_salidas_seleccion.sort_values('Fecha salida',ascending=False)
-        df_salidas_seleccion = df_salidas_seleccion.sort_values(by='Fecha salida', ascending=False, na_position='first')
+        df_salidas_seleccion = df_salidas_seleccion.sort_values(by='Fecha salida', ascending=False)
 
 
         # Mueve los identificadores de muestreo al final del dataframe
