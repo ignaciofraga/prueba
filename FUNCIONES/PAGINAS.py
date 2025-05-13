@@ -473,8 +473,8 @@ def entrada_salidas_mar():
         #df_salidas_seleccion = df_salidas_seleccion.sort_values('Fecha salida',ascending=False)
         #df_salidas_seleccion_ordenado = df_salidas_seleccion.sort_values(by='Fecha salida')
         
-        df_salidas_seleccion['Fecha salida'] =  pandas.to_datetime(df_salidas_seleccion['Fecha salida']).dt.strftime('%Y-%m-%d')
-        df_salidas_seleccion = df_salidas_seleccion.sort_values(by=['Fecha salida'],axis=0, ascending=False)
+        #df_salidas_seleccion['Fecha salida'] =  pandas.to_datetime(df_salidas_seleccion['Fecha salida']).dt.strftime('%Y-%m-%d')
+        #df_salidas_seleccion = df_salidas_seleccion.sort_values(by=['Fecha salida'],axis=0, ascending=False)
 
 
 
