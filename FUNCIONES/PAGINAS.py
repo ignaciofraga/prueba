@@ -457,18 +457,26 @@ def entrada_salidas_mar():
         df_salidas_seleccion = df_salidas_seleccion.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados'})
     
     
-        df_salidas_seleccion = df_salidas_seleccion.sort_values('Fecha salida',ascending=False)
+
     
         # Ajusta el formato de las fechas
         for idato in range(df_salidas_seleccion.shape[0]):
             df_salidas_seleccion['Fecha salida'].iloc[idato]   =  df_salidas_seleccion['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
             df_salidas_seleccion['Fecha retorno'].iloc[idato]  =  df_salidas_seleccion['Fecha retorno'].iloc[idato].strftime("%Y-%m-%d")
 
+
+
+
         #st.dataframe(df_salidas_seleccion)
 
         # Ordena los valores por fechas
         #df_salidas_seleccion = df_salidas_seleccion.sort_values('Fecha salida',ascending=False)
-        df_salidas_seleccion_ordenado = df_salidas_seleccion.sort_values(by='Fecha salida')
+        #df_salidas_seleccion_ordenado = df_salidas_seleccion.sort_values(by='Fecha salida')
+        
+        df_salidas_seleccion['Fecha salida'] =  pandas.to_datetime(df_salidas_seleccion['Fecha salida']).dt.strftime('%Y-%m-%d')
+        df_salidas_seleccion = df_salidas_seleccion.sort_values(by=['Fecha salida'],axis=0, ascending=True)
+
+
 
 
         # Mueve los identificadores de muestreo al final del dataframe
