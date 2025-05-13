@@ -456,6 +456,9 @@ def entrada_salidas_mar():
         # Renombra las columnas
         df_salidas_seleccion = df_salidas_seleccion.rename(columns={'nombre_salida':'Salida','tipo_salida':'Tipo','fecha_salida':'Fecha salida','hora_salida':'Hora salida','fecha_retorno':'Fecha retorno','hora_retorno':'Hora retorno','observaciones':'Observaciones','estaciones':'Estaciones muestreadas','participantes_comisionados':'Participantes comisionados','participantes_no_comisionados':'Participantes no comisionados'})
     
+    
+        df_salidas_seleccion = df_salidas_seleccion.sort_values('Fecha salida',ascending=False)
+    
         # Ajusta el formato de las fechas
         for idato in range(df_salidas_seleccion.shape[0]):
             df_salidas_seleccion['Fecha salida'].iloc[idato]   =  df_salidas_seleccion['Fecha salida'].iloc[idato].strftime("%Y-%m-%d")
@@ -483,8 +486,8 @@ def entrada_salidas_mar():
         
         
         # Muestra una tabla con las salidas realizadas
-        #st.dataframe(df_salidas_seleccion,use_container_width=True)
-        st.dataframe(df_salidas_seleccion_ordenado)
+        st.dataframe(df_salidas_seleccion,use_container_width=True)
+        #st.dataframe(df_salidas_seleccion_ordenado)
 
         # Botón para descargar las salidas disponibles
         nombre_archivo =  'DATOS_SALIDAS.xlsx'
