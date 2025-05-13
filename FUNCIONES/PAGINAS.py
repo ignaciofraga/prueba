@@ -465,7 +465,7 @@ def entrada_salidas_mar():
 
         # Ordena los valores por fechas
         #df_salidas_seleccion = df_salidas_seleccion.sort_values('Fecha salida',ascending=False)
-        df_salidas_seleccion = df_salidas_seleccion.sort_values(by='Fecha salida', ascending=False,ignore_index=True)
+        df_salidas_seleccion_ordenado = df_salidas_seleccion.sort_values(by='Fecha salida', ascending=False,ignore_index=True)
 
 
         # Mueve los identificadores de muestreo al final del dataframe
@@ -483,7 +483,8 @@ def entrada_salidas_mar():
         
         
         # Muestra una tabla con las salidas realizadas
-        st.dataframe(df_salidas_seleccion,use_container_width=True)
+        #st.dataframe(df_salidas_seleccion,use_container_width=True)
+        st.dataframe(df_salidas_seleccion_ordenado)
 
         # Botón para descargar las salidas disponibles
         nombre_archivo =  'DATOS_SALIDAS.xlsx'
