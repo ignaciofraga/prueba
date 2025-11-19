@@ -633,7 +633,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             
             import streamlit as st
             st.dataframe(df_datos_salidas)
-            datos.iloc[idato]
+            #datos.iloc[idato]
             
             
             if 'nombre_muestreo' in listado_variables_datos and datos['nombre_muestreo'].iloc[idato] is not None: 
