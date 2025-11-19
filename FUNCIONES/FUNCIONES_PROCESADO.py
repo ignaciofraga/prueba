@@ -563,8 +563,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     listado_salidas  = datos['id_salida'].unique()
     df_datos_salidas = tabla_muestreos[tabla_muestreos['salida_mar'].isin(listado_salidas)]
     
-    import streamlit as st
-    st.dataframe(datos)
+
             #datos.iloc[idato]
     
     listado_variables_datos   = datos.columns.tolist()
@@ -592,6 +591,12 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             nombre_estacion                              = tabla_estaciones.loc[tabla_estaciones['id_estacion'] == exporta_registros['estacion'].iloc[idato]]['nombre_estacion'].iloc[0]
             
             nombre_muestreo     = abreviatura_programa + '_' + exporta_registros['fecha_muestreo'].iloc[idato].strftime("%Y%m%d") + '_' + str(nombre_estacion)
+            
+            
+            import streamlit as st
+            st.dataframe(exporta_registros)
+            
+            
             if 'num_cast' in listado_variables_datos and exporta_registros['num_cast'].iloc[idato] is not None:
                 nombre_muestreo = nombre_muestreo + '_C' + str(round(exporta_registros['num_cast'].iloc[idato]))
             else:
