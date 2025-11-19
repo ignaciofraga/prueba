@@ -400,6 +400,9 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                     fechas_partida     = fechas_salidas_mar
                     fechas_regreso     = fechas_salidas_mar
                    
+                    import streamlit as st
+                    st.dataframe(fechas_salidas_mar) 
+                   
                     for isalida in range(len(fechas_partida)):            
             
                         #df_temporal = tabla_salidas[tabla_salidas['fecha_salida']==fechas_partida[isalida]]

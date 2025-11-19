@@ -28,10 +28,10 @@ import psycopg2
 
 # Parámetros de la base de datos
 base_datos     = 'COAC'
-usuario        = 'postgres'
-contrasena     = 'm0nt34lt0'
-puerto         = '5432'
-direccion_host = '193.146.155.99'
+usuario        = "ignacio"
+contrasena     = "1gn4c10"
+puerto         = 5432
+direccion_host = '193.146.155.72'
 
 # Carga informacion común a todas las salidas
 con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
@@ -40,8 +40,12 @@ tabla_variables  = psql.read_sql('SELECT * FROM variables_procesado', conn)
 conn.dispose() 
 
 
-
-
+# [postgres]
+# host = "193.146.155.72"
+# port = 5432
+# dbname = "COAC"
+# user = "ignacio"
+# password = "1gn4c10"
 
 
 # # # DATOS HISTORICOS (CORUÑA: 1988 - 2012, VIGO: 1988 - 2015)
@@ -133,44 +137,44 @@ conn.dispose()
 
 
 
-# # # RADIALES 2013-2020 CORUÑA
+# # # # RADIALES 2013-2020 CORUÑA
 
-# Recupera el identificador del programa de muestreo
-programa_muestreo = 'RADIAL CORUÑA'
-id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
+# # Recupera el identificador del programa de muestreo
+# programa_muestreo = 'RADIAL CORUÑA'
+# id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_muestreo,direccion_host,base_datos,usuario,contrasena,puerto)
 
-# Listado de archivos disponibles
-directorio_datos           = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES'
-listado_archivos = [f for f in listdir(directorio_datos) if isfile(join(directorio_datos, f))]
+# # Listado de archivos disponibles
+# directorio_datos           = 'C:/Users/ifraga/Desktop/03-DESARROLLOS/BASE_DATOS_COAC/DATOS/RADIALES'
+# listado_archivos = [f for f in listdir(directorio_datos) if isfile(join(directorio_datos, f))]
 
-listado_archivos = ['RADIAL_BTL_COR_2021.xlsx']
+# listado_archivos = ['RADIAL_BTL_COR_2021.xlsx']
 
 
-#for iarchivo in range(len(listado_archivos)):
-for iarchivo in range(1):
+# #for iarchivo in range(len(listado_archivos)):
+# for iarchivo in range(1):
     
-    # Carga de informacion previa
-    conn             = create_engine(con_engine)
-    tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
-    tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
-    tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
-    tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
-    conn.dispose() 
+#     # Carga de informacion previa
+#     conn             = create_engine(con_engine)
+#     tabla_muestreos  = psql.read_sql('SELECT * FROM muestreos_discretos', conn)
+#     tabla_salidas    = psql.read_sql('SELECT * FROM salidas_muestreos', conn)
+#     tabla_datos      = psql.read_sql('SELECT * FROM datos_discretos', conn)
+#     tabla_estaciones = psql.read_sql('SELECT * FROM estaciones', conn)
+#     conn.dispose() 
     
-    nombre_archivo = directorio_datos + '/' + listado_archivos[iarchivo]
-    print('Procesando la informacion correspondiente al año ',nombre_archivo[-9:-5])
+#     nombre_archivo = directorio_datos + '/' + listado_archivos[iarchivo]
+#     print('Procesando la informacion correspondiente al año ',nombre_archivo[-9:-5])
     
-    # Lectura
-    print('Leyendo los datos contenidos en el archivo excel')
-    datos_radiales = FUNCIONES_LECTURA.lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto)
+#     # Lectura
+#     print('Leyendo los datos contenidos en el archivo excel')
+#     datos_radiales = FUNCIONES_LECTURA.lectura_datos_radiales(nombre_archivo,direccion_host,base_datos,usuario,contrasena,puerto)
     
-    # Control de calidad
-    print('Realizando control de calidad')
-    datos_radiales_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radiales)  
+#     # Control de calidad
+#     print('Realizando control de calidad')
+#     datos_radiales_corregido,textos_aviso = FUNCIONES_PROCESADO.control_calidad(datos_radiales)  
     
-    # Encuentra la estación asociada a cada registro
-    print('Asignando la estación correspondiente a cada medida')
-    datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_estaciones(datos_radiales_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
+#     # Encuentra la estación asociada a cada registro
+#     print('Asignando la estación correspondiente a cada medida')
+#     datos_radiales_corregido = FUNCIONES_PROCESADO.evalua_estaciones(datos_radiales_corregido,id_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_muestreos)
     
     # # Encuentra las salidas al mar correspondientes
     # tipo_salida = 'MENSUAL'   
