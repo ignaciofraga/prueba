@@ -400,8 +400,8 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                     fechas_partida     = fechas_salidas_mar
                     fechas_regreso     = fechas_salidas_mar
                    
-                    import streamlit as st
-                    st.dataframe(fechas_salidas_mar) 
+                    # import streamlit as st
+                    # st.dataframe(fechas_salidas_mar) 
                    
                     for isalida in range(len(fechas_partida)):            
             
@@ -629,6 +629,12 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             
 
         for idato in range(datos.shape[0]):
+            
+            
+            import streamlit as st
+            st.dataframe(df_datos_salidas)
+            datos.iloc[idato]
+            
             
             if 'nombre_muestreo' in listado_variables_datos and datos['nombre_muestreo'].iloc[idato] is not None: 
                 
