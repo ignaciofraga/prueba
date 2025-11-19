@@ -563,8 +563,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     listado_salidas  = datos['id_salida'].unique()
     df_datos_salidas = tabla_muestreos[tabla_muestreos['salida_mar'].isin(listado_salidas)]
     
-    # import streamlit as st
-    # st.dataframe(df_datos_salidas)
+    import streamlit as st
+    st.dataframe(datos)
             #datos.iloc[idato]
     
     listado_variables_datos   = datos.columns.tolist()
