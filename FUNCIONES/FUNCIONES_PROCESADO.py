@@ -592,10 +592,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             
             nombre_muestreo     = abreviatura_programa + '_' + exporta_registros['fecha_muestreo'].iloc[idato].strftime("%Y%m%d") + '_' + str(nombre_estacion)
             
-            
-            import streamlit as st
-            st.dataframe(exporta_registros)
-            
+                       
             
             if 'num_cast' in listado_variables_datos and exporta_registros['num_cast'].iloc[idato] is not None:
                 nombre_muestreo = nombre_muestreo + '_C' + str(round(exporta_registros['num_cast'].iloc[idato]))
