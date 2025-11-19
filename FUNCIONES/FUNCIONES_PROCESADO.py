@@ -563,8 +563,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     listado_salidas  = datos['id_salida'].unique()
     df_datos_salidas = tabla_muestreos[tabla_muestreos['salida_mar'].isin(listado_salidas)]
     
-    import streamlit as st
-    st.dataframe(df_datos_salidas)
+    # import streamlit as st
+    # st.dataframe(df_datos_salidas)
             #datos.iloc[idato]
     
     listado_variables_datos   = datos.columns.tolist()
@@ -574,7 +574,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     datos['muestreo']  = numpy.zeros(datos.shape[0],dtype=int)
     
     # si no hay ningun valor en la tabla de registros, meter directamente todos los datos registrados
-    if tabla_muestreos.shape[0] == 0:
+    if df_datos_salidas.shape[0] == 0:
             
         # Busca qué variables están incluidas en los datos a importar
         listado_variables_comunes = list(set(listado_variables_datos).intersection(df_variables['nombre']))
