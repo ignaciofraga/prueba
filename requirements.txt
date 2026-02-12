@@ -1,8 +1,8 @@
-matplotlib==3.6.2
-openpyxl==3.1.0
+matplotlib
+openpyxl
 psycopg2-binary==2.9.3
-streamlit==1.30.0
-sqlalchemy==1.4.40
-xlsxwriter==3.0.3
-seawater==3.3.4
-pandas==1.5.3
+streamlit
+sqlalchemy
+xlsxwriter
+seawater
+pandas
