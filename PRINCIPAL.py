@@ -15,6 +15,7 @@ from FUNCIONES import PAGINAS
 # Datos comunes utilizados por la aplicación
 logo_IEO_reducido     = 'DATOS/IMAGENES/ieo.ico'
 
+
 # Encabezado  
 imagen_logo   = Image.open(logo_IEO_reducido)
 st.set_page_config(page_title="IEO-COAC", layout="wide",page_icon=logo_IEO_reducido) 
