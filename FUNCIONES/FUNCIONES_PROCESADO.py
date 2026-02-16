@@ -569,9 +569,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     listado_variables_datos   = datos.columns.tolist()
     
     df_variables = tabla_variables[tabla_variables['tipo']=='parametro_muestreo']
-    
-    datos['muestreo']  = numpy.zeros(datos.shape[0],dtype=int)
-    
+        
     # si no hay ningun valor en la tabla de registros, meter directamente todos los datos registrados
     if df_datos_salidas.shape[0] == 0:
         
@@ -586,9 +584,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         listado_adicional         = ['id_estacion_temp','id_salida'] + listado_variables_comunes
         exporta_registros         = datos[listado_adicional]
 
-        # añade el indice de cada registro
-        indices_registros                    = numpy.arange(1,(exporta_registros.shape[0]+1))    
-        exporta_registros['muestreo']     = indices_registros
+        # Crea una columna para almacenar el numero de muestreo
+        exporta_registros['muestreo']     = numpy.zeros(datos.shape[0],dtype=int)
+        
         # renombra la columna con información de la estación muestreada
         exporta_registros                    = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
         # corrige posibles errores en el formato de los datos
@@ -619,6 +617,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
 
             exporta_registros['muestreo'].iloc[idato]                 = registro_inicial + idato + 1
+        
+        
+        datos['muestreo'] = exporta_registros['muestreo']
             
         import streamlit as st    
         st.dataframe(exporta_registros)
