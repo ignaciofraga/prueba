@@ -574,6 +574,12 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     
     # si no hay ningun valor en la tabla de registros, meter directamente todos los datos registrados
     if df_datos_salidas.shape[0] == 0:
+        
+        # Define el numero de registro inicial. 
+        if tabla_muestreos.shape[0] == 0:
+            registro_inicial = 0
+        else:
+            registro_inicial = tabla_muestreos['muestreo'].max()
             
         # Busca qué variables están incluidas en los datos a importar
         listado_variables_comunes = list(set(listado_variables_datos).intersection(df_variables['nombre']))
@@ -612,7 +618,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 
             exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
 
-            exporta_registros['muestreo'].iloc[idato]                 = tabla_muestreos.shape[0] + idato + 1
+            exporta_registros['muestreo'].iloc[idato]                 = registro_inicial + idato + 1
             
         import streamlit as st    
         st.dataframe(exporta_registros)
