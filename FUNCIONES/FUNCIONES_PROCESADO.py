@@ -611,6 +611,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
             datos['muestreo'].iloc[idato]                 = idato + 1
             
+        import streamlit as st    
+        st.dataframe(exporta_registros)
             
         # Inserta en base de datos
         con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
