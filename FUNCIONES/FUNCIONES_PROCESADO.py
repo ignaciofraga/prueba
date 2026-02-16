@@ -612,7 +612,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 
             exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
 
-            datos['muestreo'].iloc[idato]                 = tabla_muestreos.shape[0] + idato + 1
+            exporta_registros['muestreo'].iloc[idato]                 = tabla_muestreos.shape[0] + idato + 1
             
         import streamlit as st    
         st.dataframe(exporta_registros)
