@@ -585,6 +585,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         exporta_registros['muestreo']     = indices_registros
         # renombra la columna con información de la estación muestreada
         exporta_registros                    = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
+        # corrige posibles errores en el formato de los datos
+        exporta_registros[['latitud_muestreo', 'longitud_muestreo']] = exporta_registros[['latitud_muestreo', 'longitud_muestreo']].apply(pandas.to_numeric)
+        
         # # añade el nombre del muestreo
         exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
         for idato in range(exporta_registros.shape[0]):    
