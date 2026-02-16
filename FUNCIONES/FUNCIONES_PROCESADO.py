@@ -620,10 +620,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         
         
         datos['muestreo'] = exporta_registros['muestreo']
-            
-        import streamlit as st    
-        st.dataframe(exporta_registros)
-            
+                        
         # Inserta en base de datos
         con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
         conn_psql        = create_engine(con_engine)        
@@ -675,7 +672,10 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 else:
 
                     df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['presion_ctd_comparacion']== round(datos['presion_ctd'].iloc[idato]))]
-                
+              
+            import streamlit as st
+            st.dataframe(df_temp)
+              
             # Bucle para insertar identificadores de muestreos (vial nutrientes/TOC)
             if df_temp.shape[0]> 0:
                 datos['muestreo'].iloc[idato]          = df_temp['muestreo'].iloc[0]    
