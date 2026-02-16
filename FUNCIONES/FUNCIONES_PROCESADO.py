@@ -631,6 +631,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     # En caso contrario hay que ver registro a registro, si ya está incluido en la base de datos
     else:
     
+        # predimensiona la columna con el identificador del muestreo
+        datos['muestreo']     = numpy.zeros(datos.shape[0],dtype=int)    
+    
         # Busca cuál es el último registro
         ultimo_registro_bd         = max(tabla_muestreos['muestreo'])
         datos['io_nuevo_muestreo'] = numpy.ones(datos.shape[0],dtype=int)
