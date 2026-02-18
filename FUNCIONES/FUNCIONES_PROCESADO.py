@@ -753,6 +753,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 if 'longitud_muestreo' in listado_variables_datos and exporta_registros['longitud_muestreo'].iloc[idato] is not None:
                     exporta_registros['longitud_muestreo'].iloc[idato]  = round(exporta_registros['longitud_muestreo'].iloc[idato],4)
                     
+                    import streamlit as st
+                    st.text('sssssss')
 
                 exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
         
