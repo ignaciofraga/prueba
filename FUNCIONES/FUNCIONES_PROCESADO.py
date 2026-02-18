@@ -681,6 +681,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             
               
             # Bucle para insertar identificadores de muestreos (vial nutrientes/TOC)
+            import streamlit as st
+            st.dataframe(df_temp)
+            
             if df_temp.shape[0]> 0:
                 datos['muestreo'].iloc[idato]          = df_temp['muestreo'].iloc[0]    
                 datos['io_nuevo_muestreo'].iloc[idato] = 0
