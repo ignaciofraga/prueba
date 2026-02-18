@@ -1780,6 +1780,7 @@ def entrada_datos_excel():
         # Cambia los nombres de latitud/longitud 
         if 'latitud' in variables_archivo:
             df_datos_importacion = df_datos_importacion.rename(columns={"latitud": "latitud_muestreo"})
+            df_datos_importacion["latitud_muestreo"] = pandas.to_numeric(df_datos_importacion["latitud_muestreo"])
         else:
             if 'latitud_muestreo' not in variables_archivo:
                 texto_aviso = "Los datos importados no contienen latitud. Se asignará la correspondiente a la estación."
@@ -1787,6 +1788,7 @@ def entrada_datos_excel():
 
         if 'longitud' in variables_archivo:
             df_datos_importacion = df_datos_importacion.rename(columns={"longitud": "longitud_muestreo"})
+            df_datos_importacion["longitud_muestreo"] = pandas.to_numeric(df_datos_importacion["longitud_muestreo"])
         else:
             if 'longitud_muestreo' not in variables_archivo:
                 texto_aviso = "Los datos importados no contienen longitud. Se asignará la correspondiente a la estación."
