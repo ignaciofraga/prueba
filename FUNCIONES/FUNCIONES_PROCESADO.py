@@ -746,7 +746,14 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                         nombre_muestreo = nombre_muestreo + '_P' + str(round(exporta_registros['prof_teorica'].iloc[idato]))
                     else:
                         nombre_muestreo = nombre_muestreo + '_P' + str(round(exporta_registros['presion_ctd'].iloc[idato])) 
-                 
+                        
+                if 'latitud_muestreo' in listado_variables_datos and exporta_registros['latitud_muestreo'].iloc[idato] is not None:
+                    exporta_registros['latitud_muestreo'].iloc[idato]  = round(exporta_registros['latitud_muestreo'].iloc[idato],4)
+
+                if 'longitud_muestreo' in listado_variables_datos and exporta_registros['longitud_muestreo'].iloc[idato] is not None:
+                    exporta_registros['longitud_muestreo'].iloc[idato]  = round(exporta_registros['longitud_muestreo'].iloc[idato],4)
+                    
+
                 exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
         
             # # Inserta el dataframe resultante en la base de datos 
