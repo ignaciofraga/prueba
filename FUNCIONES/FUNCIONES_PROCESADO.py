@@ -1646,6 +1646,8 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
     if 'fosfato' in variables_run:
         datos_entrada['fosfato_CONC'] = datos_entrada['fosfato']/datos_entrada['DENSIDAD']  
 
+    import streamlit as st
+    st.dataframe(datos_entrada)
 
     
     ####  APLICA LA CORRECCIÓN DE DERIVA ####   
