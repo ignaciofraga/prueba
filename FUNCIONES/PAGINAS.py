@@ -1295,8 +1295,8 @@ def procesado_nutrientes():
             # spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
             # listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
 
-            # import streamlit as st
-            # st.text(rmn_elegida_alto)
+            import streamlit as st
+            st.text(rmn_elegida_alto)
             # st.text(rmn_elegida_bajo)
 
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_alto)]
