@@ -136,9 +136,10 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     # Comprueba si los datos tienen un identificador de muestreo. En ese caso, ya tenemos la estacion identificada.
     variables_datos    = datos.columns.tolist()
     if 'nombre_muestreo' in variables_datos and datos['nombre_muestreo'].isnull().values.any() == False:
+     
 
         for idato in range(datos.shape[0]):
-            datos['id_estacion_temp'].iloc[idato] = tabla_muestreos['estacion'].iloc[tabla_muestreos['nombre_muestreo']==datos['nombre_muestreo'].iloc[idato]]
+            datos['id_estacion_temp'].iloc[idato] = tabla_muestreos['estacion'][tabla_muestreos['nombre_muestreo']==datos['nombre_muestreo'].iloc[idato]]
     
     # En caso contrario, hay que buscar la estación asociada
     else: 
@@ -676,10 +677,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
                     df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['presion_ctd_comparacion']== round(datos['presion_ctd'].iloc[idato]))]
               
-            import streamlit as st
-            st.dataframe(df_temp)
-            
-            st.dataframe(datos)
+
             
               
             # Bucle para insertar identificadores de muestreos (vial nutrientes/TOC)
