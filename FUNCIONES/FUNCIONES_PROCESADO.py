@@ -1673,7 +1673,8 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
         pte_RMN      = (RMN_ALTO_variable-RMN_BAJO_variable)/(RMN_altos.iloc[0]-RMN_bajos.iloc[0]) 
         t_indep_RMN  = RMN_BAJO_variable- pte_RMN*RMN_bajos.iloc[0] 
     
-        st.text(variable_concentracion,str(pte_RMN))
+        st.text(variable_concentracion)
+        st.text(str(pte_RMN))
     
         variable_drift = numpy.zeros(datos_entrada.shape[0])
     
