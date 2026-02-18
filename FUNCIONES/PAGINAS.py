@@ -1771,7 +1771,7 @@ def entrada_datos_excel():
                 
         # Cambia el nombre del identificador 
         try:
-            df_datos_importacion = df_datos_importacion.rename(columns={"ID": "id_externo"})
+            df_datos_importacion = df_datos_importacion.rename(columns={"id": "id_externo"})
         except:
             texto_aviso = "Los datos importados no contienen identificador."
             st.warning(texto_aviso, icon="⚠️")
