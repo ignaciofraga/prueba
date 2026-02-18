@@ -138,7 +138,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     if 'nombre_muestreo' in variables_datos and datos['nombre_muestreo'].isnull().values.any() == False:
 
         for idato in range(datos.shape[0]):
-            datos['id_estacion_temp'].iloc[idato] = tabla_muestreos['estacion'][tabla_muestreos['nombre_muestreo']==datos['nombre_muestreo'].iloc[idato]]
+            datos['id_estacion_temp'].iloc[idato] = tabla_muestreos['estacion'].iloc[tabla_muestreos['nombre_muestreo']==datos['nombre_muestreo'].iloc[idato]]
     
     # En caso contrario, hay que buscar la estación asociada
     else: 
