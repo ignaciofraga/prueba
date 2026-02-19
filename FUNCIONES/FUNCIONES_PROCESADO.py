@@ -1646,9 +1646,22 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
     if 'fosfato' in variables_run:
         datos_entrada['fosfato_CONC'] = datos_entrada['fosfato']/datos_entrada['DENSIDAD']  
 
-    import streamlit as st 
+    import streamlit as st
+    st.dataframe(datos_entrada)
+    
+    st.text('hola')
 
     
+    # En el caso de los RMNs, deja la concentración en umol/kg, que es la que está en la base de datos
+    for ivariable in range(len(variables_run)):
+        variable_conc = variables_run[ivariable] + '_CONC'
+        datos_entrada[variable_conc].iloc[posicion_RMN_bajos[0]] = df_referencias_bajas[variables_run[ivariable]].iloc[0]
+        datos_entrada[variable_conc].iloc[posicion_RMN_bajos[1]] = df_referencias_bajas[variables_run[ivariable]].iloc[1]
+        datos_entrada[variable_conc].iloc[posicion_RMN_altos[0]] = df_referencias_altas[variables_run[ivariable]].iloc[0]
+        datos_entrada[variable_conc].iloc[posicion_RMN_altos[1]] = df_referencias_altas[variables_run[ivariable]].iloc[1]
+
+    st.dataframe(datos_entrada)
+
     ####  APLICA LA CORRECCIÓN DE DERIVA ####   
     for ivariable in range(len(variables_run)):
                
