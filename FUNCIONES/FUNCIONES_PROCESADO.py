@@ -1654,6 +1654,9 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
     st.dataframe(posicion_RMN_bajos)
     st.dataframe(posicion_RMN_altos)
     
+    st.dataframe(df_referencias_bajas)
+    st.dataframe(df_referencias_altas)
+    
     # En el caso de los RMNs, deja la concentración en umol/kg, que es la que está en la base de datos
     for ivariable in range(len(variables_run)):
         variable_conc = variables_run[ivariable] + '_CONC'
