@@ -5,3 +5,4 @@ streamlit
 sqlalchemy
 xlsxwriter
 seawater
+pandas==2.3.3
