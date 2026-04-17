@@ -1222,10 +1222,15 @@ def procesado_nutrientes():
             listado_programas         = df_salidas['nombre_programa'].unique()
             programa_seleccionado     = st.selectbox('Programa',(listado_programas))
             indice_programa           = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0]
-
+            
+            st.df(listado_programas)
+            
         with col2:
             
             df_prog_sel               = df_salidas[df_salidas['programa']==indice_programa]
+            
+            st.df(df_prog_sel)
+            
             df_prog_sel['año']        = None
             for idato in range(df_prog_sel.shape[0]):
                 df_prog_sel['año'].iloc[idato] = (df_prog_sel['fecha_salida'].iloc[idato]).year
