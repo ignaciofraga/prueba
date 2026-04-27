@@ -1279,8 +1279,6 @@ def procesado_nutrientes():
             datos_AA              = pandas.read_excel(archivo_AA,skiprows=15)            
             datos_AA              = datos_AA.rename(columns={"Results 1":canales_autoanalizador[0],"Results 2":canales_autoanalizador[1],"Results 3":canales_autoanalizador[2],"Results 4":canales_autoanalizador[3]})
                   
-            st.dataframe(datos_AA)
-            
             # Identifica qué canales/variables se han procesado
             variables_procesadas = datos_AA.columns.tolist()
             variables_run        = list(set(variables_procesadas).intersection(variables_procesado_bd))

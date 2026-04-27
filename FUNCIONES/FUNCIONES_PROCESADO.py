@@ -17,6 +17,7 @@ import seawater
 from io import BytesIO
 
 from matplotlib.ticker import FormatStrFormatter
+import streamlit as st
 
 pandas.options.mode.chained_assignment = None
 
@@ -1672,6 +1673,9 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
         t_indep_RMN  = RMN_BAJO_variable- pte_RMN*RMN_bajos.iloc[0] 
     
 
+        st.text(variables_run[ivariable])
+        st.text(pte_RMN)
+        st.text(t_indep_RMN)
     
         variable_drift = numpy.zeros(datos_entrada.shape[0])
     
