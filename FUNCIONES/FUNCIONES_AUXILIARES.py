@@ -1557,7 +1557,7 @@ def menu_variables_radiales(json_variables_previas):
         if otros:
             json_variables = json_variables + [otros]
 
-
+    st.markdown('')
     st.markdown('REDES')
     col1, col2, col3= st.columns(3,gap="small")
     
