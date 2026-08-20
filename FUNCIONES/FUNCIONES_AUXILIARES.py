@@ -1496,22 +1496,67 @@ def menu_variables_radiales(json_variables_previas):
             nut_b = st.checkbox('Nutrientes (B)', value=False)                     
         if nut_b:
             json_variables = json_variables + ['Nutrientes (B)']
-           
-            
-    with col2:                                       
-        if 'Citometria' in json_variables_previas:   
-            citometria = st.checkbox('Citometria', value=True)
-        else:
-            citometria = st.checkbox('Citometria', value=False)                    
-        if citometria:
-            json_variables = json_variables + ['Citometría']
 
-        if 'Ciliados' in json_variables_previas:                                         
-            ciliados = st.checkbox('Ciliados', value=True)
+    with col2:
+        if 'TOC' in json_variables_previas:                 
+            toc = st.checkbox('TOC', value=True)
         else:
+            toc = st.checkbox('TOC', value=False)                    
+        if toc:
+            json_variables = json_variables + ['TOC']
+        
+        if 'Bacterias' in json_variables_previas:                                    
+            bacterias = st.checkbox('Bacterias', value=True)
+        else:
+            bacterias = st.checkbox('Bacterias', value=False)                    
+        if bacterias:
+            json_variables = json_variables + ['Bacterias']  
+                   
+        if 'POC' in json_variables_previas:    
+            poc = st.checkbox('POC', value=True)
+        else:
+            poc = st.checkbox('POC', value=False)                    
+        if poc:
+            json_variables = json_variables + ['POC']
+
+    with col3:
+       if 'Clorofilas' in json_variables_previas: 
+           colorofilas = st.checkbox('Clorofilas', value=True)
+       else:
+           colorofilas = st.checkbox('Clorofilas', value=False)                    
+       if colorofilas:
+           json_variables = json_variables + ['Clorofilas'] 
+
+       if 'Prod.Primaria' in json_variables_previas: 
+           prod_prim = st.checkbox('Prod.Primaria', value=True)
+       else:
+           prod_prim = st.checkbox('Prod.Primaria', value=False)                    
+       if prod_prim:
+           json_variables = json_variables + ['Prod.Primaria']
+               
+       if 'Ciliados' in json_variables_previas:                                         
+            ciliados = st.checkbox('Ciliados', value=True)
+       else:
             ciliados = st.checkbox('Ciliados', value=False)                    
-        if ciliados:
+       if ciliados:
             json_variables = json_variables + ['Ciliados']
+                
+       if 'Flow Cam' in json_variables_previas:                     
+           flow_cam = st.checkbox('Flow Cam', value=True)
+       else:
+           flow_cam = st.checkbox('Flow Cam', value=False)
+       if flow_cam:
+           json_variables = json_variables + ['Flow Cam'] 
+           
+       if 'ADN' in json_variables_previas:                    
+           adn = st.checkbox('ADN', value=True)
+       else:
+           adn = st.checkbox('ADN', value=False)                    
+       if adn:
+           json_variables = json_variables + ['ADN'] 
+
+            
+    with col4:                                       
 
         if 'Zoop. (meso)' in json_variables_previas:                     
             zoop_meso = st.checkbox('Zoop. (meso)', value=True)
@@ -1533,66 +1578,6 @@ def menu_variables_radiales(json_variables_previas):
             zoop_ictio = st.checkbox('Zoop. (ictio)', value=False)                    
         if zoop_ictio:
             json_variables = json_variables + ['Zoop. (ictio)']   
-
-
-    with col3:
-        if 'Clorofilas' in json_variables_previas: 
-            colorofilas = st.checkbox('Clorofilas', value=True)
-        else:
-            colorofilas = st.checkbox('Clorofilas', value=False)                    
-        if colorofilas:
-            json_variables = json_variables + ['Clorofilas'] 
-
-        if 'Prod.Primaria' in json_variables_previas: 
-            prod_prim = st.checkbox('Prod.Primaria', value=True)
-        else:
-            prod_prim = st.checkbox('Prod.Primaria', value=False)                    
-        if prod_prim:
-            json_variables = json_variables + ['Prod.Primaria']
-                                
-        if 'Flow Cam' in json_variables_previas:                     
-            flow_cam = st.checkbox('Flow Cam', value=True)
-        else:
-            flow_cam = st.checkbox('Flow Cam', value=False)
-        if flow_cam:
-            json_variables = json_variables + ['Flow Cam'] 
-            
-        if 'ADN' in json_variables_previas:                    
-            adn = st.checkbox('ADN', value=True)
-        else:
-            adn = st.checkbox('ADN', value=False)                    
-        if adn:
-            json_variables = json_variables + ['ADN'] 
-
-        if 'DOM' in json_variables_previas:                     
-            dom = st.checkbox('DOM', value=True)
-        else:
-            dom = st.checkbox('DOM', value=False)                
-        if dom:
-            json_variables = json_variables + ['DOM']
-    
-    
-    with col4:
-        if 'TOC' in json_variables_previas:                 
-            toc = st.checkbox('TOC', value=True)
-        else:
-            toc = st.checkbox('TOC', value=False)                    
-        if toc:
-            json_variables = json_variables + ['TOC']
-            
-        if 'POC' in json_variables_previas:    
-            poc = st.checkbox('POC', value=True)
-        else:
-            poc = st.checkbox('POC', value=False)                    
-        if poc:
-            json_variables = json_variables + ['POC']
-
-        if 'PPL' in json_variables_previas:                                    
-            ppl = st.checkbox('PPL', value=True)
-        else:
-            ppl = st.checkbox('PPL', value=False)                    
-        if ppl:
-            json_variables = json_variables + ['PPL']
             
         otros = st.text_input('Otros:')
         if otros:
