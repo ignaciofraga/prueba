@@ -259,9 +259,9 @@ def entrada_salidas_mar():
         with col1:
             tipo_salida     = st.selectbox('Tipo de radial',(tipos_radiales))
        
-            nombre_temporal= 'RADIAL CORUÑA ' + tipos_radiales + ' ' + listado_meses[fecha_actual.month] + ' ' + str(fecha_actual.year)
+            nombre_temporal= 'RADIAL CORUÑA ' + tipo_salida + ' ' + listado_meses[fecha_actual.month] + ' ' + str(fecha_actual.year)
         
-            if tipos_radiales == 'SEMANAL':
+            if tipo_salida == 'SEMANAL':
   
                 dia_1 = fecha_actual.replace(day=1)
                 inicio_semana = 7-dia_1.weekday()
