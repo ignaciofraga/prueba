@@ -1561,7 +1561,6 @@ def menu_variables_radiales(json_variables_previas):
     st.markdown('')
     st.markdown('')
     st.markdown('')
-    st.markdown('')
     st.markdown('REDES')
     col1, col2, col3= st.columns(3,gap="small")
     
@@ -1592,7 +1591,6 @@ def menu_variables_radiales(json_variables_previas):
     
     
     
-    st.markdown('')
     st.markdown('')
     st.markdown('')
     st.markdown('')
