@@ -1483,20 +1483,13 @@ def menu_variables_radiales(json_variables_previas):
         if ph:
             json_variables = json_variables + ['pH']
             
-        if 'Nutrientes (A)' in json_variables_previas:                 
-            nut_a = st.checkbox('Nutrientes (A)', value=True)
+        if 'Nutrientes' in json_variables_previas:                 
+            nut = st.checkbox('Nutrientes', value=True)
         else:
-            nut_a = st.checkbox('Nutrientes (A)', value=False)                    
-        if nut_a:
-            json_variables = json_variables + ['Nutrientes (A)']
+            nut = st.checkbox('Nutrientes', value=False)                    
+        if nut:
+            json_variables = json_variables + ['Nutrientes']
             
-        if 'Nutrientes (B)' in json_variables_previas:                 
-            nut_b = st.checkbox('Nutrientes (B)', value=True)
-        else:
-            nut_b = st.checkbox('Nutrientes (B)', value=False)                     
-        if nut_b:
-            json_variables = json_variables + ['Nutrientes (B)']
-
     with col2:
         if 'TOC' in json_variables_previas:                 
             toc = st.checkbox('TOC', value=True)
@@ -1518,14 +1511,16 @@ def menu_variables_radiales(json_variables_previas):
             poc = st.checkbox('POC', value=False)                    
         if poc:
             json_variables = json_variables + ['POC']
+            
+        if 'Clorofilas' in json_variables_previas: 
+            colorofilas = st.checkbox('Clorofilas', value=True)
+        else:
+            colorofilas = st.checkbox('Clorofilas', value=False)                    
+        if colorofilas:
+            json_variables = json_variables + ['Clorofilas'] 
+
 
     with col3:
-       if 'Clorofilas' in json_variables_previas: 
-           colorofilas = st.checkbox('Clorofilas', value=True)
-       else:
-           colorofilas = st.checkbox('Clorofilas', value=False)                    
-       if colorofilas:
-           json_variables = json_variables + ['Clorofilas'] 
 
        if 'Prod.Primaria' in json_variables_previas: 
            prod_prim = st.checkbox('Prod.Primaria', value=True)
