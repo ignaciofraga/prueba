@@ -1552,27 +1552,6 @@ def menu_variables_radiales(json_variables_previas):
 
             
     with col4:                                       
-
-        if 'Zoop. (meso)' in json_variables_previas:                     
-            zoop_meso = st.checkbox('Zoop. (meso)', value=True)
-        else:
-            zoop_meso = st.checkbox('Zoop. (meso)', value=False)                    
-        if zoop_meso:
-            json_variables = json_variables + ['Zoop. (meso)']
-
-        if 'Zoop. (micro)' in json_variables_previas:                     
-            zoop_micro = st.checkbox('Zoop. (micro)', value=True)
-        else:
-            zoop_micro = st.checkbox('Zoop. (micro)', value=False)                    
-        if zoop_micro:
-            json_variables = json_variables + ['Zoop. (micro)']   
-           
-        if 'Zoop. (ictio)' in json_variables_previas: 
-            zoop_ictio = st.checkbox('Zoop. (ictio)', value=True)
-        else:
-            zoop_ictio = st.checkbox('Zoop. (ictio)', value=False)                    
-        if zoop_ictio:
-            json_variables = json_variables + ['Zoop. (ictio)']   
             
         otros = st.text_input('Otros:')
         if otros:
