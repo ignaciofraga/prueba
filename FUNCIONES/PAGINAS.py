@@ -280,17 +280,7 @@ def entrada_salidas_mar():
         # Despliega los formularios 
         with st.form("Formulario seleccion"):
                    
-            # col1, col2 = st.columns(2,gap="small")
-            
-            # with col1:
-            #     tipo_salida     = st.selectbox('Tipo de radial',(tipos_radiales))
-           
-            # with col2:
-                
-            #     #st.text(tipo_salida)
-            #     nombre_salida        = st.text_input('Nombre de la salida', value=tipo_salida)                
-            
-
+  
             # Selección de fechas, personal, y estaciones        
             personal_comisionado_previo    = None
             personal_no_comisionado_previo = None
@@ -307,7 +297,9 @@ def entrada_salidas_mar():
             json_variables    = json.dumps(json_variables)
                     
             json_variables         = json.dumps(json_variables)
-
+    
+            st.markdown('')
+            st.markdown('')
             observaciones = st.text_input('Observaciones', value="")
 
             submit = st.form_submit_button("Añadir salida")
