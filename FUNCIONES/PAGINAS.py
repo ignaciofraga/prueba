@@ -261,8 +261,8 @@ def entrada_salidas_mar():
            
             with col2:
                 
-                st.text(tipo_salida)
-                nombre_salida        = st.text_input('Nombre de la salida', value="")                
+                #st.text(tipo_salida)
+                nombre_salida        = st.text_input('Nombre de la salida', value=tipo_salida)                
             
 
             # Selección de fechas, personal, y estaciones        
