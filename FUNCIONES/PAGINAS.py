@@ -237,6 +237,7 @@ def entrada_salidas_mar():
     fecha_actual        = datetime.date.today()
     hora_defecto_inicio = datetime.time(8,30,0,0,tzinfo = datetime.timezone.utc)
     hora_defecto_final  = datetime.time(14,30,0,0,tzinfo = datetime.timezone.utc)  
+    listado_meses       = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']
   
     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
     entradas     = ['Añadir salida al mar','Modificar salidas realizadas','Consultar salidas realizadas','Personal participante']
@@ -251,11 +252,24 @@ def entrada_salidas_mar():
         # tipos de salida en las radiales
         tipos_radiales = ['MENSUAL','SEMANAL']
 
+
+
         col1, col2 = st.columns(2,gap="small")
         
         with col1:
             tipo_salida     = st.selectbox('Tipo de radial',(tipos_radiales))
        
+            nombre_temporal= 'RADIAL CORUÑA ' + tipos_radiales + ' ' + listado_meses[fecha_actual.month] + ' ' + str(fecha_actual.year)
+        
+            if tipos_radiales == 'SEMANAL':
+  
+                dia_1 = fecha_actual.replace(day=1)
+                inicio_semana = 7-dia_1.weekday()
+                fecha_inicio_semana = fecha_actual.replace(day=inicio_semana+1)
+                num_semana = int((fecha_actual.day-fecha_inicio_semana.day)/7) + 1
+                
+                nombre_temporal= nombre_temporal  + ' SEMANA ' + str(num_semana)             
+        
         with col2:
             
             #st.text(tipo_salida)
