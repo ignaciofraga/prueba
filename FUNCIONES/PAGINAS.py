@@ -495,7 +495,7 @@ def entrada_salidas_mar():
         st.dataframe(df_temp,use_container_width=True)
         
         # Muestra una tabla con las salidas realizadas
-        st.dataframe(df_salidas_seleccion,use_container_width=True)
+        #st.dataframe(df_salidas_seleccion,use_container_width=True)
         #st.dataframe(df_salidas_seleccion_ordenado)
 
         # Botón para descargar las salidas disponibles
