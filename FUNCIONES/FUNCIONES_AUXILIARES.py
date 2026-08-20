@@ -1559,40 +1559,36 @@ def menu_variables_radiales(json_variables_previas):
 
     st.markdown('')
     st.markdown('')
-    st.markdown('')
-    st.markdown('')
     st.markdown('REDES')
     col1, col2, col3= st.columns(3,gap="small")
     
     with col1:                                       
-        if 'Zoop. (micro)' in json_variables_previas:                     
-            zoop_micro = st.checkbox('Zoop. (micro)', value=True)
+        if 'Microplancton' in json_variables_previas:                     
+            micro_pkt = st.checkbox('Microplancton', value=True)
         else:
-            zoop_micro = st.checkbox('Zoop. (micro)', value=False)                    
-        if zoop_micro:
-            json_variables = json_variables + ['Zoop. (micro)']   
+            micro_pkt = st.checkbox('Microplancton', value=False)                    
+        if micro_pkt:
+            json_variables = json_variables + ['Microplancton']   
 
 
     with col2: 
-        if 'Zoop. (meso)' in json_variables_previas:                     
-            zoop_meso = st.checkbox('Zoop. (meso)', value=True)
+        if 'Mesoplankton' in json_variables_previas:                     
+            meso_pkt = st.checkbox('Mesoplankton', value=True)
         else:
-            zoop_meso = st.checkbox('Zoop. (meso)', value=False)                    
-        if zoop_meso:
-            json_variables = json_variables + ['Zoop. (meso)']
+            meso_pkt = st.checkbox('Mesoplankton', value=False)                    
+        if meso_pkt:
+            json_variables = json_variables + ['Mesoplankton']
            
     with col3: 
-        if 'Zoop. (ictio)' in json_variables_previas: 
-            zoop_ictio = st.checkbox('Zoop. (ictio)', value=True)
+        if 'Ictioplankton' in json_variables_previas: 
+            zoop_ictio = st.checkbox('Ictioplankton', value=True)
         else:
-            zoop_ictio = st.checkbox('Zoop. (ictio)', value=False)                    
+            zoop_ictio = st.checkbox('Ictioplankton', value=False)                    
         if zoop_ictio:
-            json_variables = json_variables + ['Zoop. (ictio)']       
+            json_variables = json_variables + ['Ictioplankton']       
     
     
     
-    st.markdown('')
-    st.markdown('')
     st.markdown('')
     st.markdown('')
     st.markdown('CONTINUO')
