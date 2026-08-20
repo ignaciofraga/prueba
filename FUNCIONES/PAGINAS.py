@@ -260,6 +260,8 @@ def entrada_salidas_mar():
                 tipo_salida     = st.selectbox('Tipo de radial',(tipos_radiales))
            
             with col2:
+                
+                st.text(tipo_salida)
                 nombre_salida        = st.text_input('Nombre de la salida', value="")                
             
 
