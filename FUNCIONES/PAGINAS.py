@@ -253,7 +253,30 @@ def entrada_datos_continuo():
 
     salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)     
 
-    
+
+    with st.form("Formulario seleccion"): 
+
+        # Despliega la extensión para subir los archivos .btl y .cnv
+        col1, col2, col3, col4 = st.columns(4,gap="small")
+        
+        with col1:
+            archivo_cnv = st.file_uploader("Arrastra o selecciona el archivos .cnv", accept_multiple_files=False)   
+        with col2:
+            archivo_pco2 = st.file_uploader("Arrastra o selecciona el archivo del pCO2", accept_multiple_files=False)   
+        with col3:
+            archivo_pH = st.file_uploader("Arrastra o selecciona el archivo del pH", accept_multiple_files=False)   
+        with col4:
+            archivo_o2 = st.file_uploader("Arrastra o selecciona el archivo del oxímetro", accept_multiple_files=False)               
+       
+        
+        submit = st.form_submit_button("Procesar los archivos añadidos")                    
+
+    if submit is True:
+                                         
+        for archivo_btl in listado_archivos_btl:
+
+
+
 ###############################################################################
 ################# PÁGINA DE ENTRADA DE SALIDAS A MAR ##########################
 ###############################################################################    
