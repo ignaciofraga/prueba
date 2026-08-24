@@ -272,9 +272,9 @@ def entrada_datos_continuo():
         
         submit = st.form_submit_button("Procesar los archivos añadidos")                    
 
-    if submit is True:
+    # if submit is True:
                                          
-        for archivo_btl in listado_archivos_btl:
+    #     for archivo_btl in listado_archivos_btl:
 
 
 
