@@ -197,6 +197,7 @@ def consulta_estado():
 ###############################################################################    
     
 
+
 def entrada_datos_continuo():
     
     # Función para cargar en caché los datos a utilizar
