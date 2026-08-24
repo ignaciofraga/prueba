@@ -196,6 +196,7 @@ def consulta_estado():
 ################# PÁGINA DE ENTRADA DE SALIDAS A MAR ##########################
 ###############################################################################    
     
+
 def entrada_datos_continuo():
     
     # Función para cargar en caché los datos a utilizar
