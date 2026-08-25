@@ -300,7 +300,7 @@ def entrada_datos_continuo():
                    io_init = icount
                    
                if texto_linea[0:7] == "# name ":
-                   listado_variables = listado_variables + [re.search(formato_variables, ilinea).group(1) ]
+                   listado_variables = listado_variables + [re.search(formato_variables, datos_archivo_cnv[ilinea]).group(1) ]
                    
                    
                if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast 
