@@ -288,15 +288,15 @@ def entrada_datos_continuo():
             
             st.text(fecha_muestreo)
     
-    #         # Inserta en la base de datos
-    #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    #         cursor = conn.cursor()                      
-    #         instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
-    #         VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''        
-    #         cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,dias_salida_mar[idia],dias_salida_mar[idia],json_estaciones))
-    #         conn.commit()
-    #         cursor.close()
-    #         conn.close()
+            # Inserta en la base de datos
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()                      
+            instruccion_sql = '''INSERT INTO transectos_superficie (nombre_transecto,fecha_inicio,trayectoria,salida_mar)
+            VALUES (%s,%s,%s,%s) ON CONFLICT (nombre_transecto,salida_mar) DO NOTHING;'''        
+            cursor.execute(instruccion_sql, (nombre_salida,fecha_muestreo,json_datos,int(id_salida)))
+            conn.commit()
+            cursor.close()
+            conn.close()
                                      
     #     for archivo_btl in listado_archivos_btl:
 
