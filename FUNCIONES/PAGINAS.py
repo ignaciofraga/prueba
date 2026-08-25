@@ -252,10 +252,15 @@ def entrada_datos_continuo():
         anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
         df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
 
-    salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)     
+    nombre_salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)     
 
+    id_salida                      = df_salidas_seleccion[df_salidas_seleccion['nombre_salida']==nombre_salida]["id_salida"].iloc[0]
+    
+    st.text(nombre_salida)
+    
+    st.text(id_salida)
 
-    with st.form("Formulario seleccion"): 
+    with st.form("Archivos a cargar en la base de datos"): 
 
         # Despliega la extensión para subir los archivos .btl y .cnv
         col1, col2, col3, col4 = st.columns(4,gap="small")
@@ -273,7 +278,19 @@ def entrada_datos_continuo():
         submit = st.form_submit_button("Procesar los archivos añadidos")                    
 
     # if submit is True:
-                                         
+    
+    #     if archivo_cnv:
+            
+    #         # Inserta en la base de datos
+    #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    #         cursor = conn.cursor()                      
+    #         instruccion_sql = '''INSERT INTO salidas_muestreos (id_salida,nombre_salida,programa,nombre_programa,tipo_salida,fecha_salida,fecha_retorno,estaciones)
+    #         VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (programa,fecha_salida) DO NOTHING;'''        
+    #         cursor.execute(instruccion_sql, (int(id_salida),nombre_salida,int(id_programa),nombre_programa,tipo_salida,dias_salida_mar[idia],dias_salida_mar[idia],json_estaciones))
+    #         conn.commit()
+    #         cursor.close()
+    #         conn.close()
+                                     
     #     for archivo_btl in listado_archivos_btl:
 
 
