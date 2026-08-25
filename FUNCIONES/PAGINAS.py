@@ -322,7 +322,7 @@ def entrada_datos_continuo():
             json_datos = datos_cnv.to_json(orient='records') 
             #json_datos,fecha_muestreo = FUNCIONES_LECTURA.lectura_continuo_cnv(archivo_cnv) 
             
-            st.text(fecha_muestreo)
+            st.text(json_datos)
     
     #         # Inserta en la base de datos
     #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
