@@ -277,10 +277,14 @@ def entrada_datos_continuo():
         
         submit = st.form_submit_button("Procesar los archivos añadidos")                    
 
-    # if submit is True:
+    if submit is True:
     
-    #     if archivo_cnv:
+        if archivo_cnv:
+    
+            json_datos,fecha_muestreo = FUNCIONES_LECTURA.lectura_continuo_cnv(archivo_cnv) 
             
+            st.text(fecha_muestreo)
+    
     #         # Inserta en la base de datos
     #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
     #         cursor = conn.cursor()                      
