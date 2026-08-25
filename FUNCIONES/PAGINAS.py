@@ -291,7 +291,7 @@ def entrada_datos_continuo():
             # Inserta en la base de datos
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
             cursor = conn.cursor()                      
-            instruccion_sql = '''INSERT INTO transectos_superficie (nombre_transecto,fecha_inicio,trayectoria,salida_mar)
+            instruccion_sql = '''INSERT INTO transectos_superficie (nombre_transecto,fecha_inicio,datos_tsg,salida_mar)
             VALUES (%s,%s,%s,%s) ON CONFLICT (nombre_transecto,salida_mar) DO NOTHING;'''        
             cursor.execute(instruccion_sql, (nombre_salida,fecha_muestreo,json_datos,int(id_salida)))
             conn.commit()
