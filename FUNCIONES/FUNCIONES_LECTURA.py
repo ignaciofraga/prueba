@@ -1197,40 +1197,43 @@ def lectura_toc(archivo_toc):
 # ########### FUNCION PARA PROCESAR ARCHIVOS CNV DEL CONTINUO ##########
 # ######################################################################    
 
-def lectura_continuo_cnv(archivo_cnv): 
+def lectura_continuo_cnv(nombre_archivo_cnv,datos_archivo_cnv): 
  
     
-   # Lee todo el archivo linea a linea para encontrar el final de la cabecera
-   listado_variables = []
-   formato_variables = r"\= (.*?)\:"
+    # Lee todo el archivo linea a linea para encontrar el final de la cabecera
+    listado_variables = []
+    formato_variables = r"\= (.*?)\:"
 
-   with open(archivo_cnv, "r", encoding="utf-8") as file:
-       icount = 0
-       for line in file:
-           icount = icount + 1
-           if line[0:5] == '*END*': 
-               io_init = icount
-               
-           if line[0:7] == "# name ":
-               listado_variables = listado_variables + [re.search(formato_variables, line).group(1) ]
-               
-               
-           if line[0:14] == '* System UTC =': # Línea con hora del cast 
-               listado_textos   = line.split('= ') 
-               try:
-                   datetime_inicio_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
-               except:
-                   datetime_inicio_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
 
-               fecha_muestreo = datetime_inicio_muestreo.date()
-               
-   datos_cnv = pandas.read_csv(archivo_cnv,skiprows=io_init,sep='\s{2,}',names = listado_variables)
+    icount = 0
+    for ilinea in range(len(datos_archivo_cnv)):
+
+       icount = icount + 1
+       texto_linea = datos_archivo_cnv[ilinea]
+       
+       if texto_linea[0:5] == '*END*': 
+           io_init = icount
            
+       if texto_linea[0:7] == "# name ":
+           listado_variables = listado_variables + [re.search(formato_variables, datos_archivo_cnv[ilinea]).group(1) ]
+           
+           
+       if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast 
+           listado_textos   = texto_linea.split('= ') 
+           try:
+               datetime_inicio_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
+           except:
+               datetime_inicio_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
 
-   datos_cnv['time'] = (datetime_inicio_muestreo + pandas.to_timedelta(datos_cnv['timeM'], unit='m'))
+           fecha_muestreo = datetime_inicio_muestreo.date()
+           
+    datos_cnv = pandas.read_csv(nombre_archivo_cnv,skiprows=io_init,sep='\s{2,}',names = listado_variables)
+       
 
-   datos_cnv = datos_cnv.drop(["timeM", "flag"], axis=1)
+    datos_cnv['time'] = (datetime_inicio_muestreo + pandas.to_timedelta(datos_cnv['timeM'], unit='m'))
 
-   json_datos = datos_cnv.to_json(orient='records') 
+    datos_cnv = datos_cnv.drop(["timeM", "flag"], axis=1)
+
+    json_datos = datos_cnv.to_json(orient='records') 
    
-   return json_datos,fecha_muestreo
+    return json_datos,fecha_muestreo

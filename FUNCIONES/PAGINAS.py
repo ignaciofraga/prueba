@@ -282,47 +282,10 @@ def entrada_datos_continuo():
         if archivo_cnv:
     
             datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines()        
-    
-            import re
-    
-            # Lee todo el archivo linea a linea para encontrar el final de la cabecera
-            listado_variables = []
-            formato_variables = r"\= (.*?)\:"
-    
-    
-            icount = 0
-            for ilinea in range(len(datos_archivo_cnv)):
-    
-               icount = icount + 1
-               texto_linea = datos_archivo_cnv[ilinea]
-               
-               if texto_linea[0:5] == '*END*': 
-                   io_init = icount
-                   
-               if texto_linea[0:7] == "# name ":
-                   listado_variables = listado_variables + [re.search(formato_variables, datos_archivo_cnv[ilinea]).group(1) ]
-                   
-                   
-               if texto_linea[0:14] == '* System UTC =': # Línea con hora del cast 
-                   listado_textos   = texto_linea.split('= ') 
-                   try:
-                       datetime_inicio_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S ')
-                   except:
-                       datetime_inicio_muestreo = datetime.datetime.strptime(listado_textos[-1],'%b %d %Y %H:%M:%S')
-
-                   fecha_muestreo = datetime_inicio_muestreo.date()
-                   
-            datos_cnv = pandas.read_csv(archivo_cnv,skiprows=io_init,sep='\s{2,}',names = listado_variables)
-               
-
-            datos_cnv['time'] = (datetime_inicio_muestreo + pandas.to_timedelta(datos_cnv['timeM'], unit='m'))
-
-            datos_cnv = datos_cnv.drop(["timeM", "flag"], axis=1)
-
-            json_datos = datos_cnv.to_json(orient='records') 
-            #json_datos,fecha_muestreo = FUNCIONES_LECTURA.lectura_continuo_cnv(archivo_cnv) 
+       
+            json_datos,fecha_muestreo = FUNCIONES_LECTURA.lectura_continuo_cnv(archivo_cnv,datos_archivo_cnv) 
             
-            st.text(json_datos)
+            st.text(fecha_muestreo)
     
     #         # Inserta en la base de datos
     #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
