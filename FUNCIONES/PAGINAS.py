@@ -285,6 +285,7 @@ def entrada_datos_continuo():
        
             json_datos,fecha_muestreo = FUNCIONES_LECTURA.lectura_continuo_cnv(archivo_cnv,datos_archivo_cnv) 
             
+            
             st.text(fecha_muestreo)
     
     #         # Inserta en la base de datos
