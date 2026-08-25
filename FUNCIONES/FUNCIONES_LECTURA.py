@@ -1232,6 +1232,7 @@ def lectura_continuo_cnv(nombre_archivo_cnv,datos_archivo_cnv):
 
     datos_cnv['time'] = (datetime_inicio_muestreo + pandas.to_timedelta(datos_cnv['timeM'], unit='m'))
     
+    
     datos_cnv['time'] = datos_cnv['time'].astype(str)
 
     datos_cnv = datos_cnv.drop(["timeM", "flag"], axis=1)
