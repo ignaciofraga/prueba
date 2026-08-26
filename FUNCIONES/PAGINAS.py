@@ -288,10 +288,15 @@ def entrada_datos_continuo():
          
             
         # Leer el archivo del sensor de pH y guardar el contenido tal cual como una cadena de texto
+        
         if archivo_pH:
             
-            with open(archivo_pH, 'r') as file:
-                contenido_archivo_pH = file.read()
+            contenido_archivo_pH = archivo_pH.getvalue().decode('ISO-8859-1')
+            # with open(archivo_pH, 'r') as file:
+        
+            #     contenido_archivo_pH = file.read()
+                
+                
                 
         else:
             contenido_archivo_pH = None
