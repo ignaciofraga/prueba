@@ -287,31 +287,31 @@ def entrada_datos_continuo():
             json_datos,fecha_muestreo = FUNCIONES_LECTURA.lectura_continuo_cnv(archivo_cnv,datos_archivo_cnv) 
          
             
-        # Leer el archivo del sensor de pH y guardar el contenido tal cual como una cadena de texto
+            # Leer el archivo del sensor de pH y guardar el contenido tal cual como una cadena de texto
         
-        if archivo_pH:
+            if archivo_pH:
             
-            contenido_archivo_pH = archivo_pH.getvalue().decode('ISO-8859-1')
+                contenido_archivo_pH = archivo_pH.getvalue().decode('ISO-8859-1')
             # with open(archivo_pH, 'r') as file:
         
             #     contenido_archivo_pH = file.read()
                 
                 
                 
-        else:
-            contenido_archivo_pH = None
+            else:
+                contenido_archivo_pH = None
 
 
-        # Leer el archivo del sensor de pCO2 y guardar el contenido tal cual como una cadena de texto
-        if archivo_pco2:
+            # Leer el archivo del sensor de pCO2 y guardar el contenido tal cual como una cadena de texto
+            if archivo_pco2:
             
             
-            contenido_archivo_pCO2 = archivo_pco2.getvalue().decode('ISO-8859-1')
+                contenido_archivo_pCO2 = archivo_pco2.getvalue().decode('ISO-8859-1')
             # with open(archivo_pco2, 'r') as file:
             #     contenido_archivo_pCO2 = file.read()
                 
-        else:
-            contenido_archivo_pCO2 = None
+            else:
+                contenido_archivo_pCO2 = None
             
  
             # Leer el archivo del sensor de O2 y guardar el contenido tal cual como una cadena de texto
