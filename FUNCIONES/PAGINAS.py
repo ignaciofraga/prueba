@@ -278,22 +278,55 @@ def entrada_datos_continuo():
         submit = st.form_submit_button("Procesar los archivos añadidos")                    
 
     if submit is True:
-    
+ 
+        # Leer los datos del TSG y transformarlos a un json
         if archivo_cnv:
     
             datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines()        
        
             json_datos,fecha_muestreo = FUNCIONES_LECTURA.lectura_continuo_cnv(archivo_cnv,datos_archivo_cnv) 
+         
+            
+        # Leer el archivo del sensor de pH y guardar el contenido tal cual como una cadena de texto
+        if archivo_pH:
+            
+            with open(archivo_pH, 'r') as file:
+                contenido_archivo_pH = file.read()
+                
+        else:
+            contenido_archivo_pH = None
+
+
+        # Leer el archivo del sensor de pCO2 y guardar el contenido tal cual como una cadena de texto
+        if archivo_pco2:
+            
+            with open(archivo_pco2, 'r') as file:
+                contenido_archivo_pCO2 = file.read()
+                
+        else:
+            contenido_archivo_pCO2 = None
+            
+ 
+            # Leer el archivo del sensor de O2 y guardar el contenido tal cual como una cadena de texto
+            if archivo_o2:
+                
+                with open(archivo_o2, 'r') as file:
+                    contenido_archivo_O2 = file.read()
+                    
+            else:
+                contenido_archivo_O2 = None
             
             
             st.text(fecha_muestreo)
+            
+            
     
             # Inserta en la base de datos
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
             cursor = conn.cursor()                      
-            instruccion_sql = '''INSERT INTO transectos_superficie (nombre_transecto,fecha_inicio,datos_tsg,salida_mar)
-            VALUES (%s,%s,%s,%s) ON CONFLICT (nombre_transecto,salida_mar) DO NOTHING;'''        
-            cursor.execute(instruccion_sql, (nombre_salida,fecha_muestreo,json_datos,int(id_salida)))
+            instruccion_sql = '''INSERT INTO transectos_superficie (nombre_transecto,fecha_inicio,datos_tsg,datos_o2,datos_ph,datos_pco2,salida_mar)
+            VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_transecto,salida_mar) DO NOTHING;'''        
+            cursor.execute(instruccion_sql, (nombre_salida,fecha_muestreo,json_datos,contenido_archivo_O2,contenido_archivo_pH,contenido_archivo_pCO2,int(id_salida)))
             conn.commit()
             cursor.close()
             conn.close()
