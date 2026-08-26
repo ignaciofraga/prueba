@@ -338,7 +338,10 @@ def entrada_datos_continuo():
             conn.commit()
             cursor.close()
             conn.close()
-                                     
+                              
+            texto_exito = 'Datos añadidos correctamente'
+            st.success(texto_exito)
+            
     #     for archivo_btl in listado_archivos_btl:
 
 
