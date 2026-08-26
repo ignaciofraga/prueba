@@ -305,8 +305,10 @@ def entrada_datos_continuo():
         # Leer el archivo del sensor de pCO2 y guardar el contenido tal cual como una cadena de texto
         if archivo_pco2:
             
-            with open(archivo_pco2, 'r') as file:
-                contenido_archivo_pCO2 = file.read()
+            
+            contenido_archivo_pCO2 = archivo_pco2.getvalue().decode('ISO-8859-1')
+            # with open(archivo_pco2, 'r') as file:
+            #     contenido_archivo_pCO2 = file.read()
                 
         else:
             contenido_archivo_pCO2 = None
@@ -315,8 +317,9 @@ def entrada_datos_continuo():
             # Leer el archivo del sensor de O2 y guardar el contenido tal cual como una cadena de texto
             if archivo_o2:
                 
-                with open(archivo_o2, 'r') as file:
-                    contenido_archivo_O2 = file.read()
+                contenido_archivo_O2 = archivo_o2.getvalue().decode('ISO-8859-1')
+                # with open(archivo_o2, 'r') as file:
+                #     contenido_archivo_O2 = file.read()
                     
             else:
                 contenido_archivo_O2 = None
