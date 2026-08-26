@@ -327,17 +327,18 @@ def entrada_datos_continuo():
             
             st.text(fecha_muestreo)
             
-            
+            texto_estado = 'Subiendo la informacion ' 
+            with st.spinner(texto_estado):
     
-            # Inserta en la base de datos
-            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-            cursor = conn.cursor()                      
-            instruccion_sql = '''INSERT INTO transectos_superficie (nombre_transecto,fecha_inicio,datos_tsg,datos_o2,datos_ph,datos_pco2,salida_mar)
-            VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_transecto,salida_mar) DO NOTHING;'''        
-            cursor.execute(instruccion_sql, (nombre_salida,fecha_muestreo,json_datos,contenido_archivo_O2,contenido_archivo_pH,contenido_archivo_pCO2,int(id_salida)))
-            conn.commit()
-            cursor.close()
-            conn.close()
+                # Inserta en la base de datos
+                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                cursor = conn.cursor()                      
+                instruccion_sql = '''INSERT INTO transectos_superficie (nombre_transecto,fecha_inicio,datos_tsg,datos_o2,datos_ph,datos_pco2,salida_mar)
+                VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_transecto,salida_mar) DO NOTHING;'''        
+                cursor.execute(instruccion_sql, (nombre_salida,fecha_muestreo,json_datos,contenido_archivo_O2,contenido_archivo_pH,contenido_archivo_pCO2,int(id_salida)))
+                conn.commit()
+                cursor.close()
+                conn.close()
                               
             texto_exito = 'Datos añadidos correctamente'
             st.success(texto_exito)
