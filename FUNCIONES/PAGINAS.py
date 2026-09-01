@@ -86,111 +86,6 @@ def principal_radiales():
      
         
      
-###############################################################################
-############### PÁGINA DE CONSULTA DEL ESTADO DE LOS PROCESOS #################
-###############################################################################
-
-def consulta_estado():
-        
-             
-    ### Encabezados y titulos 
-    #st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
-    st.title('Estado de las analíticas de nutrientes realizadas en el C.O de A Coruña')
-    
-    # Recupera la tabla de los programas disponibles como un dataframe
-    conn = init_connection()
-    df_programas = pandas.read_sql('SELECT * FROM programas', conn)
-    conn.close()
-    
-    # Despliega un formulario para elegir el programa y la fecha a consultar
-    with st.form("Formulario seleccion"):
-        nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
-
-        # Botón de envío para confirmar selección
-        submit = st.form_submit_button("Enviar")
-    
- 
-    if submit:
-    
-        # Recupera el identificador del programa seleccionado
-        id_programa = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
-        
-        ### Consulta a la base de datos las fechas de los distintos procesos (muestreo, análisis y post-procesado)
-        
-        # Recupera la tabla del estado de los procesos como un dataframe
-        conn = init_connection()
-        temporal_estado_procesos = pandas.read_sql('SELECT * FROM estado_procesos', conn)
-        conn.close()
-        
-        # Extrae los datos disponibles del programa consultado 
-        estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['programa']==id_programa]
-        
-        # Bucle if para desplegar información únicamente si hay información del programa seleccionado
-        if estado_procesos_programa.shape[0] == 0:
-            
-            st.warning('No se dispone de información acerca del estado del programa de muestreo seleccionado', icon="⚠️")
-        
-        else:
-            
-            estado_procesos_programa = estado_procesos_programa.sort_values('año')
-            
-            # Determina el estado en cada caso 0-campaña no realizada 1-pendiente de analisis 2-analisis parcial 3-terminado
-            nombre_estados  = ['Campaña no realizada','Pendiente de analizar','Analizado parcialmente','Analizado completamente']
-            colores_estados = ['#000000','#CD5C5C','#87CEEB','#00b300'] 
-                      
-            estado_procesos_programa['estado'] = None
-            for idato in range(estado_procesos_programa.shape[0]):
-                if estado_procesos_programa['campaña_realizada'].iloc[idato] == False:
-                    estado_procesos_programa['estado'].iloc[idato] = 'Campaña no realizada'
-                else:
-                    if estado_procesos_programa['analisis_finalizado'].iloc[idato] == True:
-                        estado_procesos_programa['estado'].iloc[idato] = 'Analizado completamente'
-                    else:
-                        if estado_procesos_programa['fecha_analisis_laboratorio'].iloc[idato] is None:
-                            estado_procesos_programa['estado'].iloc[idato] = 'Pendiente de analizar'
-                        else:
-                            estado_procesos_programa['estado'].iloc[idato] = 'Analizado parcialmente'
-                            
-                
-            # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
-            num_valores = numpy.zeros(len(nombre_estados),dtype=int)
-            for ivalor in range(len(nombre_estados)):
-                try:
-                    num_valores[ivalor] = estado_procesos_programa.estado.value_counts()[nombre_estados[ivalor]]
-                except:
-                    pass
-            porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),2)
-            
-            # Despliega la información en una tabla
-            def color_tabla(s):
-                if s.estado == 'Campaña no realizada':
-                    return ['background-color: #000000']*len(s)
-                if s.estado == 'Pendiente de analizar':
-                    return ['background-color: #CD5C5C']*len(s)
-                if s.estado == 'Analizado parcialmente':
-                    return ['background-color: #87CEEB']*len(s)                    
-                if s.estado == 'Analizado completamente':
-                    return ['background-color: #00b300']*len(s)
-            
-            estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa','analisis_finalizado','campaña_realizada']) 
-            estado_procesos_programa = estado_procesos_programa.rename(columns={"año":"Año","fecha_analisis_laboratorio":"Fecha de analisis"})
-            st.dataframe(estado_procesos_programa.style.apply(color_tabla, axis=1),use_container_width=True)  
-            
-            # Construye el gráfico
-            cm              = 1/2.54 # pulgadas a cm
-            fig, ax1 = plt.subplots(figsize=(8*cm, 8*cm))
-            patches, texts= ax1.pie(num_valores, colors=colores_estados,shadow=True, startangle=90,radius=1.2)
-            ax1.axis('equal')  # Para representar el pie-chart como un circulo
-            
-            # Representa y ordena la leyenda
-            etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
-            plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(1.5, 0.5),fontsize=8)                
-
-            # Representa el pie-chart con el estado de los procesos
-            buf = BytesIO()
-            fig.savefig(buf, format="png",bbox_inches='tight')
-            st.image(buf)                
-
 
 ###############################################################################
 ################# PÁGINA DE ENTRADA DE SALIDAS A MAR ##########################
@@ -2351,7 +2246,7 @@ def entrada_procesos():
     
     
     
-        io_envio            = st.form_submit_button("Añadir encargo")    
+        io_envio            = st.form_submit_button("Añadir solicitud")    
     
     
     
@@ -2374,6 +2269,111 @@ def entrada_procesos():
     
     
     
+
+###############################################################################
+############### PÁGINA DE CONSULTA DEL ESTADO DE LOS PROCESOS #################
+###############################################################################
+
+def consulta_estado():
+        
+             
+    ### Encabezados y titulos 
+    #st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
+    st.title('Estado de las analíticas de nutrientes realizadas en el C.O de A Coruña')
+    
+    # Recupera la tabla de los programas disponibles como un dataframe
+    conn = init_connection()
+    df_programas = pandas.read_sql('SELECT * FROM programas', conn)
+    conn.close()
+    
+    # Despliega un formulario para elegir el programa y la fecha a consultar
+    with st.form("Formulario seleccion"):
+        nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
+
+        # Botón de envío para confirmar selección
+        submit = st.form_submit_button("Enviar")
+    
+ 
+    if submit:
+    
+        # Recupera el identificador del programa seleccionado
+        id_programa = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
+        
+        ### Consulta a la base de datos las fechas de los distintos procesos (muestreo, análisis y post-procesado)
+        
+        # Recupera la tabla del estado de los procesos como un dataframe
+        conn = init_connection()
+        temporal_estado_procesos = pandas.read_sql('SELECT * FROM estado_procesos', conn)
+        conn.close()
+        
+        # Extrae los datos disponibles del programa consultado 
+        estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['programa']==id_programa]
+        
+        # Bucle if para desplegar información únicamente si hay información del programa seleccionado
+        if estado_procesos_programa.shape[0] == 0:
+            
+            st.warning('No se dispone de información acerca del estado del programa de muestreo seleccionado', icon="⚠️")
+        
+        else:
+            
+            estado_procesos_programa = estado_procesos_programa.sort_values('año')
+            
+            # Determina el estado en cada caso 0-campaña no realizada 1-pendiente de analisis 2-analisis parcial 3-terminado
+            nombre_estados  = ['Campaña no realizada','Pendiente de analizar','Analizado parcialmente','Analizado completamente']
+            colores_estados = ['#000000','#CD5C5C','#87CEEB','#00b300'] 
+                      
+            estado_procesos_programa['estado'] = None
+            for idato in range(estado_procesos_programa.shape[0]):
+                if estado_procesos_programa['campaña_realizada'].iloc[idato] == False:
+                    estado_procesos_programa['estado'].iloc[idato] = 'Campaña no realizada'
+                else:
+                    if estado_procesos_programa['analisis_finalizado'].iloc[idato] == True:
+                        estado_procesos_programa['estado'].iloc[idato] = 'Analizado completamente'
+                    else:
+                        if estado_procesos_programa['fecha_analisis_laboratorio'].iloc[idato] is None:
+                            estado_procesos_programa['estado'].iloc[idato] = 'Pendiente de analizar'
+                        else:
+                            estado_procesos_programa['estado'].iloc[idato] = 'Analizado parcialmente'
+                            
+                
+            # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
+            num_valores = numpy.zeros(len(nombre_estados),dtype=int)
+            for ivalor in range(len(nombre_estados)):
+                try:
+                    num_valores[ivalor] = estado_procesos_programa.estado.value_counts()[nombre_estados[ivalor]]
+                except:
+                    pass
+            porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),2)
+            
+            # Despliega la información en una tabla
+            def color_tabla(s):
+                if s.estado == 'Campaña no realizada':
+                    return ['background-color: #000000']*len(s)
+                if s.estado == 'Pendiente de analizar':
+                    return ['background-color: #CD5C5C']*len(s)
+                if s.estado == 'Analizado parcialmente':
+                    return ['background-color: #87CEEB']*len(s)                    
+                if s.estado == 'Analizado completamente':
+                    return ['background-color: #00b300']*len(s)
+            
+            estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa','analisis_finalizado','campaña_realizada']) 
+            estado_procesos_programa = estado_procesos_programa.rename(columns={"año":"Año","fecha_analisis_laboratorio":"Fecha de analisis"})
+            st.dataframe(estado_procesos_programa.style.apply(color_tabla, axis=1),use_container_width=True)  
+            
+            # Construye el gráfico
+            cm              = 1/2.54 # pulgadas a cm
+            fig, ax1 = plt.subplots(figsize=(8*cm, 8*cm))
+            patches, texts= ax1.pie(num_valores, colors=colores_estados,shadow=True, startangle=90,radius=1.2)
+            ax1.axis('equal')  # Para representar el pie-chart como un circulo
+            
+            # Representa y ordena la leyenda
+            etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
+            plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(1.5, 0.5),fontsize=8)                
+
+            # Representa el pie-chart con el estado de los procesos
+            buf = BytesIO()
+            fig.savefig(buf, format="png",bbox_inches='tight')
+            st.image(buf)                
     
     
     
