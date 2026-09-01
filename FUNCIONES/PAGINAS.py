@@ -2294,7 +2294,7 @@ def entrada_procesos():
     df_programas = pandas.read_sql('SELECT * FROM programas', conn)
     conn.close()
     
-    col1, col2, col3 = st.columns(2,gap="small")
+    col1, col2, col3 = st.columns(3,gap="small")
     
     # Selecciona el programa de muestreo   
     with col1:
