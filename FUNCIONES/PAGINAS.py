@@ -2273,3 +2273,93 @@ def entrada_toc():
         # st.pyplot(fig=None, clear_figure=None, use_container_width=True, **kwargs)
         
         # st.scatter_chart(tabla_parametros_toc, x="fecha_analisis", y="pte_carbono")
+        
+        
+        
+        
+###############################################################################
+############### PÁGINA DE CONSULTA DEL ESTADO DE LOS PROCESOS #################
+###############################################################################
+
+def entrada_procesos():
+        
+             
+    ### Encabezados y titulos 
+    #st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
+    st.title('Entrada de encargos del servicio de análisis del C.O de A Coruña')
+    
+    # Recupera la tabla de los programas disponibles como un dataframe
+    conn = init_connection()
+    df_programas = pandas.read_sql('SELECT * FROM programas', conn)
+    conn.close()
+    
+    # Selecciona el programa de muestreo
+    programa_seleccionado  = st.selectbox('Muestreo',(df_programas['nombre_programa'].unique())) 
+    
+    # col1, col2 = st.columns(2,gap="small")
+        
+    # # Despliega menús de selección del programa, tipo de salida, año y fecha               
+    # col1, col2= st.columns(2,gap="small")
+ 
+    # with col1:
+    #     programa_seleccionado  = st.selectbox('Muestreo',(df_programas['nombre_programa'].unique()))   
+
+    
+    # with col2:
+    #     anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
+    #     df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    # # Despliega un formulario para elegir el programa y la fecha a consultar
+    # with st.form("Formulario seleccion"):
+    #     nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
+
+    #     # Botón de envío para confirmar selección
+    #     submit = st.form_submit_button("Enviar")
+    
+ 
+    # if submit:
+    
+    #     # Recupera el identificador del programa seleccionado
+    #     id_programa = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
+        
+    #     ### Consulta a la base de datos las fechas de los distintos procesos (muestreo, análisis y post-procesado)
+        
+    #     # Recupera la tabla del estado de los procesos como un dataframe
+    #     conn = init_connection()
+    #     temporal_estado_procesos = pandas.read_sql('SELECT * FROM estado_procesos', conn)
+    #     conn.close()
+        
+    #     # Extrae los datos disponibles del programa consultado 
+    #     estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['programa']==id_programa]
+        
+    #     # Bucle if para desplegar información únicamente si hay información del programa seleccionado
+    #     if estado_procesos_programa.shape[0] == 0:
+            
+    #         st.warning('No se dispone de información acerca del estado del programa de muestreo seleccionado', icon="⚠️")
+        
+    #     else:
