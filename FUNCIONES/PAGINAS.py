@@ -2355,7 +2355,7 @@ def entrada_procesos():
     
     
     
-        if io_envio == 0:   
+        if io_envio == 1:   
                         
             instruccion_sql = '''INSERT INTO servicio_nutrientes_entradas (entidad_solicitante,fecha_solicitud,id_programa,año_campaña,nombre_muestreo,numero_muestras,importe)
                 VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_muestreo) DO NOTHING;''' 
