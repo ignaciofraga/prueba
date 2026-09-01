@@ -2303,27 +2303,28 @@ def entrada_procesos():
         id_programa    = df_programas[df_programas['nombre_programa']==programa_seleccionado]['id_programa'].iloc[0]
         st.text(id_programa)
     
-    # col1, col2 = st.columns(2,gap="small")
-        
-    # # Despliega menús de selección del programa, tipo de salida, año y fecha               
-    # col1, col2= st.columns(2,gap="small")
- 
     with col2:
-        st.text(id_programa)
+    
+        if int(id_programa) != 6:
+                        
+            anho_muestreo = st.number_input("Año")
+            
+        else:
+                    
+            nombre_muestras        = st.text_input('Nombre del muestreo')  
+        
+        
     with col3:
-        st.text(id_programa)
+        
+        if int(id_programa) != 6:
+        
+            nombre_temporal  = programa_seleccionado + ' ' + str(anho_muestreo)    
+        
+            nombre_muestras        = st.text_input('Nombre del muestreo', value=nombre_temporal)
     #     programa_seleccionado  = st.selectbox('Muestreo',(df_programas['nombre_programa'].unique()))   
 
     
-    # with col2:
-    #     anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
-    #     df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
-    
-    
-    
-    
-    
-    
+
     
     
     
