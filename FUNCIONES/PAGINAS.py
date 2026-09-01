@@ -2293,6 +2293,14 @@ def entrada_procesos():
     df_programas = pandas.read_sql('SELECT * FROM programas', conn)
     conn.close()
     
+    
+    # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    direccion_host = st.secrets["postgres"].host
+    base_datos     = st.secrets["postgres"].dbname
+    usuario        = st.secrets["postgres"].user
+    contrasena     = st.secrets["postgres"].password
+    puerto         = st.secrets["postgres"].port
+    
     st.subheader('Selección del muestreo')
     
     col1, col2, col3 = st.columns(3,gap="small")
@@ -2302,29 +2310,24 @@ def entrada_procesos():
         programa_seleccionado  = st.selectbox('Muestreo',(df_programas['nombre_programa'])) 
     
         id_programa    = df_programas[df_programas['nombre_programa']==programa_seleccionado]['id_programa'].iloc[0]
-        st.text(id_programa)
     
     with col2:
     
         if int(id_programa) != 6:
-                        
             anho_muestreo = st.number_input("Año",value=2025)
             
         else:
-                    
+            anho_muestreo = None
             nombre_muestras        = st.text_input('Nombre del muestreo')  
-        
         
     with col3:
         
         if int(id_programa) != 6:
         
-            nombre_temporal  = programa_seleccionado + ' ' + str(anho_muestreo)    
-        
-            nombre_muestras        = st.text_input('Nombre del muestreo', value=nombre_temporal)
-    #     programa_seleccionado  = st.selectbox('Muestreo',(df_programas['nombre_programa'].unique()))   
-
-  
+            nombre_temporal  = programa_seleccionado + ' ' + str(anho_muestreo)
+            
+            nombre_muestras        = st.text_input('Nombre del muestreo',value = nombre_temporal) 
+          
     st.subheader('Información adicional')    
 
     # Despliega un formulario para introducir los datos de las muestras que se están analizando
@@ -2348,10 +2351,25 @@ def entrada_procesos():
     
     
     
-        io_envio            = st.form_submit_button("Procesar el archivo subido")    
+        io_envio            = st.form_submit_button("Añadir encargo")    
     
     
-    
+        if io_envio == 0:   
+                        
+            instruccion_sql = '''INSERT INTO servicio_nutrientes_entradas (entidad_solicitante,fecha_solicitud,id_programa,año_campaña,nombre_muestreo,numero_muestras,importe)
+                VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_muestreo) DO NOTHING;''' 
+                    
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()
+            cursor.execute(instruccion_sql, (solicitante,fecha_solicitud,id_programa,anho_muestreo,nombre_muestras,num_muestras,importe))
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            texto_exito = 'Salida añadida correctamente'
+            st.success(texto_exito)
+            
+            st.cache_data.clear()    
     
     
     
