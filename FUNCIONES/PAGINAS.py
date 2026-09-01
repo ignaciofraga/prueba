@@ -2306,7 +2306,7 @@ def entrada_procesos():
     
         if int(id_programa) != 6:
                         
-            anho_muestreo = st.number_input("Año")
+            anho_muestreo = st.number_input("Año",value=2025)
             
         else:
                     
