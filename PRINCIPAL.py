@@ -55,7 +55,7 @@ if FUNCIONES_AUXILIARES.log_in() is True:
      
             paginas = {"INICIO": PAGINAS.principal,
 #                     "CONSULTA PROGRAMA ANALIZADOS": PAGINAS.consulta_estado, 
-                     "CONSULTA DATOS":PAGINAS.entrada_procesos
+                     "ENTRADA DE SOLICITUDES":PAGINAS.entrada_procesos
                       }           
             
         # if st.session_state["usuario"] == 'Usuario externo':

@@ -2286,7 +2286,7 @@ def entrada_procesos():
         
     ### Encabezados y titulos 
     #st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
-    st.title('Entrada de encargos del servicio de análisis del C.O de A Coruña')
+    st.title('Entrada de solicitudes del servicio de análisis del C.O de A Coruña')
     
     # Recupera la tabla de los programas disponibles como un dataframe
     conn = init_connection()
@@ -2301,7 +2301,7 @@ def entrada_procesos():
     contrasena     = st.secrets["postgres"].password
     puerto         = st.secrets["postgres"].port
     
-    st.subheader('Selección del muestreo')
+    st.subheader('Datos del muestreo')
     
     col1, col2, col3 = st.columns(3,gap="small")
     
@@ -2367,7 +2367,7 @@ def entrada_procesos():
             cursor.close()
             conn.close()
 
-            texto_exito = 'Salida añadida correctamente'
+            texto_exito = 'Solictud de análisis añadida correctamente'
             st.success(texto_exito)
             
             st.cache_data.clear()    
