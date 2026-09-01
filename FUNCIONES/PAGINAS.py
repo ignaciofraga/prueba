@@ -2308,7 +2308,10 @@ def entrada_procesos():
     # # Despliega menús de selección del programa, tipo de salida, año y fecha               
     # col1, col2= st.columns(2,gap="small")
  
-    # with col1:
+    with col2:
+        st.text(id_programa)
+    with col3:
+        st.text(id_programa)
     #     programa_seleccionado  = st.selectbox('Muestreo',(df_programas['nombre_programa'].unique()))   
 
     
