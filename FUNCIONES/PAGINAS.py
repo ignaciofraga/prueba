@@ -2293,6 +2293,8 @@ def entrada_procesos():
     df_programas = pandas.read_sql('SELECT * FROM programas', conn)
     conn.close()
     
+    st.subheader('Selección del muestreo')
+    
     col1, col2, col3 = st.columns(3,gap="small")
     
     # Selecciona el programa de muestreo   
@@ -2322,12 +2324,27 @@ def entrada_procesos():
             nombre_muestras        = st.text_input('Nombre del muestreo', value=nombre_temporal)
     #     programa_seleccionado  = st.selectbox('Muestreo',(df_programas['nombre_programa'].unique()))   
 
-    
+  
+    st.subheader('Información adicional')    
 
+    # Despliega un formulario para introducir los datos de las muestras que se están analizando
+    with st.form("Formulario seleccion"):
+         
+        col1, col2, col3, col4= st.columns(4,gap="small")
+        with col1:
+            solicitante        = st.text_input('Entidad solicitante')
+
+           
+        with col2:
+           fecha_solicitud = st.date_input("Fecha de solicitud", value="today", format="DD/MM/YYYY")
+
+
+        with col3:
+           num_muestras = st.number_input("Número total de muestras",value=int(0))      
     
     
-    
-    
+        with col4:
+           importe = st.number_input("Importe facturado (€)",value=int(0))         
     
     
     
