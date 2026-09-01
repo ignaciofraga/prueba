@@ -2354,6 +2354,7 @@ def entrada_procesos():
         io_envio            = st.form_submit_button("Añadir encargo")    
     
     
+    
         if io_envio == 0:   
                         
             instruccion_sql = '''INSERT INTO servicio_nutrientes_entradas (entidad_solicitante,fecha_solicitud,id_programa,año_campaña,nombre_muestreo,numero_muestras,importe)
