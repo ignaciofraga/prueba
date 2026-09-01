@@ -2284,7 +2284,6 @@ def entrada_toc():
 
 def entrada_procesos():
         
-             
     ### Encabezados y titulos 
     #st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
     st.title('Entrada de encargos del servicio de análisis del C.O de A Coruña')
