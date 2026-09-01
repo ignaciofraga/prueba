@@ -2294,8 +2294,14 @@ def entrada_procesos():
     df_programas = pandas.read_sql('SELECT * FROM programas', conn)
     conn.close()
     
-    # Selecciona el programa de muestreo
-    programa_seleccionado  = st.selectbox('Muestreo',(df_programas['nombre_programa'].unique())) 
+    col1, col2, col3 = st.columns(2,gap="small")
+    
+    # Selecciona el programa de muestreo   
+    with col1:
+        programa_seleccionado  = st.selectbox('Muestreo',(df_programas['nombre_programa'])) 
+    
+        id_programa    = df_programas[df_programas['nombre_programa']==programa_seleccionado]['id_programa'].iloc[0]
+        st.text(id_programa)
     
     # col1, col2 = st.columns(2,gap="small")
         
