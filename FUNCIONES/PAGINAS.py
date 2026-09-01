@@ -2362,7 +2362,7 @@ def entrada_procesos():
                     
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
             cursor = conn.cursor()
-            cursor.execute(instruccion_sql, (solicitante,fecha_solicitud,id_programa,anho_muestreo,nombre_muestras,num_muestras,importe))
+            cursor.execute(instruccion_sql, (solicitante,fecha_solicitud,int(id_programa),int(anho_muestreo),nombre_muestras,int(num_muestras),importe))
             conn.commit()
             cursor.close()
             conn.close()
