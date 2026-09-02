@@ -2279,14 +2279,13 @@ def planificacion_procesos():
         
     ### Encabezados y titulos 
     #st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
-    st.title('Entrada de solicitudes del servicio de análisis del C.O de A Coruña')
+    st.title('Gestión de análisis solicitados al servicio de nutrientes del C.O de A Coruña')
     
     # Recupera la tabla de los programas disponibles como un dataframe
     conn = init_connection()
     df_solicitudes     = pandas.read_sql('SELECT * FROM servicio_nutrientes_entradas', conn)
     df_planificaciones = pandas.read_sql('SELECT * FROM planificacion_analisis_nutrientes', conn)
     conn.close()
-    
     
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
     direccion_host = st.secrets["postgres"].host
@@ -2295,65 +2294,21 @@ def planificacion_procesos():
     contrasena     = st.secrets["postgres"].password
     puerto         = st.secrets["postgres"].port
     
+    # Identifica la solicitud que se quiere planificar
     solicitud_seleccionada  = st.selectbox('Solicitud de análisis',(df_solicitudes['nombre_muestreo'])) 
-    
     id_solicitud = df_solicitudes[df_solicitudes['nombre_muestreo']==solicitud_seleccionada]['id_entrada'].iloc[0]
     
+    st.subheader('Lotes de análisis previstos')
     
-    
-    # # Despliega un formulario para introducir los datos de las muestras que se están analizando
-    # with st.form("Formulario seleccion"):
-         
-    #     col1, col2, col3= st.columns(3,gap="small")
-    #     with col1:
-            
-    #         num_lote = st.number_input("Lote de análisis")
-           
-    #     with col2:
-    #        num_muestras_lote = st.number_input("Número de muestras")
- 
- 
-    #     with col3:
-    #        observaciones        = st.text_input('Descripción')                     
-    
-    #     io_envio            = st.form_submit_button("Añadir lote de muestras")     
-    
-    #     if io_envio == 1:   
-                        
-    #         instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,observaciones)
-    #             VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO NOTHING;''' 
-                    
-    #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    #         cursor = conn.cursor()
-    #         cursor.execute(instruccion_sql, (int(id_solicitud),int(num_lote),int(num_muestras_lote),observaciones))
-    #         conn.commit()
-    #         cursor.close()
-    #         conn.close()
-
-    #         texto_exito = 'Lote de análisis añadida correctamente'
-    #         st.success(texto_exito)
-            
-    #         st.cache_data.clear()
-            
-    #         st.rerun()
-    
-    
-    
-    
-    
+    # Genera un dataframe dinámico para la entrada de datos
     df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
-               
-    df_muestra = df_solicitud_seleccionada[["lote","num_muestras","observaciones"]]
-    
-    # # Despliega un formulario para introducir los datos de las muestras que se están analizando
-    
-        
+    df_muestra = df_solicitud_seleccionada[["lote","num_muestras","observaciones"]]       
     df_modificado = st.data_editor(df_muestra, num_rows="dynamic")
         
-    io_envio            = st.button("Modificar ")     
+    # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
+    io_envio            = st.button("Actualizar o modificar")     
         
     if io_envio == True:
-        
         
         instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,observaciones)
             VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO UPDATE SET (num_muestras,observaciones) = ROW(EXCLUDED.num_muestras,EXCLUDED.observaciones);''' 
@@ -2367,14 +2322,23 @@ def planificacion_procesos():
             conn.commit()
             cursor.close()
             
-            
         conn.close()
-        
         
         texto_exito = 'Solictud de análisis añadida correctamente'
         st.success(texto_exito)
     
         st.cache_data.clear()  
+    
+    
+    # Comprueba que el número de muestras encaja con el total    
+    conn = init_connection()
+    df_planificaciones = pandas.read_sql('SELECT * FROM planificacion_analisis_nutrientes', conn)
+    conn.close()    
+    df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
+    
+    num_muestras_planificadas = df_solicitud_seleccionada["num_muestras"].sum(axis=0)
+    
+    st.text(num_muestras_planificadas)
     
     #st.dataframe(df_solicitud_seleccionada, on_select="rerun")
     
