@@ -1635,8 +1635,8 @@ def procesado_nutrientes():
         df_rmns_bajos             = pandas.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
         df_rmns_altos             = pandas.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
         df_variables              = pandas.read_sql('SELECT * FROM variables_procesado', conn)
-        df_solicitudes            = pandas.read_sql('SELECT * FROM variables_procesado', conn)
-        df_planificaciones        = pandas.read_sql('SELECT * FROM variables_procesado', conn)
+        df_solicitudes            = pandas.read_sql('SELECT * FROM servicio_nutrientes_entradas', conn)
+        df_planificaciones        = pandas.read_sql('SELECT * FROM planificacion_analisis_nutrientes', conn)
         conn.close()
         return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos,df_variables,df_solicitudes,df_planificaciones
         
