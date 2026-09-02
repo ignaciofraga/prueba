@@ -2346,12 +2346,14 @@ def planificacion_procesos():
     
     num_muestras_totales      = df_solicitudes[df_solicitudes['nombre_muestreo']==solicitud_seleccionada]['numero_muestras'].iloc[0]
     
+    if num_muestras_planificadas != num_muestras_totales:
     
+        texto_advertencia = "AVISO! El número de muestras planificadas (" + str(num_muestras_planificadas) + ") difiere del solicitado (" + str(num_muestras_totales) + ")"
+        st.warning(texto_advertencia, icon="⚠️")
     
+    # st.text(num_muestras_planificadas)
     
-    st.text(num_muestras_planificadas)
-    
-    st.text(num_muestras_totales)
+    # st.text(num_muestras_totales)
     
     #st.dataframe(df_solicitud_seleccionada, on_select="rerun")
     
