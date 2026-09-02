@@ -2295,7 +2295,7 @@ def planificacion_procesos():
     contrasena     = st.secrets["postgres"].password
     puerto         = st.secrets["postgres"].port
     
-    solicitud_seleccionada  = st.selectbox('Muestreo',(df_solicitudes['nombre_muestreo'])) 
+    solicitud_seleccionada  = st.selectbox('Solicitud de análisis',(df_solicitudes['nombre_muestreo'])) 
     
     id_solicitud = df_solicitudes[df_solicitudes['nombre_muestreo']==solicitud_seleccionada]['id_entrada'].iloc[0]
     
@@ -2316,7 +2316,7 @@ def planificacion_procesos():
         with col3:
            observaciones        = st.text_input('Descripción')                     
     
-        io_envio            = st.form_submit_button("Añadir solicitud")     
+        io_envio            = st.form_submit_button("Añadir lote de muestras")     
     
         if io_envio == 1:   
                         
@@ -2339,21 +2339,7 @@ def planificacion_procesos():
     
     
     
-    
-    df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
-    
-    if df_solicitud_seleccionada.shape[0] == 0:
-        
-        session_state = st.session_state
-        
-        # Check if the session state variable is already defined
-        if "df" not in session_state:
-            # Assign the initial data to the session state variable
-            session_state.df = df_solicitud_seleccionada
-            session_state.row = pandas.Series(index=df_planificaciones.columns)
-            
-            
-            
+
             
             
     
