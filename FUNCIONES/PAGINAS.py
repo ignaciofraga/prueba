@@ -2309,7 +2309,7 @@ def planificacion_procesos():
     
         df_modificado = st.data_editor(df_muestra, num_rows="dynamic")
     
-
+        st.dataframe(df_modificado)
       
         # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
         #io_envio            = st.button("Actualizar o modificar")  
