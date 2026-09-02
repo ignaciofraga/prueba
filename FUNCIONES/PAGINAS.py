@@ -2301,41 +2301,41 @@ def planificacion_procesos():
     
     
     
-    # Despliega un formulario para introducir los datos de las muestras que se están analizando
-    with st.form("Formulario seleccion"):
+    # # Despliega un formulario para introducir los datos de las muestras que se están analizando
+    # with st.form("Formulario seleccion"):
          
-        col1, col2, col3= st.columns(3,gap="small")
-        with col1:
+    #     col1, col2, col3= st.columns(3,gap="small")
+    #     with col1:
             
-            num_lote = st.number_input("Lote de análisis")
+    #         num_lote = st.number_input("Lote de análisis")
            
-        with col2:
-           num_muestras_lote = st.number_input("Número de muestras")
+    #     with col2:
+    #        num_muestras_lote = st.number_input("Número de muestras")
  
  
-        with col3:
-           observaciones        = st.text_input('Descripción')                     
+    #     with col3:
+    #        observaciones        = st.text_input('Descripción')                     
     
-        io_envio            = st.form_submit_button("Añadir lote de muestras")     
+    #     io_envio            = st.form_submit_button("Añadir lote de muestras")     
     
-        if io_envio == 1:   
+    #     if io_envio == 1:   
                         
-            instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,observaciones)
-                VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO NOTHING;''' 
+    #         instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,observaciones)
+    #             VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO NOTHING;''' 
                     
-            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-            cursor = conn.cursor()
-            cursor.execute(instruccion_sql, (int(id_solicitud),int(num_lote),int(num_muestras_lote),observaciones))
-            conn.commit()
-            cursor.close()
-            conn.close()
+    #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    #         cursor = conn.cursor()
+    #         cursor.execute(instruccion_sql, (int(id_solicitud),int(num_lote),int(num_muestras_lote),observaciones))
+    #         conn.commit()
+    #         cursor.close()
+    #         conn.close()
 
-            texto_exito = 'Lote de análisis añadida correctamente'
-            st.success(texto_exito)
+    #         texto_exito = 'Lote de análisis añadida correctamente'
+    #         st.success(texto_exito)
             
-            st.cache_data.clear()
+    #         st.cache_data.clear()
             
-            st.rerun()
+    #         st.rerun()
     
     
     
@@ -2344,7 +2344,9 @@ def planificacion_procesos():
     df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
                
     
-    st.dataframe(df_solicitud_seleccionada, on_select="rerun")
+    edited_df = st.data_editor(df_solicitud_seleccionada, num_rows="dynamic")
+    
+    #st.dataframe(df_solicitud_seleccionada, on_select="rerun")
     
     # st.subheader('Datos del muestreo')
     
