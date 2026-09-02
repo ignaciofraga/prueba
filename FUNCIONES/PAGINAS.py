@@ -2344,7 +2344,14 @@ def planificacion_procesos():
     
     num_muestras_planificadas = df_solicitud_seleccionada["num_muestras"].sum(axis=0)
     
+    num_muestras_totales      = df_solicitudes[df_solicitudes['nombre_muestreo']==solicitud_seleccionada]['numero_muestras'].iloc[0]
+    
+    
+    
+    
     st.text(num_muestras_planificadas)
+    
+    st.text(num_muestras_totales)
     
     #st.dataframe(df_solicitud_seleccionada, on_select="rerun")
     
