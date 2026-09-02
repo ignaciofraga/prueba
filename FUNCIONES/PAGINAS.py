@@ -2283,7 +2283,8 @@ def planificacion_procesos():
     
     # Recupera la tabla de los programas disponibles como un dataframe
     conn = init_connection()
-    df_solicitudes = pandas.read_sql('SELECT * FROM servicio_nutrientes_entradas', conn)
+    df_solicitudes     = pandas.read_sql('SELECT * FROM servicio_nutrientes_entradas', conn)
+    df_planificaciones = pandas.read_sql('SELECT * FROM planificacion_analisis_nutrientes', conn)
     conn.close()
     
     
@@ -2296,9 +2297,9 @@ def planificacion_procesos():
     
     solicitud_seleccionada  = st.selectbox('Muestreo',(df_solicitudes['nombre_muestreo'])) 
     
+    id_solicitud = df_solicitudes[df_solicitudes['nombre_muestreo']==solicitud_seleccionada]['id_entrada'].iloc[0]
     
-    
-    df_solicitud_seleccionada = df_solicitudes[df_solicitudes['nombre_muestreo']==solicitud_seleccionada]
+    df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
     
     
     st.dataframe(df_solicitud_seleccionada)
