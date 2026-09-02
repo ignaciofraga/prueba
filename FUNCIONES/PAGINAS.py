@@ -2303,10 +2303,14 @@ def planificacion_procesos():
     # Genera un dataframe dinámico para la entrada de datos
     df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
     df_muestra = df_solicitud_seleccionada[["lote","num_muestras","observaciones"]]       
-    df_modificado = st.data_editor(df_muestra, num_rows="dynamic")
+    
+    
+    with st.form("Formulario seleccion"):  
+    
+        df_modificado = st.data_editor(df_muestra, num_rows="dynamic")
     
 
-    with st.form("Formulario seleccion"):    
+      
         # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
         #io_envio            = st.button("Actualizar o modificar")  
         io_envio            = st.form_submit_button("Añadir solicitud")   
