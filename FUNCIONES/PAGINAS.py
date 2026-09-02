@@ -2308,8 +2308,6 @@ def planificacion_procesos():
     with st.form("Formulario seleccion"):  
     
         df_modificado = st.data_editor(df_muestra, num_rows="dynamic")
-    
-        st.dataframe(df_modificado)
       
         # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
         #io_envio            = st.button("Actualizar o modificar")  
@@ -2322,7 +2320,7 @@ def planificacion_procesos():
                     
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
             
-            for idato in range(df_muestra.shape[0]):
+            for idato in range(df_modificado.shape[0]):
             
                 cursor = conn.cursor()
                 cursor.execute(instruccion_sql, (int(id_solicitud),int(df_modificado["lote"].iloc[idato]),int(df_modificado["num_muestras"].iloc[idato]),df_modificado["observaciones"].iloc[idato]))
