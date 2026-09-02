@@ -2299,8 +2299,62 @@ def planificacion_procesos():
     
     id_solicitud = df_solicitudes[df_solicitudes['nombre_muestreo']==solicitud_seleccionada]['id_entrada'].iloc[0]
     
+    
+    # Despliega un formulario para introducir los datos de las muestras que se están analizando
+    with st.form("Formulario seleccion"):
+         
+        col1, col2, col3= st.columns(3,gap="small")
+        with col1:
+            
+            num_lote = st.number_input("Lote de análisis")
+           
+        with col2:
+           num_muestras_lote = st.number_input("Número de muestras")
+ 
+ 
+        with col3:
+           observaciones        = st.text_input('Descripción')                     
+    
+        io_envio            = st.form_submit_button("Añadir solicitud")     
+    
+        if io_envio == 1:   
+                        
+            instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,observaciones)
+                VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO NOTHING;''' 
+                    
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()
+            cursor.execute(instruccion_sql, (int(id_solicitud),int(num_lote),int(num_muestras_lote),observaciones))
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            texto_exito = 'Lote de análisis añadida correctamente'
+            st.success(texto_exito)
+            
+            st.cache_data.clear()
+            
+            st.rerun()
+    
+    
+    
+    
     df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
     
+    if df_solicitud_seleccionada.shape[0] == 0:
+        
+        session_state = st.session_state
+        
+        # Check if the session state variable is already defined
+        if "df" not in session_state:
+            # Assign the initial data to the session state variable
+            session_state.df = df_solicitud_seleccionada
+            session_state.row = pandas.Series(index=df_planificaciones.columns)
+            
+            
+            
+            
+            
     
     st.dataframe(df_solicitud_seleccionada)
     
