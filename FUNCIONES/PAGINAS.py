@@ -2363,7 +2363,7 @@ def planificacion_procesos():
             for idato in range(df_muestra.shape[0]):
             
                 cursor = conn.cursor()
-                cursor.execute(instruccion_sql, (int(id_solicitud),int(df_modificado["num_lote"].iloc[idato]),int(df_modificado["num_muestras"].iloc[idato]),df_modificado["observaciones"].iloc[idato]))
+                cursor.execute(instruccion_sql, (int(id_solicitud),int(df_modificado["lote"].iloc[idato]),int(df_modificado["num_muestras"].iloc[idato]),df_modificado["observaciones"].iloc[idato]))
                 conn.commit()
                 cursor.close()
                 
@@ -2371,10 +2371,10 @@ def planificacion_procesos():
             conn.close()
             
             
-        texto_exito = 'Solictud de análisis añadida correctamente'
-        st.success(texto_exito)
+            texto_exito = 'Solictud de análisis añadida correctamente'
+            st.success(texto_exito)
         
-        st.cache_data.clear()  
+            st.cache_data.clear()  
     
     #st.dataframe(df_solicitud_seleccionada, on_select="rerun")
     
