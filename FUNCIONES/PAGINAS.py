@@ -1206,6 +1206,415 @@ def consulta_datos():
         
         
         
+# ###############################################################################
+# ############ PÁGINA DE PROCESADO DE INFORMACION DE NUTRIENTES #################
+# ###############################################################################    
+
+
+# def procesado_nutrientes():
+    
+#     # Función para cargar en caché los datos a utilizar
+#     @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
+#     def carga_datos_procesado_nutrientes():
+#         conn                      = init_connection()
+#         df_muestreos              = pandas.read_sql('SELECT * FROM muestreos_discretos', conn)
+#         df_estaciones             = pandas.read_sql('SELECT * FROM estaciones', conn)
+#         df_datos_discretos        = pandas.read_sql('SELECT * FROM datos_discretos', conn)
+#         df_salidas                = pandas.read_sql('SELECT * FROM salidas_muestreos', conn)
+#         df_programas              = pandas.read_sql('SELECT * FROM programas', conn)
+#         df_indices_calidad        = pandas.read_sql('SELECT * FROM indices_calidad', conn)
+#         df_rmns_bajos             = pandas.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
+#         df_rmns_altos             = pandas.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
+#         df_variables              = pandas.read_sql('SELECT * FROM variables_procesado', conn)
+#         conn.close()
+#         return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos,df_variables
+        
+
+
+     
+#     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+#     direccion_host   = st.secrets["postgres"].host
+#     base_datos       = st.secrets["postgres"].dbname
+#     usuario          = st.secrets["postgres"].user
+#     contrasena       = st.secrets["postgres"].password
+#     puerto           = st.secrets["postgres"].port
+    
+   
+#     df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos,df_variables = carga_datos_procesado_nutrientes()
+
+#     # Combina la información de muestreos y salidas en un único dataframe 
+#     df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
+#     df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
+                         
+#     # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
+#     acciones     = ['Procesar salidas del AA','Modificar datos procesados','Realizar control de calidad de datos disponibles']
+#     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
+ 
+#     # Define los vectores con las variables a procesar
+#     variables_procesado    = ['Nitrogeno inorganico total','Nitrato','Nitrito','Silicato','Fosfato']    
+#     variables_procesado_bd = ['nitrogeno_inorganico_total','nitrato','nitrito','silicato','fosfato']
+#     variables_unidades     = ['\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg','\u03BCmol/kg']
+    
+    
+#     # Define unos valores de referencia 
+#     df_referencia        = pandas.DataFrame(columns = variables_procesado_bd,index = [0])
+#     df_referencia.loc[0] = [float(0),float(0),float(0),float(0),float(0)]
+    
+#     # Añade salidas del AA
+#     if tipo_accion == acciones[0]:
+        
+#         st.subheader('Procesado de datos de nutrientes')
+        
+#         canales_autoanalizador = ['nitrogeno_inorganico_total','nitrito','silicato','fosfato']
+        
+#         # Selecciona campaña y año (para evitar problemas con id duplicados en años distintos)              
+#         col1, col2 = st.columns(2,gap="small")
+#         with col1: 
+            
+#             listado_programas         = df_salidas['nombre_programa'].unique()
+#             programa_seleccionado     = st.selectbox('Programa',(listado_programas))
+#             indice_programa           = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0]
+                       
+#         with col2:
+            
+#             df_prog_sel               = df_salidas[df_salidas['programa']==indice_programa]
+#             df_prog_sel['año']        = None
+#             for idato in range(df_prog_sel.shape[0]):
+#                 df_prog_sel['año'].iloc[idato] = (df_prog_sel['fecha_salida'].iloc[idato]).year
+#             df_prog_sel               = df_prog_sel.sort_values('año',ascending=False)
+
+            
+#             anhos_disponibles         = df_prog_sel['año'].unique()
+#             anho_seleccionado         = st.selectbox('Año',(anhos_disponibles))
+        
+#             salidas_seleccionadas = df_prog_sel[df_prog_sel['año']==anho_seleccionado]
+#             listado_salidas       = salidas_seleccionadas['salida_mar']
+    
+#         df_muestreos_salidas_seleccionadas = df_muestreos[df_muestreos['salida_mar'].isin(listado_salidas)]
+#         df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos_salidas_seleccionadas, on="muestreo") 
+        
+#         with st.form("Formulario", clear_on_submit=False):
+              
+#             # Despliega un formulario para subir los archivos del AA y las referencias
+#             col1, col2,col3,col4 = st.columns(4,gap="small")
+#             with col1:
+#                 temperatura_laboratorio = st.number_input('Temperatura laboratorio:',value=20.5)
+#             with col2:
+#                 rendimiento_columna     = st.number_input('Rendimiento columna:',value=float(100),min_value=float(0),max_value=float(100))
+#             with col3:            
+#                 rmn_elegida_bajo             = st.selectbox("Selecciona RMN **BAJO**", (df_rmns_bajos['nombre_rmn']))
+#                 df_referencias_bajas    = df_rmns_bajos[df_rmns_bajos['nombre_rmn']==rmn_elegida_bajo]
+#             with col4:            
+#                 rmn_elegida_alto             = st.selectbox("Selecciona RMN **ALTO**", (df_rmns_altos['nombre_rmn']))
+#                 df_referencias_altas    = df_rmns_altos[df_rmns_altos['nombre_rmn']==rmn_elegida_alto]
+            
+#             archivo_AA                  = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
+            
+#             iq_elegido = st.radio("Indice de calidad asignado a los datos procesados",('Bueno', 'No evaluado'),horizontal=True)
+#             if iq_elegido == 'Bueno':
+#                 iq_asignado = 2
+#             if iq_elegido == 'No evaluado':
+#                 iq_asignado = 1
+            
+#             col1, col2 = st.columns(2,gap="small")
+#             with col1:
+#                 io_add_data                 = st.checkbox('Añadir datos procesados a la base de datos',value=False)
+#             with col2:
+#                 io_dato_completo            = st.checkbox('Datos correspondientes al total de la campaña',value=False)            
+                
+#             io_envio                    = st.form_submit_button("Procesar el archivo subido")        
+        
+#         if archivo_AA is not None and io_envio is True:
+    
+        
+#             # Lectura del archivo con los resultados del AA
+#             datos_AA              = pandas.read_excel(archivo_AA,skiprows=15)            
+#             datos_AA              = datos_AA.rename(columns={"Results 1":canales_autoanalizador[0],"Results 2":canales_autoanalizador[1],"Results 3":canales_autoanalizador[2],"Results 4":canales_autoanalizador[3]})
+                  
+#             # Identifica qué canales/variables se han procesado
+#             variables_procesadas = datos_AA.columns.tolist()
+#             variables_run        = list(set(variables_procesadas).intersection(variables_procesado_bd))
+            
+                        
+#             ### Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
+                                       
+#             # Adapta el nombre de las sw
+#             for idato in range(datos_AA.shape[0]):
+#                 if datos_AA['Sample ID'].iloc[idato][0:2].lower()=='sw':
+#                    datos_AA['Sample ID'].iloc[idato] ='sw' 
+            
+#             # Encuentra las posiciones de las referencias de sw
+#             # indices_referencias = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='sw']) - 1
+#             # # Agrupa en dos tandas, las iniciales y las finales
+#             # spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
+#             # listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
+
+
+#             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_alto)]
+#             ref_inicial       = datos_referencias['Peak Number'].iloc[0] + 2
+#             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
+#             ref_final         = datos_referencias['Peak Number'].iloc[1] - 2
+            
+
+            
+#             # Encuentra la salinidad de cada muestra
+#             datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
+#             datos_AA['io_procesado']  = None
+#             for idato in range(ref_inicial,ref_final):
+                
+#                 if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
+     
+#                     id_temp = df_datos_disponibles['muestreo'][df_datos_disponibles['id_externo']==datos_AA['Sample ID'].iloc[idato]]
+                
+#                     if len(id_temp) > 0:
+#                         datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
+#                         datos_AA['io_procesado'].iloc[idato]  = 1
+#                     else:
+#                         if datos_AA['Sample ID'].iloc[idato].lower() != 'sw': 
+                        
+#                             texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
+#                             st.warning(texto_error, icon="⚠️")                        
+       
+#             # comprobación por si no hay ningún dato a procesar
+#             if datos_AA['io_procesado'].isnull().all():
+#                 texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
+#                 st.warning(texto_error, icon="⚠️")          
+   
+#             else:
+                
+#             # En caso contrario procesa los datos
+                        
+                
+            
+#                 # Aplica la corrección de deriva (DRIFT)                 
+#                 datos_corregidos,posicion_RMN_bajos,posicion_RMN_altos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
+                            
+                
+                
+#                 # Calcula el NO3 como diferencia entre el TON y el NO2 (sólo si se han procesado estos dos canales)
+#                 if 'nitrogeno_inorganico_total' in variables_run and 'nitrito' in variables_run:
+#                     datos_corregidos['nitrato'] = datos_corregidos['nitrogeno_inorganico_total'] - datos_corregidos['nitrito']
+#                     datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
+                    
+#                     # vuelvo a calcular el TON como NO3+NO2, por si hubiese corregido valores nulos
+#                     datos_corregidos['nitrogeno_inorganico_total'] = datos_corregidos['nitrato'] + datos_corregidos['nitrito']
+                    
+#                     # añade nitrato a variables procesadas (para redondear decimales y añadir qf)
+#                     variables_run = variables_run + ['nitrato']
+               
+#                 # Cambia el orden de las variables
+#                 orden_inverso = ['fosato','silicato','nitrito','nitrato','nitrogeno_inorganico_total']
+#                 for iorden in range(len(orden_inverso)):
+#                     if orden_inverso[iorden] in variables_run : 
+#                             variables_run.insert(0, variables_run.pop(variables_run.index(orden_inverso[iorden])))
+ 
+
+ 
+
+                    
+            
+#                 datos_corregidos = datos_corregidos[['id_externo','nitrogeno_inorganico_total','nitrato','nitrito', 'silicato', 'fosfato']]
+            
+
+#                 # Añade informacion de RMNs, temperaturas y rendimiento
+#                 datos_corregidos['rto_columna_procesado']  = rendimiento_columna
+#                 datos_corregidos['temp_lab_procesado']     = temperatura_laboratorio
+#                 datos_corregidos['rmn_bajo_procesado']     = int(df_referencias_bajas['id_rmn'].iloc[0])
+#                 datos_corregidos['rmn_alto_procesado']     = int(df_referencias_altas['id_rmn'].iloc[0])
+                
+#                 texto_exito = 'Muestreos disponibles procesados correctamente'
+#                 st.success(texto_exito)
+                
+                
+
+#                 variables_elimina       = variables_procesado_bd + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado']
+#                 df_datos_biogeoquimicos = df_datos_disponibles.drop(columns=variables_elimina)
+                
+#                 datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="id_externo",how='left')
+                                               
+#                 # Reduce los decimales y asigna QF a los datos
+#                 variables_run_qf = []
+#                 for ivariable_procesada in range(len(variables_run)):
+                        
+#                     #reduce los decimales 
+#                     datos_corregidos[variables_run[ivariable_procesada]]=round(datos_corregidos[variables_run[ivariable_procesada]],3)
+                        
+#                     # Añade qf a los datos, asignando a las variables procesadas el qf elegido
+#                     variables_run_qf                                        = variables_run_qf + [variables_run[ivariable_procesada] + '_qf']
+#                     datos_corregidos[variables_run_qf[ivariable_procesada]] = int(iq_asignado) #numpy.ones(datos_corregidos.shape[0],dtype=int)
+  
+                
+#                 variables_exporta =  variables_procesado_bd + variables_run_qf + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado','muestreo','id_externo']
+#                 datos_exporta = datos_corregidos[variables_exporta]
+                
+                
+#                 # Añade los datos a la base de datos si se seleccionó esta opción                        
+#                 if io_add_data is True:
+                                       
+#                     with st.spinner('Insertando datos en la base de datos'):
+                        
+#                         # Mantén sólo los registros con identificador de muestreo asociado
+#                         datos_insercion = datos_exporta.dropna(subset = ['muestreo'])
+
+#                         # Define una columna índice
+#                         indices_dataframe         = numpy.arange(0,datos_insercion.shape[0],1,dtype=int)
+#                         datos_insercion['id_temp'] = indices_dataframe
+#                         datos_insercion.set_index('id_temp',drop=True,append=False,inplace=True)
+                       
+#                         # Inserta datos
+#                         texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_insercion,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
+                        
+#                     st.success(texto_insercion)
+                    
+#                     # Actualiza el estado de los procesos
+#                     fecha_actualizacion = datetime.date.today()
+#                     FUNCIONES_AUXILIARES.actualiza_estado(indice_programa,programa_seleccionado,anho_seleccionado,fecha_actualizacion,io_dato_completo,direccion_host,base_datos,usuario,contrasena,puerto)
+#                     st.success('Estado del procesado actualizado correctamente')
+
+
+
+
+#                 # Añade nombre de la estacion
+#                 df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
+                
+                               
+#                 # Extrae información de los RMNs y sw al inicio y final del run
+#                 num_registros_mitad = int((datos_corregidos.shape[0])/2)
+#                 sw_inicio = []
+#                 for iregistro in range(num_registros_mitad):
+#                     if datos_corregidos['id_externo'].iloc[iregistro].lower() == 'sw':
+#                         sw_inicio = sw_inicio + [iregistro]
+#                 sw_final = []
+#                 for iregistro in range(num_registros_mitad,datos_corregidos.shape[0]):
+#                     if datos_corregidos['id_externo'].iloc[iregistro].lower() == 'sw':
+#                         sw_final = sw_final + [iregistro]
+                        
+#                 registros_inicio = sw_inicio + [posicion_RMN_bajos[0]] + [posicion_RMN_altos[0]]
+#                 registros_final  = sw_final + [posicion_RMN_bajos[1]] + [posicion_RMN_altos[1]]
+                        
+#                 subset_inicio = datos_corregidos.iloc[registros_inicio, :]
+#                 subset_final = datos_corregidos.iloc[registros_final, :]
+                
+
+
+                
+#                 datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
+                
+#                 datos_exporta_excel = pandas.concat([subset_inicio, datos_corregidos], ignore_index=True)
+#                 datos_exporta_excel = pandas.concat([datos_exporta_excel, subset_final], ignore_index=True)
+                
+#                 # Descarga los datos como una hoja Excel        
+#                 listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
+#                 datos_exporta_excel     = datos_exporta_excel[listado_columnas]
+                
+#                 # first_cols = ['A','B','C']
+#                 # last_cols = [col for col in df.columns if col not in first_cols]
+
+#                 # df = df[first_cols+last_cols]
+      
+#                 # Botón para descargar la información como Excel
+#                 nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
+                       
+#                 output = BytesIO()
+#                 writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+#                 datos_excel = datos_exporta_excel.to_excel(writer, index=False, sheet_name='DATOS')
+#                 writer.close()
+#                 datos_excel = output.getvalue()
+            
+#                 st.download_button(
+#                     label="DESCARGA EXCEL CON LOS DATOS PROCESADOS",
+#                     data=datos_excel,
+#                     file_name=nombre_archivo,
+#                     help= 'Descarga un archivo .xlsx con los datos procesados',
+#                     mime="application/vnd.ms-excel"
+#                 )              
+       
+#                 st.cache_data.clear()
+                              
+
+
+
+
+
+
+#     # Añade manualmente resultados del procesado 
+#     if tipo_accion == acciones[1]:
+        
+#         st.subheader('Inserción de datos de nutrientes')
+        
+#         FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_procesado,variables_procesado_bd,df_referencia)
+
+        
+
+        
+#     # control de calidad de salidas previamente disponibles
+#     if tipo_accion == acciones[2]: 
+        
+#         st.subheader('Control de calidad de datos procedentes de botellas')    
+            
+#         # Toma los datos de la caché    
+# #        df_muestreos,df_estaciones,df_datos_biogeoquimicos,df_datos_fisicos,df_salidas,df_programas,df_indices_calidad,df_rmns = carga_datos_procesado_nutrientes()
+#         df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos = carga_datos_procesado_nutrientes()       
+        
+#         # # Mantén sólo las salidas de radiales
+#         # id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+#         # df_salidas  = df_salidas[df_salidas['programa']==int(id_radiales)]
+        
+#         # Combina la información de muestreos y salidas en un único dataframe 
+#         df_muestreos          = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
+#         df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="id_salida")
+#         df_muestreos          = df_muestreos.rename(columns={"id_salida": "salida_mar"}) # Deshaz el cambio de nombre
+                         
+#         # compón un dataframe con la información de muestreo y datos disponibles                                            
+#         df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")
+         
+#         # Añade columna con información del año
+#         df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
+        
+#         # Borra los dataframes que ya no hagan falta para ahorrar memoria
+#         del(df_datos_discretos,df_muestreos)
+        
+#         # procesa ese dataframe
+#         io_control_calidad = 1
+#         indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada = FUNCIONES_AUXILIARES.menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
+                                                   
+#         # Recupera el nombre "completo" de la variable y sus unidades
+#         indice_variable          = variables_procesado_bd.index(variable_seleccionada)
+#         nombre_completo_variable = variables_procesado[indice_variable] 
+#         unidades_variable        = variables_unidades[indice_variable]
+                                                                      
+#         # Selecciona los datos correspondientes al programa, estación, salida y cast seleccionados
+#         datos_procesados     = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion) & (df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
+
+#         df_datos_disponibles = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion)]
+                
+#         if not datos_procesados[variable_seleccionada].isnull().all():         
+  
+#             FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset)
+
+#         else:
+            
+#             texto_error = "La base de datos no contiene información para la variable, salida y estación seleccionadas"
+#             st.warning(texto_error, icon="⚠️")
+
+        
+        
+#         # st.subheader('Control de calidad de datos de nutrientes')
+
+#         # # compón un dataframe con la información de muestreo y datos biogeoquímicos
+#         # df_muestreos          = df_muestreos.rename(columns={"id_muestreo": "muestreo"}) # Para igualar los nombres de columnas                                               
+#         # df_datos_disponibles  = pandas.merge(df_datos_biogeoquimicos, df_muestreos, on="muestreo")
+        
+#         # # Añade columna con información del año
+#         # df_datos_disponibles['año']                = numpy.zeros(df_datos_disponibles.shape[0],dtype=int)
+#         # for idato in range(df_datos_disponibles.shape[0]):
+#         #     df_datos_disponibles['año'].iloc[idato] = (df_datos_disponibles['fecha_muestreo'].iloc[idato]).year
+        
+        
+#         # # procesa ese dataframe
+#         # FUNCIONES_PROCESADO.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades)
+
+        
 ###############################################################################
 ############ PÁGINA DE PROCESADO DE INFORMACION DE NUTRIENTES #################
 ###############################################################################    
@@ -1226,8 +1635,10 @@ def procesado_nutrientes():
         df_rmns_bajos             = pandas.read_sql('SELECT * FROM rmn_bajo_nutrientes', conn)
         df_rmns_altos             = pandas.read_sql('SELECT * FROM rmn_alto_nutrientes', conn)
         df_variables              = pandas.read_sql('SELECT * FROM variables_procesado', conn)
+        df_solicitudes            = pandas.read_sql('SELECT * FROM variables_procesado', conn)
+        df_planificaciones        = pandas.read_sql('SELECT * FROM variables_procesado', conn)
         conn.close()
-        return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos,df_variables
+        return df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos,df_variables,df_solicitudes,df_planificaciones
         
 
 
@@ -1240,7 +1651,7 @@ def procesado_nutrientes():
     puerto           = st.secrets["postgres"].port
     
    
-    df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos,df_variables = carga_datos_procesado_nutrientes()
+    df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,df_rmns_bajos,df_rmns_altos,df_variables,df_solicitudes,df_planificaciones = carga_datos_procesado_nutrientes()
 
     # Combina la información de muestreos y salidas en un único dataframe 
     df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
@@ -1289,6 +1700,11 @@ def procesado_nutrientes():
         
             salidas_seleccionadas = df_prog_sel[df_prog_sel['año']==anho_seleccionado]
             listado_salidas       = salidas_seleccionadas['salida_mar']
+            
+        # Selecciona el lote de muestras a analizar
+        df_test = df_solicitudes[(df_solicitudes["id_programa"]==int(indice_programa)) & (df_solicitudes["año_campaña"]==int(anho_seleccionado))]
+        
+        st.dataframe(df_test)
     
         df_muestreos_salidas_seleccionadas = df_muestreos[df_muestreos['salida_mar'].isin(listado_salidas)]
         df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos_salidas_seleccionadas, on="muestreo") 
@@ -1613,8 +2029,6 @@ def procesado_nutrientes():
         
         # # procesa ese dataframe
         # FUNCIONES_PROCESADO.control_calidad_biogeoquimica(df_datos_disponibles,variables_procesado,variables_procesado_bd,variables_unidades)
-
-        
 
             
             
@@ -2307,11 +2721,10 @@ def planificacion_procesos():
     
     with st.form("Formulario seleccion"):  
     
-        df_modificado = st.data_editor(df_muestra, num_rows="dynamic")
+        df_modificado = st.data_editor(df_muestra, num_rows="add")
       
         # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
-        #io_envio            = st.button("Actualizar o modificar")  
-        io_envio            = st.form_submit_button("Añadir solicitud")   
+        io_envio            = st.form_submit_button("Modificar o añadir información")   
             
         if io_envio == True:
             
@@ -2329,7 +2742,7 @@ def planificacion_procesos():
                 
             conn.close()
             
-            texto_exito = 'Solictud de análisis añadida correctamente'
+            texto_exito = 'Información actualizada correctamente'
             st.success(texto_exito)
         
             st.cache_data.clear()  
@@ -2350,83 +2763,7 @@ def planificacion_procesos():
     
         texto_advertencia = "AVISO! El número de muestras planificadas (" + str(num_muestras_planificadas) + ") difiere del solicitado (" + str(num_muestras_totales) + ")"
         st.warning(texto_advertencia, icon="⚠️")
-    
-    # st.text(num_muestras_planificadas)
-    
-    # st.text(num_muestras_totales)
-    
-    #st.dataframe(df_solicitud_seleccionada, on_select="rerun")
-    
-    # st.subheader('Datos del muestreo')
-    
-    # col1, col2, col3 = st.columns(3,gap="small")
-    
-    # # Selecciona el programa de muestreo   
-    # with col1:
-    #     programa_seleccionado  = st.selectbox('Muestreo',(df_programas['nombre_programa'])) 
-    
-    #     id_programa    = df_programas[df_programas['nombre_programa']==programa_seleccionado]['id_programa'].iloc[0]
-    
-    # with col2:
-    
-    #     if int(id_programa) != 6:
-    #         anho_muestreo = st.number_input("Año",value=2025)
-            
-    #     else:
-    #         anho_muestreo = None
-    #         nombre_muestras        = st.text_input('Nombre del muestreo')  
-        
-    # with col3:
-        
-    #     if int(id_programa) != 6:
-        
-    #         nombre_temporal  = programa_seleccionado + ' ' + str(anho_muestreo)
-            
-    #         nombre_muestras        = st.text_input('Nombre del muestreo',value = nombre_temporal) 
-          
-    # st.subheader('Información adicional')    
-
-    # # Despliega un formulario para introducir los datos de las muestras que se están analizando
-    # with st.form("Formulario seleccion"):
-         
-    #     col1, col2, col3, col4= st.columns(4,gap="small")
-    #     with col1:
-    #         solicitante        = st.text_input('Entidad solicitante')
-
-           
-    #     with col2:
-    #        fecha_solicitud = st.date_input("Fecha de solicitud", value="today", format="DD/MM/YYYY")
-
-
-    #     with col3:
-    #        num_muestras = st.number_input("Número total de muestras",value=int(0))      
-    
-    
-    #     with col4:
-    #        importe = st.number_input("Importe facturado (€)",value=int(0))         
-    
-    
-    
-    #     io_envio            = st.form_submit_button("Añadir solicitud")    
-    
-    
-    
-    #     if io_envio == 1:   
-                        
-    #         instruccion_sql = '''INSERT INTO servicio_nutrientes_entradas (entidad_solicitante,fecha_solicitud,id_programa,año_campaña,nombre_muestreo,numero_muestras,importe)
-    #             VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_muestreo) DO NOTHING;''' 
-                    
-    #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    #         cursor = conn.cursor()
-    #         cursor.execute(instruccion_sql, (solicitante,fecha_solicitud,int(id_programa),int(anho_muestreo),nombre_muestras,int(num_muestras),importe))
-    #         conn.commit()
-    #         cursor.close()
-    #         conn.close()
-
-    #         texto_exito = 'Solictud de análisis añadida correctamente'
-    #         st.success(texto_exito)
-            
-    #         st.cache_data.clear()        
+ 
     
 
 ###############################################################################
