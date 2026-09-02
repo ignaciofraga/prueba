@@ -1679,7 +1679,7 @@ def procesado_nutrientes():
         canales_autoanalizador = ['nitrogeno_inorganico_total','nitrito','silicato','fosfato']
         
         # Selecciona campaña y año (para evitar problemas con id duplicados en años distintos)              
-        col1, col2 = st.columns(2,gap="small")
+        col1, col2, col3 = st.columns(3,gap="small")
         with col1: 
             
             listado_programas         = df_salidas['nombre_programa'].unique()
@@ -1705,13 +1705,10 @@ def procesado_nutrientes():
         id_solicitud_analisis = df_solicitudes[(df_solicitudes["id_programa"]==int(indice_programa)) & (df_solicitudes["año_campaña"]==int(anho_seleccionado))]["id_entrada"].iloc[0]
         df_planificacion_solicitud = df_planificaciones[df_planificaciones["id_solicitud"]==id_solicitud_analisis]
         
-        col1, col2, col3 = st.columns(3,gap="small")
-        with col1:
+        with col3:
             lote_analisis        = st.selectbox('Lote',(df_planificacion_solicitud["nombre"]))
             df_lote_seleccionado = df_planificacion_solicitud[df_planificacion_solicitud["nombre"]==lote_analisis]
-        with col2:
-            texto_apoyo = "Lote " + str(df_lote_seleccionado["lote"].iloc[0]) + ", " + str(df_lote_seleccionado["num_muestras"].iloc[0]) + " muestras"
-            st.text(texto_apoyo)
+   
         
     
         df_muestreos_salidas_seleccionadas = df_muestreos[df_muestreos['salida_mar'].isin(listado_salidas)]
