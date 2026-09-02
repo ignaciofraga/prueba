@@ -2343,7 +2343,7 @@ def planificacion_procesos():
     
     df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
                
-    df_muestra = df_solicitud_seleccionada["lote","num_muestras","observaciones"]
+    df_muestra = df_solicitud_seleccionada[["lote","num_muestras","observaciones"]]
     
     
     edited_df = st.data_editor(df_muestra, num_rows="dynamic")
