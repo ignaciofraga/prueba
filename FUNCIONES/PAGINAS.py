@@ -1731,17 +1731,19 @@ def procesado_nutrientes():
             
             archivo_AA                  = st.file_uploader("Arrastra o selecciona los archivos del AA", accept_multiple_files=False)
             
-            iq_elegido = st.radio("Indice de calidad asignado a los datos procesados",('Bueno', 'No evaluado'),horizontal=True)
-            if iq_elegido == 'Bueno':
-                iq_asignado = 2
-            if iq_elegido == 'No evaluado':
-                iq_asignado = 1
-            
             col1, col2 = st.columns(2,gap="small")
+            
             with col1:
-                io_add_data                 = st.checkbox('Añadir datos procesados a la base de datos',value=False)
+            
+                iq_elegido = st.radio("Indice de calidad asignado a los datos procesados",('Bueno', 'No evaluado'),horizontal=True)
+                if iq_elegido == 'Bueno':
+                    iq_asignado = 2
+                if iq_elegido == 'No evaluado':
+                    iq_asignado = 1
+                
             with col2:
-                io_dato_completo            = st.checkbox('Datos correspondientes al total de la campaña',value=False)            
+                io_add_data                 = st.checkbox('Añadir datos procesados a la base de datos',value=False)
+        
                 
             io_envio                    = st.form_submit_button("Procesar el archivo subido")        
         
@@ -1887,10 +1889,10 @@ def procesado_nutrientes():
                         
                     st.success(texto_insercion)
                     
-                    # Actualiza el estado de los procesos
-                    fecha_actualizacion = datetime.date.today()
-                    FUNCIONES_AUXILIARES.actualiza_estado(indice_programa,programa_seleccionado,anho_seleccionado,fecha_actualizacion,io_dato_completo,direccion_host,base_datos,usuario,contrasena,puerto)
-                    st.success('Estado del procesado actualizado correctamente')
+                    # # Actualiza el estado de los procesos
+                    # fecha_actualizacion = datetime.date.today()
+                    # FUNCIONES_AUXILIARES.actualiza_estado(indice_programa,programa_seleccionado,anho_seleccionado,fecha_actualizacion,io_dato_completo,direccion_host,base_datos,usuario,contrasena,puerto)
+                    # st.success('Estado del procesado actualizado correctamente')
 
 
 
