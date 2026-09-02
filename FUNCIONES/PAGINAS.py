@@ -2340,6 +2340,7 @@ def planificacion_procesos():
     
     
     
+    
     df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
                
     
