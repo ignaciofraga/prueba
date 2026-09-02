@@ -1705,7 +1705,7 @@ def procesado_nutrientes():
         # Selecciona el lote de muestras a analizar
         id_solicitud_analisis = df_solicitudes[(df_solicitudes["id_programa"]==int(indice_programa)) & (df_solicitudes["año_campaña"]==int(anho_seleccionado))]["id_entrada"].iloc[0]
         df_planificacion_solicitud = df_planificaciones[df_planificaciones["id_solicitud"]==id_solicitud_analisis]
-        lote_analisis        = st.selectbox('Observaciones',(df_planificacion_solicitud["Observaciones"]))
+        lote_analisis        = st.selectbox('Observaciones',(df_planificacion_solicitud["observaciones"]))
         
         
     
