@@ -2304,30 +2304,33 @@ def planificacion_procesos():
     df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
     df_muestra = df_solicitud_seleccionada[["lote","num_muestras","observaciones"]]       
     df_modificado = st.data_editor(df_muestra, num_rows="dynamic")
-        
-    # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
-    io_envio            = st.button("Actualizar o modificar")     
-        
-    if io_envio == True:
-        
-        instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,observaciones)
-            VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO UPDATE SET (num_muestras,observaciones) = ROW(EXCLUDED.num_muestras,EXCLUDED.observaciones);''' 
-                
-        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        
-        for idato in range(df_muestra.shape[0]):
-        
-            cursor = conn.cursor()
-            cursor.execute(instruccion_sql, (int(id_solicitud),int(df_modificado["lote"].iloc[idato]),int(df_modificado["num_muestras"].iloc[idato]),df_modificado["observaciones"].iloc[idato]))
-            conn.commit()
-            cursor.close()
-            
-        conn.close()
-        
-        texto_exito = 'Solictud de análisis añadida correctamente'
-        st.success(texto_exito)
     
-        st.cache_data.clear()  
+
+    with st.form("Formulario seleccion"):    
+        # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
+        #io_envio            = st.button("Actualizar o modificar")  
+        io_envio            = st.form_submit_button("Añadir solicitud")   
+            
+        if io_envio == True:
+            
+            instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,observaciones)
+                VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO UPDATE SET (num_muestras,observaciones) = ROW(EXCLUDED.num_muestras,EXCLUDED.observaciones);''' 
+                    
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            
+            for idato in range(df_muestra.shape[0]):
+            
+                cursor = conn.cursor()
+                cursor.execute(instruccion_sql, (int(id_solicitud),int(df_modificado["lote"].iloc[idato]),int(df_modificado["num_muestras"].iloc[idato]),df_modificado["observaciones"].iloc[idato]))
+                conn.commit()
+                cursor.close()
+                
+            conn.close()
+            
+            texto_exito = 'Solictud de análisis añadida correctamente'
+            st.success(texto_exito)
+        
+            st.cache_data.clear()  
     
     
     
