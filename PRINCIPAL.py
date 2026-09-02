@@ -45,6 +45,7 @@ if FUNCIONES_AUXILIARES.log_in() is True:
                         "CONSULTA DATOS":PAGINAS.consulta_datos,
                         "REFERENCIAS NUTRIENTES":PAGINAS.referencias_nutrientes,                        
                         "PROCESADO NUTRIENTES":PAGINAS.procesado_nutrientes,
+                        "PLANIFICACION NUTRIENTES":PAGINAS.planificacion_procesos,
                         "ENTRADA DATOS DE LABORATORIO":PAGINAS.entrada_datos_laboratorio,  
                         "ENTRADA DATOS TOC/TN":PAGINAS.entrada_toc,                         
                         "ENTRADA DATOS GENERALES":PAGINAS.entrada_datos_excel

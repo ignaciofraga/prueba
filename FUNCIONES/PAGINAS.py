@@ -2267,7 +2267,111 @@ def entrada_procesos():
             
             st.cache_data.clear()    
     
+ 
     
+ 
+###############################################################################
+############### PÁGINA DE CONSULTA DEL ESTADO DE LOS PROCESOS #################
+###############################################################################
+
+def planificacion_procesos():
+        
+    ### Encabezados y titulos 
+    #st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
+    st.title('Entrada de solicitudes del servicio de análisis del C.O de A Coruña')
+    
+    # Recupera la tabla de los programas disponibles como un dataframe
+    conn = init_connection()
+    df_solicitudes = pandas.read_sql('SELECT * FROM servicio_nutrientes_entradas', conn)
+    conn.close()
+    
+    
+    # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    direccion_host = st.secrets["postgres"].host
+    base_datos     = st.secrets["postgres"].dbname
+    usuario        = st.secrets["postgres"].user
+    contrasena     = st.secrets["postgres"].password
+    puerto         = st.secrets["postgres"].port
+    
+    solicitud_seleccionada  = st.selectbox('Muestreo',(df_solicitudes['nombre_muestreo'])) 
+    
+    
+    
+    df_solicitud_seleccionada = df_solicitudes[df_solicitudes['nombre_muestreo']==solicitud_seleccionada]
+    
+    
+    st.dataframe(df_solicitud_seleccionada)
+    
+    # st.subheader('Datos del muestreo')
+    
+    # col1, col2, col3 = st.columns(3,gap="small")
+    
+    # # Selecciona el programa de muestreo   
+    # with col1:
+    #     programa_seleccionado  = st.selectbox('Muestreo',(df_programas['nombre_programa'])) 
+    
+    #     id_programa    = df_programas[df_programas['nombre_programa']==programa_seleccionado]['id_programa'].iloc[0]
+    
+    # with col2:
+    
+    #     if int(id_programa) != 6:
+    #         anho_muestreo = st.number_input("Año",value=2025)
+            
+    #     else:
+    #         anho_muestreo = None
+    #         nombre_muestras        = st.text_input('Nombre del muestreo')  
+        
+    # with col3:
+        
+    #     if int(id_programa) != 6:
+        
+    #         nombre_temporal  = programa_seleccionado + ' ' + str(anho_muestreo)
+            
+    #         nombre_muestras        = st.text_input('Nombre del muestreo',value = nombre_temporal) 
+          
+    # st.subheader('Información adicional')    
+
+    # # Despliega un formulario para introducir los datos de las muestras que se están analizando
+    # with st.form("Formulario seleccion"):
+         
+    #     col1, col2, col3, col4= st.columns(4,gap="small")
+    #     with col1:
+    #         solicitante        = st.text_input('Entidad solicitante')
+
+           
+    #     with col2:
+    #        fecha_solicitud = st.date_input("Fecha de solicitud", value="today", format="DD/MM/YYYY")
+
+
+    #     with col3:
+    #        num_muestras = st.number_input("Número total de muestras",value=int(0))      
+    
+    
+    #     with col4:
+    #        importe = st.number_input("Importe facturado (€)",value=int(0))         
+    
+    
+    
+    #     io_envio            = st.form_submit_button("Añadir solicitud")    
+    
+    
+    
+    #     if io_envio == 1:   
+                        
+    #         instruccion_sql = '''INSERT INTO servicio_nutrientes_entradas (entidad_solicitante,fecha_solicitud,id_programa,año_campaña,nombre_muestreo,numero_muestras,importe)
+    #             VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (nombre_muestreo) DO NOTHING;''' 
+                    
+    #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    #         cursor = conn.cursor()
+    #         cursor.execute(instruccion_sql, (solicitante,fecha_solicitud,int(id_programa),int(anho_muestreo),nombre_muestras,int(num_muestras),importe))
+    #         conn.commit()
+    #         cursor.close()
+    #         conn.close()
+
+    #         texto_exito = 'Solictud de análisis añadida correctamente'
+    #         st.success(texto_exito)
+            
+    #         st.cache_data.clear()        
     
 
 ###############################################################################
