@@ -1701,8 +1701,6 @@ def procesado_nutrientes():
             salidas_seleccionadas = df_prog_sel[df_prog_sel['año']==anho_seleccionado]
             listado_salidas       = salidas_seleccionadas['salida_mar']
             
-            
-            
         # Selecciona el lote de muestras a analizar
         id_solicitud_analisis = df_solicitudes[(df_solicitudes["id_programa"]==int(indice_programa)) & (df_solicitudes["año_campaña"]==int(anho_seleccionado))]["id_entrada"].iloc[0]
         df_planificacion_solicitud = df_planificaciones[df_planificaciones["id_solicitud"]==id_solicitud_analisis]
