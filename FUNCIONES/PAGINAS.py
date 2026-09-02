@@ -2343,7 +2343,7 @@ def planificacion_procesos():
     df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
                
     
-    st.dataframe(df_solicitud_seleccionada)
+    st.dataframe(df_solicitud_seleccionada, on_select="rerun")
     
     # st.subheader('Datos del muestreo')
     
