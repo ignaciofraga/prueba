@@ -2344,7 +2344,7 @@ def planificacion_procesos():
     df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
                
     
-    edited_df = st.data_editor(df_solicitud_seleccionada, num_rows="dynamic")
+    edited_df = st.data_editor(df_solicitud_seleccionada, num_rows="dynamic",column_config=["lote","num_muestras"])
     
     #st.dataframe(df_solicitud_seleccionada, on_select="rerun")
     
