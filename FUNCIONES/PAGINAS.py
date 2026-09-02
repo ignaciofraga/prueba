@@ -2300,6 +2300,7 @@ def planificacion_procesos():
     id_solicitud = df_solicitudes[df_solicitudes['nombre_muestreo']==solicitud_seleccionada]['id_entrada'].iloc[0]
     
     
+    
     # Despliega un formulario para introducir los datos de las muestras que se están analizando
     with st.form("Formulario seleccion"):
          
