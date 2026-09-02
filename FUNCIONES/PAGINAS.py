@@ -1705,8 +1705,14 @@ def procesado_nutrientes():
         # Selecciona el lote de muestras a analizar
         id_solicitud_analisis = df_solicitudes[(df_solicitudes["id_programa"]==int(indice_programa)) & (df_solicitudes["año_campaña"]==int(anho_seleccionado))]["id_entrada"].iloc[0]
         df_planificacion_solicitud = df_planificaciones[df_planificaciones["id_solicitud"]==id_solicitud_analisis]
-        lote_analisis        = st.selectbox('Observaciones',(df_planificacion_solicitud["observaciones"]))
         
+        col1, col2, col3 = st.columns(3,gap="small")
+        with col1:
+            lote_analisis        = st.selectbox('Lote',(df_planificacion_solicitud["nombre"]))
+            df_lote_seleccionado = df_planificacion_solicitud[df_planificacion_solicitud["nombre"]==lote_analisis]
+        with col2:
+            texto_apoyo = "Lote " + str(df_lote_seleccionado["lote"].iloc[0]) + ", " + str(df_lote_seleccionado["num_muestras"].iloc[0]) + " muestras"
+            st.text(texto_apoyo)
         
     
         df_muestreos_salidas_seleccionadas = df_muestreos[df_muestreos['salida_mar'].isin(listado_salidas)]
@@ -2731,8 +2737,8 @@ def planificacion_procesos():
             
         if io_envio == True:
             
-            instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,observaciones)
-                VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO UPDATE SET (num_muestras,observaciones) = ROW(EXCLUDED.num_muestras,EXCLUDED.observaciones);''' 
+            instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,nombre)
+                VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO UPDATE SET (num_muestras,nombre) = ROW(EXCLUDED.num_muestras,EXCLUDED.nombre);''' 
                     
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
             
