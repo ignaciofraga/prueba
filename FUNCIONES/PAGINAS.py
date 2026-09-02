@@ -2330,6 +2330,7 @@ def planificacion_procesos():
         st.cache_data.clear()  
     
     
+    
     # Comprueba que el número de muestras encaja con el total    
     conn = init_connection()
     df_planificaciones = pandas.read_sql('SELECT * FROM planificacion_analisis_nutrientes', conn)
