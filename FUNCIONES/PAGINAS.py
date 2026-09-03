@@ -2821,7 +2821,7 @@ def consulta_estado():
         
         df_proceso = df_estados[df_estados["id_solicitud"]==df_solicitudes["id_entrada"].iloc[isolicitud]]
 
-        df_proceso['dttime'] = pandas.to_datetime(df_proceso['fecha_analisis'], format='%Y-%M-%D')
+        df_proceso['dttime'] = pandas.to_datetime(df_proceso['fecha_analisis'], format='%Y-%M-%d')
         df_proceso = df_proceso.sort_values(by='dttime',ascending=False)
 
         df_solicitudes["fecha_actualizacion"].iloc[isolicitud] = df_proceso['dttime'].iloc[0]
