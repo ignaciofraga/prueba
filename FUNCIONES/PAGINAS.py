@@ -1760,8 +1760,8 @@ def procesado_nutrientes():
                 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                 
                 cursor = conn.cursor()
-                instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s, temperatura_laboratorio=%s, rendimiento_columna=%s,id_rmn_bajo=%s, id_rmn_alto=%s  WHERE lote = %s AND nombre = %s;'
-                cursor.execute(instruccion_sql, (fecha_actualizacion,True,temperatura_laboratorio,rendimiento_columna,int(id_ref_bajo),int(id_ref_alto),int(id_solicitud_analisis),lote_analisis))              
+                instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s, temperatura_laboratorio=%s, rendimiento_columna=%s,id_rmn_bajo=%s, id_rmn_alto=%s  WHERE id_solicitud = %s AND lote = %s;'
+                cursor.execute(instruccion_sql, (fecha_actualizacion,True,temperatura_laboratorio,rendimiento_columna,int(id_ref_bajo),int(id_ref_alto),int(id_solicitud_analisis),int(id_lote_seleccionado)))              
                 conn.commit()
                 cursor.close()
                     

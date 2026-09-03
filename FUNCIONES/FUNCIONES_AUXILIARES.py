@@ -463,48 +463,6 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
 
 
 
-###############################################################################
-############### FUNCION PARA ACTUALIZAR EL ESTADO DEL PROCESADO ###############
-############################################################################### 
-
-def actualiza_estado(id_lote_seleccionado,id_ref_bajo,id_ref_alto,rendimiento_columna,temperatura_laboratorio,fecha_actualizacion):
-
-    # Recupera los datos de conexión
-    direccion_host   = st.secrets["postgres"].host
-    base_datos       = st.secrets["postgres"].dbname
-    usuario          = st.secrets["postgres"].user
-    contrasena       = st.secrets["postgres"].password
-    puerto           = st.secrets["postgres"].port 
-
-
-
-
-
-
-    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    cursor = conn.cursor()
-
-    # Comprueba si hay un estado para el año considerado
-    df_anual            = df_estados[df_estados['año']==int(anho_datos)]
-        
-    # Si no lo hay añade línea a la matriz de estados
-    if df_anual.shape[0] == 0:
-        instruccion_actualiza = 'INSERT INTO estado_procesos (programa,nombre_programa,año,fecha_analisis_laboratorio,analisis_finalizado,campaña_realizada) VALUES (%s,%s,%s,%s,%s,%s) ;' 
-        cursor.execute(instruccion_actualiza, (int(id_programa),nombre_programa,int(anho_datos),fecha_actualizacion,io_terminado,True))
-        conn.commit()
-    # En caso contrario, actualiza
-    else:
-        instruccion_actualiza = 'UPDATE estado_procesos SET fecha_analisis_laboratorio =%s WHERE programa = %s AND año = %s;'
-        cursor.execute(instruccion_actualiza, (fecha_actualizacion,int(id_programa),int(anho_datos)))
-        conn.commit()
-    
-        instruccion_actualiza = 'UPDATE estado_procesos SET analisis_finalizado =%s WHERE programa = %s AND año = %s;'
-        cursor.execute(instruccion_actualiza, (io_terminado,int(id_programa),int(anho_datos)))
-        conn.commit()
-
-    cursor.close()
-    conn.close()
-
     
 ###############################################################################
 ##################### PÁGINA DE CONSULTA DE DATOS DE BOTELLAS #################
