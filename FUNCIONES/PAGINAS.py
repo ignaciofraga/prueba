@@ -2814,9 +2814,6 @@ def consulta_estado():
     conn.close()
     
     # Determina el estado de cada solicitud
-    
-    
-    
     df_solicitudes["estado"] = None
     df_solicitudes["fecha_actualizacion"] = None
     
@@ -2824,11 +2821,15 @@ def consulta_estado():
         
         df_proceso = df_estados[df_estados["id_solicitud"]==df_solicitudes["id_entrada"].iloc[isolicitud]]
 
+        df_proceso['dttime'] = pandas.to_datetime(df_proceso['fecha_analisis'], format='%Y-%M-%D')
+        df_proceso = df_proceso.sort_values(by='dttime',ascending=False)
+
+        df_solicitudes["fecha_actualizacion"].iloc[isolicitud] = df_proceso['dttime'].iloc[0]
+            
         analisis_terminados = df_proceso.io_analizado.sum()   
         
         if int(analisis_terminados) == int(df_proceso.shape[0]):
             df_solicitudes["estado"].iloc[isolicitud] = 'Terminado'
-            df_solicitudes["fecha_actualizacion"].iloc[isolicitud] = max(df_proceso['fecha_analisis'])
             
         if analisis_terminados == 0:
             df_solicitudes["estado"].iloc[isolicitud] = 'Pendiente'
@@ -2838,8 +2839,7 @@ def consulta_estado():
             porcentaje = (analisis_terminados/df_proceso.shape[0])*100
             
             df_solicitudes["estado"].iloc[isolicitud] = "En curso (" + str(round(porcentaje*100,0)) + "%) finalizado"
-    
-            df_solicitudes["fecha_actualizacion"].iloc[isolicitud] = max(df_proceso['fecha_analisis'])
+
     
     
     st.dataframe(df_solicitudes)
