@@ -2841,6 +2841,8 @@ def consulta_estado():
  
     df_muestra = df_solicitudes[["entidad_solicitante","fecha_solicitud","nombre_muestreo","numero_muestras","importe","estado","fecha_actualizacion"]]   
     
+    df_muestra = df_muestra.style.map(lambda x: f"background-color: {'green' if x=='Terminado' else 'blue' if x=='Pendiente' else 'red'}", subset='estado')
+  
     st.dataframe(df_muestra)
             
             # # Despliega la información en una tabla
