@@ -2814,16 +2814,35 @@ def consulta_estado():
     conn.close()
     
     # Determina el estado de cada solicitud
+    
+    
+    
     df_solicitudes["estado"] = None
+    df_solicitudes["fecha_actualizacion"] = None
+    
     for isolicitud in range(df_solicitudes.shape[0]):
         
         df_proceso = df_estados[df_estados["id_solicitud"]==df_solicitudes["id_entrada"].iloc[isolicitud]]
 
         analisis_terminados = df_proceso.io_analizado.sum()   
         
-        st.text(analisis_terminados)
+        if int(analisis_terminados) == int(df_proceso.shape[0]):
+            df_solicitudes["estado"].iloc[isolicitud] = 'Terminado'
+            df_solicitudes["fecha_actualizacion"].iloc[isolicitud] = max(df_proceso['fecha_analisis'])
+            
+        if analisis_terminados == 0:
+            df_solicitudes["estado"].iloc[isolicitud] = 'Pendiente'
+            
+        if int(analisis_terminados) < int(df_proceso.shape[0]) and analisis_terminados > 0:
+            
+            porcentaje = (analisis_terminados/df_proceso.shape[0])*100
+            
+            df_solicitudes["estado"].iloc[isolicitud] = "En curso (" + str(round(porcentaje*100,0)) + "%) finalizado"
+    
+            df_solicitudes["fecha_actualizacion"].iloc[isolicitud] = max(df_proceso['fecha_analisis'])
     
     
+    st.dataframe(df_solicitudes)
             
             # # Despliega la información en una tabla
             # def color_tabla(s):
