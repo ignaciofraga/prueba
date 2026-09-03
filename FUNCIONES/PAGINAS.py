@@ -2836,11 +2836,12 @@ def consulta_estado():
             
         if int(analisis_terminados) < int(df_proceso.shape[0]) and analisis_terminados > 0:
                         
-            df_solicitudes["estado"].iloc[isolicitud] = "En curso (" + str(round((analisis_terminados/df_proceso.shape[0])*100,0)) + "%) finalizado"
+            df_solicitudes["estado"].iloc[isolicitud] = "En curso. " + str(round((analisis_terminados/df_proceso.shape[0])*100,0)) + "% finalizado"
 
+ 
+    df_muestra = df_solicitudes[["entidad_solicitante","fecha_solicitud","nombre_muestreo","numero_muestras","importe","estado","fecha_actualizacion"]]   
     
-    
-    st.dataframe(df_solicitudes)
+    st.dataframe(df_muestra)
             
             # # Despliega la información en una tabla
             # def color_tabla(s):
