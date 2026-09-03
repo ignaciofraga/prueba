@@ -1751,196 +1751,167 @@ def procesado_nutrientes():
                 
             io_envio                    = st.form_submit_button("Procesar el archivo subido")   
             
-            
-            
-            if io_envio:
-                # Actualiza el estado de los procesos
-                fecha_actualizacion = datetime.date.today()
-                
-                conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                
-                cursor = conn.cursor()
-                instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s, temperatura_laboratorio=%s, rendimiento_columna=%s,id_rmn_bajo=%s, id_rmn_alto=%s  WHERE id_solicitud = %s AND lote = %s;'
-                cursor.execute(instruccion_sql, (fecha_actualizacion,True,temperatura_laboratorio,rendimiento_columna,int(id_ref_bajo),int(id_ref_alto),int(id_solicitud_analisis),int(id_lote_seleccionado)))              
-                conn.commit()
-                cursor.close()
-                    
-                st.text(int(id_solicitud_analisis))
-                st.text(lote_analisis)
-                
-                conn.close()
-                
-                texto_exito = 'Información actualizada correctamente'
-                st.success(texto_exito)
-            
-                st.cache_data.clear()  
-                
-                
-            
-            
-            
+                        
         
-        # if archivo_AA is not None and io_envio is True:
+        if archivo_AA is not None and io_envio is True:
     
         
-        #     # Lectura del archivo con los resultados del AA
-        #     datos_AA              = pandas.read_excel(archivo_AA,skiprows=15)            
-        #     datos_AA              = datos_AA.rename(columns={"Results 1":canales_autoanalizador[0],"Results 2":canales_autoanalizador[1],"Results 3":canales_autoanalizador[2],"Results 4":canales_autoanalizador[3]})
+            # Lectura del archivo con los resultados del AA
+            datos_AA              = pandas.read_excel(archivo_AA,skiprows=15)            
+            datos_AA              = datos_AA.rename(columns={"Results 1":canales_autoanalizador[0],"Results 2":canales_autoanalizador[1],"Results 3":canales_autoanalizador[2],"Results 4":canales_autoanalizador[3]})
                   
-        #     # Identifica qué canales/variables se han procesado
-        #     variables_procesadas = datos_AA.columns.tolist()
-        #     variables_run        = list(set(variables_procesadas).intersection(variables_procesado_bd))
+            # Identifica qué canales/variables se han procesado
+            variables_procesadas = datos_AA.columns.tolist()
+            variables_run        = list(set(variables_procesadas).intersection(variables_procesado_bd))
             
                         
-        #     ### Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
+            ### Añade la información de salinidad en aquellas muestras que tienen un muestreo asociado                                            
                                        
-        #     # Adapta el nombre de las sw
-        #     for idato in range(datos_AA.shape[0]):
-        #         if datos_AA['Sample ID'].iloc[idato][0:2].lower()=='sw':
-        #            datos_AA['Sample ID'].iloc[idato] ='sw' 
+            # Adapta el nombre de las sw
+            for idato in range(datos_AA.shape[0]):
+                if datos_AA['Sample ID'].iloc[idato][0:2].lower()=='sw':
+                   datos_AA['Sample ID'].iloc[idato] ='sw' 
             
-        #     # Encuentra las posiciones de las referencias de sw
-        #     # indices_referencias = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='sw']) - 1
-        #     # # Agrupa en dos tandas, las iniciales y las finales
-        #     # spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
-        #     # listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
+            # Encuentra las posiciones de las referencias de sw
+            # indices_referencias = numpy.asarray(datos_AA['Peak Number'][datos_AA['Sample ID']=='sw']) - 1
+            # # Agrupa en dos tandas, las iniciales y las finales
+            # spl          = [0]+[i for i in range(1,len(indices_referencias)) if indices_referencias[i]-indices_referencias[i-1]>1]+[None]
+            # listado_refs = [indices_referencias[b:e] for (b, e) in [(spl[i-1],spl[i]) for i in range(1,len(spl))]]
 
 
-        #     datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_alto)]
-        #     ref_inicial       = datos_referencias['Peak Number'].iloc[0] + 2
-        #     datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
-        #     ref_final         = datos_referencias['Peak Number'].iloc[1] - 2
+            datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_alto)]
+            ref_inicial       = datos_referencias['Peak Number'].iloc[0] + 2
+            datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
+            ref_final         = datos_referencias['Peak Number'].iloc[1] - 2
             
 
             
-        #     # Encuentra la salinidad de cada muestra
-        #     datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
-        #     datos_AA['io_procesado']  = None
-        #     for idato in range(ref_inicial,ref_final):
+            # Encuentra la salinidad de cada muestra
+            datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
+            datos_AA['io_procesado']  = None
+            for idato in range(ref_inicial,ref_final):
                 
-        #         if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
+                if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
      
-        #             id_temp = df_datos_disponibles['muestreo'][df_datos_disponibles['id_externo']==datos_AA['Sample ID'].iloc[idato]]
+                    id_temp = df_datos_disponibles['muestreo'][df_datos_disponibles['id_externo']==datos_AA['Sample ID'].iloc[idato]]
                 
-        #             if len(id_temp) > 0:
-        #                 datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
-        #                 datos_AA['io_procesado'].iloc[idato]  = 1
-        #             else:
-        #                 if datos_AA['Sample ID'].iloc[idato].lower() != 'sw': 
+                    if len(id_temp) > 0:
+                        datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
+                        datos_AA['io_procesado'].iloc[idato]  = 1
+                    else:
+                        if datos_AA['Sample ID'].iloc[idato].lower() != 'sw': 
                         
-        #                     texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
-        #                     st.warning(texto_error, icon="⚠️")                        
+                            texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
+                            st.warning(texto_error, icon="⚠️")                        
        
-        #     # comprobación por si no hay ningún dato a procesar
-        #     if datos_AA['io_procesado'].isnull().all():
-        #         texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
-        #         st.warning(texto_error, icon="⚠️")          
+            # comprobación por si no hay ningún dato a procesar
+            if datos_AA['io_procesado'].isnull().all():
+                texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
+                st.warning(texto_error, icon="⚠️")          
    
-        #     else:
+            else:
                 
-        #     # En caso contrario procesa los datos
+            # En caso contrario procesa los datos
                         
                 
             
-        #         # Aplica la corrección de deriva (DRIFT)                 
-        #         datos_corregidos,posicion_RMN_bajos,posicion_RMN_altos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
+                # Aplica la corrección de deriva (DRIFT)                 
+                datos_corregidos,posicion_RMN_bajos,posicion_RMN_altos = FUNCIONES_PROCESADO.correccion_drift(datos_AA,df_referencias_altas,df_referencias_bajas,variables_run,rendimiento_columna,temperatura_laboratorio)
                             
                 
                 
-        #         # Calcula el NO3 como diferencia entre el TON y el NO2 (sólo si se han procesado estos dos canales)
-        #         if 'nitrogeno_inorganico_total' in variables_run and 'nitrito' in variables_run:
-        #             datos_corregidos['nitrato'] = datos_corregidos['nitrogeno_inorganico_total'] - datos_corregidos['nitrito']
-        #             datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
+                # Calcula el NO3 como diferencia entre el TON y el NO2 (sólo si se han procesado estos dos canales)
+                if 'nitrogeno_inorganico_total' in variables_run and 'nitrito' in variables_run:
+                    datos_corregidos['nitrato'] = datos_corregidos['nitrogeno_inorganico_total'] - datos_corregidos['nitrito']
+                    datos_corregidos['nitrato'][datos_corregidos['nitrato']<0]   = 0
                     
-        #             # vuelvo a calcular el TON como NO3+NO2, por si hubiese corregido valores nulos
-        #             datos_corregidos['nitrogeno_inorganico_total'] = datos_corregidos['nitrato'] + datos_corregidos['nitrito']
+                    # vuelvo a calcular el TON como NO3+NO2, por si hubiese corregido valores nulos
+                    datos_corregidos['nitrogeno_inorganico_total'] = datos_corregidos['nitrato'] + datos_corregidos['nitrito']
                     
-        #             # añade nitrato a variables procesadas (para redondear decimales y añadir qf)
-        #             variables_run = variables_run + ['nitrato']
+                    # añade nitrato a variables procesadas (para redondear decimales y añadir qf)
+                    variables_run = variables_run + ['nitrato']
                
-        #         # Cambia el orden de las variables
-        #         orden_inverso = ['fosato','silicato','nitrito','nitrato','nitrogeno_inorganico_total']
-        #         for iorden in range(len(orden_inverso)):
-        #             if orden_inverso[iorden] in variables_run : 
-        #                     variables_run.insert(0, variables_run.pop(variables_run.index(orden_inverso[iorden])))
+                # Cambia el orden de las variables
+                orden_inverso = ['fosato','silicato','nitrito','nitrato','nitrogeno_inorganico_total']
+                for iorden in range(len(orden_inverso)):
+                    if orden_inverso[iorden] in variables_run : 
+                            variables_run.insert(0, variables_run.pop(variables_run.index(orden_inverso[iorden])))
  
 
  
 
                     
             
-        #         datos_corregidos = datos_corregidos[['id_externo','nitrogeno_inorganico_total','nitrato','nitrito', 'silicato', 'fosfato']]
+                datos_corregidos = datos_corregidos[['id_externo','nitrogeno_inorganico_total','nitrato','nitrito', 'silicato', 'fosfato']]
             
 
-        #         # Añade informacion de RMNs, temperaturas y rendimiento
-        #         datos_corregidos['rto_columna_procesado']  = rendimiento_columna
-        #         datos_corregidos['temp_lab_procesado']     = temperatura_laboratorio
-        #         datos_corregidos['rmn_bajo_procesado']     = int(df_referencias_bajas['id_rmn'].iloc[0])
-        #         datos_corregidos['rmn_alto_procesado']     = int(df_referencias_altas['id_rmn'].iloc[0])
+                # Añade informacion de RMNs, temperaturas y rendimiento
+                datos_corregidos['rto_columna_procesado']  = rendimiento_columna
+                datos_corregidos['temp_lab_procesado']     = temperatura_laboratorio
+                datos_corregidos['rmn_bajo_procesado']     = int(df_referencias_bajas['id_rmn'].iloc[0])
+                datos_corregidos['rmn_alto_procesado']     = int(df_referencias_altas['id_rmn'].iloc[0])
                 
-        #         texto_exito = 'Muestreos disponibles procesados correctamente'
-        #         st.success(texto_exito)
+                texto_exito = 'Muestreos disponibles procesados correctamente'
+                st.success(texto_exito)
                 
                 
 
-        #         variables_elimina       = variables_procesado_bd + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado']
-        #         df_datos_biogeoquimicos = df_datos_disponibles.drop(columns=variables_elimina)
+                variables_elimina       = variables_procesado_bd + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado']
+                df_datos_biogeoquimicos = df_datos_disponibles.drop(columns=variables_elimina)
                 
-        #         datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="id_externo",how='left')
+                datos_corregidos = pandas.merge(datos_corregidos, df_datos_biogeoquimicos, on="id_externo",how='left')
                                                
-        #         # Reduce los decimales y asigna QF a los datos
-        #         variables_run_qf = []
-        #         for ivariable_procesada in range(len(variables_run)):
+                # Reduce los decimales y asigna QF a los datos
+                variables_run_qf = []
+                for ivariable_procesada in range(len(variables_run)):
                         
-        #             #reduce los decimales 
-        #             datos_corregidos[variables_run[ivariable_procesada]]=round(datos_corregidos[variables_run[ivariable_procesada]],3)
+                    #reduce los decimales 
+                    datos_corregidos[variables_run[ivariable_procesada]]=round(datos_corregidos[variables_run[ivariable_procesada]],3)
                         
-        #             # Añade qf a los datos, asignando a las variables procesadas el qf elegido
-        #             variables_run_qf                                        = variables_run_qf + [variables_run[ivariable_procesada] + '_qf']
-        #             datos_corregidos[variables_run_qf[ivariable_procesada]] = int(iq_asignado) #numpy.ones(datos_corregidos.shape[0],dtype=int)
+                    # Añade qf a los datos, asignando a las variables procesadas el qf elegido
+                    variables_run_qf                                        = variables_run_qf + [variables_run[ivariable_procesada] + '_qf']
+                    datos_corregidos[variables_run_qf[ivariable_procesada]] = int(iq_asignado) #numpy.ones(datos_corregidos.shape[0],dtype=int)
   
                 
-        #         variables_exporta =  variables_procesado_bd + variables_run_qf + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado','muestreo','id_externo']
-        #         datos_exporta = datos_corregidos[variables_exporta]
+                variables_exporta =  variables_procesado_bd + variables_run_qf + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado','muestreo','id_externo']
+                datos_exporta = datos_corregidos[variables_exporta]
                 
                 
-        #         # Añade los datos a la base de datos si se seleccionó esta opción                        
-        #         if io_add_data is True:
+                # Añade los datos a la base de datos si se seleccionó esta opción                        
+                if io_add_data is True:
                                        
-        #             with st.spinner('Insertando datos en la base de datos'):
+                    with st.spinner('Insertando datos en la base de datos'):
                         
-        #                 # Mantén sólo los registros con identificador de muestreo asociado
-        #                 datos_insercion = datos_exporta.dropna(subset = ['muestreo'])
+                        # Mantén sólo los registros con identificador de muestreo asociado
+                        datos_insercion = datos_exporta.dropna(subset = ['muestreo'])
 
-        #                 # Define una columna índice
-        #                 indices_dataframe         = numpy.arange(0,datos_insercion.shape[0],1,dtype=int)
-        #                 datos_insercion['id_temp'] = indices_dataframe
-        #                 datos_insercion.set_index('id_temp',drop=True,append=False,inplace=True)
+                        # Define una columna índice
+                        indices_dataframe         = numpy.arange(0,datos_insercion.shape[0],1,dtype=int)
+                        datos_insercion['id_temp'] = indices_dataframe
+                        datos_insercion.set_index('id_temp',drop=True,append=False,inplace=True)
                        
-        #                 # Inserta datos
-        #                 texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_insercion,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
+                        # Inserta datos
+                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_insercion,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,df_variables,df_datos_discretos,df_muestreos)
                         
-        #             st.success(texto_insercion)
+                    st.success(texto_insercion)
                     
-        #             # Actualiza el estado de los procesos
-        #             fecha_actualizacion = datetime.date.today()
-                    
-        #             instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s, temperatura_laboratorio=%s, rendimiento_columna=%s,id_rmn_bajo=%s, id_rmn_alto  WHERE lote = %s AND nombre = %s;'
-
-        #             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-                    
-
-        #             cursor = conn.cursor()
-        #             cursor.execute(instruccion_sql, (fecha_actualizacion,True,temperatura_laboratorio,rendimiento_columna,int(id_ref_bajo),int(id_ref_alto),lote_analisis,int(id_solicitud_analisis)))
-        #             conn.commit()
-        #             cursor.close()
+                    # Actualiza el estado de los procesos
+                    fecha_actualizacion = datetime.date.today()
                         
-        #             conn.close()
+                    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+                        
+                    cursor = conn.cursor()
+                    instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s, temperatura_laboratorio=%s, rendimiento_columna=%s,id_rmn_bajo=%s, id_rmn_alto=%s  WHERE id_solicitud = %s AND lote = %s;'
+                    cursor.execute(instruccion_sql, (fecha_actualizacion,True,temperatura_laboratorio,rendimiento_columna,int(id_ref_bajo),int(id_ref_alto),int(id_solicitud_analisis),int(id_lote_seleccionado)))              
+                    conn.commit()
+                    cursor.close()
+
+                    conn.close()
+                        
+                    texto_exito = 'Información actualizada correctamente'
+                    st.success(texto_exito)
                     
-        #             texto_exito = 'Información actualizada correctamente'
-        #             st.success(texto_exito)
-                
-        #             st.cache_data.clear()  
+                    st.cache_data.clear()
                     
                     
                     
@@ -1948,62 +1919,62 @@ def procesado_nutrientes():
                     
 
 
-        #         # Añade nombre de la estacion
-        #         df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
+                # Añade nombre de la estacion
+                df_estaciones = df_estaciones.rename(columns={"id_estacion": "estacion"})
                 
                                
-        #         # Extrae información de los RMNs y sw al inicio y final del run
-        #         num_registros_mitad = int((datos_corregidos.shape[0])/2)
-        #         sw_inicio = []
-        #         for iregistro in range(num_registros_mitad):
-        #             if datos_corregidos['id_externo'].iloc[iregistro].lower() == 'sw':
-        #                 sw_inicio = sw_inicio + [iregistro]
-        #         sw_final = []
-        #         for iregistro in range(num_registros_mitad,datos_corregidos.shape[0]):
-        #             if datos_corregidos['id_externo'].iloc[iregistro].lower() == 'sw':
-        #                 sw_final = sw_final + [iregistro]
+                # Extrae información de los RMNs y sw al inicio y final del run
+                num_registros_mitad = int((datos_corregidos.shape[0])/2)
+                sw_inicio = []
+                for iregistro in range(num_registros_mitad):
+                    if datos_corregidos['id_externo'].iloc[iregistro].lower() == 'sw':
+                        sw_inicio = sw_inicio + [iregistro]
+                sw_final = []
+                for iregistro in range(num_registros_mitad,datos_corregidos.shape[0]):
+                    if datos_corregidos['id_externo'].iloc[iregistro].lower() == 'sw':
+                        sw_final = sw_final + [iregistro]
                         
-        #         registros_inicio = sw_inicio + [posicion_RMN_bajos[0]] + [posicion_RMN_altos[0]]
-        #         registros_final  = sw_final + [posicion_RMN_bajos[1]] + [posicion_RMN_altos[1]]
+                registros_inicio = sw_inicio + [posicion_RMN_bajos[0]] + [posicion_RMN_altos[0]]
+                registros_final  = sw_final + [posicion_RMN_bajos[1]] + [posicion_RMN_altos[1]]
                         
-        #         subset_inicio = datos_corregidos.iloc[registros_inicio, :]
-        #         subset_final = datos_corregidos.iloc[registros_final, :]
+                subset_inicio = datos_corregidos.iloc[registros_inicio, :]
+                subset_final = datos_corregidos.iloc[registros_final, :]
                 
 
 
                 
-        #         datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
+                datos_corregidos  = pandas.merge(datos_corregidos, df_estaciones, on="estacion")
                 
-        #         datos_exporta_excel = pandas.concat([subset_inicio, datos_corregidos], ignore_index=True)
-        #         datos_exporta_excel = pandas.concat([datos_exporta_excel, subset_final], ignore_index=True)
+                datos_exporta_excel = pandas.concat([subset_inicio, datos_corregidos], ignore_index=True)
+                datos_exporta_excel = pandas.concat([datos_exporta_excel, subset_final], ignore_index=True)
                 
-        #         # Descarga los datos como una hoja Excel        
-        #         listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
-        #         datos_exporta_excel     = datos_exporta_excel[listado_columnas]
+                # Descarga los datos como una hoja Excel        
+                listado_columnas        = ['nombre_muestreo','id_externo','fecha_muestreo','hora_muestreo','nombre_estacion','botella','presion_ctd','salinidad_ctd'] + variables_run + variables_run_qf
+                datos_exporta_excel     = datos_exporta_excel[listado_columnas]
                 
-        #         # first_cols = ['A','B','C']
-        #         # last_cols = [col for col in df.columns if col not in first_cols]
+                # first_cols = ['A','B','C']
+                # last_cols = [col for col in df.columns if col not in first_cols]
 
-        #         # df = df[first_cols+last_cols]
+                # df = df[first_cols+last_cols]
       
-        #         # Botón para descargar la información como Excel
-        #         nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
+                # Botón para descargar la información como Excel
+                nombre_archivo =  'PROCESADO_' + archivo_AA.name[0:-5] + '.xlsx'
                        
-        #         output = BytesIO()
-        #         writer = pandas.ExcelWriter(output, engine='xlsxwriter')
-        #         datos_excel = datos_exporta_excel.to_excel(writer, index=False, sheet_name='DATOS')
-        #         writer.close()
-        #         datos_excel = output.getvalue()
+                output = BytesIO()
+                writer = pandas.ExcelWriter(output, engine='xlsxwriter')
+                datos_excel = datos_exporta_excel.to_excel(writer, index=False, sheet_name='DATOS')
+                writer.close()
+                datos_excel = output.getvalue()
             
-        #         st.download_button(
-        #             label="DESCARGA EXCEL CON LOS DATOS PROCESADOS",
-        #             data=datos_excel,
-        #             file_name=nombre_archivo,
-        #             help= 'Descarga un archivo .xlsx con los datos procesados',
-        #             mime="application/vnd.ms-excel"
-        #         )              
+                st.download_button(
+                    label="DESCARGA EXCEL CON LOS DATOS PROCESADOS",
+                    data=datos_excel,
+                    file_name=nombre_archivo,
+                    help= 'Descarga un archivo .xlsx con los datos procesados',
+                    mime="application/vnd.ms-excel"
+                )              
        
-        #         st.cache_data.clear()
+                st.cache_data.clear()
                               
 
 
@@ -2011,12 +1982,12 @@ def procesado_nutrientes():
 
 
 
-    # # Añade manualmente resultados del procesado 
-    # if tipo_accion == acciones[1]:
+    # Añade manualmente resultados del procesado 
+    if tipo_accion == acciones[1]:
         
-    #     st.subheader('Inserción de datos de nutrientes')
+        st.subheader('Inserción de datos de nutrientes')
         
-    #     FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_procesado,variables_procesado_bd,df_referencia)
+        FUNCIONES_AUXILIARES.inserta_datos_biogeoquimicos(df_muestreos,df_datos_biogeoquimicos,variables_procesado,variables_procesado_bd,df_referencia)
 
         
 
@@ -2833,101 +2804,55 @@ def consulta_estado():
              
     ### Encabezados y titulos 
     #st.set_page_config(page_title='CONSULTA DATOS', layout="wide",page_icon=logo_IEO_reducido) 
-    st.title('Estado de las analíticas de nutrientes realizadas en el C.O de A Coruña')
+    st.title('Estado de las analíticas encargadas al servicio de nutrientes del C.O de A Coruña')
     
     # Recupera la tabla de los programas disponibles como un dataframe
     conn = init_connection()
-    df_programas = pandas.read_sql('SELECT * FROM programas', conn)
+    df_solicitudes = pandas.read_sql('SELECT * FROM servicio_nutrientes_entradas', conn)
+    df_estados = pandas.read_sql('SELECT * FROM planificacion_analisis_nutrientes', conn)
     conn.close()
     
-    # Despliega un formulario para elegir el programa y la fecha a consultar
-    with st.form("Formulario seleccion"):
-        nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
+    # Determina el estado de cada solicitud
+    df_solicitudes["estado"] = None
+    for isolicitud in range(df_solicitudes.shape[0]):
+        
+        df_proceso = df_estados[df_estados["id_solicitud"]==df_solicitudes["id_entrada"].iloc[isolicitud]]
 
-        # Botón de envío para confirmar selección
-        submit = st.form_submit_button("Enviar")
+        analisis_terminados = df_proceso.io_analizado.sum()   
+        
+        st.text(analisis_terminados)
     
- 
-    if submit:
     
-        # Recupera el identificador del programa seleccionado
-        id_programa = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
-        
-        ### Consulta a la base de datos las fechas de los distintos procesos (muestreo, análisis y post-procesado)
-        
-        # Recupera la tabla del estado de los procesos como un dataframe
-        conn = init_connection()
-        temporal_estado_procesos = pandas.read_sql('SELECT * FROM estado_procesos', conn)
-        conn.close()
-        
-        # Extrae los datos disponibles del programa consultado 
-        estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['programa']==id_programa]
-        
-        # Bucle if para desplegar información únicamente si hay información del programa seleccionado
-        if estado_procesos_programa.shape[0] == 0:
             
-            st.warning('No se dispone de información acerca del estado del programa de muestreo seleccionado', icon="⚠️")
-        
-        else:
+            # # Despliega la información en una tabla
+            # def color_tabla(s):
+            #     if s.estado == 'Campaña no realizada':
+            #         return ['background-color: #000000']*len(s)
+            #     if s.estado == 'Pendiente de analizar':
+            #         return ['background-color: #CD5C5C']*len(s)
+            #     if s.estado == 'Analizado parcialmente':
+            #         return ['background-color: #87CEEB']*len(s)                    
+            #     if s.estado == 'Analizado completamente':
+            #         return ['background-color: #00b300']*len(s)
             
-            estado_procesos_programa = estado_procesos_programa.sort_values('año')
+            # estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa','analisis_finalizado','campaña_realizada']) 
+            # estado_procesos_programa = estado_procesos_programa.rename(columns={"año":"Año","fecha_analisis_laboratorio":"Fecha de analisis"})
+            # st.dataframe(estado_procesos_programa.style.apply(color_tabla, axis=1),use_container_width=True)  
             
-            # Determina el estado en cada caso 0-campaña no realizada 1-pendiente de analisis 2-analisis parcial 3-terminado
-            nombre_estados  = ['Campaña no realizada','Pendiente de analizar','Analizado parcialmente','Analizado completamente']
-            colores_estados = ['#000000','#CD5C5C','#87CEEB','#00b300'] 
-                      
-            estado_procesos_programa['estado'] = None
-            for idato in range(estado_procesos_programa.shape[0]):
-                if estado_procesos_programa['campaña_realizada'].iloc[idato] == False:
-                    estado_procesos_programa['estado'].iloc[idato] = 'Campaña no realizada'
-                else:
-                    if estado_procesos_programa['analisis_finalizado'].iloc[idato] == True:
-                        estado_procesos_programa['estado'].iloc[idato] = 'Analizado completamente'
-                    else:
-                        if estado_procesos_programa['fecha_analisis_laboratorio'].iloc[idato] is None:
-                            estado_procesos_programa['estado'].iloc[idato] = 'Pendiente de analizar'
-                        else:
-                            estado_procesos_programa['estado'].iloc[idato] = 'Analizado parcialmente'
-                            
-                
-            # Cuenta el numero de veces que se repite cada estado para sacar un gráfico pie-chart
-            num_valores = numpy.zeros(len(nombre_estados),dtype=int)
-            for ivalor in range(len(nombre_estados)):
-                try:
-                    num_valores[ivalor] = estado_procesos_programa.estado.value_counts()[nombre_estados[ivalor]]
-                except:
-                    pass
-            porcentajes = numpy.round((100*(num_valores/numpy.sum(num_valores))),2)
+            # # Construye el gráfico
+            # cm              = 1/2.54 # pulgadas a cm
+            # fig, ax1 = plt.subplots(figsize=(8*cm, 8*cm))
+            # patches, texts= ax1.pie(num_valores, colors=colores_estados,shadow=True, startangle=90,radius=1.2)
+            # ax1.axis('equal')  # Para representar el pie-chart como un circulo
             
-            # Despliega la información en una tabla
-            def color_tabla(s):
-                if s.estado == 'Campaña no realizada':
-                    return ['background-color: #000000']*len(s)
-                if s.estado == 'Pendiente de analizar':
-                    return ['background-color: #CD5C5C']*len(s)
-                if s.estado == 'Analizado parcialmente':
-                    return ['background-color: #87CEEB']*len(s)                    
-                if s.estado == 'Analizado completamente':
-                    return ['background-color: #00b300']*len(s)
-            
-            estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa','analisis_finalizado','campaña_realizada']) 
-            estado_procesos_programa = estado_procesos_programa.rename(columns={"año":"Año","fecha_analisis_laboratorio":"Fecha de analisis"})
-            st.dataframe(estado_procesos_programa.style.apply(color_tabla, axis=1),use_container_width=True)  
-            
-            # Construye el gráfico
-            cm              = 1/2.54 # pulgadas a cm
-            fig, ax1 = plt.subplots(figsize=(8*cm, 8*cm))
-            patches, texts= ax1.pie(num_valores, colors=colores_estados,shadow=True, startangle=90,radius=1.2)
-            ax1.axis('equal')  # Para representar el pie-chart como un circulo
-            
-            # Representa y ordena la leyenda
-            etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
-            plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(1.5, 0.5),fontsize=8)                
+            # # Representa y ordena la leyenda
+            # etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
+            # plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(1.5, 0.5),fontsize=8)                
 
-            # Representa el pie-chart con el estado de los procesos
-            buf = BytesIO()
-            fig.savefig(buf, format="png",bbox_inches='tight')
-            st.image(buf)                
+            # # Representa el pie-chart con el estado de los procesos
+            # buf = BytesIO()
+            # fig.savefig(buf, format="png",bbox_inches='tight')
+            # st.image(buf)                
     
     
     
