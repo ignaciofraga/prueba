@@ -467,13 +467,19 @@ def inserta_datos_biogeoquimicos(df_muestreos,df_datos_discretos,variables_proce
 ############### FUNCION PARA ACTUALIZAR EL ESTADO DEL PROCESADO ###############
 ############################################################################### 
 
-def actualiza_estado(id_programa,nombre_programa,anho_datos,fecha_actualizacion,io_terminado,direccion_host,base_datos,usuario,contrasena,puerto):
+def actualiza_estado(id_lote_seleccionado,id_ref_bajo,id_ref_alto,rendimiento_columna,temperatura_laboratorio,fecha_actualizacion):
 
-    # Recupera la tabla con los estados del programa
-    con_engine          = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-    conn_psql           = create_engine(con_engine)
-    instruccion_SQL     = " SELECT * FROM estado_procesos WHERE programa = %(idprograma)s"  
-    df_estados          = pandas.read_sql_query(instruccion_SQL, con=conn_psql, params={'idprograma':int(id_programa)})
+    # Recupera los datos de conexión
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port 
+
+
+
+
+
 
     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
     cursor = conn.cursor()
