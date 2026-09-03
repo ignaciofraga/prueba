@@ -1765,7 +1765,7 @@ def procesado_nutrientes():
                 cursor = conn.cursor()
                 #cursor.execute(instruccion_sql, (fecha_actualizacion,True,temperatura_laboratorio,rendimiento_columna,int(id_ref_bajo),int(id_ref_alto),int(id_solicitud_analisis),lote_analisis))
                 # #instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s, temperatura_laboratorio=%s, rendimiento_columna=%s,id_rmn_bajo=%s, id_rmn_alto  WHERE lote = %s AND nombre = %s;'
-                instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s, temperatura_laboratorio=%s, rendimiento_columna=%s,id_rmn_bajo=%s,  WHERE lote = %s AND nombre = %s;'
+                instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s, temperatura_laboratorio=%s, rendimiento_columna=%s,id_rmn_bajo=%s  WHERE lote = %s AND nombre = %s;'
                 # st.text(fecha_actualizacion)
                 # st.text(lote_analisis)
                 # st.text(int(id_solicitud_analisis))
