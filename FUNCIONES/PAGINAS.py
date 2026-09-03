@@ -2841,20 +2841,20 @@ def consulta_estado():
  
     df_muestra = df_solicitudes[["entidad_solicitante","fecha_solicitud","nombre_muestreo","numero_muestras","importe","estado","fecha_actualizacion"]]   
     
-    df_muestra = df_muestra.style.map(lambda x: f"background-color: {'green' if x=='Terminado' else 'blue' if x=='Pendiente' else 'red'}", subset='estado')
+    
+    # Despliega la información en una tabla
+    def color_tabla(s):
+        if s.estado == 'Terminado':
+            return ['background-color: #000000']*len(s)
+        elif s.estado == 'Pendiente':
+            return ['background-color: #CD5C5C']*len(s)
+        else:
+            return ['background-color: #87CEEB']*len(s)                    
+
   
-    st.dataframe(df_muestra)
+    st.dataframe(df_muestra.style.apply(color_tabla, axis=1),use_container_width=True)
             
-            # # Despliega la información en una tabla
-            # def color_tabla(s):
-            #     if s.estado == 'Campaña no realizada':
-            #         return ['background-color: #000000']*len(s)
-            #     if s.estado == 'Pendiente de analizar':
-            #         return ['background-color: #CD5C5C']*len(s)
-            #     if s.estado == 'Analizado parcialmente':
-            #         return ['background-color: #87CEEB']*len(s)                    
-            #     if s.estado == 'Analizado completamente':
-            #         return ['background-color: #00b300']*len(s)
+
             
             # estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa','analisis_finalizado','campaña_realizada']) 
             # estado_procesos_programa = estado_procesos_programa.rename(columns={"año":"Año","fecha_analisis_laboratorio":"Fecha de analisis"})
