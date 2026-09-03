@@ -1757,19 +1757,19 @@ def procesado_nutrientes():
                 # Actualiza el estado de los procesos
                 fecha_actualizacion = datetime.date.today()
                 
-                instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s, temperatura_laboratorio=%s, rendimiento_columna=%s,id_rmn_bajo=%s, id_rmn_alto  WHERE lote = %s AND nombre = %s;'
+                #instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s, temperatura_laboratorio=%s, rendimiento_columna=%s,id_rmn_bajo=%s, id_rmn_alto  WHERE lote = %s AND nombre = %s;'
 
                 conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                 
 
                 cursor = conn.cursor()
-                cursor.execute(instruccion_sql, (fecha_actualizacion,True,temperatura_laboratorio,rendimiento_columna,int(id_ref_bajo),int(id_ref_alto),int(id_solicitud_analisis),lote_analisis))
+                #cursor.execute(instruccion_sql, (fecha_actualizacion,True,temperatura_laboratorio,rendimiento_columna,int(id_ref_bajo),int(id_ref_alto),int(id_solicitud_analisis),lote_analisis))
                 # #instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s, temperatura_laboratorio=%s, rendimiento_columna=%s,id_rmn_bajo=%s, id_rmn_alto  WHERE lote = %s AND nombre = %s;'
-                # instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s  WHERE lote = %s AND nombre = %s;'
+                instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s  WHERE lote = %s AND nombre = %s;'
                 # st.text(fecha_actualizacion)
                 # st.text(lote_analisis)
                 # st.text(int(id_solicitud_analisis))
-                # cursor.execute(instruccion_sql, (fecha_actualizacion,int(id_solicitud_analisis),lote_analisis))
+                cursor.execute(instruccion_sql, (fecha_actualizacion,True,int(id_solicitud_analisis),lote_analisis))
                
                 conn.commit()
                 cursor.close()
