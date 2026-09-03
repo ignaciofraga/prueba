@@ -2799,6 +2799,7 @@ def planificacion_procesos():
 ############### PÁGINA DE CONSULTA DEL ESTADO DE LOS PROCESOS #################
 ###############################################################################
 
+
 def consulta_estado():
         
              
