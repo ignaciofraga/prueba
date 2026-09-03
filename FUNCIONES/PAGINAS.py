@@ -1768,7 +1768,7 @@ def procesado_nutrientes():
                 st.text(fecha_actualizacion)
                 st.text(lote_analisis)
                 st.text(int(id_solicitud_analisis))
-                cursor.execute(instruccion_sql, (fecha_actualizacion,lote_analisis,int(id_solicitud_analisis)))
+                cursor.execute(instruccion_sql, (fecha_actualizacion,int(id_solicitud_analisis),lote_analisis))
                
                 conn.commit()
                 cursor.close()
