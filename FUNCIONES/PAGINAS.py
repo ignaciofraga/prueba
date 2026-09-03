@@ -2824,7 +2824,7 @@ def consulta_estado():
         df_proceso['dttime'] = pandas.to_datetime(df_proceso['fecha_analisis'], format='%Y-%M-%d')
         df_proceso = df_proceso.sort_values(by='dttime',ascending=False)
 
-        df_solicitudes["fecha_actualizacion"].iloc[isolicitud] = df_proceso['dttime'].iloc[0]
+        df_solicitudes["fecha_actualizacion"].iloc[isolicitud] = (df_proceso['dttime'].iloc[0]).date()
             
         analisis_terminados = df_proceso.io_analizado.sum()   
         
@@ -2835,10 +2835,8 @@ def consulta_estado():
             df_solicitudes["estado"].iloc[isolicitud] = 'Pendiente'
             
         if int(analisis_terminados) < int(df_proceso.shape[0]) and analisis_terminados > 0:
-            
-            porcentaje = (analisis_terminados/df_proceso.shape[0])*100
-            
-            df_solicitudes["estado"].iloc[isolicitud] = "En curso (" + str(round(porcentaje*100,0)) + "%) finalizado"
+                        
+            df_solicitudes["estado"].iloc[isolicitud] = "En curso (" + str(round((analisis_terminados/df_proceso.shape[0])*100,0)) + "%) finalizado"
 
     
     
