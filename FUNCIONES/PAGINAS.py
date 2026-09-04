@@ -2765,55 +2765,55 @@ def planificacion_procesos():
     # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
     io_envio            = st.button("Modificar o añadir información")   
         
-    if io_envio == True:
+    # if io_envio == True:
         
-        instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,nombre)
-            VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO UPDATE SET (num_muestras,nombre) = ROW(EXCLUDED.num_muestras,EXCLUDED.nombre);''' 
+    #     instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,nombre)
+    #         VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO UPDATE SET (num_muestras,nombre) = ROW(EXCLUDED.num_muestras,EXCLUDED.nombre);''' 
                 
-        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    #     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
         
-        for idato in range(df_modificado.shape[0]):
+    #     for idato in range(df_modificado.shape[0]):
         
-            cursor = conn.cursor()
-            cursor.execute(instruccion_sql, (int(id_solicitud),int(df_modificado["lote"].iloc[idato]),int(df_modificado["num_muestras"].iloc[idato]),df_modificado["nombre"].iloc[idato]))
-            conn.commit()
-            cursor.close()
+    #         cursor = conn.cursor()
+    #         cursor.execute(instruccion_sql, (int(id_solicitud),int(df_modificado["lote"].iloc[idato]),int(df_modificado["num_muestras"].iloc[idato]),df_modificado["nombre"].iloc[idato]))
+    #         conn.commit()
+    #         cursor.close()
             
-        conn.close()
+    #     conn.close()
         
-        texto_exito = 'Información actualizada correctamente'
-        st.success(texto_exito)
+    #     texto_exito = 'Información actualizada correctamente'
+    #     st.success(texto_exito)
     
-        st.cache_data.clear()
+    #     st.cache_data.clear()
     
     
-    # with st.form("Formulario seleccion"):  
+    with st.form("Formulario seleccion"):  
     
-    #     df_modificado = st.data_editor(df_muestra, num_rows="add")
+        df_modificado = st.data_editor(df_muestra, num_rows="add")
       
-    #     # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
-    #     io_envio            = st.form_submit_button("Modificar o añadir información")   
+        # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
+        io_envio            = st.form_submit_button("Modificar o añadir información")   
             
-    #     if io_envio == True:
+        if io_envio == True:
             
-    #         instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,nombre)
-    #             VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO UPDATE SET (num_muestras,nombre) = ROW(EXCLUDED.num_muestras,EXCLUDED.nombre);''' 
+            instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,nombre)
+                VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO UPDATE SET (num_muestras,nombre) = ROW(EXCLUDED.num_muestras,EXCLUDED.nombre);''' 
                     
-    #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
             
-    #         for idato in range(df_modificado.shape[0]):
+            for idato in range(df_modificado.shape[0]):
             
-    #             cursor = conn.cursor()
-    #             cursor.execute(instruccion_sql, (int(id_solicitud),int(df_modificado["lote"].iloc[idato]),int(df_modificado["num_muestras"].iloc[idato]),df_modificado["observaciones"].iloc[idato]))
-    #             conn.commit()
-    #             cursor.close()
+                cursor = conn.cursor()
+                cursor.execute(instruccion_sql, (int(id_solicitud),int(df_modificado["lote"].iloc[idato]),int(df_modificado["num_muestras"].iloc[idato]),df_modificado["nombre"].iloc[idato]))
+                conn.commit()
+                cursor.close()
                 
-    #         conn.close()
+            conn.close()
             
-    #         texto_exito = 'Información actualizada correctamente'
-    #         st.success(texto_exito)
+            texto_exito = 'Información actualizada correctamente'
+            st.success(texto_exito)
         
-    #         st.cache_data.clear()  
+            st.cache_data.clear()  
     
     
     
