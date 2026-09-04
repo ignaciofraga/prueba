@@ -2845,7 +2845,7 @@ def consulta_estado():
     nombres_modificados = []
     
     for ivariable in range(len(nombres_iniciales)):
-        nombres_modificados = nombres_modificados + nombres_iniciales[ivariable].replace("_", " ").title()
+        nombres_modificados = nombres_modificados + [nombres_iniciales[ivariable].replace("_", " ").title()]
     
     df_muestra.columns = nombres_modificados
         
