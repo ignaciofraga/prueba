@@ -1705,6 +1705,9 @@ def procesado_nutrientes():
         id_solicitud_analisis = df_solicitudes[(df_solicitudes["id_programa"]==int(indice_programa)) & (df_solicitudes["año_campaña"]==int(anho_seleccionado))]["id_entrada"].iloc[0]
         df_planificacion_solicitud = df_planificaciones[df_planificaciones["id_solicitud"]==id_solicitud_analisis]
         
+        #if 
+        
+        
         with col3:
             lote_analisis        = st.selectbox('Lote',(df_planificacion_solicitud["nombre"]))
             id_lote_seleccionado = df_planificacion_solicitud[df_planificacion_solicitud["nombre"]==lote_analisis]["id_analisis"].iloc[0]
@@ -2860,60 +2863,5 @@ def consulta_estado():
             return ['background-color: #FF8C00']*len(s)                    
 
     # Muestra el dataframe
-    st.dataframe(df_muestra.style.apply(color_tabla, axis=1),use_container_width=True,column_config={"Importe": st.column_config.NumberColumn(format="%.2f")})
+    st.dataframe(df_muestra.style.apply(color_tabla, axis=1),use_container_width=True,column_config={"Importe (€)": st.column_config.NumberColumn(format="%.2f")})
             
-
-            
-            # estado_procesos_programa = estado_procesos_programa.drop(columns=['id_proceso','programa', 'nombre_programa','analisis_finalizado','campaña_realizada']) 
-            # estado_procesos_programa = estado_procesos_programa.rename(columns={"año":"Año","fecha_analisis_laboratorio":"Fecha de analisis"})
-            # st.dataframe(estado_procesos_programa.style.apply(color_tabla, axis=1),use_container_width=True)  
-            
-            # # Construye el gráfico
-            # cm              = 1/2.54 # pulgadas a cm
-            # fig, ax1 = plt.subplots(figsize=(8*cm, 8*cm))
-            # patches, texts= ax1.pie(num_valores, colors=colores_estados,shadow=True, startangle=90,radius=1.2)
-            # ax1.axis('equal')  # Para representar el pie-chart como un circulo
-            
-            # # Representa y ordena la leyenda
-            # etiquetas_leyenda = ['{0} - {1:1.0f} %'.format(i,j) for i,j in zip(nombre_estados, porcentajes)]
-            # plt.legend(patches, etiquetas_leyenda, loc='lower center', bbox_to_anchor=(1.5, 0.5),fontsize=8)                
-
-            # # Representa el pie-chart con el estado de los procesos
-            # buf = BytesIO()
-            # fig.savefig(buf, format="png",bbox_inches='tight')
-            # st.image(buf)                
-    
-    
-    
-    
-    
-    
-    # # Despliega un formulario para elegir el programa y la fecha a consultar
-    # with st.form("Formulario seleccion"):
-    #     nombre_programa  = st.selectbox('Selecciona el programa del cual se quiere consultar el estado',(df_programas['nombre_programa']))
-
-    #     # Botón de envío para confirmar selección
-    #     submit = st.form_submit_button("Enviar")
-    
- 
-    # if submit:
-    
-    #     # Recupera el identificador del programa seleccionado
-    #     id_programa = int(df_programas['id_programa'][df_programas['nombre_programa']==nombre_programa].values[0])
-        
-    #     ### Consulta a la base de datos las fechas de los distintos procesos (muestreo, análisis y post-procesado)
-        
-    #     # Recupera la tabla del estado de los procesos como un dataframe
-    #     conn = init_connection()
-    #     temporal_estado_procesos = pandas.read_sql('SELECT * FROM estado_procesos', conn)
-    #     conn.close()
-        
-    #     # Extrae los datos disponibles del programa consultado 
-    #     estado_procesos_programa = temporal_estado_procesos[temporal_estado_procesos['programa']==id_programa]
-        
-    #     # Bucle if para desplegar información únicamente si hay información del programa seleccionado
-    #     if estado_procesos_programa.shape[0] == 0:
-            
-    #         st.warning('No se dispone de información acerca del estado del programa de muestreo seleccionado', icon="⚠️")
-        
-    #     else:
