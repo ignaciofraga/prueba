@@ -2858,6 +2858,8 @@ def consulta_estado():
         df_proceso.set_index('id_temp',drop=True,append=False,inplace=True)
 
 
+        st.dataframe(df_proceso)
+
         df_proceso['dttime'] = pandas.to_datetime(df_proceso['fecha_analisis'], format='%Y-%M-%d')
         df_proceso = df_proceso.sort_values(by='dttime',ascending=False)
 
