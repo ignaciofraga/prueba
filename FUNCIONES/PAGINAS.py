@@ -2756,7 +2756,7 @@ def planificacion_procesos():
     
     # Genera un dataframe dinámico para la entrada de datos
     df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
-    df_muestra = df_solicitud_seleccionada[["lote","num_muestras","observaciones"]]       
+    df_muestra = df_solicitud_seleccionada[["lote","num_muestras","nombre"]]       
     
     
     with st.form("Formulario seleccion"):  
