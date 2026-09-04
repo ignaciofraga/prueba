@@ -2847,7 +2847,7 @@ def consulta_estado():
     for ivariable in range(len(nombres_iniciales)):
         nombres_modificados = nombres_modificados + [nombres_iniciales[ivariable].replace("_", " ").title()]
     
-    df_muestra.set_axis(nombres_modificados, axis=1, inplace=False)
+    df_muestra.set_axis(nombres_modificados, axis=1)
         
     # Despliega la información en una tabla
     def color_tabla(s):
