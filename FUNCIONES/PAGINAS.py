@@ -2842,12 +2842,13 @@ def consulta_estado():
     df_muestra = df_solicitudes[["entidad_solicitante","fecha_solicitud","nombre_muestreo","numero_muestras","importe","estado","fecha_actualizacion"]]   
     
     nombres_iniciales   = list(df_muestra.columns.values)
-    nombres_modificados = []
     
     for ivariable in range(len(nombres_iniciales)):
-        nombres_modificados = nombres_modificados + [nombres_iniciales[ivariable].replace("_", " ").title()]
+        nombre_modificados = nombres_iniciales[ivariable].replace("_", " ").title()
+        
+        df_muestra = df_muestra.rename(columns={nombres_iniciales[ivariable]: nombre_modificados})
     
-    df_muestra = df_muestra.set_axis(nombres_modificados, axis=1)
+
         
     # Despliega la información en una tabla
     def color_tabla(s):
