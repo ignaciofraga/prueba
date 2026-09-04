@@ -2758,6 +2758,8 @@ def planificacion_procesos():
     df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
     df_muestra = df_solicitud_seleccionada[["lote","num_muestras","nombre"]]       
 
+    texto_muestras_totales = "Número de muestras totales solicitadas: " + str(int(df_solicitudes[df_solicitudes['nombre_muestreo']==solicitud_seleccionada]['numero_muestras'].iloc[0]))
+    st.text(texto_muestras_totales)
     
     with st.form("Formulario seleccion"):  
     
@@ -2772,9 +2774,8 @@ def planificacion_procesos():
         
         with col2:
             
-            suma_muestras_temporal = df_modificado["num_muestras"].sum(axis=0)
-            
-            st.text(suma_muestras_temporal)
+            texto_muestras_planificadas = "Número de muestras planificado: " + str(int(df_modificado["num_muestras"].sum(axis=0)))
+            st.text(texto_muestras_planificadas)
             
         
         if io_envio == True:
