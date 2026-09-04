@@ -2851,7 +2851,12 @@ def consulta_estado():
     
     for isolicitud in range(df_solicitudes.shape[0]):
         
+        # Recorta el dataframe a la solicitud seleccionada y reescribe los indices
         df_proceso = df_estados[df_estados["id_solicitud"]==df_solicitudes["id_entrada"].iloc[isolicitud]]
+        indices_dataframe              = numpy.arange(0,df_proceso.shape[0],1,dtype=int)    
+        df_proceso['id_temp'] = indices_dataframe
+        df_proceso.set_index('id_temp',drop=True,append=False,inplace=True)
+
 
         df_proceso['dttime'] = pandas.to_datetime(df_proceso['fecha_analisis'], format='%Y-%M-%d')
         df_proceso = df_proceso.sort_values(by='dttime',ascending=False)
