@@ -1794,9 +1794,7 @@ def procesado_nutrientes():
                 ref_inicial       = datos_referencias['Peak Number'].iloc[0] + 2
                 datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
                 ref_final         = datos_referencias['Peak Number'].iloc[1] - 2
-                
-    
-                
+                                
                 # Encuentra la salinidad de cada muestra
                 datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
                 datos_AA['io_procesado']  = None
@@ -1887,9 +1885,11 @@ def procesado_nutrientes():
                     variables_exporta =  variables_procesado_bd + variables_run_qf + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado','muestreo','id_externo']
                     datos_exporta = datos_corregidos[variables_exporta]
                     
-                    listado_muestras_procesadas = datos_corregidos["id_externo"]
                     
-                    st.text(listado_muestras_procesadas)
+                    temp = datos_AA[datos_AA['io_procesado']== 1]
+                    #listado_muestras_procesadas = datos_corregidos["id_externo"]
+                    
+                    st.dataframe(temp)
                     
                     # Añade los datos a la base de datos si se seleccionó esta opción                        
                     if io_add_data is True:
