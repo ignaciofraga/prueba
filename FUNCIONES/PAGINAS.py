@@ -1702,17 +1702,19 @@ def procesado_nutrientes():
             listado_salidas       = salidas_seleccionadas['salida_mar']
             
         # Selecciona el lote de muestras a analizar
-        id_solicitud_analisis = df_solicitudes[(df_solicitudes["id_programa"]==int(indice_programa)) & (df_solicitudes["año_campaña"]==int(anho_seleccionado))]["id_entrada"].iloc[0]
-        df_planificacion_solicitud = df_planificaciones[df_planificaciones["id_solicitud"]==id_solicitud_analisis]
+        df_solicitud_seleccionada = (df_solicitudes["id_programa"]==int(indice_programa)) & (df_solicitudes["año_campaña"]==int(anho_seleccionado))
         
-        
-        if df_planificacion_solicitud.shape[0]:
-            
+        if df_solicitud_seleccionada.shape[0]:
+ 
             with col3:
         
                 st.error('No existe planificación de las analíticas para el muestreo seleccionado')
-        else:        
+                
+        else:
         
+            id_solicitud_analisis = df_solicitud_seleccionada["id_entrada"].iloc[0]
+        
+            df_planificacion_solicitud = df_planificaciones[df_planificaciones["id_solicitud"]==id_solicitud_analisis]
         
             with col3:
                 lote_analisis        = st.selectbox('Lote',(df_planificacion_solicitud["nombre"]))
