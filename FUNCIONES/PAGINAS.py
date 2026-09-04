@@ -1703,14 +1703,12 @@ def procesado_nutrientes():
             
         # Selecciona el lote de muestras a analizar
         df_solicitud_seleccionada = df_solicitudes[(df_solicitudes["id_programa"]==int(indice_programa)) & (df_solicitudes["año_campaña"]==int(anho_seleccionado))]
-        
-        st.dataframe(df_solicitud_seleccionada)
-        
+                
         if df_solicitud_seleccionada.shape[0] == 0:
  
             with col3:
         
-                st.error('No existe planificación de las analíticas para el muestreo seleccionado')
+                st.error('No existe planificación de las analíticas para el muestreo seleccionado',icon="🚨")
                 
         else:
         
