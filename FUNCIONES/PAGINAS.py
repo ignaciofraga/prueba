@@ -2752,14 +2752,17 @@ def planificacion_procesos():
     solicitud_seleccionada  = st.selectbox('Solicitud de análisis',(df_solicitudes['nombre_muestreo'])) 
     id_solicitud = df_solicitudes[df_solicitudes['nombre_muestreo']==solicitud_seleccionada]['id_entrada'].iloc[0]
     
+    # Escribe el número de muestras total solicitado
+    texto_muestras_totales = "Número de muestras totales solicitadas: " + str(int(df_solicitudes[df_solicitudes['nombre_muestreo']==solicitud_seleccionada]['numero_muestras'].iloc[0]))
+    st.text(texto_muestras_totales)
+    
     st.subheader('Lotes de análisis previstos')
     
     # Genera un dataframe dinámico para la entrada de datos
     df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
     df_muestra = df_solicitud_seleccionada[["lote","num_muestras","nombre"]]       
 
-    texto_muestras_totales = "Número de muestras totales solicitadas: " + str(int(df_solicitudes[df_solicitudes['nombre_muestreo']==solicitud_seleccionada]['numero_muestras'].iloc[0]))
-    st.text(texto_muestras_totales)
+
     
     with st.form("Formulario seleccion"):  
     
