@@ -1706,7 +1706,7 @@ def procesado_nutrientes():
         
         st.dataframe(df_solicitud_seleccionada)
         
-        if df_solicitud_seleccionada.shape[0]:
+        if df_solicitud_seleccionada.shape[0] == 0:
  
             with col3:
         
