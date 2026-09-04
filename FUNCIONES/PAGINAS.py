@@ -2847,6 +2847,8 @@ def consulta_estado():
     df_solicitudes["estado"] = None
     df_solicitudes["fecha_actualizacion"] = None
     
+    st.dataframe(df_solicitudes)
+    
     for isolicitud in range(df_solicitudes.shape[0]):
         
         df_proceso = df_estados[df_estados["id_solicitud"]==df_solicitudes["id_entrada"].iloc[isolicitud]]
