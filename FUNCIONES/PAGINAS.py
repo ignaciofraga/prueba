@@ -1702,7 +1702,7 @@ def procesado_nutrientes():
             listado_salidas       = salidas_seleccionadas['salida_mar']
             
         # Selecciona el lote de muestras a analizar
-        df_solicitud_seleccionada = (df_solicitudes["id_programa"]==int(indice_programa)) & (df_solicitudes["año_campaña"]==int(anho_seleccionado))
+        df_solicitud_seleccionada = df_solicitudes[(df_solicitudes["id_programa"]==int(indice_programa)) & (df_solicitudes["año_campaña"]==int(anho_seleccionado))]
         
         st.dataframe(df_solicitud_seleccionada)
         
