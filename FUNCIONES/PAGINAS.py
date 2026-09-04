@@ -2838,23 +2838,16 @@ def consulta_estado():
                         
             df_solicitudes["estado"].iloc[isolicitud] = "En curso. " + str(round((analisis_terminados/df_proceso.shape[0])*100,0)) + "% finalizado"
 
- 
+    # Mantén solo las variables que interesa mostrar
     df_muestra = df_solicitudes[["entidad_solicitante","fecha_solicitud","nombre_muestreo","numero_muestras","importe","estado","fecha_actualizacion"]]   
     
+    #Formatea los nombres de las columnas
     nombres_iniciales   = list(df_muestra.columns.values)
-    
     for ivariable in range(len(nombres_iniciales)):
         nombre_modificados = nombres_iniciales[ivariable].replace("_", " ").title()
-        
-        st.text(nombres_iniciales[ivariable])
-        
-        st.text(nombre_modificados)
-        
         df_muestra = df_muestra.rename(columns={nombres_iniciales[ivariable]: nombre_modificados})
     
-
-        
-    # Despliega la información en una tabla
+    # Asigna colores en función del Estado del proceso
     def color_tabla(s):
         if s.Estado == 'Terminado':
             return ['background-color: #8FBC8F']*len(s)
@@ -2863,8 +2856,8 @@ def consulta_estado():
         else:
             return ['background-color: #FF8C00']*len(s)                    
 
-  
-    st.dataframe(df_muestra.style.apply(color_tabla, axis=1),use_container_width=True)
+    # Muestra el dataframe
+    st.dataframe(df_muestra.style.apply(color_tabla, axis=1),use_container_width=True,column_config={"Importe": st.column_config.NumberColumn(format="%.2f")})
             
 
             
