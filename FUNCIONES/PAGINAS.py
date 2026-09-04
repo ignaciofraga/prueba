@@ -1887,9 +1887,9 @@ def procesado_nutrientes():
                     
                     
                     temp = datos_AA[datos_AA['io_procesado']== 1]
-                    #listado_muestras_procesadas = datos_corregidos["id_externo"]
-                    
-                    st.dataframe(temp)
+                    listado_muestras_procesadas = datos_AA[datos_AA['io_procesado']== 1]["id_externo"]
+                    st.text(listado_muestras_procesadas)
+                    #st.dataframe(temp)
                     
                     # Añade los datos a la base de datos si se seleccionó esta opción                        
                     if io_add_data is True:
