@@ -1705,6 +1705,7 @@ def procesado_nutrientes():
         id_solicitud_analisis = df_solicitudes[(df_solicitudes["id_programa"]==int(indice_programa)) & (df_solicitudes["año_campaña"]==int(anho_seleccionado))]["id_entrada"].iloc[0]
         df_planificacion_solicitud = df_planificaciones[df_planificaciones["id_solicitud"]==id_solicitud_analisis]
         
+        
         if df_planificacion_solicitud.shape[0]:
             
             with col3:
