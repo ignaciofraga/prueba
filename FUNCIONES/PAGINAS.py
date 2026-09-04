@@ -2856,9 +2856,9 @@ def consulta_estado():
         
     # Despliega la información en una tabla
     def color_tabla(s):
-        if s.estado == 'Terminado':
+        if s.Estado == 'Terminado':
             return ['background-color: #8FBC8F']*len(s)
-        elif s.estado == 'Pendiente':
+        elif s.Estado == 'Pendiente':
             return ['background-color: #CD5C5C']*len(s)
         else:
             return ['background-color: #FF8C00']*len(s)                    
