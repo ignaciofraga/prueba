@@ -2758,42 +2758,25 @@ def planificacion_procesos():
     df_solicitud_seleccionada = df_planificaciones[df_planificaciones['id_solicitud']==id_solicitud]
     df_muestra = df_solicitud_seleccionada[["lote","num_muestras","nombre"]]       
 
-
-
-    # df_modificado = st.data_editor(df_muestra, num_rows="add")
-  
-    # # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
-    # io_envio            = st.button("Modificar o añadir información")   
-        
-    # if io_envio == True:
-        
-    #     instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,nombre)
-    #         VALUES (%s,%s,%s,%s) ON CONFLICT (id_solicitud,lote) DO UPDATE SET (num_muestras,nombre) = ROW(EXCLUDED.num_muestras,EXCLUDED.nombre);''' 
-                
-    #     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        
-    #     for idato in range(df_modificado.shape[0]):
-        
-    #         cursor = conn.cursor()
-    #         cursor.execute(instruccion_sql, (int(id_solicitud),int(df_modificado["lote"].iloc[idato]),int(df_modificado["num_muestras"].iloc[idato]),df_modificado["nombre"].iloc[idato]))
-    #         conn.commit()
-    #         cursor.close()
-            
-    #     conn.close()
-        
-    #     texto_exito = 'Información actualizada correctamente'
-    #     st.success(texto_exito)
-    
-    #     st.cache_data.clear()
-    
     
     with st.form("Formulario seleccion"):  
     
         df_modificado = st.data_editor(df_muestra, num_rows="add")
+        
+        col1, col2 = st.columns(2,gap="small")
       
-        # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
-        io_envio            = st.form_submit_button("Modificar o añadir información")   
+        with col1:  
+      
+            # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
+            io_envio            = st.form_submit_button("Modificar o añadir información")   
+        
+        with col2:
             
+            suma_muestras_temporal = df_modificado["num_muestras"].sum(axis=0)
+            
+            st.text(suma_muestras_temporal)
+            
+        
         if io_envio == True:
             
             instruccion_sql = '''INSERT INTO planificacion_analisis_nutrientes (id_solicitud,lote,num_muestras,nombre)
