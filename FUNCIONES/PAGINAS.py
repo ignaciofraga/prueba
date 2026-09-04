@@ -2770,6 +2770,7 @@ def planificacion_procesos():
             # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
             io_envio            = st.form_submit_button("Modificar o añadir información")   
         
+        
         with col2:
             
             suma_muestras_temporal = df_modificado["num_muestras"].sum(axis=0)
