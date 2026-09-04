@@ -2847,6 +2847,8 @@ def consulta_estado():
         nombre_modificados = nombres_iniciales[ivariable].replace("_", " ").title()
         df_muestra = df_muestra.rename(columns={nombres_iniciales[ivariable]: nombre_modificados})
     
+    df_muestra = df_muestra.rename(columns={'Importe': 'Importe (€)'})
+    
     # Asigna colores en función del Estado del proceso
     def color_tabla(s):
         if s.Estado == 'Terminado':
