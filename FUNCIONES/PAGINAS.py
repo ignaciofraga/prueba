@@ -1887,6 +1887,9 @@ def procesado_nutrientes():
                     variables_exporta =  variables_procesado_bd + variables_run_qf + ['rto_columna_procesado','temp_lab_procesado','rmn_bajo_procesado','rmn_alto_procesado','muestreo','id_externo']
                     datos_exporta = datos_corregidos[variables_exporta]
                     
+                    listado_muestras_procesadas = datos_corregidos["id_externo"]
+                    
+                    st.text(listado_muestras_procesadas)
                     
                     # Añade los datos a la base de datos si se seleccionó esta opción                        
                     if io_add_data is True:
@@ -2846,9 +2849,7 @@ def consulta_estado():
     # Determina el estado de cada solicitud
     df_solicitudes["estado"] = None
     df_solicitudes["fecha_actualizacion"] = None
-    
-    st.dataframe(df_solicitudes)
-    
+       
     for isolicitud in range(df_solicitudes.shape[0]):
         
         # Recorta el dataframe a la solicitud seleccionada y reescribe los indices
@@ -2856,9 +2857,6 @@ def consulta_estado():
         indices_dataframe              = numpy.arange(0,df_proceso.shape[0],1,dtype=int)    
         df_proceso['id_temp'] = indices_dataframe
         df_proceso.set_index('id_temp',drop=True,append=False,inplace=True)
-
-
-        st.dataframe(df_proceso)
 
         df_proceso['dttime'] = pandas.to_datetime(df_proceso['fecha_analisis'], format='%Y-%M-%d')
         df_proceso = df_proceso.sort_values(by='dttime',ascending=False)
