@@ -2799,6 +2799,11 @@ def planificacion_procesos():
                 cursor.execute(instruccion_sql, (int(id_solicitud),int(df_modificado["lote"].iloc[idato]),int(df_modificado["num_muestras"].iloc[idato]),df_modificado["nombre"].iloc[idato]))
                 conn.commit()
                 cursor.close()
+
+                st.text(int(id_solicitud))                
+                st.text(int(df_modificado["lote"].iloc[idato]))
+                st.text(int(df_modificado["num_muestras"].iloc[idato]))
+                st.text(df_modificado["nombre"].iloc[idato])                 
                 
             conn.close()
             
