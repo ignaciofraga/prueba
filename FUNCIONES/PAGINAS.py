@@ -2766,7 +2766,7 @@ def planificacion_procesos():
     df_muestra = df_solicitud_seleccionada[["lote","num_muestras","nombre"]]       
 
 
-    
+    df_muestra = df_muestra.set_index('lote')#,drop=True,append=False,inplace=True)
 
     
     df_modificado = st.data_editor(df_muestra, num_rows="add")
