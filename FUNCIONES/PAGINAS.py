@@ -2798,7 +2798,7 @@ def planificacion_procesos():
             
             indices_dataframe              = numpy.arange(0,df_modificado.shape[0],1,dtype=int)    
             df_modificado['id_temp'] = indices_dataframe
-            df_modificado.set_index('id_temp',drop=True,append=False,inplace=True)
+            df_modificado.set_index('id_temp',drop=False,append=True)
             
             st.text("este")
             st.dataframe(df_modificado)
