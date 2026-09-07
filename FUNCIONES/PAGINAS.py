@@ -1915,8 +1915,8 @@ def procesado_nutrientes():
                         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
                             
                         cursor = conn.cursor()
-                        instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s, temperatura_laboratorio=%s, rendimiento_columna=%s,id_rmn_bajo=%s, id_rmn_alto=%s  WHERE id_solicitud = %s AND lote = %s;'
-                        cursor.execute(instruccion_sql, (fecha_actualizacion,True,temperatura_laboratorio,rendimiento_columna,int(id_ref_bajo),int(id_ref_alto),int(id_solicitud_analisis),int(id_lote_seleccionado)))              
+                        instruccion_sql = 'UPDATE planificacion_analisis_nutrientes SET fecha_analisis =%s, io_analizado=%s, temperatura_laboratorio=%s, rendimiento_columna=%s,id_rmn_bajo=%s, id_rmn_alto=%s, muestras_analizadas=%s  WHERE id_solicitud = %s AND lote = %s;'
+                        cursor.execute(instruccion_sql, (fecha_actualizacion,True,temperatura_laboratorio,rendimiento_columna,int(id_ref_bajo),int(id_ref_alto),listado_muestras_procesadas,int(id_solicitud_analisis),int(id_lote_seleccionado)))              
                         conn.commit()
                         cursor.close()
     
@@ -2767,22 +2767,24 @@ def planificacion_procesos():
 
 
     
-    with st.form("Formulario seleccion"):  
+
     
-        df_modificado = st.data_editor(df_muestra, num_rows="add")
+    df_modificado = st.data_editor(df_muestra, num_rows="add")
+    
+    col1, col2 = st.columns(2,gap="small")
+  
+    with col1:  
+  
+        # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
+        io_envio            = st.button("Modificar o añadir información")   
+    
+    with col2:
         
-        col1, col2 = st.columns(2,gap="small")
-      
-        with col1:  
-      
-            # En caso de actualizar, añadir la información nueva del dataframe dinámico a la base de datos
-            io_envio            = st.form_submit_button("Modificar o añadir información")   
+        texto_muestras_planificadas = "Número de muestras planificado: " + str(int(df_modificado["num_muestras"].sum(axis=0)))
+        st.text(texto_muestras_planificadas)
         
-        with col2:
-            
-            texto_muestras_planificadas = "Número de muestras planificado: " + str(int(df_modificado["num_muestras"].sum(axis=0)))
-            st.text(texto_muestras_planificadas)
-            
+
+    with st.form("Formulario seleccion"):  
         
         if io_envio == True:
             
