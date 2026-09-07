@@ -2800,6 +2800,9 @@ def planificacion_procesos():
             df_modificado['id_temp'] = indices_dataframe
             df_modificado.set_index('id_temp',drop=True,append=False,inplace=True)
             
+            st.text("este")
+            st.dataframe(df_modificado)
+            
             for idato in range(df_modificado.shape[0]):
             
                 cursor = conn.cursor()
