@@ -2784,6 +2784,8 @@ def planificacion_procesos():
         st.text(texto_muestras_planificadas)
         
 
+    st.text(df_modificado.shape[0])
+
     with st.form("Formulario seleccion"):  
         
         if io_envio == True:
