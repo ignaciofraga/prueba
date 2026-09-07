@@ -2795,6 +2795,11 @@ def planificacion_procesos():
                     
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
             
+            
+            indices_dataframe              = numpy.arange(0,df_modificado.shape[0],1,dtype=int)    
+            df_modificado['id_temp'] = indices_dataframe
+            df_modificado.set_index('id_temp',drop=True,append=False,inplace=True)
+            
             for idato in range(df_modificado.shape[0]):
             
                 cursor = conn.cursor()
