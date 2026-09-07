@@ -2805,6 +2805,8 @@ def planificacion_procesos():
             
             for idato in range(df_modificado.shape[0]):
             
+                st.text(df_modificado["num_muestras"].iloc[idato])    
+            
                 cursor = conn.cursor()
                 cursor.execute(instruccion_sql, (int(id_solicitud),int(df_modificado["lote"].iloc[idato]),int(df_modificado["num_muestras"].iloc[idato]),df_modificado["nombre"].iloc[idato]))
                 conn.commit()
