@@ -2784,8 +2784,6 @@ def planificacion_procesos():
         st.text(texto_muestras_planificadas)
         
 
-    st.text(df_modificado.shape[0])
-
     with st.form("Formulario seleccion"):  
         
         if io_envio == True:
@@ -2797,19 +2795,14 @@ def planificacion_procesos():
             
             df_modificado = df_modificado.reset_index()
             df_modificado = df_modificado.reset_index(drop=True)
-            df_modificado.index.to_frame()# df_modificado["lote_temp"] = df_modificado["lote"]
+            #df_modificado.index.to_frame()# df_modificado["lote_temp"] = df_modificado["lote"]
             
             for idato in range(df_modificado.shape[0]):
              
                 cursor = conn.cursor()
                 cursor.execute(instruccion_sql, (int(id_solicitud),int(df_modificado["lote"].iloc[idato]),int(df_modificado["num_muestras"].iloc[idato]),df_modificado["nombre"].iloc[idato]))
                 conn.commit()
-                cursor.close()
-
-                st.text(int(id_solicitud))                
-                st.text(int(df_modificado["lote"].iloc[idato]))
-                st.text(int(df_modificado["num_muestras"].iloc[idato]))
-                st.text(df_modificado["nombre"].iloc[idato])                 
+                cursor.close()       
                 
             conn.close()
             
