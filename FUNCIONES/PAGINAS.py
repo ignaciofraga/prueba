@@ -2796,7 +2796,7 @@ def planificacion_procesos():
             conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
             
             
-            df_modificado = df_modificado.index.to_frame()# df_modificado["lote_temp"] = df_modificado["lote"]
+            df_modificado.index.to_frame()# df_modificado["lote_temp"] = df_modificado["lote"]
             
             # indices_dataframe              = numpy.arange(0,df_modificado.shape[0],1,dtype=int)    
             # df_modificado['id_temp'] = indices_dataframe
