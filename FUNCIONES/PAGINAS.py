@@ -1247,7 +1247,8 @@ def procesado_nutrientes():
     # Combina la información de muestreos y salidas en un único dataframe 
     df_salidas            = df_salidas.rename(columns={"id_salida": "salida_mar"}) # Para igualar los nombres de columnas                                               
     df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="salida_mar")
-                         
+        
+                 
  
     # Define los vectores con las variables a procesar
     variables_procesado    = ['Nitrogeno inorganico total','Nitrato','Nitrito','Silicato','Fosfato']    
