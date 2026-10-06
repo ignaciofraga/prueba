@@ -68,7 +68,7 @@ if FUNCIONES_AUXILIARES.log_in() is True:
                         "SALIDAS AL MAR": PAGINAS.entrada_salidas_mar,
                         "CONDICIONES AMBIENTALES":PAGINAS.entrada_condiciones_ambientales,
                         "ENTRADA DATOS DE ROSETA":PAGINAS.entrada_archivos_roseta,
-                        "ENTRADA DATOS DE LABORATORIO":PAGINAS.entrada_datos_laboratorio,
+                        #"ENTRADA DATOS DE LABORATORIO":PAGINAS.entrada_datos_laboratorio,
                         "ENTRADA DATOS CONTINUO":PAGINAS.entrada_datos_continuo,
                         "CONSULTA DATOS":PAGINAS.consulta_datos}
         
