@@ -954,7 +954,7 @@ def entrada_archivos_roseta():
     puerto           = st.secrets["postgres"].port
     
         
-    st.subheader('Entrada de datos procedentes de botellas y perfiles') 
+    st.subheader('Entrada de datos de cierre de botellas y perfiles') 
 
     # Recupera tablas con informacion utilizada en el procesado
     df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles = carga_datos_entrada_archivo_roseta()
