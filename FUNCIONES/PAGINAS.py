@@ -953,222 +953,164 @@ def entrada_archivos_roseta():
     contrasena       = st.secrets["postgres"].password
     puerto           = st.secrets["postgres"].port
     
-    # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
-    acciones     = ['Añadir datos de botellas y perfiles', 'Realizar control de calidad de datos de botellas']
-    tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
+        
+    st.subheader('Entrada de datos procedentes de botellas y perfiles') 
+
+    # Recupera tablas con informacion utilizada en el procesado
+    df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles = carga_datos_entrada_archivo_roseta()
+
+    id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
+
+    #with st.form("Formulario seleccion"): 
     
-
-
-    # Añade datos de botellas
-    if tipo_accion == acciones[0]: 
-        
-        st.subheader('Entrada de datos procedentes de botellas y perfiles') 
+    # Despliega menús de selección del programa, tipo de salida, año y fecha               
+    col1, col2, col3= st.columns(3,gap="small")
+ 
+    with col1: 
+        programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
+        df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
+        abreviatura_programa      = df_programas['abreviatura'][df_programas['nombre_programa']==programa_seleccionado].iloc[0] 
+        id_programa               = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0] 
     
-        # Recupera tablas con informacion utilizada en el procesado
-        df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles = carga_datos_entrada_archivo_roseta()
-
-        id_radiales   = df_programas.index[df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
-
-        #with st.form("Formulario seleccion"): 
+    with col2:
+        tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
+        df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
+    
+        # Añade la variable año al dataframe
+        indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
+        df_salidas_seleccion['id_temp'] = indices_dataframe
+        df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
         
-        # Despliega menús de selección del programa, tipo de salida, año y fecha               
-        col1, col2, col3= st.columns(3,gap="small")
-     
-        with col1: 
-            programa_seleccionado     = st.selectbox('Programa',(df_programas['nombre_programa']),index=id_radiales)   
-            df_salidas_seleccion      = df_salidas[df_salidas['nombre_programa']==programa_seleccionado]
-            abreviatura_programa      = df_programas['abreviatura'][df_programas['nombre_programa']==programa_seleccionado].iloc[0] 
-            id_programa               = df_programas['id_programa'][df_programas['nombre_programa']==programa_seleccionado].iloc[0] 
+        # Define los años con salidas asociadas
+        df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
+        for idato in range(df_salidas_seleccion.shape[0]):
+            df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+        df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
         
+        listado_anhos              = df_salidas_seleccion['año'].unique()
+    
+    with col3:
+        anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
+        df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
+
+    salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
+
+    # Recupera el identificador de la salida seleccionada
+    id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+
+    fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
+   
+    tabla_estaciones_programa = df_estaciones[df_estaciones['programa']==int(id_programa)]
+
+    
+    with st.form("Formulario seleccion"): 
+
+        # Despliega la extensión para subir los archivos .btl y .cnv
+        col1, col2 = st.columns(2,gap="small")
+        
+        with col1:
+            listado_archivos_btl = st.file_uploader("Arrastra o selecciona los archivos .btl", accept_multiple_files=True)   
         with col2:
-            tipo_salida_seleccionada  = st.selectbox('Tipo de salida',(df_salidas_seleccion['tipo_salida'].unique()))   
-            df_salidas_seleccion      = df_salidas_seleccion[df_salidas_seleccion['tipo_salida']==tipo_salida_seleccionada]
-        
-            # Añade la variable año al dataframe
-            indices_dataframe               = numpy.arange(0,df_salidas_seleccion.shape[0],1,dtype=int)    
-            df_salidas_seleccion['id_temp'] = indices_dataframe
-            df_salidas_seleccion.set_index('id_temp',drop=False,append=False,inplace=True)
-            
-            # Define los años con salidas asociadas
-            df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
-            for idato in range(df_salidas_seleccion.shape[0]):
-                df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
-            df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
-            
-            listado_anhos              = df_salidas_seleccion['año'].unique()
-        
-        with col3:
-            anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
-            df_salidas_seleccion        = df_salidas_seleccion[df_salidas_seleccion['año']==anho_seleccionado]
-    
-        salida                      = st.selectbox('Muestreo',(df_salidas_seleccion['nombre_salida']),index=df_salidas_seleccion.shape[0]-1)   
-    
-        # Recupera el identificador de la salida seleccionada
-        id_salida                   = df_salidas_seleccion['id_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
-    
-        fecha_salida                = df_salidas_seleccion['fecha_salida'][df_salidas_seleccion['nombre_salida']==salida].iloc[0]
-       
-        tabla_estaciones_programa = df_estaciones[df_estaciones['programa']==int(id_programa)]
-    
-        
-        with st.form("Formulario seleccion"): 
-    
-            # Despliega la extensión para subir los archivos .btl y .cnv
-            col1, col2 = st.columns(2,gap="small")
-            
-            with col1:
-                listado_archivos_btl = st.file_uploader("Arrastra o selecciona los archivos .btl", accept_multiple_files=True)   
-            with col2:
-                listado_archivos_cnv = st.file_uploader("Arrastra o selecciona los archivos .cnv", accept_multiple_files=True)   
-                 
-            submit = st.form_submit_button("Procesar los archivos añadidos")                    
-    
-        if submit is True:
-                                             
-            for archivo_btl in listado_archivos_btl:
-                            
-                # encuentra el nombre de la estación
-                nombre_archivo_btl = archivo_btl.name
-                posicion_inicio    = nombre_archivo_btl.find('e') 
-                posicion_final     = nombre_archivo_btl.find('.')
-                nombre_estacion    = nombre_archivo_btl[posicion_inicio:posicion_final].upper() + 'CO' 
-                
-                id_estacion        = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
-                              
-                texto_estado = 'Procesando la información de la estación ' + nombre_estacion
-                with st.spinner(texto_estado):
-                                    
-                    # Lee los datos de cada archivo de botella
-                    #datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines()
-                    datos_archivo = archivo_btl.getvalue().decode('ISO-8859-1').splitlines()
-                    
-                    # Comprueba que la fecha del archivo y de la salida coinciden
-                    fecha_salida_texto    = nombre_archivo_btl[0:8]
-                    fecha_salida_archivo  = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
-                    
-                    if fecha_salida_archivo == fecha_salida:
-                    
-                        ### DATOS DE BOTELLERO ###
-                        mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_btl,datos_archivo)
-                      
-                        datos_botellas = FUNCIONES_PROCESADO.procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_salida,tabla_estaciones_programa)
-                    
-                        # Vuelve a cargar los datos disponibles
-                        conn                      = init_connection()
-                        df_muestreos              = pandas.read_sql('SELECT * FROM muestreos_discretos', conn)
-                        df_datos_discretos        = pandas.read_sql('SELECT * FROM datos_discretos', conn)
-                        conn.close() 
-                        
-                      
-                        # Aplica control de calidad
-                        datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
-           
-                        # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
-                        datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
-                                
-                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,df_datos_discretos,df_muestreos)
-                        if texto_insercion:
-                            st.success(texto_insercion)   
-                        
-                    else:
-                    
-                        texto_error = 'La fecha del archivo ' + archivo_btl.name + ' no coindice con la fecha seleccionada '
-                        st.warning(texto_error, icon="⚠️")  
-
-                texto_exito = 'Estación ' + nombre_estacion + ' procesada correctamente. Información subida a la base de datos'
-                st.success(texto_exito)                            
+            listado_archivos_cnv = st.file_uploader("Arrastra o selecciona los archivos .cnv", accept_multiple_files=True)   
              
+        submit = st.form_submit_button("Procesar los archivos añadidos")                    
+
+    if submit is True:
+                                         
+        for archivo_btl in listado_archivos_btl:
                         
-                      
-                        
-            ### DATOS DE PERFILES
+            # encuentra el nombre de la estación
+            nombre_archivo_btl = archivo_btl.name
+            posicion_inicio    = nombre_archivo_btl.find('e') 
+            posicion_final     = nombre_archivo_btl.find('.')
+            nombre_estacion    = nombre_archivo_btl[posicion_inicio:posicion_final].upper() + 'CO' 
             
-            for archivo_cnv in listado_archivos_cnv:
+            id_estacion        = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
+                          
+            texto_estado = 'Procesando la información de la estación ' + nombre_estacion
+            with st.spinner(texto_estado):
+                                
+                # Lee los datos de cada archivo de botella
+                #datos_archivo = archivo_btl.getvalue().decode('utf-8').splitlines()
+                datos_archivo = archivo_btl.getvalue().decode('ISO-8859-1').splitlines()
                 
-                # encuentra el nombre de la estación
-                nombre_archivo_cnv = archivo_cnv.name
-                posicion_inicio    = nombre_archivo_cnv.find('e')
-                posicion_final     = nombre_archivo_cnv.find('.')
-                nombre_estacion    = nombre_archivo_cnv[posicion_inicio:posicion_final].upper() + 'CO' 
-                id_estacion        = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
-                              
-                              
-                texto_estado = 'Procesando la información del perfil ' + archivo_cnv.name
-                with st.spinner(texto_estado):
-                                                                            
-                    datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
-                                  
-                    datos_perfil,df_perfiles,datos_muestreo_perfil = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
-                                                     
-                    df_botellas,df_perfiles = FUNCIONES_PROCESADO.procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,id_programa,abreviatura_programa,nombre_estacion,id_estacion,direccion_host,base_datos,usuario,contrasena,puerto)
+                # Comprueba que la fecha del archivo y de la salida coinciden
+                fecha_salida_texto    = nombre_archivo_btl[0:8]
+                fecha_salida_archivo  = datetime.datetime.strptime(fecha_salida_texto, '%Y%m%d').date()
                 
-                    if df_botellas is not None:     
-                        
-                        conn                      = init_connection()
-                        tabla_datos_discretos = pandas.read_sql('SELECT * FROM datos_discretos', conn)
-                        conn.close()
-                        
-                        df_botellas = FUNCIONES_PROCESADO.evalua_registros(df_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
-                               
-                        texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_discretos,df_muestreos)
-        
-                    texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles)
-           
-                    st.success(texto_insercion)      
+                if fecha_salida_archivo == fecha_salida:
+                
+                    ### DATOS DE BOTELLERO ###
+                    mensaje_error,datos_botellas,io_par,io_fluor,io_O2 = FUNCIONES_LECTURA.lectura_btl(nombre_archivo_btl,datos_archivo)
+                  
+                    datos_botellas = FUNCIONES_PROCESADO.procesado_botella(datos_botellas,id_estacion,nombre_estacion,id_programa,id_salida,tabla_estaciones_programa)
+                
+                    # Vuelve a cargar los datos disponibles
+                    conn                      = init_connection()
+                    df_muestreos              = pandas.read_sql('SELECT * FROM muestreos_discretos', conn)
+                    df_datos_discretos        = pandas.read_sql('SELECT * FROM datos_discretos', conn)
+                    conn.close() 
+                    
+                  
+                    # Aplica control de calidad
+                    datos_botellas,textos_aviso        = FUNCIONES_PROCESADO.control_calidad(datos_botellas)            
+       
+                    # Asigna el registro correspondiente a cada muestreo e introduce la información en la base de datos
+                    datos_botellas = FUNCIONES_PROCESADO.evalua_registros(datos_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
+                            
+                    texto_insercion = FUNCIONES_PROCESADO.inserta_datos(datos_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,df_datos_discretos,df_muestreos)
+                    if texto_insercion:
+                        st.success(texto_insercion)   
+                    
+                else:
+                
+                    texto_error = 'La fecha del archivo ' + archivo_btl.name + ' no coindice con la fecha seleccionada '
+                    st.warning(texto_error, icon="⚠️")  
 
-
-
-            
-
-    # Control de calidad 
-    if tipo_accion == acciones[1]: 
-    
-        
-        st.subheader('Control de calidad de datos procedentes de botellas')    
-    
-        # Define las variables a utilizar
-        variables_procesado    = ['Temperatura','Salinidad','PAR','Fluorescencia','O2(CTD)']    
-        variables_procesado_bd = ['temperatura_ctd','salinidad_ctd','par_ctd','fluorescencia_ctd','oxigeno_ctd']
-        variables_unidades     = ['ºC','psu','\u03BCE/m2.s1','\u03BCg/kg','\u03BCmol/kg']
-
-        # Toma los datos de la caché    
-        df_muestreos,df_estaciones,df_datos_discretos,df_salidas,df_programas,df_indices_calidad,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles = carga_datos_entrada_archivo_roseta()
-        
-        # Mantén sólo las salidas de radiales
-        id_radiales   = df_programas['id_programa'][df_programas['nombre_programa']=='RADIAL CORUÑA'].tolist()[0]
-        df_salidas  = df_salidas[df_salidas['programa']==int(id_radiales)]
-        
-        # Combina la información de muestreos y salidas en un único dataframe 
-        df_muestreos          = df_muestreos.rename(columns={"salida_mar": "id_salida"}) # Para igualar los nombres de columnas                                               
-        df_muestreos          = pandas.merge(df_muestreos, df_salidas, on="id_salida")
-        df_muestreos          = df_muestreos.rename(columns={"id_salida": "salida_mar"}) # Deshaz el cambio de nombre
-                         
-        # compón un dataframe con la información de muestreo y datos biogeoquímicos                                            
-        df_datos_disponibles  = pandas.merge(df_datos_discretos, df_muestreos, on="muestreo")
+            texto_exito = 'Estación ' + nombre_estacion + ' procesada correctamente. Información subida a la base de datos'
+            st.success(texto_exito)                            
          
-        # Añade columna con información del año
-        df_datos_disponibles['año'] = pandas.DatetimeIndex(df_datos_disponibles['fecha_muestreo']).year
-               
-        # Borra los dataframes que ya no hagan falta para ahorrar memoria
-        del(df_datos_discretos,df_muestreos)
+                    
+                  
+                    
+        ### DATOS DE PERFILES
         
-        # procesa ese dataframe
-        io_control_calidad = 1
-        indice_programa,indice_estacion,indice_salida,cast_seleccionado,meses_offset,variable_seleccionada,salida_seleccionada = FUNCIONES_AUXILIARES.menu_seleccion(df_datos_disponibles,variables_procesado,variables_procesado_bd,io_control_calidad,df_salidas,df_estaciones,df_programas)
-                                                   
-        # Recupera el nombre "completo" de la variable y sus unidades
-        indice_variable          = variables_procesado_bd.index(variable_seleccionada)
-        nombre_completo_variable = variables_procesado[indice_variable] 
-        unidades_variable        = variables_unidades[indice_variable]
-                        
-                                                        
-        # Selecciona los datos correspondientes al programa, estación, salida y cast seleccionados
-        datos_procesados     = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion) & (df_datos_disponibles["salida_mar"] == indice_salida) & (df_datos_disponibles["num_cast"] == cast_seleccionado)]
+        for archivo_cnv in listado_archivos_cnv:
+            
+            # encuentra el nombre de la estación
+            nombre_archivo_cnv = archivo_cnv.name
+            posicion_inicio    = nombre_archivo_cnv.find('e')
+            posicion_final     = nombre_archivo_cnv.find('.')
+            nombre_estacion    = nombre_archivo_cnv[posicion_inicio:posicion_final].upper() + 'CO' 
+            id_estacion        = tabla_estaciones_programa['id_estacion'][tabla_estaciones_programa['nombre_estacion']==str(nombre_estacion)].iloc[0]
+                          
+                          
+            texto_estado = 'Procesando la información del perfil ' + archivo_cnv.name
+            with st.spinner(texto_estado):
+                                                                        
+                datos_archivo_cnv = archivo_cnv.getvalue().decode('ISO-8859-1').splitlines() 
+                              
+                datos_perfil,df_perfiles,datos_muestreo_perfil = FUNCIONES_LECTURA.lectura_archivo_perfiles(datos_archivo_cnv)
+                                                 
+                df_botellas,df_perfiles = FUNCIONES_PROCESADO.procesado_perfiles(datos_perfil,datos_muestreo_perfil,df_perfiles,id_salida,id_programa,abreviatura_programa,nombre_estacion,id_estacion,direccion_host,base_datos,usuario,contrasena,puerto)
+            
+                if df_botellas is not None:     
+                    
+                    conn                      = init_connection()
+                    tabla_datos_discretos = pandas.read_sql('SELECT * FROM datos_discretos', conn)
+                    conn.close()
+                    
+                    df_botellas = FUNCIONES_PROCESADO.evalua_registros(df_botellas,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,df_muestreos,df_estaciones,tabla_variables)
+                           
+                    texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_botellas,'discreto',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_discretos,df_muestreos)
+    
+                texto_insercion = FUNCIONES_PROCESADO.inserta_datos(df_perfiles,'perfil',direccion_host,base_datos,usuario,contrasena,puerto,tabla_variables,tabla_datos_perfiles,tabla_muestreo_perfiles)
+       
+                st.success(texto_insercion)      
 
-        df_datos_disponibles = df_datos_disponibles[(df_datos_disponibles["programa"] == indice_programa) & (df_datos_disponibles["estacion"] == indice_estacion)]
-        
-        FUNCIONES_PROCESADO.control_calidad_biogeoquimica(datos_procesados,df_datos_disponibles,variable_seleccionada,nombre_completo_variable,unidades_variable,df_indices_calidad,meses_offset)
 
+
+            
 
 
 
