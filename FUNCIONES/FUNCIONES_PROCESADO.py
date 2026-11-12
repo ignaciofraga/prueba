@@ -204,6 +204,9 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                 
                 st.text(df_temporal['id_estacion'].iloc[0])
                 
+                datos[datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]]['id_estacion_temp'] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
+                
+                
                 # Asigna lat/lon a la medida si ésta no la tenía
                 if 'latitud' not in listado_variables:
                     datos['latitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['latitud_estacion'].iloc[0] 
@@ -224,10 +227,10 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                 if 'longitud' in listado_variables:
                     estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
               
-            st.text(estaciones_muestreadas['id_estacion'].iloc[iestacion])  
+            # st.text(estaciones_muestreadas['id_estacion'].iloc[iestacion])  
               
-            # Asigna el identificador de estación a los datos importados
-            datos[datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]]['id_estacion_temp'] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
+            # # Asigna el identificador de estación a los datos importados
+            # datos[datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]]['id_estacion_temp'] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
                 
     
     
