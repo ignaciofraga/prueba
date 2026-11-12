@@ -279,7 +279,6 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
     # En caso contrario, hay que buscar la salida asociada entre las disponibles 
     else:
     
-        st.dataframe(datos)
         # listado con los nombres de meses
         meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE']
                
