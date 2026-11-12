@@ -185,7 +185,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         iconta_nueva_estacion     = 1
                 
         # Encuentra el identificador asociado a cada estacion en la base de datos
-        for iestacion in len(estaciones_muestreadas):
+        for iestacion in range(estaciones_muestreadas.shape[0]):
             
             df_temporal = estaciones_programa[estaciones_programa['nombre_estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]
                 
