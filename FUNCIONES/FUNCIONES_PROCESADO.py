@@ -244,7 +244,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             # Cierra la conexión con la base de datos
             conn_psql.dispose() 
         
-    
+    st.dataframe(estaciones_muestreadas)
     st.dataframe(datos)
     return datos  
 
@@ -570,11 +570,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     listado_salidas  = datos['id_salida'].unique()
     df_datos_salidas = tabla_muestreos[tabla_muestreos['salida_mar'].isin(listado_salidas)]
     
-    st.text('antes')
-    st.dataframe(datos)
-    st.text('despues')
-            #datos.iloc[idato]
-    
+
     listado_variables_datos   = datos.columns.tolist()
     
     df_variables = tabla_variables[tabla_variables['tipo']=='parametro_muestreo']
