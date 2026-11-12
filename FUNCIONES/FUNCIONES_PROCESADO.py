@@ -195,8 +195,8 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             if df_temporal.shape[0]>0:
                 
                 listado_id_estaciones  = listado_id_estaciones + [df_temporal['id_estacion'].iloc[0]]
-                listado_lat_estaciones = listado_id_estaciones + [df_temporal['latitud_estacion'].iloc[0]]
-                listado_lon_estaciones = listado_id_estaciones + [df_temporal['longitud_estacion'].iloc[0]]
+                listado_lat_estaciones = listado_lat_estaciones + [df_temporal['latitud_estacion'].iloc[0]]
+                listado_lon_estaciones = listado_lon_estaciones + [df_temporal['longitud_estacion'].iloc[0]]
                 listado_nueva_estacion = listado_nueva_estacion + [0]
                 
                 # estaciones_muestreadas['id_estacion'].iloc[iestacion]       = df_temporal['id_estacion'].iloc[0]
