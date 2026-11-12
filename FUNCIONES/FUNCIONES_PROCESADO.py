@@ -202,7 +202,10 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                 if 'longitud' not in listado_variables:
                     datos['longitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['longitud_estacion'].iloc[0] 
                 
-
+                # Asigna el identificador de estación a los datos importados
+                datos[datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]]['id_estacion_temp'] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
+                    
+        
                  
             # Nueva estación, asignar orden creciente de identificador
             else:
@@ -216,8 +219,8 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                 if 'longitud' in listado_variables:
                     estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
               
-            # Asigna el identificador de estación a los datos importados
-            datos[datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]]['id_estacion_temp'] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
+            # # Asigna el identificador de estación a los datos importados
+            # datos[datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]]['id_estacion_temp'] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
                 
     
     
