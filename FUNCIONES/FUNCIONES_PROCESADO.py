@@ -199,20 +199,6 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                 listado_lon_estaciones = listado_lon_estaciones + [df_temporal['longitud_estacion'].iloc[0]]
                 listado_nueva_estacion = listado_nueva_estacion + [0]
                 
-                # estaciones_muestreadas['id_estacion'].iloc[iestacion]       = df_temporal['id_estacion'].iloc[0]
-                
-                # st.text(df_temporal['id_estacion'].iloc[0])
-                
-                # datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]] = df_temporal['id_estacion'].iloc[0]
-                
-                
-                # # Asigna lat/lon a la medida si ésta no la tenía
-                # if 'latitud' not in listado_variables:
-                #     datos['latitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['latitud_estacion'].iloc[0] 
-                # if 'longitud' not in listado_variables:
-                #     datos['longitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['longitud_estacion'].iloc[0] 
-                
-                
                  
             # Nueva estación, asignar orden creciente de identificador
             else:
@@ -238,9 +224,6 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
 
         for iestacion in range(estaciones_muestreadas.shape[0]):             
                             
-            # # Asigna el identificador de estación a los datos importados
-            #datos[datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
-             
             datos.loc[datos["estacion"] == estaciones_muestreadas['nombre_estacion'].iloc[iestacion], "id_estacion_temp"] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
             
     
@@ -270,8 +253,6 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             # Cierra la conexión con la base de datos
             conn_psql.dispose() 
         
-    st.dataframe(estaciones_muestreadas)
-    st.dataframe(datos)
     return datos  
 
 
