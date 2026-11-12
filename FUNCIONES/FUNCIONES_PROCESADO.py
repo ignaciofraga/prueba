@@ -600,6 +600,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
         for idato in range(exporta_registros.shape[0]):    
             
+            st.dataframe(exporta_registros)
+            
             st.dataframe(tabla_estaciones[tabla_estaciones['id_estacion'] == exporta_registros['estacion'].iloc[idato]]['nombre_estacion'])
             
             nombre_estacion                              = tabla_estaciones[tabla_estaciones['id_estacion'] == exporta_registros['estacion'].iloc[idato]]['nombre_estacion'].iloc[0]
