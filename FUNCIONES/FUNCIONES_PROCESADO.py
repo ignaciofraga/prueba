@@ -170,16 +170,11 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         listado_estaciones_muestreadas              = datos['estacion'].unique()
         estaciones_muestreadas                      = pandas.DataFrame()
         estaciones_muestreadas['nombre_estacion']   = listado_estaciones_muestreadas
-        estaciones_muestreadas['id_estacion']       = None       
-        estaciones_muestreadas['io_nueva_estacion'] = None
-        estaciones_muestreadas['latitud_estacion']  = None       
-        estaciones_muestreadas['longitud_estacion'] = None        
-        
-        # estaciones_muestreadas                      = pandas.DataFrame(data=listado_estaciones_muestreadas,columns=['nombre_estacion'])  
-        # estaciones_muestreadas['id_estacion']       = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-        # estaciones_muestreadas['io_nueva_estacion'] = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-        # estaciones_muestreadas['latitud_estacion']  = [None]*estaciones_muestreadas.shape[0]
-        # estaciones_muestreadas['longitud_estacion'] = [None]*estaciones_muestreadas.shape[0]
+      
+        listado_id_estaciones  = []
+        listado_lat_estaciones = []
+        listado_lon_estaciones = []
+        listado_nueva_estacion = []
     
     
         # Contadores e identificadores 
@@ -195,30 +190,37 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             
             df_temporal = estaciones_programa[estaciones_programa['nombre_estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]
                 
-            st.dataframe(df_temporal)
-            
+           
             # Estacion ya incluida en la base de datos. Recuperar identificador
             if df_temporal.shape[0]>0:
                 
-                estaciones_muestreadas['id_estacion'].iloc[iestacion]       = df_temporal['id_estacion'].iloc[0]
+                listado_id_estaciones  = listado_id_estaciones + [df_temporal['id_estacion'].iloc[0]]
+                listado_lat_estaciones = listado_id_estaciones + [df_temporal['latitud_estacion'].iloc[0]]
+                listado_lon_estaciones = listado_id_estaciones + [df_temporal['longitud_estacion'].iloc[0]]
+                listado_nueva_estacion = listado_nueva_estacion + [0]
                 
-                st.text(df_temporal['id_estacion'].iloc[0])
+                # estaciones_muestreadas['id_estacion'].iloc[iestacion]       = df_temporal['id_estacion'].iloc[0]
                 
-                datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]] = df_temporal['id_estacion'].iloc[0]
+                # st.text(df_temporal['id_estacion'].iloc[0])
+                
+                # datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]] = df_temporal['id_estacion'].iloc[0]
                 
                 
-                # Asigna lat/lon a la medida si ésta no la tenía
-                if 'latitud' not in listado_variables:
-                    datos['latitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['latitud_estacion'].iloc[0] 
-                if 'longitud' not in listado_variables:
-                    datos['longitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['longitud_estacion'].iloc[0] 
+                # # Asigna lat/lon a la medida si ésta no la tenía
+                # if 'latitud' not in listado_variables:
+                #     datos['latitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['latitud_estacion'].iloc[0] 
+                # if 'longitud' not in listado_variables:
+                #     datos['longitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['longitud_estacion'].iloc[0] 
                 
                 
                  
             # Nueva estación, asignar orden creciente de identificador
             else:
-                estaciones_muestreadas['id_estacion'][iestacion]       = id_ultima_estacion_bd + iconta_nueva_estacion
-                estaciones_muestreadas['io_nueva_estacion'][iestacion] = 1           
+          
+                
+                listado_id_estaciones  = listado_id_estaciones + [id_ultima_estacion_bd + iconta_nueva_estacion]
+                listado_nueva_estacion = listado_nueva_estacion + [1]
+                
                 iconta_nueva_estacion                                 = iconta_nueva_estacion + 1
       
                 # Determina la lat/lon de la estacion a partir de los valores de los registros asociados
@@ -227,10 +229,17 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                 if 'longitud' in listado_variables:
                     estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
               
-            # st.text(estaciones_muestreadas['id_estacion'].iloc[iestacion])  
+                
               
+        estaciones_muestreadas['id_estacion']   = listado_id_estaciones         
+        estaciones_muestreadas['latitud_estacion']   = listado_lat_estaciones  
+        estaciones_muestreadas['longitud_estacion']   = listado_lon_estaciones    
+        estaciones_muestreadas['io_nueva_estacion']   = listado_nueva_estacion 
+
+        for iestacion in range(estaciones_muestreadas.shape[0]):             
+                            
             # # Asigna el identificador de estación a los datos importados
-            # datos[datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]]['id_estacion_temp'] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
+            datos[datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]]['id_estacion_temp'] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
                 
     
     
