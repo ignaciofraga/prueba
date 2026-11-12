@@ -168,14 +168,13 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             
         # Genera un dataframe con las estaciones incluidas en el muestreo
         estaciones_muestreadas                      = datos['estacion'].unique()
-        estaciones_muestreadas                      = pandas.DataFrame(data=estaciones_muestreadas,columns=['nombre_estacion'])  
-        estaciones_muestreadas['id_estacion']       = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-        estaciones_muestreadas['io_nueva_estacion'] = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-        estaciones_muestreadas['latitud_estacion']  = [None]*estaciones_muestreadas.shape[0]
-        estaciones_muestreadas['longitud_estacion'] = [None]*estaciones_muestreadas.shape[0]
+        
+        # estaciones_muestreadas                      = pandas.DataFrame(data=estaciones_muestreadas,columns=['nombre_estacion'])  
+        # estaciones_muestreadas['id_estacion']       = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
+        # estaciones_muestreadas['io_nueva_estacion'] = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
+        # estaciones_muestreadas['latitud_estacion']  = [None]*estaciones_muestreadas.shape[0]
+        # estaciones_muestreadas['longitud_estacion'] = [None]*estaciones_muestreadas.shape[0]
     
-    
-        st.dataframe(estaciones_muestreadas)
     
         # Contadores e identificadores 
         if len(tabla_estaciones['id_estacion'])>0:
@@ -186,14 +185,13 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         iconta_nueva_estacion     = 1
                 
         # Encuentra el identificador asociado a cada estacion en la base de datos
-        for iestacion in range(estaciones_muestreadas.shape[0]):
+        for iestacion in len(estaciones_muestreadas):
             
             df_temporal = estaciones_programa[estaciones_programa['nombre_estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]
-        
-            #print(df_temporal)
-        
+                
             # Estacion ya incluida en la base de datos. Recuperar identificador
             if df_temporal.shape[0]>0:
+                
                 estaciones_muestreadas['id_estacion'][iestacion]       = df_temporal['id_estacion'].iloc[0]
                 
                 # Asigna lat/lon a la medida si ésta no la tenía
@@ -217,7 +215,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                     estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
               
             # Asigna el identificador de estación a los datos importados
-            datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]=estaciones_muestreadas['id_estacion'][iestacion]
+            datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas[iestacion]] = estaciones_muestreadas['id_estacion'][iestacion]
                 
     
     
@@ -246,6 +244,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             # Cierra la conexión con la base de datos
             conn_psql.dispose() 
         
+    st.dataframe(datos)
     return datos  
 
 

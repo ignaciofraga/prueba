@@ -1686,7 +1686,7 @@ def entrada_datos_excel():
             # Encuentra las salidas al mar correspondientes  
             datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_entrada,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
      
-        st.dataframe(datos_corregidos)   
+  
      
         # Encuentra el identificador asociado a cada registro
         with st.spinner('Asignando el registro correspondiente a cada medida'):
