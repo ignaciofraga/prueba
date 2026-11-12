@@ -132,7 +132,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
     tabla_estaciones['nombre_estacion'] = tabla_estaciones['nombre_estacion'].apply(lambda x:x.upper())
     
     # Columna para punteros de estaciones
-    datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
+    #datos['id_estacion_temp'] = numpy.zeros(datos.shape[0],dtype=int) 
 
     # Comprueba si los datos tienen un identificador de muestreo. En ese caso, ya tenemos la estacion identificada.
     variables_datos    = datos.columns.tolist()
@@ -239,7 +239,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         for iestacion in range(estaciones_muestreadas.shape[0]):             
                             
             # # Asigna el identificador de estación a los datos importados
-            datos[datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]]['id_estacion_temp'] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
+            datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
                 
     
     
