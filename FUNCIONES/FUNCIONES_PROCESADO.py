@@ -232,8 +232,10 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             exporta_registros.set_index('id_estacion',drop=True,append=False,inplace=True)
         
             # Establece conexion con la base de datos   
-            con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
-            conn_psql        = create_engine(con_engine)
+            #con_engine       = 'postgresql://' + usuario + ':' + contrasena + '@' + direccion_host + ':' + str(puerto) + '/' + base_datos
+            #conn_psql        = create_engine(con_engine)
+        
+            conn_psql = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
         
             # Inserta el dataframe resultante en la base de datos 
             exporta_registros.to_sql('estaciones', conn_psql,if_exists='append')
