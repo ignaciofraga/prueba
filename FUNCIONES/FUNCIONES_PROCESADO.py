@@ -204,7 +204,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                 
                 st.text(df_temporal['id_estacion'].iloc[0])
                 
-                datos[datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]]['id_estacion_temp'] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
+                datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]] = df_temporal['id_estacion'].iloc[0]
                 
                 
                 # Asigna lat/lon a la medida si ésta no la tenía
