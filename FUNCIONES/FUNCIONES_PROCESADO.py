@@ -239,8 +239,10 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         for iestacion in range(estaciones_muestreadas.shape[0]):             
                             
             # # Asigna el identificador de estación a los datos importados
-            datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
-                
+            #datos[datos['estacion']==estaciones_muestreadas['nombre_estacion'].iloc[iestacion]] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
+             
+            datos.loc[datos["estacion"] == estaciones_muestreadas['nombre_estacion'].iloc[iestacion], "id_estacion_temp"] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
+            
     
     
         # Añade en la base de datos las nuevas estaciones    
