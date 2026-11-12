@@ -192,7 +192,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             # Estacion ya incluida en la base de datos. Recuperar identificador
             if df_temporal.shape[0]>0:
                 
-                estaciones_muestreadas['id_estacion'].iloc[iestacion]       = df_temporal['id_estacion'].iloc[0]
+                estaciones_muestreadas['id_estacion'][iestacion]       = df_temporal['id_estacion'].iloc[0]
                 
                 # Asigna lat/lon a la medida si ésta no la tenía
                 if 'latitud' not in listado_variables:
@@ -204,8 +204,8 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                  
             # Nueva estación, asignar orden creciente de identificador
             else:
-                estaciones_muestreadas['id_estacion'].iloc[iestacion]       = id_ultima_estacion_bd + iconta_nueva_estacion
-                estaciones_muestreadas['io_nueva_estacion'].iloc[iestacion] = 1           
+                estaciones_muestreadas['id_estacion'][iestacion]       = id_ultima_estacion_bd + iconta_nueva_estacion
+                estaciones_muestreadas['io_nueva_estacion'][iestacion] = 1           
                 iconta_nueva_estacion                                 = iconta_nueva_estacion + 1
       
                 # Determina la lat/lon de la estacion a partir de los valores de los registros asociados
