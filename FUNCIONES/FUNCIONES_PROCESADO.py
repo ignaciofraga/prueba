@@ -202,6 +202,8 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                 
                 estaciones_muestreadas['id_estacion'].iloc[iestacion]       = df_temporal['id_estacion'].iloc[0]
                 
+                st.text(df_temporal['id_estacion'].iloc[0])
+                
                 # Asigna lat/lon a la medida si ésta no la tenía
                 if 'latitud' not in listado_variables:
                     datos['latitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['latitud_estacion'].iloc[0] 
