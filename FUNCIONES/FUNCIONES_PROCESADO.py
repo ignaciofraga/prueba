@@ -189,6 +189,8 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             
             df_temporal = estaciones_programa[estaciones_programa['nombre_estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]
                 
+            st.dataframe(df_temporal)
+            
             # Estacion ya incluida en la base de datos. Recuperar identificador
             if df_temporal.shape[0]>0:
                 
