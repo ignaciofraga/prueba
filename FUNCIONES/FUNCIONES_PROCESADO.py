@@ -168,12 +168,18 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             
         # Genera un dataframe con las estaciones incluidas en el muestreo
         listado_estaciones_muestreadas              = datos['estacion'].unique()
+        estaciones_muestreadas                      = pandas.DataFrame()
+        estaciones_muestreadas['nombre_estacion']   = listado_estaciones_muestreadas
+        estaciones_muestreadas['id_estacion']       = None       
+        estaciones_muestreadas['io_nueva_estacion'] = None
+        estaciones_muestreadas['latitud_estacion']  = None       
+        estaciones_muestreadas['longitud_estacion'] = None        
         
-        estaciones_muestreadas                      = pandas.DataFrame(data=listado_estaciones_muestreadas,columns=['nombre_estacion'])  
-        estaciones_muestreadas['id_estacion']       = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-        estaciones_muestreadas['io_nueva_estacion'] = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
-        estaciones_muestreadas['latitud_estacion']  = [None]*estaciones_muestreadas.shape[0]
-        estaciones_muestreadas['longitud_estacion'] = [None]*estaciones_muestreadas.shape[0]
+        # estaciones_muestreadas                      = pandas.DataFrame(data=listado_estaciones_muestreadas,columns=['nombre_estacion'])  
+        # estaciones_muestreadas['id_estacion']       = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
+        # estaciones_muestreadas['io_nueva_estacion'] = numpy.zeros(estaciones_muestreadas.shape[0],dtype=int)
+        # estaciones_muestreadas['latitud_estacion']  = [None]*estaciones_muestreadas.shape[0]
+        # estaciones_muestreadas['longitud_estacion'] = [None]*estaciones_muestreadas.shape[0]
     
     
         # Contadores e identificadores 
