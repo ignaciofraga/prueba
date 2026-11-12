@@ -1,6 +1,7 @@
 matplotlib
 openpyxl
 psycopg2-binary>=2.9.6
+psycopg
 streamlit>=1.28.0
 sqlalchemy>=2.0.0
 xlsxwriter
