@@ -588,6 +588,10 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         # Busca qué variables están incluidas en los datos a importar
         listado_variables_comunes = list(set(listado_variables_datos).intersection(df_variables['nombre']))
         listado_adicional         = ['id_estacion_temp','id_salida'] + listado_variables_comunes
+        
+        for ida in range(len(listado_adicional)):
+            st.text(listado_adicional[ida])
+        
         exporta_registros         = datos[listado_adicional]
 
 
