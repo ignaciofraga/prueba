@@ -605,7 +605,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         exporta_registros['muestreo']     = numpy.zeros(datos.shape[0],dtype=int)
         
         # renombra la columna con información de la estación muestreada
-        exporta_registros                    = exporta_registros.rename(columns={"id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
+        exporta_registros                    = exporta_registros.rename(columns={"estacion":"nombre_estacion","id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
         # corrige posibles errores en el formato de los datos
         exporta_registros[['latitud_muestreo', 'longitud_muestreo']] = exporta_registros[['latitud_muestreo', 'longitud_muestreo']].apply(pandas.to_numeric)
         
@@ -615,8 +615,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
         
         for idato in range(exporta_registros.shape[0]):    
-
-            st.text(exporta_registros['estacion'].iloc[idato])            
+         
 
             nombre_estacion                              = tabla_estaciones[tabla_estaciones['id_estacion'] == exporta_registros['estacion'].iloc[idato]]['nombre_estacion'].iloc[0]
             
