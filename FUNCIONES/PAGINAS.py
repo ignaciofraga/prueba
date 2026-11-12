@@ -1673,7 +1673,7 @@ def entrada_datos_excel():
             if nombre_variable_qf not in variables_discretas:
                 df_datos_importacion[nombre_variable_qf] = int(iq_asignado) #numpy.ones(df_datos_importacion.shape[0],dtype=int)
             
-
+        st.dataframe(df_datos_importacion)
 
         # Realiza un control de calidad primario a los datos importados   
         datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
