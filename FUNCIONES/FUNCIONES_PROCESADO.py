@@ -175,6 +175,8 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         estaciones_muestreadas['longitud_estacion'] = [None]*estaciones_muestreadas.shape[0]
     
     
+        st.dataframe(estaciones_muestreadas)
+    
         # Contadores e identificadores 
         if len(tabla_estaciones['id_estacion'])>0:
             id_ultima_estacion_bd = max(tabla_estaciones['id_estacion'])
@@ -186,7 +188,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         # Encuentra el identificador asociado a cada estacion en la base de datos
         for iestacion in range(estaciones_muestreadas.shape[0]):
             
-            df_temporal = estaciones_programa[estaciones_programa['nombre_estacion']==estaciones_muestreadas['estacion'][iestacion]]
+            df_temporal = estaciones_programa[estaciones_programa['nombre_estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]
         
             #print(df_temporal)
         
@@ -200,6 +202,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                 if 'longitud' not in listado_variables:
                     datos['longitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['longitud_estacion'].iloc[0] 
                 
+
                  
             # Nueva estación, asignar orden creciente de identificador
             else:
