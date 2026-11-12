@@ -187,7 +187,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
         # Encuentra el identificador asociado a cada estacion en la base de datos
         for iestacion in range(len(estaciones_muestreadas)):
             
-            df_temporal = estaciones_programa[estaciones_programa['nombre_estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]
+            df_temporal = estaciones_programa[estaciones_programa['nombre_estacion']==estaciones_muestreadas[iestacion]]
                 
             # Estacion ya incluida en la base de datos. Recuperar identificador
             if df_temporal.shape[0]>0:
@@ -196,9 +196,9 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                 
                 # Asigna lat/lon a la medida si ésta no la tenía
                 if 'latitud' not in listado_variables:
-                    datos['latitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['latitud_estacion'].iloc[0] 
+                    datos['latitud_muestreo'][datos['estacion']==estaciones_muestreadas[iestacion]] =  df_temporal['latitud_estacion'].iloc[0] 
                 if 'longitud' not in listado_variables:
-                    datos['longitud_muestreo'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]] =  df_temporal['longitud_estacion'].iloc[0] 
+                    datos['longitud_muestreo'][datos['estacion']==estaciones_muestreadas[iestacion]] =  df_temporal['longitud_estacion'].iloc[0] 
                 
 
                  
@@ -210,9 +210,9 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
       
                 # Determina la lat/lon de la estacion a partir de los valores de los registros asociados
                 if 'latitud' in listado_variables:
-                    estaciones_muestreadas['latitud_estacion'][iestacion]  = (datos['latitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
+                    estaciones_muestreadas['latitud_estacion'][iestacion]  = (datos['latitud'][datos['estacion']==estaciones_muestreadas[iestacion]]).mean()
                 if 'longitud' in listado_variables:
-                    estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
+                    estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas[iestacion]]).mean()
               
             # Asigna el identificador de estación a los datos importados
             datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas[iestacion]] = estaciones_muestreadas['id_estacion'][iestacion]
