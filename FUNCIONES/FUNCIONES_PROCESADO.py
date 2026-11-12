@@ -588,8 +588,6 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         listado_adicional         = ['id_estacion_temp','id_salida'] + listado_variables_comunes
         exporta_registros         = datos[listado_adicional]
 
-        st.dataframe(exporta_registros)
-        st.dataframe(datos)
 
         # Crea una columna para almacenar el numero de muestreo
         exporta_registros['muestreo']     = numpy.zeros(datos.shape[0],dtype=int)
@@ -601,6 +599,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         
         # # añade el nombre del muestreo
         exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
+        
+        st.dataframe(exporta_registros)
+        
         for idato in range(exporta_registros.shape[0]):    
 
             nombre_estacion                              = tabla_estaciones[tabla_estaciones['id_estacion'] == exporta_registros['estacion'].iloc[idato]]['nombre_estacion'].iloc[0]
