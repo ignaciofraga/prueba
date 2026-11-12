@@ -215,7 +215,7 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
                     estaciones_muestreadas['longitud_estacion'][iestacion] = (datos['longitud'][datos['estacion']==estaciones_muestreadas['nombre_estacion'][iestacion]]).mean()
               
             # Asigna el identificador de estación a los datos importados
-            datos['id_estacion_temp'][datos['estacion']==estaciones_muestreadas[iestacion]] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
+            datos[datos['estacion']==estaciones_muestreadas[iestacion]]['id_estacion_temp'] = estaciones_muestreadas['id_estacion'].iloc[iestacion]
                 
     
     
