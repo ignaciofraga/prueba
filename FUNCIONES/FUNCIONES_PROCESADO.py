@@ -244,7 +244,8 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
             # Cierra la conexión con la base de datos
             conn_psql.dispose() 
         
-        
+    
+    st.dataframe(datos)
     return datos  
 
 
