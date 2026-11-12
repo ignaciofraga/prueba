@@ -1673,16 +1673,11 @@ def entrada_datos_excel():
             if nombre_variable_qf not in variables_discretas:
                 df_datos_importacion[nombre_variable_qf] = int(iq_asignado) #numpy.ones(df_datos_importacion.shape[0],dtype=int)
             
-        st.dataframe(df_datos_importacion)
-
         # Realiza un control de calidad primario a los datos importados   
         datos_corregidos,textos_aviso   = FUNCIONES_PROCESADO.control_calidad(df_datos_importacion)  
 
         # Recupera el identificador del programa de muestreo
         id_programa,abreviatura_programa = FUNCIONES_PROCESADO.recupera_id_programa(programa_seleccionado,direccion_host,base_datos,usuario,contrasena,puerto)
-                        
-    
-        st.dataframe(datos_corregidos)
     
         with st.spinner('Asignando la estación y salida al mar de cada medida'):
             # Encuentra la estación asociada a cada registro
@@ -1690,6 +1685,8 @@ def entrada_datos_excel():
                                                                 
             # Encuentra las salidas al mar correspondientes  
             datos_corregidos = FUNCIONES_PROCESADO.evalua_salidas(datos_corregidos,id_programa,nombre_entrada,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos)
+     
+        st.dataframe(datos_corregidos)   
      
         # Encuentra el identificador asociado a cada registro
         with st.spinner('Asignando el registro correspondiente a cada medida'):
