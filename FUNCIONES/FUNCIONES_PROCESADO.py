@@ -567,7 +567,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     listado_salidas  = datos['id_salida'].unique()
     df_datos_salidas = tabla_muestreos[tabla_muestreos['salida_mar'].isin(listado_salidas)]
     
-
+    st.text('antes')
+    st.dataframe(datos)
+    st.text('despues')
             #datos.iloc[idato]
     
     listado_variables_datos   = datos.columns.tolist()
@@ -600,7 +602,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         # # añade el nombre del muestreo
         exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
         
-        st.dataframe(exporta_registros)
+
         
         for idato in range(exporta_registros.shape[0]):    
 
