@@ -462,7 +462,8 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                             conn.close()
                             
                         # Asigna el id de la salida al dataframe
-                        datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]['id_salida'] = id_salida
+                        #datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]['id_salida'] = id_salida
+                        datos.loc[datos['fecha_muestreo'] == fechas_salidas_mar[isalida], 'id_salida'] = id_salida
                             
                     st.dataframe(datos)                        
                     
