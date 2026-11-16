@@ -422,6 +422,8 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                         #df_temporal = tabla_salidas[tabla_salidas['fecha_salida']==fechas_partida[isalida]]
                         df_temporal = tabla_salidas[(tabla_salidas['fecha_salida']==fechas_partida[isalida]) & (tabla_salidas['programa']==id_programa)]
                 
+                        st.dataframe(df_temporal) 
+                
                         # Salida ya incluida en la base de datos. Recuperar identificador
                         if df_temporal.shape[0]>0:
                             id_salida = df_temporal['id_salida'].iloc[0]
