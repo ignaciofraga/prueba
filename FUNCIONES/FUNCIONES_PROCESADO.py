@@ -602,7 +602,9 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
 
         # Crea una columna para almacenar el numero de muestreo
-        exporta_registros['muestreo']     = numpy.zeros(datos.shape[0],dtype=int)
+        #exporta_registros['muestreo']     = numpy.zeros(datos.shape[0],dtype=int)
+        listado_id_muestreos     = []
+        listado_nombre_muestreos = []
         
         # renombra la columna con información de la estación muestreada
         exporta_registros                    = exporta_registros.rename(columns={"estacion":"nombre_estacion","id_estacion_temp":"estacion",'id_salida':'salida_mar','latitud':'latitud_muestreo','longitud':'longitud_muestreo'})
@@ -612,7 +614,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         # # añade el nombre del muestreo
         exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
         
-        st.dataframe(exporta_registros)
+        
         
         for idato in range(exporta_registros.shape[0]):    
          
@@ -636,12 +638,17 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 else:
                     nombre_muestreo = nombre_muestreo + '_P' + str(round(exporta_registros['presion_ctd'].iloc[idato])) 
                 
-            exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
+            #exporta_registros['nombre_muestreo'].iloc[idato]  = nombre_muestreo
 
-            exporta_registros['muestreo'].iloc[idato]                 = registro_inicial + idato + 1
-        
+            #exporta_registros['muestreo'].iloc[idato]                 = registro_inicial + idato + 1
+            listado_id_muestreos = listado_id_muestreos + [registro_inicial + idato + 1]
+            listado_nombre_muestreos = listado_nombre_muestreos + [nombre_muestreo]
+            
+        exporta_registros['muestreo'] = listado_id_muestreos
+        exporta_registros['nombre_muestreo'] = listado_nombre_muestreos
 
-        
+        st.dataframe(exporta_registros)        
+
         datos['muestreo'] = exporta_registros['muestreo']
                         
         # Inserta en base de datos
