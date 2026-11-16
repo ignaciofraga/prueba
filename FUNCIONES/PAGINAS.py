@@ -1692,6 +1692,8 @@ def entrada_datos_excel():
         with st.spinner('Asignando el registro correspondiente a cada medida'):
             datos_corregidos = FUNCIONES_PROCESADO.evalua_registros(datos_corregidos,abreviatura_programa,direccion_host,base_datos,usuario,contrasena,puerto,tabla_muestreos,tabla_estaciones,tabla_variables)
 
+
+        st.dataframe(datos_corregidos)
             
         # Añade datos físicos
         if len(variables_discretas)>0:
