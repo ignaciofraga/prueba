@@ -340,7 +340,8 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                     conn.close()
                     
                 # Asigna el id de la salida al dataframe
-                datos[datos['fecha_muestreo']==dias_salida_mar[idia]]['id_salida'] = id_salida
+                #datos[datos['fecha_muestreo']==dias_salida_mar[idia]]['id_salida'] = id_salida
+                datos.loc[datos['fecha_muestreo'] == dias_salida_mar[idia], 'id_salida'] = id_salida
             
             
             
@@ -398,7 +399,8 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                     conn.close()
                     
                 # Asigna el id de la salida al dataframe
-                datos['id_salida'][datos['año']==anhos_salida_mar[ianho]] = id_salida
+                #datos['id_salida'][datos['año']==anhos_salida_mar[ianho]] = id_salida
+                datos.loc[datos['año'] == anhos_salida_mar[ianho], 'id_salida'] = id_salida
         
                 
         if tipo_salida == 'MENSUAL' or tipo_salida == 'SEMANAL' : # Programas radiales
@@ -420,9 +422,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
             
                         #df_temporal = tabla_salidas[tabla_salidas['fecha_salida']==fechas_partida[isalida]]
                         df_temporal = tabla_salidas[(tabla_salidas['fecha_salida']==fechas_partida[isalida]) & (tabla_salidas['programa']==id_programa)]
-                
-                        st.dataframe(df_temporal) 
-                
+                                
                         # Salida ya incluida en la base de datos. Recuperar identificador
                         if df_temporal.shape[0]>0:
                             id_salida = df_temporal['id_salida'].iloc[0]
@@ -465,7 +465,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                         #datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]['id_salida'] = id_salida
                         datos.loc[datos['fecha_muestreo'] == fechas_salidas_mar[isalida], 'id_salida'] = id_salida
                             
-                    st.dataframe(datos)                        
+                      
                     
                     
                 if id_programa == 4: # PROGRAMA RADIALES CANTABRICO. busco las salidas por meses únicos (salidas de más de 1 día, no vale criterio anterior)
@@ -558,8 +558,9 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                             conn.close()
                             
                         # Asigna el id de la salida al dataframe
-                        datos['id_salida'][(datos['fecha_muestreo']>=fechas_partida[isalida]) & (datos['fecha_muestreo']<=fechas_regreso[isalida])]  = id_salida
-  
+                        #datos['id_salida'][(datos['fecha_muestreo']>=fechas_partida[isalida]) & (datos['fecha_muestreo']<=fechas_regreso[isalida])]  = id_salida
+                        datos.loc[(datos['fecha_muestreo']>=fechas_partida[isalida]) & (datos['fecha_muestreo']<=fechas_regreso[isalida]), 'id_salida'] = id_salida
+    
     return datos
 
 
@@ -697,7 +698,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
                     df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['presion_ctd_comparacion']== round(datos['presion_ctd'].iloc[idato]))]
               
-
+                st.dataframe(df_temp)
             
               
             # Bucle para insertar identificadores de muestreos (vial nutrientes/TOC)
