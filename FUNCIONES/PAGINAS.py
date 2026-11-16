@@ -1220,9 +1220,12 @@ def procesado_nutrientes():
     with col2:
         
         df_prog_sel               = df_salidas[df_salidas['programa']==indice_programa]
+        listado_anhos             = []
         df_prog_sel['año']        = None
         for idato in range(df_prog_sel.shape[0]):
-            df_prog_sel['año'].iloc[idato] = (df_prog_sel['fecha_salida'].iloc[idato]).year
+            listado_anhos = listado_anhos + [df_prog_sel['fecha_salida'].iloc[idato].year]
+        
+        df_prog_sel['año']        = listado_anhos
         df_prog_sel               = df_prog_sel.sort_values('año',ascending=False)
 
         st.dataframe(df_prog_sel)        
