@@ -612,7 +612,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         # # añade el nombre del muestreo
         exporta_registros['nombre_muestreo'] = [None]*exporta_registros.shape[0]
         
-
+        st.dataframe(exporta_registros)
         
         for idato in range(exporta_registros.shape[0]):    
          
