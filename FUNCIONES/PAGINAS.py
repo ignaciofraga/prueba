@@ -1225,7 +1225,8 @@ def procesado_nutrientes():
             df_prog_sel['año'].iloc[idato] = (df_prog_sel['fecha_salida'].iloc[idato]).year
         df_prog_sel               = df_prog_sel.sort_values('año',ascending=False)
 
-        
+        st.dataframe(df_prog_sel)        
+
         anhos_disponibles         = df_prog_sel['año'].unique()
         anho_seleccionado         = st.selectbox('Año',(anhos_disponibles))
     
