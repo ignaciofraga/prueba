@@ -265,8 +265,8 @@ def evalua_estaciones(datos,id_programa,direccion_host,base_datos,usuario,contra
 
 def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,base_datos,usuario,contrasena,puerto,tabla_estaciones,tabla_salidas,tabla_muestreos):
 
-    #datos['id_salida']  = numpy.zeros(datos.shape[0],dtype=int)
-    datos['id_salida']  = None
+    datos['id_salida']  = numpy.zeros(datos.shape[0],dtype=int)
+    #datos['id_salida']  = None
     
     # Contadores e identificadores 
     if tabla_salidas['id_salida'].shape[0]>0:
@@ -340,7 +340,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                     conn.close()
                     
                 # Asigna el id de la salida al dataframe
-                datos['id_salida'][datos['fecha_muestreo']==dias_salida_mar[idia]] = id_salida
+                datos[datos['fecha_muestreo']==dias_salida_mar[idia]]['id_salida'] = id_salida
             
             
             
@@ -462,7 +462,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                             conn.close()
                             
                         # Asigna el id de la salida al dataframe
-                        datos['id_salida'][datos['fecha_muestreo']==fechas_salidas_mar[isalida]] = id_salida
+                        datos[datos['fecha_muestreo']==fechas_salidas_mar[isalida]]['id_salida'] = id_salida
                             
                     st.dataframe(datos)                        
                     
