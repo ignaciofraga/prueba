@@ -414,8 +414,6 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                     fechas_partida     = fechas_salidas_mar
                     fechas_regreso     = fechas_salidas_mar
                    
-                    import streamlit as st
-                    st.dataframe(fechas_salidas_mar) 
                    
                     for isalida in range(len(fechas_partida)):            
             
@@ -465,7 +463,7 @@ def evalua_salidas(datos,id_programa,nombre_programa,tipo_salida,direccion_host,
                         # Asigna el id de la salida al dataframe
                         datos['id_salida'][datos['fecha_muestreo']==fechas_salidas_mar[isalida]] = id_salida
                             
-                        
+                    st.dataframe(datos)                        
                     
                     
                 if id_programa == 4: # PROGRAMA RADIALES CANTABRICO. busco las salidas por meses únicos (salidas de más de 1 día, no vale criterio anterior)
