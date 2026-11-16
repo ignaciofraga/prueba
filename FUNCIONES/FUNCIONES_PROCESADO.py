@@ -643,8 +643,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             
         exporta_registros['muestreo'] = listado_id_muestreos
         exporta_registros['nombre_muestreo'] = listado_nombre_muestreos
-
-        st.dataframe(exporta_registros)        
+      
 
         datos['muestreo'] = exporta_registros['muestreo']
                         
