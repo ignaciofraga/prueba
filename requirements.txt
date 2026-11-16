@@ -1,9 +1,8 @@
 matplotlib
 openpyxl
-streamlit>=1.28.0
-sqlalchemy>=2.0.0
+streamlit
+sqlalchemy
 xlsxwriter
 seawater
 pandas
 psycopg2-binary>=2.9.6
-libpq-dev
