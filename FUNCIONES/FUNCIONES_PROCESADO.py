@@ -640,7 +640,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
             exporta_registros['muestreo'].iloc[idato]                 = registro_inicial + idato + 1
         
-        st.dataframe(exporta_registros)
+
         
         datos['muestreo'] = exporta_registros['muestreo']
                         
