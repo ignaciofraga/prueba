@@ -964,6 +964,7 @@ def consulta_botellas():
                 df_exporta = df_exporta.rename(columns={listado_nombres_ref[ivariable]: listado_nombres_exporta[ivariable]}) 
     
     
+    
 
         ##### Añade las unidades de la variable en el cabecero si se selecciona esta opción #####
         if io_uds:
