@@ -623,8 +623,6 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             
             nombre_muestreo     = abreviatura_programa + '_' + exporta_registros['fecha_muestreo'].iloc[idato].strftime("%Y%m%d") + '_' + str(nombre_estacion)
             
-            
-            
             if 'num_cast' in listado_variables_datos and exporta_registros['num_cast'].iloc[idato] is not None:
                 nombre_muestreo = nombre_muestreo + '_C' + str(round(exporta_registros['num_cast'].iloc[idato]))
             else:
@@ -657,12 +655,17 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
     # En caso contrario hay que ver registro a registro, si ya está incluido en la base de datos
     else:
     
-        # predimensiona la columna con el identificador del muestreo
-        datos['muestreo']     = numpy.zeros(datos.shape[0],dtype=int)    
+        
+        listado_identificadores   = []
+        listado_io_nuevo_muestreo = []
+        
+        
+        ## predimensiona la columna con el identificador del muestreo
+        #datos['muestreo']     = numpy.zeros(datos.shape[0],dtype=int)    
     
         # Busca cuál es el último registro
         ultimo_registro_bd         = max(tabla_muestreos['muestreo'])
-        datos['io_nuevo_muestreo'] = numpy.ones(datos.shape[0],dtype=int)
+        #datos['io_nuevo_muestreo'] = numpy.ones(datos.shape[0],dtype=int)
 
         # Crea una nueva variable, con las presiones redondeadas a enteros. Así cuando se busquen registros se evitan problemas por distinto número de decimales en la profundidad
         df_datos_salidas['presion_ctd_comparacion'] = df_datos_salidas['presion_ctd'].apply(lambda x: round(x, 0))
@@ -672,10 +675,6 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             
 
         for idato in range(datos.shape[0]):
-            
-            
-
-            
             
             if 'nombre_muestreo' in listado_variables_datos and datos['nombre_muestreo'].iloc[idato] is not None: 
                 
@@ -707,8 +706,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
             # Bucle para insertar identificadores de muestreos (vial nutrientes/TOC)
             
             if df_temp.shape[0]> 0:
-                datos['muestreo'].iloc[idato]          = df_temp['muestreo'].iloc[0]    
-                datos['io_nuevo_muestreo'].iloc[idato] = 0
+                listado_identificadores          = listado_identificadores + [df_temp['muestreo'].iloc[0]]    
+                listado_io_nuevo_muestreo        = listado_io_nuevo_muestreo + [0]
                 
                 if 'id_externo' in listado_variables_datos and datos['id_externo'].iloc[idato] is not None:                     
                     instruccion_sql = 'UPDATE muestreos_discretos SET id_externo =%s WHERE muestreo = %s;'
@@ -717,12 +716,19 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                     conn.commit()
                                                     
             else:
-                datos['io_nuevo_muestreo'].iloc[idato] = 1
-                ultimo_registro_bd                     = ultimo_registro_bd + 1
-                datos['muestreo'].iloc[idato]          = ultimo_registro_bd 
+                
+                   
+                ultimo_registro_bd               = ultimo_registro_bd + 1
+                listado_identificadores          = listado_identificadores + [ultimo_registro_bd] 
+                listado_io_nuevo_muestreo        = listado_io_nuevo_muestreo + [1]
+                
+        datos['io_nuevo_muestreo'] = listado_io_nuevo_muestreo
+        datos['muestreo']          = listado_identificadores 
             
         cursor.close()
         conn.close()
+        
+        st.dataframe(datos)
            
         # Elimina la columna con el redondeo de profundidades
         df_datos_salidas = df_datos_salidas.drop(columns=['presion_ctd_comparacion'])
