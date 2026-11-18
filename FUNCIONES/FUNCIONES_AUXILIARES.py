@@ -541,12 +541,19 @@ def consulta_botellas():
         df_salidas_seleccion.set_index('id_temp',drop=True,append=False,inplace=True)
         
         # Define los años con salidas asociadas
-        df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
-        for idato in range(df_salidas_seleccion.shape[0]):
-            df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
-        df_salidas_seleccion       = df_salidas_seleccion.sort_values('fecha_salida')
+        #df_salidas_seleccion['año'] = numpy.zeros(df_salidas_seleccion.shape[0],dtype=int)
         
-        listado_anhos              = df_salidas_seleccion['año'].unique()
+        listado_anhos_fechas = []
+        
+        for idato in range(df_salidas_seleccion.shape[0]):
+            
+            listado_anhos_fechas = listado_anhos_fechas + [df_salidas_seleccion['fecha_salida'][idato].year ]
+            #df_salidas_seleccion['año'][idato] = df_salidas_seleccion['fecha_salida'][idato].year 
+        
+        df_salidas_seleccion['año'] = listado_anhos_fechas
+        df_salidas_seleccion        = df_salidas_seleccion.sort_values('fecha_salida')
+        
+        listado_anhos               = df_salidas_seleccion['año'].unique()
     
     with col2:
         anho_seleccionado           = st.selectbox('Año',(listado_anhos),index=len(listado_anhos)-1)
