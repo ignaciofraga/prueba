@@ -1661,16 +1661,7 @@ def entrada_datos_excel():
                 texto_aviso = "Los datos importados no contienen longitud. Se asignará la correspondiente a la estación."
                 st.warning(texto_aviso, icon="⚠️")
             
-            
-            
-        # Si los datos incluyen informacion del tubo de nutrientes, cambiar el nombre a texto 
-        if 'tubo_nutrientes' in variables_discretas:
-            for idato in range(df_datos_importacion.shape[0]):
-                try:
-                    df_datos_importacion['tubo_nutrientes'].iloc[idato] = str(int(df_datos_importacion['tubo_nutrientes'].iloc[idato]))
-                except:
-                    pass
-                
+                            
         # Añade un qf de 1 (no evaluado) a las variables subidas que no tienen un índice de calidad asignado
         for ivariable in range(len(variables_discretas)):
             nombre_variable_qf = variables_discretas[ivariable] + '_qf'

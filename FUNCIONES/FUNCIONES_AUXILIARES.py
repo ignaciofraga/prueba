@@ -806,8 +806,7 @@ def consulta_botellas():
             listado_variables_unificadas = listado_variables_unificadas + ['nombre_estacion']
             
             listado_variables_listadas = []
-            if 'tubo_nutrientes' in listado_variables_datos:
-                listado_variables_listadas = listado_variables_listadas + ['tubo_nutrientes']                
+             
             listado_variables_listadas = listado_variables_listadas + ['botella']             
                                   
             listado_variables_qf        = [i for i in listado_variables_datos if '_qf' in i]
@@ -965,6 +964,7 @@ def consulta_botellas():
     
     
     
+    
 
         ##### Añade las unidades de la variable en el cabecero si se selecciona esta opción #####
         if io_uds:
@@ -973,9 +973,6 @@ def consulta_botellas():
             listado_variables_datos = df_exporta.columns.tolist()
             for ivariable in range(len(listado_nombres_exporta)):
                 if listado_nombres_exporta[ivariable] in listado_variables_datos and listado_unidades[ivariable] is not None:
-                    
-                    st.text(listado_nombres_exporta[ivariable])
-                    st.text(listado_unidades[ivariable])
                     nombre_sust = listado_nombres_exporta[ivariable] + '(' + listado_unidades[ivariable] + ')'
                     df_exporta  = df_exporta.rename(columns={listado_nombres_exporta[ivariable]: nombre_sust}) 
     
