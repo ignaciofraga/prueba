@@ -831,6 +831,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     cursor = conn.cursor()
     
     # Copia temporal de la tabla con los datos a importar, para no perder los datos si hay un fallo en la carga.
+    tabla_datos = 'test'
     tabla_temporal = 'test_temporal'
     
     instruccion_sql = "DROP TABLE IF EXISTS " + tabla_temporal + ";"
@@ -844,7 +845,26 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     cursor.close()
     conn.close() 
 
+
+    # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor()
+    instruccion_sql = "TRUNCATE " + tabla_datos + ";"
+    cursor.execute(instruccion_sql)
+    conn.commit()
+    cursor.close()
+    conn.close() 
     
+  
+    # Inserta el dataframe con los datos anteriores y nuevos en la base de datos 
+    conn_psql          = create_engine(con_engine)
+    df_test.to_sql('test', conn_psql,if_exists='append')
+    conn_psql.dispose()   
+                
+    # Texto con el resultado de la insercion
+    texto_insercion = 'Datos insertados correctamente'    
+
+
     
     
     
