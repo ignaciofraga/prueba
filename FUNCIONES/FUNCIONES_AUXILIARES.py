@@ -968,6 +968,7 @@ def consulta_botellas():
 
         ##### Añade las unidades de la variable en el cabecero si se selecciona esta opción #####
         if io_uds:
+            variables_bd = variables_bd.replace({numpy.nan: None})
             listado_unidades        = variables_bd['unidades'].tolist()
             listado_variables_datos = df_exporta.columns.tolist()
             for ivariable in range(len(listado_nombres_exporta)):
