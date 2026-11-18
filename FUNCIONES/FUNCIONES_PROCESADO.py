@@ -674,6 +674,8 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         cursor = conn.cursor()
             
 
+        st.dataframe(datos)
+
         for idato in range(datos.shape[0]):
             
             if 'nombre_muestreo' in listado_variables_datos and datos['nombre_muestreo'].iloc[idato] is not None: 
