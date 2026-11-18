@@ -674,8 +674,6 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         cursor = conn.cursor()
             
 
-        st.dataframe(datos)
-
         for idato in range(datos.shape[0]):
             
             if 'nombre_muestreo' in listado_variables_datos and datos['nombre_muestreo'].iloc[idato] is not None: 
@@ -730,9 +728,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         
         cursor.close()
         conn.close()
-        
-        st.dataframe(datos)
-           
+                   
         # Elimina la columna con el redondeo de profundidades
         df_datos_salidas = df_datos_salidas.drop(columns=['presion_ctd_comparacion'])
 
@@ -860,6 +856,8 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
             
                 tabla_registros = pandas.concat([tabla_registros, df_add]) # Combino ambos dataframes
                                  
+            st.dataframe(df_temp)
+        
         tabla_registros.set_index(puntero,drop=True,append=False,inplace=True)
                 
         ##### INSERCION DE DATOS ######
