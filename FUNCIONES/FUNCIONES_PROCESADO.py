@@ -858,9 +858,11 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
             
                 tabla_registros = pandas.concat([tabla_registros, df_add]) # Combino ambos dataframes
                                  
-            st.dataframe(df_temp)
+            
         
         tabla_registros.set_index(puntero,drop=True,append=False,inplace=True)
+        
+        st.dataframe(tabla_registros)
                 
         ##### INSERCION DE DATOS ######
         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
