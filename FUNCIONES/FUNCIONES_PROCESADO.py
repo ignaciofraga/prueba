@@ -702,7 +702,6 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
 
                     df_temp = df_datos_salidas[(df_datos_salidas['estacion']==datos['id_estacion_temp'].iloc[idato]) & (df_datos_salidas['fecha_muestreo']==fecha_comparacion) & (df_datos_salidas['presion_ctd_comparacion']== round(datos['presion_ctd'].iloc[idato]))]
               
-                st.dataframe(df_temp)
             
               
             # Bucle para insertar identificadores de muestreos (vial nutrientes/TOC)
