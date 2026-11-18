@@ -714,7 +714,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
                 if 'id_externo' in listado_variables_datos and datos['id_externo'].iloc[idato] is not None:                     
                     instruccion_sql = 'UPDATE muestreos_discretos SET id_externo =%s WHERE muestreo = %s;'
                     
-                    cursor.execute(instruccion_sql, (datos['id_externo'].iloc[idato],int(datos['muestreo'].iloc[idato])))
+                    cursor.execute(instruccion_sql, (datos['id_externo'].iloc[idato],int(df_temp['muestreo'].iloc[0])))
                     conn.commit()
                                                     
             else:
