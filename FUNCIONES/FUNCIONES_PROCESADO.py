@@ -725,6 +725,7 @@ def evalua_registros(datos,abreviatura_programa,direccion_host,base_datos,usuari
         datos['io_nuevo_muestreo'] = listado_io_nuevo_muestreo
         datos['muestreo']          = listado_identificadores 
             
+        
         cursor.close()
         conn.close()
         
