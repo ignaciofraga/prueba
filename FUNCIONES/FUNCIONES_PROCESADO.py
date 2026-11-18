@@ -823,9 +823,29 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     df_test['valores'] = [7,9,2]
     df_test['indices'] = [2,2,2]
     
-    conn_psql          = create_engine(con_engine)
-    df_test.to_sql('test', conn_psql,if_exists='append')
-    conn_psql.dispose()       
+    # conn_psql          = create_engine(con_engine)
+    # df_test.to_sql('test', conn_psql,if_exists='append')
+    # conn_psql.dispose()       
+    
+    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    cursor = conn.cursor()
+    
+    # Copia temporal de la tabla con los datos a importar, para no perder los datos si hay un fallo en la carga.
+    tabla_temporal = 'test_temporal'
+    
+    instruccion_sql = "DROP TABLE IF EXISTS " + tabla_temporal + ";"
+    cursor.execute(instruccion_sql)
+    conn.commit()
+
+    instruccion_sql = "CREATE TABLE " + tabla_temporal + "  AS TABLE " + tabla_datos + ";"        
+    cursor.execute(instruccion_sql)
+    conn.commit()
+            
+    cursor.close()
+    conn.close() 
+
+    
+    
     
     
     #####
