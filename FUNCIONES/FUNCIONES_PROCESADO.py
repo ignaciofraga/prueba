@@ -816,6 +816,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     listado_adicional         = [puntero] + listado_variables_comunes
     
     #####
+    
     texto_insercion = 'Hola.'
     df_test = pandas.DataFrame()
     df_test['valores'] = [7,9,2]
