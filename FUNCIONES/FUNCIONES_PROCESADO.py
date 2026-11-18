@@ -823,7 +823,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     df_test['indices'] = [2,2,2]
     
     conn_psql          = create_engine(con_engine)
-    datos_insercion.to_sql(df_test, conn_psql,if_exists='append')
+    df_test.to_sql('test', conn_psql,if_exists='append')
     conn_psql.dispose()       
     
     
