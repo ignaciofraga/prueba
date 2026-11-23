@@ -950,19 +950,10 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
         listado_variables_datos = list(tabla_registros)
         for ivariable in range(len(listado_variables_datos)):
             if listado_nulos.iloc[ivariable] < tabla_registros.shape[0]:
-                st.text('SI')
-                st.text(listado_variables_datos[ivariable])
                 listado_variable_insercion = listado_variable_insercion + [listado_variables_datos[ivariable]]
-            else:
-                st.text('NO')
-                st.text(listado_variables_datos[ivariable])
-                
-                
-                
-                
+       
         # Mantén el df con las columnas que tienen datos
         tabla_recortada = tabla_registros[listado_variable_insercion]
-        st.dataframe(tabla_recortada)
             
         try:
     
@@ -978,7 +969,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
       
             # Inserta el dataframe con los datos anteriores y nuevos en la base de datos 
             conn_psql          = create_engine(con_engine)
-            tabla_registros.to_sql(tabla_datos, conn_psql,if_exists='append')
+            tabla_recortada.to_sql(tabla_datos, conn_psql,if_exists='append')
             conn_psql.dispose() 
                         
             # Texto con el resultado de la insercion
