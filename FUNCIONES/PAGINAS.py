@@ -1331,6 +1331,9 @@ def procesado_nutrientes():
             ref_final         = datos_referencias['Peak Number'].iloc[1] - 2
                             
             # Encuentra la salinidad de cada muestra
+            
+            st.dataframe(df_datos_disponibles)
+            
             datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
             datos_AA['io_procesado']  = None
             for idato in range(ref_inicial,ref_final):
