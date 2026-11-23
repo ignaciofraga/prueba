@@ -937,6 +937,7 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
         cursor.close()
         conn.close() 
 
+
         # listado_variable_insercion = []
         # listado_variables_datos = list(tabla_registros)
         # for ivariable in range(len(listado_variables_datos)):
