@@ -937,38 +937,45 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
         cursor.close()
         conn.close() 
 
-        #try:
+        # listado_variable_insercion = []
+        # listado_variables_datos = list(tabla_registros)
+        # for ivariable in range(len(listado_variables_datos)):
+        # df[df['column_name'].notna()]
+
+        tabla_registros = tabla_registros.replace({numpy.nan: None})
+
+        try:
     
-        # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
-        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        cursor = conn.cursor()
-        instruccion_sql = "TRUNCATE " + tabla_datos + ";"
-        cursor.execute(instruccion_sql)
-        conn.commit()
-        cursor.close()
-        conn.close() 
-        
-  
-        # Inserta el dataframe con los datos anteriores y nuevos en la base de datos 
-        conn_psql          = create_engine(con_engine)
-        tabla_registros.to_sql(tabla_datos, conn_psql,if_exists='append')
-        conn_psql.dispose() 
-                    
-        # Texto con el resultado de la insercion
-        texto_insercion = 'Datos insertados correctamente'
+            # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()
+            instruccion_sql = "TRUNCATE " + tabla_datos + ";"
+            cursor.execute(instruccion_sql)
+            conn.commit()
+            cursor.close()
+            conn.close() 
             
-        # except:
+      
+            # Inserta el dataframe con los datos anteriores y nuevos en la base de datos 
+            conn_psql          = create_engine(con_engine)
+            tabla_registros.to_sql(tabla_datos, conn_psql,if_exists='append')
+            conn_psql.dispose() 
+                        
+            # Texto con el resultado de la insercion
+            texto_insercion = 'Datos insertados correctamente'
             
-        #     # En caso de fallo, vuelve a copiar la información de la tabla temporal a la original, para no perder informacion
-        #     instruccion_sql = "INSERT INTO " + tabla_datos + " SELECT * FROM "  + tabla_temporal +";"
-        #     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-        #     cursor = conn.cursor()
-        #     cursor.execute(instruccion_sql)
-        #     conn.commit()
-        #     cursor.close()
-        #     conn.close() 
+        except:
             
-        #     texto_insercion = 'Error en la carga de datos.'
+            # En caso de fallo, vuelve a copiar la información de la tabla temporal a la original, para no perder informacion
+            instruccion_sql = "INSERT INTO " + tabla_datos + " SELECT * FROM "  + tabla_temporal +";"
+            conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+            cursor = conn.cursor()
+            cursor.execute(instruccion_sql)
+            conn.commit()
+            cursor.close()
+            conn.close() 
+            
+            texto_insercion = 'Error en la carga de datos.'
             
     return texto_insercion
   
