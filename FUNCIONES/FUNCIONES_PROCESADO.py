@@ -945,6 +945,25 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
 
         tabla_registros = tabla_registros.replace({numpy.nan: None})
 
+        listado_nulos = tabla_registros.isnull().sum()
+        listado_variable_insercion = []
+        listado_variables_datos = list(tabla_registros)
+        for ivariable in range(len(listado_variables_datos)):
+            if listado_nulos.iloc[ivariable] < tabla_registros.shape[0]:
+                st.text('SI')
+                st.text(listado_variables_datos[ivariable])
+                listado_variable_insercion = listado_variable_insercion + [listado_variables_datos[ivariable]]
+            else:
+                st.text('NO')
+                st.text(listado_variables_datos[ivariable])
+                
+                
+                
+                
+        # Mantén el df con las columnas que tienen datos
+        tabla_recortada = tabla_registros[listado_variable_insercion]
+        st.dataframe(tabla_recortada)
+            
         try:
     
             # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
