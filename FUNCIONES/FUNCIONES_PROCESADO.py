@@ -815,54 +815,54 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     listado_variables_comunes = list(set(listado_variables_datos).intersection(variables_bd))
     listado_adicional         = [puntero] + listado_variables_comunes
     
-    #####
+    # #####
     
     
-    texto_insercion = 'Hola.'
-    df_test = pandas.DataFrame()
-    df_test['valores'] = [7,9,2]
-    df_test['indices'] = [2,2,2]
+    # texto_insercion = 'Hola.'
+    # df_test = pandas.DataFrame()
+    # df_test['valores'] = [7,9,2]
+    # df_test['indices'] = [2,2,2]
     
+    # # conn_psql          = create_engine(con_engine)
+    # # df_test.to_sql('test', conn_psql,if_exists='append')
+    # # conn_psql.dispose()       
+    
+    # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    # cursor = conn.cursor()
+    
+    # # Copia temporal de la tabla con los datos a importar, para no perder los datos si hay un fallo en la carga.
+    # tabla_datos = 'test'
+    # tabla_temporal = 'test_temporal'
+    
+    # instruccion_sql = "DROP TABLE IF EXISTS " + tabla_temporal + ";"
+    # cursor.execute(instruccion_sql)
+    # conn.commit()
+
+    # instruccion_sql = "CREATE TABLE " + tabla_temporal + "  AS TABLE " + tabla_datos + ";"        
+    # cursor.execute(instruccion_sql)
+    # conn.commit()
+            
+    # cursor.close()
+    # conn.close() 
+
+
+    # # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+    # conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+    # cursor = conn.cursor()
+    # instruccion_sql = "TRUNCATE " + tabla_datos + ";"
+    # cursor.execute(instruccion_sql)
+    # conn.commit()
+    # cursor.close()
+    # conn.close() 
+    
+  
+    # # Inserta el dataframe con los datos anteriores y nuevos en la base de datos 
     # conn_psql          = create_engine(con_engine)
     # df_test.to_sql('test', conn_psql,if_exists='append')
-    # conn_psql.dispose()       
-    
-    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    cursor = conn.cursor()
-    
-    # Copia temporal de la tabla con los datos a importar, para no perder los datos si hay un fallo en la carga.
-    tabla_datos = 'test'
-    tabla_temporal = 'test_temporal'
-    
-    instruccion_sql = "DROP TABLE IF EXISTS " + tabla_temporal + ";"
-    cursor.execute(instruccion_sql)
-    conn.commit()
-
-    instruccion_sql = "CREATE TABLE " + tabla_temporal + "  AS TABLE " + tabla_datos + ";"        
-    cursor.execute(instruccion_sql)
-    conn.commit()
-            
-    cursor.close()
-    conn.close() 
-
-
-    # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
-    conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    cursor = conn.cursor()
-    instruccion_sql = "TRUNCATE " + tabla_datos + ";"
-    cursor.execute(instruccion_sql)
-    conn.commit()
-    cursor.close()
-    conn.close() 
-    
-  
-    # Inserta el dataframe con los datos anteriores y nuevos en la base de datos 
-    conn_psql          = create_engine(con_engine)
-    df_test.to_sql('test', conn_psql,if_exists='append')
-    conn_psql.dispose()   
+    # conn_psql.dispose()   
                 
-    # Texto con el resultado de la insercion
-    texto_insercion = 'Datos insertados correctamente'    
+    # # Texto con el resultado de la insercion
+    # texto_insercion = 'Datos insertados correctamente'    
 
 
     
@@ -870,105 +870,105 @@ def inserta_datos(datos_insercion,tipo_datos,direccion_host,base_datos,usuario,c
     
     #####
 
-    # # Genera una tabla con los datos disponibles de las salidas a insertar (para agilizar la comparación entre datos nuevos y disponibles)
-    # if 'id_salida' in listado_variables_datos:
-    #     listado_salidas            = datos_insercion['id_salida'].unique()
-    #     df_muestreos_seleccionados = tabla_muestreos[tabla_muestreos['salida_mar'].isin(listado_salidas)]
-    #     tabla_datos_previos        = pandas.merge(tabla_registros, df_muestreos_seleccionados, on=puntero)
-    # else:
-    #     tabla_datos_previos        = pandas.merge(tabla_registros, tabla_muestreos, on=puntero)
+    # Genera una tabla con los datos disponibles de las salidas a insertar (para agilizar la comparación entre datos nuevos y disponibles)
+    if 'id_salida' in listado_variables_datos:
+        listado_salidas            = datos_insercion['id_salida'].unique()
+        df_muestreos_seleccionados = tabla_muestreos[tabla_muestreos['salida_mar'].isin(listado_salidas)]
+        tabla_datos_previos        = pandas.merge(tabla_registros, df_muestreos_seleccionados, on=puntero)
+    else:
+        tabla_datos_previos        = pandas.merge(tabla_registros, tabla_muestreos, on=puntero)
             
-    # # Si la tabla en la que se cargan los datos no contiene ningún registro, introducir todos los datos disponibles
-    # if tabla_datos_previos.shape[0] == 0:
+    # Si la tabla en la que se cargan los datos no contiene ningún registro, introducir todos los datos disponibles
+    if tabla_datos_previos.shape[0] == 0:
         
-    #     datos_insercion = datos_insercion[listado_adicional]
+        datos_insercion = datos_insercion[listado_adicional]
         
-    #     datos_insercion.set_index(puntero,drop=True,append=False,inplace=True)
-    #     conn_psql          = create_engine(con_engine)
-    #     datos_insercion.to_sql(tabla_datos, conn_psql,if_exists='append')
-    #     conn_psql.dispose()       
+        datos_insercion.set_index(puntero,drop=True,append=False,inplace=True)
+        conn_psql          = create_engine(con_engine)
+        datos_insercion.to_sql(tabla_datos, conn_psql,if_exists='append')
+        conn_psql.dispose()       
         
-    #     texto_insercion = 'Datos insertados correctamente'
+        texto_insercion = 'Datos insertados correctamente'
         
-    # # En caso contrario, buscar si los datos a añadir corresponden a muestreos que ya estan en la base de datos para incorporar solo la nueva informacion y no perder la disponible 
-    # else: 
+    # En caso contrario, buscar si los datos a añadir corresponden a muestreos que ya estan en la base de datos para incorporar solo la nueva informacion y no perder la disponible 
+    else: 
                     
-    #     for idato in range(datos_insercion.shape[0]): # Dataframe con la interseccion de los datos nuevos y los disponibles en la base de datos, a partir de la variable muestreo
+        for idato in range(datos_insercion.shape[0]): # Dataframe con la interseccion de los datos nuevos y los disponibles en la base de datos, a partir de la variable muestreo
                              
-    #         df_temp  = tabla_datos_previos[(tabla_datos_previos[puntero]==datos_insercion[puntero].iloc[idato])] 
+            df_temp  = tabla_datos_previos[(tabla_datos_previos[puntero]==datos_insercion[puntero].iloc[idato])] 
             
-    #         if df_temp.shape[0]>0:  # Muestreo ya incluido en la base de datos
+            if df_temp.shape[0]>0:  # Muestreo ya incluido en la base de datos
             
-    #             muestreo = df_temp[puntero].iloc[0]
+                muestreo = df_temp[puntero].iloc[0]
                                 
-    #             for ivariable in range(len(listado_variables_comunes)): # Reemplazar las variables disponibles en el muestreo correspondiente
+                for ivariable in range(len(listado_variables_comunes)): # Reemplazar las variables disponibles en el muestreo correspondiente
                         
-    #                 tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]].iloc[idato]
+                    tabla_registros[listado_variables_comunes[ivariable]][tabla_registros[puntero]==int(muestreo)] = datos_insercion[listado_variables_comunes[ivariable]].iloc[idato]
 
-    #         else: # Nuevo muestreo
+            else: # Nuevo muestreo
                        
-    #             df_add = datos_insercion[datos_insercion[puntero]==datos_insercion[puntero].iloc[idato]] # Genero un dataframe con cada línea de datos a añadir
+                df_add = datos_insercion[datos_insercion[puntero]==datos_insercion[puntero].iloc[idato]] # Genero un dataframe con cada línea de datos a añadir
   
-    #             df_add = df_add[listado_adicional] # Recorto para que tenga sólo las variables a añadir
+                df_add = df_add[listado_adicional] # Recorto para que tenga sólo las variables a añadir
             
-    #             tabla_registros = pandas.concat([tabla_registros, df_add]) # Combino ambos dataframes
+                tabla_registros = pandas.concat([tabla_registros, df_add]) # Combino ambos dataframes
                                  
             
         
-    #     tabla_registros.set_index(puntero,drop=True,append=False,inplace=True)
+        tabla_registros.set_index(puntero,drop=True,append=False,inplace=True)
         
-    #     st.dataframe(tabla_registros)
+        st.dataframe(tabla_registros)
                 
-    #     ##### INSERCION DE DATOS ######
-    #     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    #     cursor = conn.cursor()
+        ##### INSERCION DE DATOS ######
+        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        cursor = conn.cursor()
         
-    #     # Copia temporal de la tabla con los datos a importar, para no perder los datos si hay un fallo en la carga.
-    #     tabla_temporal = tabla_datos + '_temporal'
+        # Copia temporal de la tabla con los datos a importar, para no perder los datos si hay un fallo en la carga.
+        tabla_temporal = tabla_datos + '_temporal'
         
-    #     instruccion_sql = "DROP TABLE IF EXISTS " + tabla_temporal + ";"
-    #     cursor.execute(instruccion_sql)
-    #     conn.commit()
+        instruccion_sql = "DROP TABLE IF EXISTS " + tabla_temporal + ";"
+        cursor.execute(instruccion_sql)
+        conn.commit()
 
-    #     instruccion_sql = "CREATE TABLE " + tabla_temporal + "  AS TABLE " + tabla_datos + ";"        
-    #     cursor.execute(instruccion_sql)
-    #     conn.commit()
+        instruccion_sql = "CREATE TABLE " + tabla_temporal + "  AS TABLE " + tabla_datos + ";"        
+        cursor.execute(instruccion_sql)
+        conn.commit()
                 
-    #     cursor.close()
-    #     conn.close() 
+        cursor.close()
+        conn.close() 
 
-    #     try:
+        #try:
     
-    #         # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
-    #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    #         cursor = conn.cursor()
-    #         instruccion_sql = "TRUNCATE " + tabla_datos + ";"
-    #         cursor.execute(instruccion_sql)
-    #         conn.commit()
-    #         cursor.close()
-    #         conn.close() 
+        # borra los registros existentes en la tabla (no la tabla en sí, para no perder tipos de datos y referencias)
+        conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        cursor = conn.cursor()
+        instruccion_sql = "TRUNCATE " + tabla_datos + ";"
+        cursor.execute(instruccion_sql)
+        conn.commit()
+        cursor.close()
+        conn.close() 
+        
+  
+        # Inserta el dataframe con los datos anteriores y nuevos en la base de datos 
+        conn_psql          = create_engine(con_engine)
+        tabla_registros.to_sql(tabla_datos, conn_psql,if_exists='append')
+        conn_psql.dispose() 
+                    
+        # Texto con el resultado de la insercion
+        texto_insercion = 'Datos insertados correctamente'
             
-      
-    #         # Inserta el dataframe con los datos anteriores y nuevos en la base de datos 
-    #         conn_psql          = create_engine(con_engine)
-    #         tabla_registros.to_sql(tabla_datos, conn_psql,if_exists='append')
-    #         conn_psql.dispose() 
-                        
-    #         # Texto con el resultado de la insercion
-    #         texto_insercion = 'Datos insertados correctamente'
+        # except:
             
-    #     except:
+        #     # En caso de fallo, vuelve a copiar la información de la tabla temporal a la original, para no perder informacion
+        #     instruccion_sql = "INSERT INTO " + tabla_datos + " SELECT * FROM "  + tabla_temporal +";"
+        #     conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+        #     cursor = conn.cursor()
+        #     cursor.execute(instruccion_sql)
+        #     conn.commit()
+        #     cursor.close()
+        #     conn.close() 
             
-    #         # En caso de fallo, vuelve a copiar la información de la tabla temporal a la original, para no perder informacion
-    #         instruccion_sql = "INSERT INTO " + tabla_datos + " SELECT * FROM "  + tabla_temporal +";"
-    #         conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
-    #         cursor = conn.cursor()
-    #         cursor.execute(instruccion_sql)
-    #         conn.commit()
-    #         cursor.close()
-    #         conn.close() 
-            
-    #         texto_insercion = 'Error en la carga de datos.'
+        #     texto_insercion = 'Error en la carga de datos.'
             
     return texto_insercion
   
