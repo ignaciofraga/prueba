@@ -1330,12 +1330,15 @@ def procesado_nutrientes():
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
             ref_final         = datos_referencias['Peak Number'].iloc[1] - 2
                             
-            # Encuentra la salinidad de cada muestra
-            
-            st.dataframe(df_datos_disponibles)
-            
+            # Encuentra la salinidad de cada muestra          
             datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
             datos_AA['io_procesado']  = None
+            
+            # listado_salinidades       = [1]*len(datos_AA.shape[0])
+            # listado_io_procesado      = [None]*len(datos_AA.shape[0])
+            
+            st.dataframe(datos_AA)
+            
             for idato in range(ref_inicial,ref_final):
                 
                 if datos_AA['Cup Type'].iloc[idato] == 'SAMP':
