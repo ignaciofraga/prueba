@@ -1349,7 +1349,7 @@ def procesado_nutrientes():
                 
                     if len(id_temp) > 0:
                         
-                        listado_salinidades[idato]            = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
+                        listado_salinidades[idato]            = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]].iloc[0]
                         listado_io_procesado[idato]           = 1
                         
                         #datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
