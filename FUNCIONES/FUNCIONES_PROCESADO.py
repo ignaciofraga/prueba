@@ -1648,7 +1648,7 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
             for idato in range(datos_entrada.shape[0]):
                 
                 listado_rendimientos_nitrato[idato] = (datos_entrada['nitrogeno_inorganico_total'].iloc[idato]*factor - datos_entrada['nitrito'].iloc[idato])/(rendimiento_columna/100) 
-                listado_rendimientos_ton[idato]     = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['nitrito'].iloc[idato]                
+                listado_rendimientos_ton[idato]     = listado_rendimientos_nitrato[idato] + datos_entrada['nitrito'].iloc[idato]                
                 
             
             datos_entrada['nitrato_rendimiento'] = listado_rendimientos_nitrato 
