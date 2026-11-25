@@ -2333,4 +2333,6 @@ def gastos_nutrientes():
         
         df_gastos = carga_datos_entrada_datos()
         
+        df_gastos = df_gastos.drop(columns=["id_gasto"])
+        
         st.dataframe(df_gastos)
