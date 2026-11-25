@@ -1330,14 +1330,9 @@ def procesado_nutrientes():
             datos_referencias = datos_AA[datos_AA['Sample ID'].str.contains(rmn_elegida_bajo)]
             ref_final         = datos_referencias['Peak Number'].iloc[1] - 2
                             
-            # Encuentra la salinidad de cada muestra          
-            #datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
-            #datos_AA['io_procesado']  = None
-            
+            # Encuentra la salinidad de cada muestra                     
             listado_salinidades       = [1]*datos_AA.shape[0]
             listado_io_procesado      = [None]*datos_AA.shape[0]
-            
-            st.dataframe(datos_AA)
             
             for idato in range(ref_inicial,ref_final):
                 
@@ -1345,15 +1340,11 @@ def procesado_nutrientes():
      
                     id_temp = df_datos_disponibles['muestreo'][df_datos_disponibles['id_externo']==datos_AA['Sample ID'].iloc[idato]]
                 
-                    #st.dataframe(df_datos_disponibles['muestreo'][df_datos_disponibles['id_externo']==datos_AA['Sample ID'].iloc[idato]])
-                
                     if len(id_temp) > 0:
                         
                         listado_salinidades[idato]            = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]].iloc[0]
                         listado_io_procesado[idato]           = 1
-                        
-                        #datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
-                        #datos_AA['io_procesado'].iloc[idato]  = 1
+
                     else:
                         if datos_AA['Sample ID'].iloc[idato].lower() != 'sw': 
                         
@@ -1363,7 +1354,6 @@ def procesado_nutrientes():
             datos_AA['salinidad'] = listado_salinidades
             datos_AA['io_procesado'] = listado_io_procesado
             
-            st.dataframe(datos_AA)
             
             # comprobación por si no hay ningún dato a procesar
             if datos_AA['io_procesado'].isnull().all():
