@@ -2282,19 +2282,10 @@ def gastos_nutrientes():
     
     st.title('Gastos realizados por el servicio de nutrientes del C.O de A Coruña')
     
-    # Añade nuevos datos obtenidos en laboratorio
+    # Añade gasto
     if tipo_accion == acciones[0]:
          
-        # Función para cargar en caché los datos a utilizar
-        @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
-        def carga_datos_entrada_datos():
-            conn             = init_connection()
-            df_gastos        = pandas.read_sql('SELECT * FROM gastos_nutrientes', conn)
-            conn.close()   
-            
-            return df_gastos
-        
-        df_gastos = carga_datos_entrada_datos()
+
 
 
         with st.form("Formulario", clear_on_submit=False):
@@ -2323,3 +2314,23 @@ def gastos_nutrientes():
                conn.commit()
                cursor.close()
                conn.close()       
+
+
+               texto_exito = 'Gasto añadido correctamente'
+               st.success(texto_exito)
+               
+               
+    if tipo_accion == acciones[1]:
+        
+        # Función para cargar en caché los datos a utilizar
+        @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
+        def carga_datos_entrada_datos():
+            conn             = init_connection()
+            df_gastos        = pandas.read_sql('SELECT * FROM gastos_nutrientes', conn)
+            conn.close()   
+            
+            return df_gastos
+        
+        df_gastos = carga_datos_entrada_datos()
+        
+        st.dataframe(df_gastos)
