@@ -2279,6 +2279,9 @@ def gastos_nutrientes():
     acciones     = ['Añadir gasto', 'Consultar gastos']
     tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
     
+    
+    st.title('Gastos realizados por el servicio de nutrientes del C.O de A Coruña')
+    
     # Añade nuevos datos obtenidos en laboratorio
     if tipo_accion == acciones[0]:
          
@@ -2292,7 +2295,6 @@ def gastos_nutrientes():
             return df_gastos
         
         df_gastos = carga_datos_entrada_datos()
-
 
 
         with st.form("Formulario", clear_on_submit=False):
@@ -2310,5 +2312,14 @@ def gastos_nutrientes():
                       
            io_envio                    = st.form_submit_button("Añadir gasto")   
            
-                       
-       
+           if io_envio:
+               
+               # Inserta en la base de datos
+               conn = psycopg2.connect(host = direccion_host,database=base_datos, user=usuario, password=contrasena, port=puerto)
+               cursor = conn.cursor()                      
+               instruccion_sql = '''INSERT INTO gastos_nutrientes (concepto,importe,fecha,proveedor)
+               VALUES (%s,%s,%s,%s);'''        
+               cursor.execute(instruccion_sql, (concepto_gasto,importe_gasto,fecha_gasto,proveedor))
+               conn.commit()
+               cursor.close()
+               conn.close()       
