@@ -1639,12 +1639,20 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
             indices_calibracion = numpy.asarray(datos_entrada['Peak Number'][datos_entrada['Cup Type']=='CALB']) - 1
                    
             # Corrige las concentraciones a partir de los rendimientos de la columna reductora
-            datos_entrada['nitrato_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
-            datos_entrada['nitrogeno_inorganico_total_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
+            listado_rendimientos_nitrato = [0]*datos_entrada.shape[0] 
+            listado_rendimientos_ton     = [0]*datos_entrada.shape[0] 
+            
+            #datos_entrada['nitrato_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
+            #datos_entrada['nitrogeno_inorganico_total_rendimiento'] = numpy.zeros(datos_entrada.shape[0])
             factor = ((datos_entrada['nitrogeno_inorganico_total'].iloc[indices_calibracion[-1]]*rendimiento_columna/100) + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])/(datos_entrada['nitrogeno_inorganico_total'].iloc[indices_calibracion[-1]] + datos_entrada['nitrito'].iloc[indices_calibracion[-1]])
             for idato in range(datos_entrada.shape[0]):
-                datos_entrada['nitrato_rendimiento'].iloc[idato] = (datos_entrada['nitrogeno_inorganico_total'].iloc[idato]*factor - datos_entrada['nitrito'].iloc[idato])/(rendimiento_columna/100) 
-                datos_entrada['nitrogeno_inorganico_total_rendimiento'].iloc[idato] = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['nitrito'].iloc[idato]
+                
+                listado_rendimientos_nitrato[idato] = (datos_entrada['nitrogeno_inorganico_total'].iloc[idato]*factor - datos_entrada['nitrito'].iloc[idato])/(rendimiento_columna/100) 
+                listado_rendimientos_ton[idato]     = datos_entrada['nitrato_rendimiento'].iloc[idato] + datos_entrada['nitrito'].iloc[idato]                
+                
+            
+            datos_entrada['nitrato_rendimiento'] = listado_rendimientos_nitrato 
+            datos_entrada['nitrogeno_inorganico_total_rendimiento'] = listado_rendimientos_ton
             
             
     # Asocia la temperatura de laboratorio a todas las muestras
@@ -1661,11 +1669,11 @@ def correccion_drift(datos_entrada,df_referencias_altas,df_referencias_bajas,var
         if datos_entrada['Sample ID'].iloc[idato] is not None and datos_entrada['Sample ID'].iloc[idato][0:7].lower() == 'rmn low' :
             posicion_RMN_bajos[icont_bajos] = idato
             icont_bajos                     = icont_bajos + 1 
-            datos_entrada['salinidad'].iloc[idato]  = df_referencias_bajas['salinidad'].iloc[0]
+            datos_entrada.at[idato,'salinidad']  = df_referencias_bajas['salinidad'].iloc[0]
         if datos_entrada['Sample ID'].iloc[idato] is not None and datos_entrada['Sample ID'].iloc[idato][0:8].lower() == 'rmn high':
             posicion_RMN_altos[icont_altos] = idato
             icont_altos                     = icont_altos + 1
-            datos_entrada['salinidad'].iloc[idato]  = df_referencias_altas['salinidad'].iloc[0]
+            datos_entrada.at[idato,'salinidad'] = df_referencias_altas['salinidad'].iloc[0]
             
 
     densidades = seawater.eos80.dens0(datos_entrada['salinidad'], datos_entrada['temp.lab'])
