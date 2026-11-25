@@ -1334,8 +1334,8 @@ def procesado_nutrientes():
             #datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
             #datos_AA['io_procesado']  = None
             
-            listado_salinidades       = [1]*len(datos_AA.shape[0])
-            listado_io_procesado      = [None]*len(datos_AA.shape[0])
+            listado_salinidades       = [1]*datos_AA.shape[0]
+            listado_io_procesado      = [None]*datos_AA.shape[0]
             
             st.dataframe(datos_AA)
             
