@@ -2255,3 +2255,59 @@ def consulta_estado():
     # Muestra el dataframe
     st.dataframe(df_muestra.style.apply(color_tabla, axis=1),use_container_width=True,column_config={"Importe (€)": st.column_config.NumberColumn(format="%.2f")})
             
+
+
+
+# ##################################################################
+# #### PÁGINA DE ENTRADA DE GASTOS DEL SERVICIO DE NUTRIENTES ######
+# ##################################################################  
+
+def gastos_nutrientes():
+         
+    # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
+    direccion_host   = st.secrets["postgres"].host
+    base_datos       = st.secrets["postgres"].dbname
+    usuario          = st.secrets["postgres"].user
+    contrasena       = st.secrets["postgres"].password
+    puerto           = st.secrets["postgres"].port
+    
+  
+
+
+    # Despliega un botón lateral para seleccionar el tipo de información a mostrar       
+    acciones     = ['Añadir gasto', 'Consultar gastos']
+    tipo_accion  = st.sidebar.radio("Indicar la acción a realizar",acciones)
+    
+    # Añade nuevos datos obtenidos en laboratorio
+    if tipo_accion == acciones[0]:
+         
+        # Función para cargar en caché los datos a utilizar
+        @st.cache_data(ttl=600,show_spinner="Cargando información de la base de datos")
+        def carga_datos_entrada_datos():
+            conn             = init_connection()
+            df_gastos        = pandas.read_sql('SELECT * FROM gastos_nutrientes', conn)
+            conn.close()   
+            
+            return df_gastos
+        
+        df_gastos = carga_datos_entrada_datos()
+
+
+
+        with st.form("Formulario", clear_on_submit=False):
+             
+           # Despliega un formulario para subir los archivos del AA y las referencias
+           col1, col2,col3,col4 = st.columns(4,gap="small")
+           with col1:
+               concepto_gasto = st.text_input('Concepto',"")
+           with col2:
+               importe_gasto  = st.number_input('Importe',value=float(0),min_value=float(0),max_value=float(10000000))
+           with col3:            
+               fecha_gasto             = st.date_input("Fecha", "today")
+           with col4:            
+               proveedor             = st.text_input('Proveedor',"")
+                      
+           io_envio                    = st.form_submit_button("Añadir gasto")   
+           
+                       
+       

@@ -54,7 +54,8 @@ if FUNCIONES_AUXILIARES.log_in() is True:
         if st.session_state["usuario"] == 'COAC - Supervisión Nutrientes':
      
             paginas = {"ENTRADA DE SOLICITUDES":PAGINAS.entrada_procesos,
-                     "CONSULTA ESTADO DE LAS SOLICITUDES": PAGINAS.consulta_estado 
+                     "CONSULTA ESTADO DE LAS SOLICITUDES": PAGINAS.consulta_estado,
+                     "GASTOS Y COMPRAS": PAGINAS.gastos_nutrientes 
                       }           
             
         # if st.session_state["usuario"] == 'Usuario externo':
