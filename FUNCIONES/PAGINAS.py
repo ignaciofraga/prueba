@@ -1331,11 +1331,11 @@ def procesado_nutrientes():
             ref_final         = datos_referencias['Peak Number'].iloc[1] - 2
                             
             # Encuentra la salinidad de cada muestra          
-            datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
-            datos_AA['io_procesado']  = None
+            #datos_AA['salinidad']     = numpy.ones(datos_AA.shape[0])
+            #datos_AA['io_procesado']  = None
             
-            # listado_salinidades       = [1]*len(datos_AA.shape[0])
-            # listado_io_procesado      = [None]*len(datos_AA.shape[0])
+            listado_salinidades       = [1]*len(datos_AA.shape[0])
+            listado_io_procesado      = [None]*len(datos_AA.shape[0])
             
             st.dataframe(datos_AA)
             
@@ -1345,17 +1345,26 @@ def procesado_nutrientes():
      
                     id_temp = df_datos_disponibles['muestreo'][df_datos_disponibles['id_externo']==datos_AA['Sample ID'].iloc[idato]]
                 
-                    st.dataframe(df_datos_disponibles['muestreo'][df_datos_disponibles['id_externo']==datos_AA['Sample ID'].iloc[idato]])
+                    #st.dataframe(df_datos_disponibles['muestreo'][df_datos_disponibles['id_externo']==datos_AA['Sample ID'].iloc[idato]])
                 
                     if len(id_temp) > 0:
-                        datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
-                        datos_AA['io_procesado'].iloc[idato]  = 1
+                        
+                        listado_salinidades[idato]            = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
+                        listado_io_procesado[idato]           = 1
+                        
+                        #datos_AA['salinidad'].iloc[idato]     = df_datos_disponibles['salinidad_ctd'][df_datos_disponibles['muestreo']==id_temp.iloc[0]]
+                        #datos_AA['io_procesado'].iloc[idato]  = 1
                     else:
                         if datos_AA['Sample ID'].iloc[idato].lower() != 'sw': 
                         
                             texto_error = 'La muestra ' + datos_AA['Sample ID'].iloc[idato] + ' no está inlcluida en la base de datos y no ha sido procesada'
                             st.warning(texto_error, icon="⚠️")                        
        
+            datos_AA['salinidad'] = listado_salinidades
+            datos_AA['io_procesado'] = listado_io_procesado
+            
+            st.dataframe(datos_AA)
+            
             # comprobación por si no hay ningún dato a procesar
             if datos_AA['io_procesado'].isnull().all():
                 texto_error = "Ninguna de las muestras analizadas se corresponde con muestreos incluidos en la base de datos"
