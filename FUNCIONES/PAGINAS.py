@@ -2262,6 +2262,7 @@ def consulta_estado():
 # #### PÁGINA DE ENTRADA DE GASTOS DEL SERVICIO DE NUTRIENTES ######
 # ##################################################################  
 
+
 def gastos_nutrientes():
          
     # Recupera los parámetros de la conexión a partir de los "secrets" de la aplicación
